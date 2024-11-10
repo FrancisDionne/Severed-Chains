@@ -80,6 +80,7 @@ import legend.game.combat.types.DragoonAdditionScriptData1c;
 import legend.game.combat.types.PerfectDragoonAdditionEffect30;
 import legend.game.combat.types.PerfectDragoonAdditionEffectGlyph06;
 import legend.game.combat.types.VertexDifferenceAnimation18;
+import legend.game.debugger.CombatDebugger;
 import legend.game.input.Input;
 import legend.game.input.InputAction;
 import legend.game.modding.coremod.CoreMod;
@@ -104,6 +105,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
@@ -861,6 +863,9 @@ public final class SEffe {
     final ScriptState<EffectManagerData6c<EffectManagerParams.ParticleType>> state = ((Battle)currentEngineState_8004dd04).particles.allocateParticle(script.scriptState_04, behaviourType, particleCount, particleTypeId, _10, _14, _18, innerStuff, parentBobj);
 
     script.params_20[0].set(state.index);
+
+    CombatDebugger.effecting = true;
+
     return FlowControl.CONTINUE;
   }
 
@@ -3875,6 +3880,14 @@ public final class SEffe {
   @Method(0x80115288L)
   public static int tickLifespanAttachment(final EffectManagerData6c<?> manager, final GenericAttachment1c attachment) {
     attachment.ticksRemaining_1a--;
+    if (CombatDebugger.effecting && attachment.ticksRemaining_1a <= 0) {
+      try {
+        CombatDebugger.WriteLog();
+      }
+      catch(IOException e) {
+
+      }
+    }
     return attachment.ticksRemaining_1a > 0 ? 1 : 2;
   }
 

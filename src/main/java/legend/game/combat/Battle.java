@@ -88,6 +88,8 @@ import legend.game.combat.types.StageDeffThing08;
 import legend.game.combat.ui.BattleHud;
 import legend.game.combat.ui.BattleMenuStruct58;
 import legend.game.combat.ui.UiBox;
+import legend.game.debugger.CombatDebugger;
+import legend.game.debugger.CombatDebuggerController;
 import legend.game.fmv.Fmv;
 import legend.game.i18n.I18n;
 import legend.game.inventory.Equipment;

@@ -4,6 +4,7 @@ import legend.core.gte.MV;
 import legend.game.combat.effects.EffectManagerData6c;
 import legend.game.combat.effects.EffectManagerParams;
 import legend.game.combat.types.BattleObject;
+import legend.game.debugger.CombatDebugger;
 import legend.game.scripting.ScriptState;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -59,6 +60,7 @@ public class PixelParticle extends ParticleEffectData98 {
           this.mv.transfer.set(ref.x + GPU.getOffsetX(), ref.y + GPU.getOffsetY(), z + manager.params_10.z_22);
           RENDERER.queueOrthoModel(RENDERER.opaqueQuad, this.mv)
             .colour(colour);
+          CombatDebugger.AddLog("PixelParticle", this.countFramesRendered_52, ref.x + GPU.getOffsetX(), ref.y + GPU.getOffsetY(), z + manager.params_10.z_22, z + manager.params_10.z_22, 0);
         }
       }
     }

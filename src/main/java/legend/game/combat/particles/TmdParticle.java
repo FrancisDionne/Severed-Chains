@@ -13,6 +13,7 @@ import legend.game.combat.deff.DeffPart;
 import legend.game.combat.effects.EffectManagerData6c;
 import legend.game.combat.effects.EffectManagerParams;
 import legend.game.combat.types.BattleObject;
+import legend.game.debugger.CombatDebugger;
 import legend.game.scripting.ScriptState;
 import legend.game.tmd.Renderer;
 import legend.game.types.CContainer;
@@ -21,6 +22,7 @@ import org.joml.Vector3f;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 
+import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.GTE;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Scus94491BpeSegment.tmdGp0Tpage_1f8003ec;
@@ -152,6 +154,7 @@ public class TmdParticle extends ParticleEffectData98 {
         .ctmdFlags((dobj.attribute_00 & 0x4000_0000) != 0 ? 0x12 : 0x0)
         .tmdTranslucency(tmdGp0Tpage_1f8003ec >>> 5 & 0b11)
         .battleColour(((Battle)currentEngineState_8004dd04)._800c6930.colour_00);
+      CombatDebugger.AddLog("TmdParticle", this.countFramesRendered_52, GPU.getOffsetX(), GPU.getOffsetY(), zMin, zMax_1f8003cc, zShift_1f8003c4);
 
       if((particleMetrics.flags_00 & 0x40) == 0) {
         FUN_800e62a8();

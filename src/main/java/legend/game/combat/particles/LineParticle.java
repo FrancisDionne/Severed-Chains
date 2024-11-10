@@ -7,6 +7,7 @@ import legend.core.opengl.PolyBuilder;
 import legend.game.combat.effects.EffectManagerData6c;
 import legend.game.combat.effects.EffectManagerParams;
 import legend.game.combat.types.BattleObject;
+import legend.game.debugger.CombatDebugger;
 import legend.game.scripting.ScriptState;
 import legend.game.types.Translucency;
 import org.joml.Matrix4f;
@@ -149,6 +150,7 @@ public class LineParticle extends ParticleEffectData98 {
 
       RENDERER.queueLine(obj, this.identity, particleMetrics.z_04 + manager.params_10.z_22, particleMetrics.p0, particleMetrics.p1)
         .screenspaceOffset(GPU.getOffsetX(), GPU.getOffsetY());
+      CombatDebugger.AddLog("LineParticle", this.countFramesRendered_52, GPU.getOffsetX(), GPU.getOffsetY(), particleMetrics.z_04 + manager.params_10.z_22, particleMetrics.z_04 + manager.params_10.z_22, 0);
 
       obj.delete(); // Mark for deletion after this frame
     }

@@ -10,6 +10,7 @@ import legend.game.combat.effects.EffectManagerData6c;
 import legend.game.combat.effects.EffectManagerParams;
 import legend.game.combat.effects.SpriteMetrics08;
 import legend.game.combat.types.BattleObject;
+import legend.game.debugger.CombatDebugger;
 import legend.game.scripting.ScriptState;
 import legend.game.types.Translucency;
 import org.joml.Math;
@@ -160,6 +161,7 @@ public class QuadParticle extends ParticleEffectData98 {
           RENDERER.queueOrthoModel(this.obj, this.transforms)
             .screenspaceOffset(GPU.getOffsetX(), GPU.getOffsetY())
             .colour(colour);
+          CombatDebugger.AddLog("QuadParticle1", this.countFramesRendered_52, GPU.getOffsetX(), GPU.getOffsetY(), this.transforms.transfer.z, this.transforms.transfer.z, 0);
         }
 
         //LAB_800fe564
@@ -187,6 +189,7 @@ public class QuadParticle extends ParticleEffectData98 {
               RENDERER.queueOrthoModel(this.obj, particleSub.transforms)
                 .screenspaceOffset(GPU.getOffsetX(), GPU.getOffsetY())
                 .colour(colour);
+              CombatDebugger.AddLog("QuadParticle2", this.countFramesRendered_52, GPU.getOffsetX(), GPU.getOffsetY(), particleSub.transforms.transfer.z, particleSub.transforms.transfer.z, 0);
             }
 
             colour.sub(colourStep);
