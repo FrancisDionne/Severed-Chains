@@ -9,6 +9,6 @@ public enum EquipmentSlot {
   ;
 
   public static EquipmentSlot fromLegacy(final int slot) {
-    return EquipmentSlot.values()[slot];
+    return slot > -1 ? EquipmentSlot.values()[slot] : null;
   }
 }

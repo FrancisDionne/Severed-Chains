@@ -11,6 +11,7 @@ import org.legendofdragoon.modloader.registries.RegistryEntry;
 
 public class Equipment extends RegistryEntry implements InventoryEntry, ScriptReadable {
   public final int price;
+  public int quantity;
 
   /**
    * <ul>
@@ -121,6 +122,7 @@ public class Equipment extends RegistryEntry implements InventoryEntry, ScriptRe
 
   public Equipment(final int price, final int flags, final int type, final int _02, final int equipableFlags, final Element element, final int _05, final ElementSet elementalResistance, final ElementSet elementalImmunity, final int statusResist, final int _09, final int atk, final int mpPerPhysicalHit, final int spPerPhysicalHit, final int mpPerMagicalHit, final int spPerMagicalHit, final int hpMultiplier, final int mpMultiplier, final int spMultiplier, final boolean magicalResistance, final boolean physicalResistance, final boolean magicalImmunity, final boolean physicalImmunity, final int revive, final int hpRegen, final int mpRegen, final int spRegen, final int escapeBonus, final int icon, final int spd, final int atkHi, final int matk, final int def, final int mdef, final int aHit, final int mHit, final int aAv, final int mAv, final int onStatusChance, final int _19, final int _1a, final int onHitStatus) {
     this.price = price;
+    this.quantity = 1;
 
     EquipmentSlot slot = null;
     for(int i = 0; i < EquipmentSlot.values().length; i++) {
@@ -197,6 +199,12 @@ public class Equipment extends RegistryEntry implements InventoryEntry, ScriptRe
   public int getPrice() {
     return this.price;
   }
+
+  @Override
+  public int getQuantity() { return this.quantity; }
+
+  @Override
+  public void setQuantity(final int quantity) { this.quantity = quantity; }
 
   public void applyEffect(final BattleEntity27c wearer) {
 

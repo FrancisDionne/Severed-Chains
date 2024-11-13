@@ -3,6 +3,8 @@ package legend.game.inventory.screens;
 import legend.core.GameEngine;
 import legend.game.SItem;
 import legend.game.input.InputAction;
+import legend.game.inventory.Equipment;
+import legend.game.inventory.Item;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.BigList;
@@ -18,6 +20,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static legend.core.GameEngine.CONFIG;
@@ -104,6 +109,8 @@ public class CampaignSelectionScreen extends MenuScreen {
       submapCut_80052c30 = gameState_800babc8.submapCut_a8;
       collidedPrimitiveIndex_80052c38 = gameState_800babc8.submapCut_a8;
 
+      this.retrofit();
+
       if(gameState_800babc8.submapCut_a8 == 264) { // Somewhere in Home of Giganto
         submapScene_80052c34 = 53;
       }
@@ -172,5 +179,31 @@ public class CampaignSelectionScreen extends MenuScreen {
     }
 
     return InputPropagation.PROPAGATE;
+  }
+
+  private void retrofit() {
+    final List<Item> items = new ArrayList<>();
+    for (final Item item : gameState_800babc8.items_2e9) {
+      final Item itm = items.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), item.getRegistryId().entryId())).findFirst().orElse(null);
+      if (itm != null) {
+        itm.setQuantity(itm.getQuantity() + 1);
+      } else {
+        items.add(item);
+      }
+    }
+    gameState_800babc8.items_2e9.clear();
+    gameState_800babc8.items_2e9.addAll(items);
+
+    final List<Equipment> equips = new ArrayList<>();
+    for (final Equipment equip : gameState_800babc8.equipment_1e8) {
+      final Equipment itm = equips.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), equip.getRegistryId().entryId())).findFirst().orElse(null);
+      if (itm != null) {
+        itm.setQuantity(itm.getQuantity() + 1);
+      } else {
+        equips.add(equip);
+      }
+    }
+    gameState_800babc8.equipment_1e8.clear();
+    gameState_800babc8.equipment_1e8.addAll(equips);
   }
 }

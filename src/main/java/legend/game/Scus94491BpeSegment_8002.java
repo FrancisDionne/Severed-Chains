@@ -14,7 +14,6 @@ import legend.core.gte.Transforms;
 import legend.core.memory.Method;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
-import legend.core.opengl.fonts.FontManager;
 import legend.game.combat.types.EnemyDrop;
 import legend.game.i18n.I18n;
 import legend.game.input.Input;
@@ -77,6 +76,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -1008,12 +1008,15 @@ public final class Scus94491BpeSegment_8002 {
       return false;
     }
 
-    final Item item = gameState_800babc8.items_2e9.get(itemSlot);
+    final Item itm = gameState_800babc8.items_2e9.get(itemSlot);
+    final TakeItemEvent takeItemEvent = EVENTS.postEvent(new TakeItemEvent(itm, true));
 
-    final TakeItemEvent takeItemEvent = EVENTS.postEvent(new TakeItemEvent(item, true));
-
-    if(takeItemEvent.takeItem) {
-      gameState_800babc8.items_2e9.remove(itemSlot);
+    if (takeItemEvent.takeItem) {
+      if (itm.getQuantity() > 1) {
+        itm.setQuantity(itm.getQuantity() - 1);
+      } else {
+        gameState_800babc8.items_2e9.remove(itemSlot);
+      }
     }
 
     return true;
@@ -1036,7 +1039,13 @@ public final class Scus94491BpeSegment_8002 {
       return false;
     }
 
-    gameState_800babc8.equipment_1e8.remove(equipmentIndex);
+    final Equipment itm = gameState_800babc8.equipment_1e8.get(equipmentIndex);
+    if (itm.getQuantity() > 1) {
+      itm.setQuantity(itm.getQuantity() - 1);
+    } else {
+      gameState_800babc8.equipment_1e8.remove(equipmentIndex);
+    }
+
     return true;
   }
 
@@ -1046,7 +1055,13 @@ public final class Scus94491BpeSegment_8002 {
       return false;
     }
 
-    gameState_800babc8.items_2e9.add(item);
+    final Item itm = gameState_800babc8.items_2e9.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), item.getRegistryId().entryId())).findFirst().orElse(null);
+    if (itm != null) {
+      itm.setQuantity(itm.getQuantity() + 1);
+    } else {
+      gameState_800babc8.items_2e9.add(item);
+    }
+
     return true;
   }
 
@@ -1056,7 +1071,13 @@ public final class Scus94491BpeSegment_8002 {
       return false;
     }
 
-    gameState_800babc8.equipment_1e8.add(equipment);
+    final Equipment itm = gameState_800babc8.equipment_1e8.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), equipment.getRegistryId().entryId())).findFirst().orElse(null);
+    if (itm != null) {
+      itm.setQuantity(itm.getQuantity() + 1);
+    } else {
+      gameState_800babc8.equipment_1e8.add(equipment);
+    }
+
     return true;
   }
 

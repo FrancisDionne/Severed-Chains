@@ -384,7 +384,7 @@ public class ShopScreen extends MenuScreen {
       for(i = 0; firstItem + i < gameState_800babc8.items_2e9.size() && i < 6; i++) {
         final Item item = gameState_800babc8.items_2e9.get(firstItem + i);
         renderItemIcon(item.getIcon(), 151, this.menuEntryY(i), 0x8);
-        renderText(I18n.translate(item), 168, this.menuEntryY(i) + 2, TextColour.BROWN);
+        renderText(I18n.translate(item) + (item.getQuantity() > 1 ? " (" + item.getQuantity() + ')' : ""), 168, this.menuEntryY(i) + 2, TextColour.BROWN);
 
         final ShopSellPriceEvent event = EVENTS.postEvent(new ShopSellPriceEvent(shopId_8007a3b4, item, item.getPrice()));
         this.FUN_801069d0(324, this.menuEntryY(i) + 4, event.price);
@@ -396,7 +396,7 @@ public class ShopScreen extends MenuScreen {
       for(i = 0; firstItem + i < gameState_800babc8.equipment_1e8.size() && i < 6; i++) {
         final Equipment equipment = gameState_800babc8.equipment_1e8.get(firstItem + i);
         renderItemIcon(equipment.icon_0e, 151, this.menuEntryY(i), 0x8);
-        renderText(I18n.translate(equipment), 168, this.menuEntryY(i) + 2, equipment.canBeDiscarded() ? TextColour.BROWN : TextColour.MIDDLE_BROWN);
+        renderText(I18n.translate(equipment) + (equipment.getQuantity() > 1 ? " (" + equipment.getQuantity() + ')' : ""), 168, this.menuEntryY(i) + 2, equipment.canBeDiscarded() ? TextColour.BROWN : TextColour.MIDDLE_BROWN);
 
         if(equipment.canBeDiscarded()) {
           final ShopSellPriceEvent event = EVENTS.postEvent(new ShopSellPriceEvent(shopId_8007a3b4, equipment, equipment.getPrice()));
@@ -416,7 +416,8 @@ public class ShopScreen extends MenuScreen {
     int i;
     for(i = 0; i < Math.min(6, list.size() - startItemIndex); i++) {
       final ShopEntry<? extends InventoryEntry> item = list.get(startItemIndex + i);
-      renderText(I18n.translate(item.item.getNameTranslationKey()), 168, this.menuEntryY(i) + 2, TextColour.BROWN);
+      final String text = I18n.translate(item.item.getNameTranslationKey());
+      renderText(text, 168, this.menuEntryY(i) + 2, TextColour.BROWN);
       renderFiveDigitNumber(324, this.menuEntryY(i) + 4, item.price);
       renderItemIcon(item.item.getIcon(), 151, this.menuEntryY(i), 0x8);
     }

@@ -3,6 +3,7 @@ package legend.game.inventory.screens;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.Equipment;
+import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Glyph;
@@ -143,10 +144,23 @@ public class ItemListScreen extends MenuScreen {
 
   private <T> void discard(final MessageBoxResult result, final ItemList<T> list, final List<T> inv) {
     if(result == MessageBoxResult.YES) {
-      list.remove(list.getSelectedItem());
-      final List<MenuEntryStruct04<T>> items = list.getItems();
-      setInventoryFromDisplay(items, inv, items.size());
-      this.updateDescription(list.getSelectedItem());
+
+      boolean remove = true;
+      if (list.getSelectedItem().item_00 instanceof final InventoryEntry entry) {
+        if (entry.getQuantity() > 1) {
+          entry.setQuantity(entry.getQuantity() - 1);
+          remove = entry.getQuantity() < 1;
+        }
+      }
+
+      if (remove) {
+        list.remove(list.getSelectedItem());
+        final List<MenuEntryStruct04<T>> items = list.getItems();
+        setInventoryFromDisplay(items, inv, items.size());
+        this.updateDescription(list.getSelectedItem());
+      } else {
+        list.refreshList();
+      }
     }
   }
 

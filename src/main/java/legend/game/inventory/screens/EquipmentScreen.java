@@ -6,9 +6,16 @@ import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.EquipItemResult;
 import legend.game.inventory.Equipment;
+import legend.game.types.EquipmentSlot;
 import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.Renderable58;
+import org.legendofdragoon.modloader.registries.RegistryId;
+
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static legend.game.SItem.FUN_801034cc;
 import static legend.game.SItem.FUN_80104b60;
@@ -45,6 +52,7 @@ public class EquipmentScreen extends MenuScreen {
   private int selectedSlot;
   private int charSlot;
   private int equipmentCount;
+  private int filter;
   private Renderable58 itemHighlight;
   private Renderable58 _800bdb9c;
   private Renderable58 _800bdba0;
@@ -53,6 +61,7 @@ public class EquipmentScreen extends MenuScreen {
 
   public EquipmentScreen(final Runnable unload) {
     this.unload = unload;
+    this.filter = -1;
   }
 
   @Override
@@ -128,9 +137,10 @@ public class EquipmentScreen extends MenuScreen {
     for(int equipmentSlot = 0; equipmentSlot < gameState_800babc8.equipment_1e8.size(); equipmentSlot++) {
       final Equipment equipment = gameState_800babc8.equipment_1e8.get(equipmentSlot);
       if(canEquip(equipment, charIndex)) {
-        if(equipment != gameState_800babc8.charData_32c[charIndex].equipment_14.get(equipment.slot)) {
-          final MenuEntryStruct04<Equipment> menuEntry = MenuEntryStruct04.make(equipment);
-          menuEntry.itemSlot_01 = equipmentSlot;
+        final MenuEntryStruct04<Equipment> menuEntry = MenuEntryStruct04.make(equipment);
+        menuEntry.itemSlot_01 = equipmentSlot;
+
+        if(this.filter == -1 || EquipmentSlot.fromLegacy(this.filter) == menuEntry.item_00.slot) {
           this.menuItems.add(menuEntry);
         }
       }
@@ -361,6 +371,16 @@ public class EquipmentScreen extends MenuScreen {
     this.loadingStage = 2;
   }
 
+  private void filterItems() {
+    this.filter = this.filter + 1 < EquipmentSlot.values().length ?  this.filter + 1 : -1;
+    this.slotScroll = 0;
+    this.selectedSlot = 0;
+    this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
+    this.equipmentCount = this.getEquippableItemsForCharacter(characterIndices_800bdbb8[this.charSlot]);
+    this.slotScroll = MathHelper.clamp(this.slotScroll, 0, Math.max(0, this.equipmentCount - 4));
+    this.renderEquipmentScreen(this.charSlot, this.selectedSlot, this.slotScroll, 0);
+  }
+
   @Override
   public InputPropagation pressedThisFrame(final InputAction inputAction) {
     if(super.pressedThisFrame(inputAction) == InputPropagation.HANDLED) {
@@ -384,6 +404,11 @@ public class EquipmentScreen extends MenuScreen {
 
       case BUTTON_NORTH -> {
         this.menuItemSort();
+        return InputPropagation.HANDLED;
+      }
+
+      case BUTTON_WEST -> {
+        this.filterItems();
         return InputPropagation.HANDLED;
       }
 

@@ -2,6 +2,8 @@ package legend.game.inventory.screens.controls;
 
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
+import legend.game.inventory.Equipment;
+import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.screens.Control;
 import legend.game.inventory.screens.InputPropagation;
 import legend.game.types.MenuEntryStruct04;
@@ -28,7 +30,16 @@ public class ItemList<T> extends Control {
 
   public ItemList() {
     this(
-      entry -> I18n.translate(entry.getNameTranslationKey()),
+      entry ->  {
+        String text = I18n.translate(entry.getNameTranslationKey());
+        if (entry.item_00 instanceof InventoryEntry) {
+          final int quantity = ((InventoryEntry)entry.item_00).getQuantity();
+          if (quantity > 1) {
+            text += " (" + quantity + ')';
+          }
+        }
+        return text;
+      },
       MenuEntryStruct04::getIcon,
       menuItem -> (menuItem.flags_02 & 0x1000) != 0 ? menuItem.flags_02 & 0xf : -1,
       menuItem -> (menuItem.flags_02 & 0x1000) != 0
@@ -129,6 +140,10 @@ public class ItemList<T> extends Control {
 
   public void onSelection(final ListBox.Selection<MenuEntryStruct04<T>> handler) {
     this.items.onSelection(handler);
+  }
+
+  public void refreshList() {
+    this.items.updateEntries();
   }
 
   private void updateMaxLabel() {

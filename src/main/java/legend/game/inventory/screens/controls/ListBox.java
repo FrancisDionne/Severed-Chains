@@ -168,7 +168,7 @@ public class ListBox<T> extends Control {
     return this.slot;
   }
 
-  private void updateEntries() {
+  public void updateEntries() {
     for(int i = 0; i < this.entries.size(); i++) {
       final Entry entry = this.entries.get(i);
 

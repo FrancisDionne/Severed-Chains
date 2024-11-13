@@ -12,6 +12,7 @@ import legend.game.input.InputAction;
 import legend.game.inventory.Addition04;
 import legend.game.inventory.EquipItemResult;
 import legend.game.inventory.Equipment;
+import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
 import legend.game.inventory.screens.MenuStack;
 import legend.game.inventory.screens.TextColour;
@@ -1685,9 +1686,15 @@ public final class SItem {
     int i;
     for(i = 0; i < itemCount && s3 < menuItems.size(); i++) {
       final MenuEntryStruct04<?> menuItem = menuItems.get(s3);
+      String text = I18n.translate(menuItem.getNameTranslationKey());
+
+      if (menuItem.item_00 instanceof InventoryEntry) {
+        final int quantity = ((InventoryEntry)(menuItem.item_00)).getQuantity();
+        text = text + (quantity > 1 ? " (" + quantity + ')' : "");
+      }
 
       //LAB_801094ac
-      renderText(I18n.translate(menuItem.getNameTranslationKey()), x + 21, y + FUN_800fc814(i) + 2, (menuItem.flags_02 & 0x6000) == 0 ? TextColour.BROWN : TextColour.MIDDLE_BROWN);
+      renderText(text, x + 21, y + FUN_800fc814(i) + 2, (menuItem.flags_02 & 0x6000) == 0 ? TextColour.BROWN : TextColour.MIDDLE_BROWN);
       renderItemIcon(menuItem.getIcon(), x + 4, y + FUN_800fc814(i), 0x8);
 
       final int s0 = menuItem.flags_02;
