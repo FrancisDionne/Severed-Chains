@@ -83,7 +83,7 @@ public class CombatDebuggerController {
   @FXML
   public Button punchingBagMode;
 
-  public static boolean autoPunchingBagMode;
+  public static boolean autoPunchingBagMode = true;
 
   public void initialize() {
     for(int i = 0; i < 10; i++) {

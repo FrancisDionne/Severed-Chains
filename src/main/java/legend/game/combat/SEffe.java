@@ -156,6 +156,8 @@ public final class SEffe {
 
   private static final Logger LOGGER = LogManager.getFormatterLogger(SEffe.class);
   private static final Marker EFFECTS = MarkerManager.getMarker("EFFECTS");
+  public static final float ONE_DEGREE = 11.38f; // 11.38f = 1 Degree
+  public static final float ONE_ROTATION = 4125f;
 
   private static final GsF_LIGHT defaultLight_800c6ddc = new GsF_LIGHT(1.0f, 1.0f, 1.0f);
 
@@ -177,7 +179,8 @@ public final class SEffe {
   private static byte daddyMeterSpinning_80119f42;
 
   /** Array of daddy spinner step counts */
-  private static final int[] daddyHudSpinnerStepCounts_80119f44 = {14, 12, 10, 8, 1, 1, 0};
+  //private static final int[] daddyHudSpinnerStepCounts_80119f44 = {14, 12, 10, 8, 1, 1, 0};
+  private static final int[] daddyHudSpinnerStepCounts_80119f44 = {100, 100, 100, 100, 1, 1, 0};
   /** Array of daddy spinner successful press frame windows */
   private static final int[] daddyHitSuccessWindows_80119f60 = {4, 3, 2, 1, 0, 0, 0};
   /** Array of daddy spinner step counts for special boi Kongol */
@@ -1274,12 +1277,12 @@ public final class SEffe {
 
     final int buttonHudMetricsIndex;
     // Button arrow placement
-    if(getCurrentDragoonAdditionPressNumber(daddy, 0) != 0) {
+    if(getAngleIsWithinSuccessWindow(daddy, 0, false)) {
       renderButtonPressHudElement1(36, x1, y0 + 64, Translucency.B_PLUS_F, 128);
       buttonHudMetricsIndex = 33;
     } else {
       //LAB_80107a80
-      if(getCurrentDragoonAdditionPressNumber(daddy, 2) != 0) {
+      if(getAngleIsWithinSuccessWindow(daddy, 2, false)) {
         renderButtonPressHudElement1(36, x1, y0 + 60, Translucency.B_PLUS_F, 128);
         buttonHudMetricsIndex = 33;
       } else {
@@ -1427,9 +1430,35 @@ public final class SEffe {
     return stepCountsArray;
   }
 
+  private static boolean getAngleIsWithinSuccessWindow(final DragoonAdditionScriptData1c daddy, float threshold, final boolean isTick) {
+    threshold = threshold * 18f * SEffe.ONE_DEGREE;
+    final float lowerBound = daddy.successWindowLowerBound - threshold;
+    final float upperBound = daddy.successWindowUpperBound + threshold;
+
+    if (isTick && ((daddy.baseAngle_02 >= lowerBound && daddy.baseAngle_02 <= upperBound) || (daddy.lastTickAngle < upperBound && daddy.baseAngle_02 > upperBound)))
+    {
+      //renderDragoonAdditionHud_(daddy, 0, daddy.baseAngle_02 - 0x400);
+      final float n = upperBound - lowerBound;
+      System.out.println(n);
+    }
+
+    if (isTick && daddy.pressedThisCycle) {
+        return false;
+    }
+
+
+    if (daddy.baseAngle_02 >= lowerBound && daddy.baseAngle_02 <= upperBound)
+      return true;
+
+    if (daddy.lastTickAngle < upperBound && daddy.baseAngle_02 > upperBound)
+      return true;
+
+    return false;
+  }
+
   @Method(0x80108514L)
   public static void renderDragoonAdditionHud(final ScriptState<DragoonAdditionScriptData1c> state, final DragoonAdditionScriptData1c daddy) {
-    renderDragoonAdditionHud_(daddy, 0, daddy.baseAngle_02 - 0x400);
+    renderDragoonAdditionHud_(daddy, 0, daddy.baseAngle_02);
   }
 
   @Method(0x80108574L)
@@ -1462,27 +1491,39 @@ public final class SEffe {
         } else {
           //LAB_8010864c
           daddy.currentTick_04++;
-          daddy.baseAngle_02 += 0x1000 / daddyHudSpinnerStepCountsPointer_8011a028[daddy.stepCountIndex_06];
+          daddy.lastTickAngle = daddy.baseAngle_02;
+          daddy.baseAngle_02 += (int)ONE_ROTATION / daddyHudSpinnerStepCountsPointer_8011a028[daddy.stepCountIndex_06];
 
-          if(daddy.stepCountIndex_06 + 1 << 12 < daddy.baseAngle_02) {
-            daddy.stepCountIndex_06++;
-          }
+          renderDragoonAdditionHud_(daddy, 0, daddy.baseAngle_02);
 
           //LAB_801086a8
           if(daddy.countEyeFlashTicks_0d != 0) {
             daddy.countEyeFlashTicks_0d--;
           }
 
+          if(daddy.baseAngle_02 > daddy.nextAngle && daddy.currentPressNumber_07 < daddy.totalPressCount_14) {
+            daddy.stepCountIndex_06++;
+            daddy.nextAngle = (ONE_ROTATION - (11f * daddy.stepCountIndex_06)) * (daddy.stepCountIndex_06 + 1);
+          }
+
+          if(daddy.baseAngle_02 > daddy.successWindowUpperBound && daddy.currentPressNumber_07 < daddy.totalPressCount_14) {
+            daddy.setSuccessWindowBounds(daddyHitSuccessWindowsPointer_8011a02c);
+            daddy.pressedThisCycle = false;
+          }
+
+          final boolean angleIsWithinSuccessWindow = getAngleIsWithinSuccessWindow(daddy, 0, true);
+
           //LAB_801086bc
           //LAB_801086e0
-          if(getCurrentDragoonAdditionPressNumber(daddy, 0) != 0 && daddy.inputMode_13 == 1 || Input.pressedThisFrame(InputAction.BUTTON_SOUTH) && daddy.inputMode_13 == 0) {
+          if((angleIsWithinSuccessWindow && daddy.inputMode_13 == 1) || (Input.pressedThisFrame(InputAction.BUTTON_SOUTH) && daddy.inputMode_13 == 0)) {
+            daddy.pressedThisCycle = true;
+
             //LAB_8010870c
             daddy.buttonPressGlowBrightnessFactor_11 = 4;
             daddy.countEyeFlashTicks_0d = 0;
 
-            final int currentPressNumber = getCurrentDragoonAdditionPressNumber(daddy, 0);
-            if(currentPressNumber != 0) {
-              daddy.currentPressNumber_07 = currentPressNumber;
+            if(angleIsWithinSuccessWindow) {
+              daddy.currentPressNumber_07++;
               daddy.countEyeFlashTicks_0d = 4;
               daddyHitsCompleted_80119f40 = 0;
             } else {
@@ -1558,8 +1599,9 @@ public final class SEffe {
     daddy.ticksRemainingToBeginAddition_12 = script.params_20[2].get();
     daddy.inputMode_13 = CONFIG.getConfig(CoreMod.DRAGOON_ADDITION_MODE_CONFIG.get()) == DragoonAdditionMode.AUTOMATIC ? 1 : flag & 0xff;
     daddy.charId_18 = charId;
+    daddy.nextAngle = ONE_ROTATION;
 
-    //LAB_80108910
+      //LAB_80108910
     daddyHudOffsetX_8011a01c = script.params_20[3].get();
     daddyHudOffsetY_8011a020 = script.params_20[4].get();
 
@@ -1576,6 +1618,8 @@ public final class SEffe {
     }
 
     daddyHudSpinnerStepCountsPointer_8011a028 = getDragoonAdditionStepCountsArrayFromDifficulty();
+
+    daddy.setSuccessWindowBounds(daddyHitSuccessWindowsPointer_8011a02c);
 
     //LAB_80108984
     daddyHitsCompleted_80119f40 = 0;

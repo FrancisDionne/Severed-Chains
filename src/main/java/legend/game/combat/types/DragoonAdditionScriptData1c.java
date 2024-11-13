@@ -1,5 +1,7 @@
 package legend.game.combat.types;
 
+import legend.game.combat.SEffe;
+
 public class DragoonAdditionScriptData1c {
   public int unused_00;
   public int baseAngle_02;
@@ -18,4 +20,17 @@ public class DragoonAdditionScriptData1c {
   public int inputMode_13;
   public int totalPressCount_14;
   public int charId_18;
+
+  //Handles for Adjusted Dragoon Additions
+  public float successWindowLowerBound;
+  public float successWindowUpperBound;
+  public float nextAngle;
+  public float lastTickAngle;
+  public boolean pressedThisCycle;
+
+  public void setSuccessWindowBounds(final int[] successWindowArray) {
+    final float threshold = 0f * 18f * SEffe.ONE_DEGREE;
+    this.successWindowLowerBound = this.nextAngle - (SEffe.ONE_DEGREE * 18f);// - ((successWindowArray[this.stepCountIndex_06] - 1) * 2f * SEffe.ONE_DEGREE) - threshold;
+    this.successWindowUpperBound = this.nextAngle + (SEffe.ONE_DEGREE * 18f);// + ((successWindowArray[this.stepCountIndex_06] - 1) * 2f * SEffe.ONE_DEGREE) + threshold;
+  }
 }
