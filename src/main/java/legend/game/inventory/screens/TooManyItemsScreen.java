@@ -130,8 +130,8 @@ public class TooManyItemsScreen extends MenuScreen {
               this.invScroll--;
               this.renderable_8011e204.y_44 = this.FUN_8010f178(this.invIndex);
             } else if(this.invScroll == 0) {
-              this.invScroll = slotCount - 7;
-              this.invIndex = 6;
+              this.invScroll = Math.max(0, slotCount - 7);
+              this.invIndex = this.invScroll > 0 ? 6 : 0;
               this.renderable_8011e204.y_44 = this.FUN_8010f178(this.invIndex);
             }
           }
@@ -262,7 +262,7 @@ public class TooManyItemsScreen extends MenuScreen {
         }
       }
     } else if(this.menuState == MenuState._9) {
-      for(int i = 0; i < 7; i++) {
+      for(int i = 0; i < this.items.size(); i++) {
         if(this.invIndex != i && MathHelper.inBox(x, y, 188, this.FUN_8010f178(i), 171, 17)) {
           playMenuSound(1);
           this.invIndex = i;
@@ -449,7 +449,7 @@ public class TooManyItemsScreen extends MenuScreen {
     final MenuEntryStruct04<InventoryEntry> newItem = this.droppedItems.get(this.dropIndex);
     final boolean isItem = this.droppedItems.get(this.dropIndex).item_00 instanceof Item;
 
-    if (this.invIndex + this.invScroll > this.items.size() - 1) {
+    if(this.invIndex + this.invScroll > this.items.size() - 1) {
       return;
     }
 
