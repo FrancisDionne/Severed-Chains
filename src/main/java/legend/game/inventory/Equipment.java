@@ -201,10 +201,14 @@ public class Equipment extends RegistryEntry implements InventoryEntry, ScriptRe
   }
 
   @Override
-  public int getQuantity() { return this.quantity; }
+  public int getQuantity() {
+    return this.quantity;
+  }
 
   @Override
-  public void setQuantity(final int quantity) { this.quantity = quantity; }
+  public void setQuantity(final int quantity) {
+    this.quantity = quantity;
+  }
 
   public void applyEffect(final BattleEntity27c wearer) {
 
@@ -219,10 +223,8 @@ public class Equipment extends RegistryEntry implements InventoryEntry, ScriptRe
   }
 
   @Override
-  public Object clone()
-  {
-    try
-    {
+  public Object clone() {
+    try {
       return super.clone();
     } catch(final CloneNotSupportedException e) {
       throw new RuntimeException(e);

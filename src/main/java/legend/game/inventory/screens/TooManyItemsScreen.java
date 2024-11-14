@@ -212,7 +212,7 @@ public class TooManyItemsScreen extends MenuScreen {
       }
 
       if((a4 & 0x2) != 0) {
-        if (slotScroll + slotIndex > -1 && slotScroll + slotIndex < this.items.size()) {
+        if(slotScroll + slotIndex > -1 && slotScroll + slotIndex < this.items.size()) {
           renderString(194, 164, I18n.translate(this.items.get(slotScroll + slotIndex).getDescriptionTranslationKey()), allocate);
         }
 
@@ -228,7 +228,7 @@ public class TooManyItemsScreen extends MenuScreen {
       }
 
       if((a4 & 0x2) != 0) {
-        if (slotScroll + slotIndex > -1 && slotScroll + slotIndex < this.equipment.size()) {
+        if(slotScroll + slotIndex > -1 && slotScroll + slotIndex < this.equipment.size()) {
           renderString(194, 164, I18n.translate(this.equipment.get(slotScroll + slotIndex).getDescriptionTranslationKey()), allocate);
         }
 
@@ -471,7 +471,7 @@ public class TooManyItemsScreen extends MenuScreen {
         final MenuEntryStruct04<Item> itm = this.items.stream().filter((e) -> Objects.equals(e.item_00.getRegistryId().entryId(), ((Item)newItem.item_00).getRegistryId().entryId())).findFirst().orElse(null);
         if(itm != null) {
           itm.item_00.setQuantity(itm.item_00.getQuantity() + 1);
-          if (!Objects.equals(droppedItem.item_00.getRegistryId().entryId(), ((Item)newItem.item_00).getRegistryId().entryId())) {
+          if(!Objects.equals(droppedItem.item_00.getRegistryId().entryId(), ((Item)newItem.item_00).getRegistryId().entryId())) {
             this.items.remove(droppedItem);
           }
         } else if(swap) {
@@ -481,7 +481,7 @@ public class TooManyItemsScreen extends MenuScreen {
         }
 
         setInventoryFromDisplay(this.items, gameState_800babc8.items_2e9, this.items.size());
-        } else {
+      } else {
         MenuEntryStruct04<Equipment> droppedItem = this.equipment.get(this.invIndex + this.invScroll);
         if(droppedItem.item_00.getQuantity() > 1) {
           droppedItem.item_00.setQuantity(droppedItem.item_00.getQuantity() - 1);
@@ -494,7 +494,7 @@ public class TooManyItemsScreen extends MenuScreen {
         final MenuEntryStruct04<Equipment> itm = this.equipment.stream().filter((e) -> Objects.equals(e.item_00.getRegistryId().entryId(), ((Equipment)newItem.item_00).getRegistryId().entryId())).findFirst().orElse(null);
         if(itm != null) {
           itm.item_00.setQuantity(itm.item_00.getQuantity() + 1);
-          if (!Objects.equals(droppedItem.item_00.getRegistryId().entryId(), ((Equipment)newItem.item_00).getRegistryId().entryId())) {
+          if(!Objects.equals(droppedItem.item_00.getRegistryId().entryId(), ((Equipment)newItem.item_00).getRegistryId().entryId())) {
             this.equipment.remove(droppedItem);
           }
         } else if(swap) {

@@ -372,7 +372,7 @@ public class EquipmentScreen extends MenuScreen {
   }
 
   private void filterItems() {
-    this.filter = this.filter + 1 < EquipmentSlot.values().length ?  this.filter + 1 : -1;
+    this.filter = this.filter + 1 < EquipmentSlot.values().length ? this.filter + 1 : -1;
     this.slotScroll = 0;
     this.selectedSlot = 0;
     this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);

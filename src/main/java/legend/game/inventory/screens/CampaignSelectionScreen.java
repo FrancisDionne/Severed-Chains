@@ -183,9 +183,12 @@ public class CampaignSelectionScreen extends MenuScreen {
 
   private void retrofit() {
     final List<Item> items = new ArrayList<>();
-    for (final Item item : gameState_800babc8.items_2e9) {
+    for(final Item item : gameState_800babc8.items_2e9) {
+      if(item.getQuantity() > 0) { //Means the items are already in that format
+        break;
+      }
       final Item itm = items.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), item.getRegistryId().entryId())).findFirst().orElse(null);
-      if (itm != null) {
+      if(itm != null) {
         itm.setQuantity(itm.getQuantity() + 1);
       } else {
         items.add(item);
@@ -195,9 +198,12 @@ public class CampaignSelectionScreen extends MenuScreen {
     gameState_800babc8.items_2e9.addAll(items);
 
     final List<Equipment> equips = new ArrayList<>();
-    for (final Equipment equip : gameState_800babc8.equipment_1e8) {
+    for(final Equipment equip : gameState_800babc8.equipment_1e8) {
+      if(equip.getQuantity() > 0) { //Means the items are already in that format
+        break;
+      }
       final Equipment itm = equips.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), equip.getRegistryId().entryId())).findFirst().orElse(null);
-      if (itm != null) {
+      if(itm != null) {
         itm.setQuantity(itm.getQuantity() + 1);
       } else {
         equips.add(equip);

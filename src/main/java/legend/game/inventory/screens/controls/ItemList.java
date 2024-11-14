@@ -31,11 +31,11 @@ public class ItemList<T> extends Control {
 
   public ItemList() {
     this(
-      entry ->  {
+      entry -> {
         String text = I18n.translate(entry.getNameTranslationKey());
-        if (entry.item_00 instanceof InventoryEntry) {
+        if(entry.item_00 instanceof InventoryEntry) {
           final int quantity = ((InventoryEntry)entry.item_00).getQuantity();
-          if (quantity > 1) {
+          if(quantity > 1) {
             text += " (" + quantity + ')';
           }
         }
@@ -149,7 +149,7 @@ public class ItemList<T> extends Control {
 
   private void updateMaxLabel() {
     final int count;
-    if (this.items.getCount() > 0 && this.getItems().getFirst().item_00 instanceof InventoryEntry) {
+    if(this.items.getCount() > 0 && this.getItems().getFirst().item_00 instanceof InventoryEntry) {
       count = this.items.getEntries().stream().mapToInt(x -> ((InventoryEntry)x.item_00).getQuantity()).sum();
     } else {
       count = this.items.getCount();

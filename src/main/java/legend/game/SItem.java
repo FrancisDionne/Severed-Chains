@@ -1688,7 +1688,7 @@ public final class SItem {
       final MenuEntryStruct04<?> menuItem = menuItems.get(s3);
       String text = I18n.translate(menuItem.getNameTranslationKey());
 
-      if (menuItem.item_00 instanceof InventoryEntry) {
+      if(menuItem.item_00 instanceof InventoryEntry) {
         final int quantity = ((InventoryEntry)(menuItem.item_00)).getQuantity();
         text = text + (quantity > 1 ? " (" + quantity + ')' : "");
       }

@@ -146,14 +146,14 @@ public class ItemListScreen extends MenuScreen {
     if(result == MessageBoxResult.YES) {
 
       boolean remove = true;
-      if (list.getSelectedItem().item_00 instanceof final InventoryEntry entry) {
-        if (entry.getQuantity() > 1) {
+      if(list.getSelectedItem().item_00 instanceof final InventoryEntry entry) {
+        if(entry.getQuantity() > 1) {
           entry.setQuantity(entry.getQuantity() - 1);
           remove = entry.getQuantity() < 1;
         }
       }
 
-      if (remove) {
+      if(remove) {
         list.remove(list.getSelectedItem());
         final List<MenuEntryStruct04<T>> items = list.getItems();
         setInventoryFromDisplay(items, inv, items.size());

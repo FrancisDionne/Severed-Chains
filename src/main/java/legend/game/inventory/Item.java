@@ -134,10 +134,8 @@ public abstract class Item extends RegistryEntry implements InventoryEntry, Clon
   }
 
   @Override
-  public Object clone()
-  {
-    try
-    {
+  public Object clone() {
+    try {
       return super.clone();
     } catch(final CloneNotSupportedException e) {
       throw new RuntimeException(e);

@@ -1011,8 +1011,8 @@ public final class Scus94491BpeSegment_8002 {
     final Item itm = gameState_800babc8.items_2e9.get(itemSlot);
     final TakeItemEvent takeItemEvent = EVENTS.postEvent(new TakeItemEvent(itm, true));
 
-    if (takeItemEvent.takeItem) {
-      if (itm.getQuantity() > 1) {
+    if(takeItemEvent.takeItem) {
+      if(itm.getQuantity() > 1) {
         itm.setQuantity(itm.getQuantity() - 1);
       } else {
         gameState_800babc8.items_2e9.remove(itemSlot);
@@ -1040,7 +1040,7 @@ public final class Scus94491BpeSegment_8002 {
     }
 
     final Equipment itm = gameState_800babc8.equipment_1e8.get(equipmentIndex);
-    if (itm.getQuantity() > 1) {
+    if(itm.getQuantity() > 1) {
       itm.setQuantity(itm.getQuantity() - 1);
     } else {
       gameState_800babc8.equipment_1e8.remove(equipmentIndex);
@@ -1056,7 +1056,7 @@ public final class Scus94491BpeSegment_8002 {
     }
 
     final Item itm = gameState_800babc8.items_2e9.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), item.getRegistryId().entryId())).findFirst().orElse(null);
-    if (itm != null) {
+    if(itm != null) {
       itm.setQuantity(itm.getQuantity() + 1);
     } else {
       gameState_800babc8.items_2e9.add(item);
@@ -1072,7 +1072,7 @@ public final class Scus94491BpeSegment_8002 {
     }
 
     final Equipment itm = gameState_800babc8.equipment_1e8.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), equipment.getRegistryId().entryId())).findFirst().orElse(null);
-    if (itm != null) {
+    if(itm != null) {
       itm.setQuantity(itm.getQuantity() + 1);
     } else {
       gameState_800babc8.equipment_1e8.add(equipment);
