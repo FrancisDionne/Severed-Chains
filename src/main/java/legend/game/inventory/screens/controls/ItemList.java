@@ -4,6 +4,7 @@ import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.InventoryEntry;
+import legend.game.inventory.Item;
 import legend.game.inventory.screens.Control;
 import legend.game.inventory.screens.InputPropagation;
 import legend.game.types.MenuEntryStruct04;
@@ -147,7 +148,13 @@ public class ItemList<T> extends Control {
   }
 
   private void updateMaxLabel() {
-    this.maxLabel.setText(this.items.getCount() + "/" + this.max);
+    final int count;
+    if (this.items.getCount() > 0 && this.getItems().getFirst().item_00 instanceof InventoryEntry) {
+      count = this.items.getEntries().stream().mapToInt(x -> ((InventoryEntry)x.item_00).getQuantity()).sum();
+    } else {
+      count = this.items.getCount();
+    }
+    this.maxLabel.setText(count + "/" + this.max);
     this.maxLabel.setX(162 - textWidth(this.maxLabel.getText()));
   }
 

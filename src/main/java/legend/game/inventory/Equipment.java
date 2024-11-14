@@ -9,7 +9,7 @@ import legend.game.types.EquipmentSlot;
 import legend.game.unpacker.FileData;
 import org.legendofdragoon.modloader.registries.RegistryEntry;
 
-public class Equipment extends RegistryEntry implements InventoryEntry, ScriptReadable {
+public class Equipment extends RegistryEntry implements InventoryEntry, ScriptReadable, Cloneable {
   public final int price;
   public int quantity;
 
@@ -216,5 +216,22 @@ public class Equipment extends RegistryEntry implements InventoryEntry, ScriptRe
       case 1000 -> out.set(0); //TODO temporary - is detonate arrow
       default -> throw new RuntimeException("Invalid equipment read");
     }
+  }
+
+  @Override
+  public Object clone()
+  {
+    try
+    {
+      return super.clone();
+    } catch(final CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public Equipment cloneEquipment() {
+    final Equipment equip = (Equipment)this.clone();
+    equip.setQuantity(1);
+    return equip;
   }
 }

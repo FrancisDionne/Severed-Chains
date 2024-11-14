@@ -12,6 +12,8 @@ import legend.game.types.MenuEntryStruct04;
 import legend.game.types.MessageBoxResult;
 import legend.game.types.Renderable58;
 
+import java.util.Objects;
+
 import static legend.game.SItem.FUN_80104b60;
 import static legend.game.SItem.allocateOneFrameGlyph;
 import static legend.game.SItem.allocateUiElement;
@@ -24,6 +26,7 @@ import static legend.game.SItem.renderString;
 import static legend.game.SItem.renderText;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryItemCount;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.setInventoryFromDisplay;
 import static legend.game.Scus94491BpeSegment_8002.sortItems;
@@ -209,7 +212,7 @@ public class TooManyItemsScreen extends MenuScreen {
       }
 
       if((a4 & 0x2) != 0) {
-        if (slotScroll + slotIndex < this.items.size()) {
+        if (slotScroll + slotIndex > -1 && slotScroll + slotIndex < this.items.size()) {
           renderString(194, 164, I18n.translate(this.items.get(slotScroll + slotIndex).getDescriptionTranslationKey()), allocate);
         }
 
@@ -225,7 +228,7 @@ public class TooManyItemsScreen extends MenuScreen {
       }
 
       if((a4 & 0x2) != 0) {
-        if (slotScroll + slotIndex < this.equipment.size()) {
+        if (slotScroll + slotIndex > -1 && slotScroll + slotIndex < this.equipment.size()) {
           renderString(194, 164, I18n.translate(this.equipment.get(slotScroll + slotIndex).getDescriptionTranslationKey()), allocate);
         }
 
@@ -453,14 +456,54 @@ public class TooManyItemsScreen extends MenuScreen {
     if(((isItem ? this.items : this.equipment).get(this.invIndex + this.invScroll).flags_02 & 0x6000) != 0) {
       playMenuSound(40);
     } else {
+      boolean swap = true;
+
       if(isItem) {
-        this.droppedItems.set(this.dropIndex, (MenuEntryStruct04<InventoryEntry>)(MenuEntryStruct04)this.items.get(this.invIndex + this.invScroll));
-        this.items.set(this.invIndex + this.invScroll, (MenuEntryStruct04<Item>)(MenuEntryStruct04)newItem);
-        setInventoryFromDisplay(this.items, gameState_800babc8.items_2e9, gameState_800babc8.items_2e9.size());
-      } else {
+        MenuEntryStruct04<Item> droppedItem = this.items.get(this.invIndex + this.invScroll);
+        if(droppedItem.item_00.getQuantity() > 1) {
+          droppedItem.item_00.setQuantity(droppedItem.item_00.getQuantity() - 1);
+          droppedItem = MenuEntryStruct04.make(droppedItem.item_00.cloneItem());
+          swap = false;
+        }
+
+        this.droppedItems.set(this.dropIndex, (MenuEntryStruct04<InventoryEntry>)(MenuEntryStruct04)droppedItem);
+
+        final MenuEntryStruct04<Item> itm = this.items.stream().filter((e) -> Objects.equals(e.item_00.getRegistryId().entryId(), ((Item)newItem.item_00).getRegistryId().entryId())).findFirst().orElse(null);
+        if(itm != null) {
+          itm.item_00.setQuantity(itm.item_00.getQuantity() + 1);
+          if (!Objects.equals(droppedItem.item_00.getRegistryId().entryId(), ((Item)newItem.item_00).getRegistryId().entryId())) {
+            this.items.remove(droppedItem);
+          }
+        } else if(swap) {
+          this.items.set(this.invIndex + this.invScroll, (MenuEntryStruct04<Item>)(MenuEntryStruct04)newItem);
+        } else {
+          this.items.add((MenuEntryStruct04<Item>)(MenuEntryStruct04)newItem);
+        }
+
+        setInventoryFromDisplay(this.items, gameState_800babc8.items_2e9, this.items.size());
+        } else {
+        MenuEntryStruct04<Equipment> droppedItem = this.equipment.get(this.invIndex + this.invScroll);
+        if(droppedItem.item_00.getQuantity() > 1) {
+          droppedItem.item_00.setQuantity(droppedItem.item_00.getQuantity() - 1);
+          droppedItem = MenuEntryStruct04.make(droppedItem.item_00.cloneEquipment());
+          swap = false;
+        }
+
         this.droppedItems.set(this.dropIndex, (MenuEntryStruct04<InventoryEntry>)(MenuEntryStruct04)this.equipment.get(this.invIndex + this.invScroll));
-        this.equipment.set(this.invIndex + this.invScroll, (MenuEntryStruct04<Equipment>)(MenuEntryStruct04)newItem);
-        setInventoryFromDisplay(this.equipment, gameState_800babc8.equipment_1e8, gameState_800babc8.equipment_1e8.size());
+
+        final MenuEntryStruct04<Equipment> itm = this.equipment.stream().filter((e) -> Objects.equals(e.item_00.getRegistryId().entryId(), ((Equipment)newItem.item_00).getRegistryId().entryId())).findFirst().orElse(null);
+        if(itm != null) {
+          itm.item_00.setQuantity(itm.item_00.getQuantity() + 1);
+          if (!Objects.equals(droppedItem.item_00.getRegistryId().entryId(), ((Equipment)newItem.item_00).getRegistryId().entryId())) {
+            this.equipment.remove(droppedItem);
+          }
+        } else if(swap) {
+          this.equipment.set(this.invIndex + this.invScroll, (MenuEntryStruct04<Equipment>)(MenuEntryStruct04)newItem);
+        } else {
+          this.equipment.add((MenuEntryStruct04<Equipment>)(MenuEntryStruct04)newItem);
+        }
+
+        setInventoryFromDisplay(this.equipment, gameState_800babc8.equipment_1e8, this.equipment.size());
       }
 
       this.invScroll = 0;

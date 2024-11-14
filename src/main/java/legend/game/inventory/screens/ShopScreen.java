@@ -54,6 +54,8 @@ import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.addGold;
 import static legend.game.Scus94491BpeSegment_8002.allocateRenderable;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryEquipmentCount;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryItemCount;
 import static legend.game.Scus94491BpeSegment_8002.giveEquipment;
 import static legend.game.Scus94491BpeSegment_8002.giveItem;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
@@ -320,11 +322,11 @@ public class ShopScreen extends MenuScreen {
     renderCentredText(Leave_8011c6c8, 72, this.getShopMenuYOffset(3) + 2, selectedMenuItem != 3 ? TextColour.BROWN : TextColour.RED);
 
     if(isItemMenu != 0) {
-      renderTwoDigitNumber(105, 36, gameState_800babc8.items_2e9.size(), 0x2);
+      renderTwoDigitNumber(105, 36, getInventoryItemCount(), 0x2);
       allocateOneFrameGlyph(94, 16, 16);
       renderTwoDigitNumber(123, 36, CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get()), 0x2);
     } else {
-      renderThreeDigitNumber(93, 36, gameState_800babc8.equipment_1e8.size(), 0x2);
+      renderThreeDigitNumber(93, 36, getInventoryEquipmentCount(), 0x2);
       allocateOneFrameGlyph(95, 16, 16);
       renderThreeDigitNumber(117, 36, 255, 0x2);
     }
@@ -369,13 +371,7 @@ public class ShopScreen extends MenuScreen {
   }
 
   private void renderNumberOfItems(final Item item) {
-    int count = 0;
-    for(int i = 0; i < gameState_800babc8.items_2e9.size(); i++) {
-      if(gameState_800babc8.items_2e9.get(i) == item) {
-        count++;
-      }
-    }
-    renderText(Number_kept_8011c7f4 + count, 195, 125, TextColour.BROWN);
+    renderText(Number_kept_8011c7f4 + item.getQuantity(), 195, 125, TextColour.BROWN);
   }
 
   private void renderItemList(final int firstItem, final int isItemMenu, final Renderable58 upArrow, final Renderable58 downArrow) {
@@ -799,9 +795,9 @@ public class ShopScreen extends MenuScreen {
 
     final boolean hasSpace;
     if(this.shopType == 0) {
-      hasSpace = gameState_800babc8.equipment_1e8.size() < 255;
+      hasSpace = getInventoryEquipmentCount() < 255;
     } else {
-      hasSpace = gameState_800babc8.items_2e9.size() < CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get());
+      hasSpace = getInventoryItemCount() < CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get());
     }
 
     if(!hasSpace) {

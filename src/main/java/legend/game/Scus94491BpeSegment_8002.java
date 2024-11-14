@@ -1051,7 +1051,7 @@ public final class Scus94491BpeSegment_8002 {
 
   @Method(0x80023484L)
   public static boolean giveItem(final Item item) {
-    if(gameState_800babc8.items_2e9.size() >= CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get())) {
+    if(getInventoryItemCount() >= CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get())) {
       return false;
     }
 
@@ -4079,5 +4079,13 @@ public final class Scus94491BpeSegment_8002 {
   @Method(0x8002d270L)
   public static void srand(final int seed) {
     randSeed = seed;
+  }
+
+  public static int getInventoryItemCount() {
+    return gameState_800babc8.items_2e9.stream().mapToInt(Item::getQuantity).sum();
+  }
+
+  public static int getInventoryEquipmentCount() {
+    return gameState_800babc8.equipment_1e8.stream().mapToInt(Equipment::getQuantity).sum();
   }
 }
