@@ -19,6 +19,10 @@ import java.util.function.ToIntFunction;
 
 import static legend.game.SItem.allocateUiElement;
 import static legend.game.Scus94491BpeSegment_8002.allocateManualRenderable;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryEquipmentCount;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryItemCount;
+import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryEquipments;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.Scus94491BpeSegment_8002.uploadRenderable;
 
@@ -33,8 +37,8 @@ public class ItemList<T> extends Control {
     this(
       entry -> {
         String text = I18n.translate(entry.getNameTranslationKey());
-        if(entry.item_00 instanceof InventoryEntry) {
-          final int quantity = ((InventoryEntry)entry.item_00).getQuantity();
+        if(entry.item_00 instanceof final InventoryEntry inventoryEntry) {
+          final int quantity = getInventoryEntryQuantity(inventoryEntry);
           if(quantity > 1) {
             text += " (" + quantity + ')';
           }
@@ -147,10 +151,12 @@ public class ItemList<T> extends Control {
     this.items.updateEntries();
   }
 
-  private void updateMaxLabel() {
+  public void updateMaxLabel() {
     final int count;
-    if(this.items.getCount() > 0 && this.getItems().getFirst().item_00 instanceof InventoryEntry) {
-      count = this.items.getEntries().stream().mapToInt(x -> ((InventoryEntry)x.item_00).getQuantity()).sum();
+    if(this.items.getCount() > 0 && this.getItems().getFirst().item_00 instanceof Item) {
+      count = getInventoryItemCount();
+    } else if(this.items.getCount() > 0 && this.getItems().getFirst().item_00 instanceof Equipment) {
+      count = getInventoryEquipmentCount() - getUniqueInventoryEquipments().size() + this.items.getCount();
     } else {
       count = this.items.getCount();
     }

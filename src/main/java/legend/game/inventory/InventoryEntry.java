@@ -5,6 +5,4 @@ public interface InventoryEntry {
   String getNameTranslationKey();
   String getDescriptionTranslationKey();
   int getPrice();
-  int getQuantity();
-  void setQuantity(final int quantity);
 }

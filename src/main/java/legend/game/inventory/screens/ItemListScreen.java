@@ -21,10 +21,14 @@ import static legend.core.GameEngine.CONFIG;
 import static legend.game.SItem.loadItemsAndEquipmentForDisplay;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
+import static legend.game.Scus94491BpeSegment_8002.EQUIPMENT_MAX_AMOUNT;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
+import static legend.game.Scus94491BpeSegment_8002.getFirstIndexOfInventoryEntry;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
 import static legend.game.Scus94491BpeSegment_8002.menuItemComparator;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
-import static legend.game.Scus94491BpeSegment_8002.setInventoryFromDisplay;
+import static legend.game.Scus94491BpeSegment_8002.sortEquipmentInventory;
+import static legend.game.Scus94491BpeSegment_8002.sortItemInventory;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 
 public class ItemListScreen extends MenuScreen {
@@ -46,7 +50,7 @@ public class ItemListScreen extends MenuScreen {
 
     this.equipmentList.setPos(188, 15);
     this.equipmentList.setTitle("Equipment");
-    this.equipmentList.setMax(255);
+    this.equipmentList.setMax(EQUIPMENT_MAX_AMOUNT);
 
     this.itemList.onHoverIn(() -> this.setFocus(this.itemList));
     this.itemList.onGotFocus(() -> {
@@ -144,23 +148,19 @@ public class ItemListScreen extends MenuScreen {
 
   private <T> void discard(final MessageBoxResult result, final ItemList<T> list, final List<T> inv) {
     if(result == MessageBoxResult.YES) {
+      final InventoryEntry entry = (InventoryEntry)list.getSelectedItem().item_00;
+      final int index = getFirstIndexOfInventoryEntry(entry);
 
-      boolean remove = true;
-      if(list.getSelectedItem().item_00 instanceof final InventoryEntry entry) {
-        if(entry.getQuantity() > 1) {
-          entry.setQuantity(entry.getQuantity() - 1);
-          remove = entry.getQuantity() < 1;
-        }
-      }
+      inv.remove(index);
 
-      if(remove) {
+      if(getInventoryEntryQuantity(entry) < 1) {
         list.remove(list.getSelectedItem());
-        final List<MenuEntryStruct04<T>> items = list.getItems();
-        setInventoryFromDisplay(items, inv, items.size());
-        this.updateDescription(list.getSelectedItem());
       } else {
-        list.refreshList();
+        list.updateMaxLabel();
       }
+
+      list.refreshList();
+      this.updateDescription(list.getSelectedItem());
     }
   }
 
@@ -183,8 +183,8 @@ public class ItemListScreen extends MenuScreen {
     playMenuSound(2);
     this.itemList.sort(menuItemComparator());
     this.equipmentList.sort(menuItemComparator());
-    setInventoryFromDisplay(this.itemList.getItems(), gameState_800babc8.items_2e9, this.itemList.getItems().size());
-    setInventoryFromDisplay(this.equipmentList.getItems(), gameState_800babc8.equipment_1e8, this.equipmentList.getItems().size());
+    sortItemInventory();
+    sortEquipmentInventory();
   }
 
   @Override

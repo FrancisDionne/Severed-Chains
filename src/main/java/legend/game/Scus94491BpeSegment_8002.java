@@ -19,6 +19,7 @@ import legend.game.i18n.I18n;
 import legend.game.input.Input;
 import legend.game.input.InputAction;
 import legend.game.inventory.Equipment;
+import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.MainMenuScreen;
@@ -80,6 +81,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static legend.core.GameEngine.AUDIO_THREAD;
 import static legend.core.GameEngine.CONFIG;
@@ -166,6 +168,8 @@ public final class Scus94491BpeSegment_8002 {
 
   private static Obj textboxSelectionObj;
   private static final MV textboxSelectionTransforms = new MV();
+
+  public static final int EQUIPMENT_MAX_AMOUNT = 255;
 
   @Method(0x80020008L)
   public static void sssqResetStuff() {
@@ -1008,15 +1012,10 @@ public final class Scus94491BpeSegment_8002 {
       return false;
     }
 
-    final Item itm = gameState_800babc8.items_2e9.get(itemSlot);
-    final TakeItemEvent takeItemEvent = EVENTS.postEvent(new TakeItemEvent(itm, true));
+    final TakeItemEvent takeItemEvent = EVENTS.postEvent(new TakeItemEvent(gameState_800babc8.items_2e9.get(itemSlot), true));
 
     if(takeItemEvent.takeItem) {
-      if(itm.getQuantity() > 1) {
-        itm.setQuantity(itm.getQuantity() - 1);
-      } else {
-        gameState_800babc8.items_2e9.remove(itemSlot);
-      }
+      gameState_800babc8.items_2e9.remove(itemSlot);
     }
 
     return true;
@@ -1038,14 +1037,7 @@ public final class Scus94491BpeSegment_8002 {
       LOGGER.warn("Tried to take equipment index %d (out of bounds)", equipmentIndex);
       return false;
     }
-
-    final Equipment itm = gameState_800babc8.equipment_1e8.get(equipmentIndex);
-    if(itm.getQuantity() > 1) {
-      itm.setQuantity(itm.getQuantity() - 1);
-    } else {
-      gameState_800babc8.equipment_1e8.remove(equipmentIndex);
-    }
-
+    gameState_800babc8.equipment_1e8.remove(equipmentIndex);
     return true;
   }
 
@@ -1054,30 +1046,16 @@ public final class Scus94491BpeSegment_8002 {
     if(getInventoryItemCount() >= CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get())) {
       return false;
     }
-
-    final Item itm = gameState_800babc8.items_2e9.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), item.getRegistryId().entryId())).findFirst().orElse(null);
-    if(itm != null) {
-      itm.setQuantity(itm.getQuantity() + 1);
-    } else {
-      gameState_800babc8.items_2e9.add(item);
-    }
-
+    gameState_800babc8.items_2e9.add(item);
     return true;
   }
 
   @Method(0x80023484L)
   public static boolean giveEquipment(final Equipment equipment) {
-    if(gameState_800babc8.equipment_1e8.size() >= 255) {
+    if(gameState_800babc8.equipment_1e8.size() >= EQUIPMENT_MAX_AMOUNT) {
       return false;
     }
-
-    final Equipment itm = gameState_800babc8.equipment_1e8.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), equipment.getRegistryId().entryId())).findFirst().orElse(null);
-    if(itm != null) {
-      itm.setQuantity(itm.getQuantity() + 1);
-    } else {
-      gameState_800babc8.equipment_1e8.add(equipment);
-    }
-
+    gameState_800babc8.equipment_1e8.add(equipment);
     return true;
   }
 
@@ -1166,15 +1144,30 @@ public final class Scus94491BpeSegment_8002 {
   }
 
   @Method(0x80023a2cL)
-  public static <T> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items, final int count) {
+  public static <T extends InventoryEntry> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items, final int count) {
     display.sort(menuItemComparator());
-    setInventoryFromDisplay(display, items, count);
+    sortItems(items);
   }
 
-  public static <T> Comparator<MenuEntryStruct04<T>> menuItemComparator() {
+  public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemComparator() {
     return Comparator
       .comparingInt((MenuEntryStruct04<T> item) -> item.getIcon())
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+  }
+
+  public static void sortEquipmentInventory() {
+    gameState_800babc8.equipment_1e8 = sortItems(gameState_800babc8.equipment_1e8);
+  }
+
+  public static void sortItemInventory() {
+    gameState_800babc8.items_2e9 = sortItems(gameState_800babc8.items_2e9);
+  }
+
+  public static <T extends InventoryEntry> List<T> sortItems(final List<T> list) {
+    final Comparator<T> compare = Comparator
+      .comparingInt((T item) -> item.getIcon())
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    return list.stream().sorted(compare).collect(Collectors.toList());
   }
 
   @Method(0x80023a88L)
@@ -4081,11 +4074,51 @@ public final class Scus94491BpeSegment_8002 {
     randSeed = seed;
   }
 
+  public static int getInventoryEntryQuantity(final InventoryEntry entry) {
+    if(entry instanceof final Item item) {
+      return (int)gameState_800babc8.items_2e9.stream().filter((e) -> compareInventoryEntries(e, entry)).count();
+    }
+    if(entry instanceof final Equipment equipment) {
+      return (int)gameState_800babc8.equipment_1e8.stream().filter((e) -> compareInventoryEntries(e, entry)).count();
+    }
+    return 0;
+  }
+
+  public static List<Item> getUniqueInventoryItems() {
+    return gameState_800babc8.items_2e9.stream().distinct().toList();
+  }
+
+  public static List<Equipment> getUniqueInventoryEquipments() {
+    return gameState_800babc8.equipment_1e8.stream().distinct().toList();
+  }
+
   public static int getInventoryItemCount() {
-    return gameState_800babc8.items_2e9.stream().mapToInt(Item::getQuantity).sum();
+    return getUniqueInventoryItems().stream().mapToInt(Scus94491BpeSegment_8002::getInventoryEntryQuantity).sum();
   }
 
   public static int getInventoryEquipmentCount() {
-    return gameState_800babc8.equipment_1e8.stream().mapToInt(Equipment::getQuantity).sum();
+    return getUniqueInventoryEquipments().stream().mapToInt(Scus94491BpeSegment_8002::getInventoryEntryQuantity).sum();
+  }
+
+  public static int getFirstIndexOfInventoryEntry(final InventoryEntry entry) {
+    int index = -1;
+    if (entry instanceof final Item item) {
+      index = (int)gameState_800babc8.items_2e9.stream().takeWhile((e) -> !compareInventoryEntries(e, entry)).count();
+      index = index < gameState_800babc8.items_2e9.size() ? index : -1;
+    } else if (entry instanceof final Equipment equipment) {
+      index = (int)gameState_800babc8.equipment_1e8.stream().takeWhile((e) -> !compareInventoryEntries(e, entry)).count();
+      index = index < gameState_800babc8.equipment_1e8.size() ? index : -1;
+    }
+    return index;
+  }
+
+  public static boolean compareInventoryEntries(final InventoryEntry entry1, final InventoryEntry entry2) {
+    if(entry1 instanceof final Item item1 && entry2 instanceof final Item item2) {
+      return Objects.equals(item1.getRegistryId().toString(), item2.getRegistryId().toString());
+    }
+    if(entry1 instanceof final Equipment equipment1 && entry2 instanceof final Equipment equipment2) {
+      return Objects.equals(equipment1.getRegistryId().toString(), equipment2.getRegistryId().toString());
+    }
+    return false;
   }
 }

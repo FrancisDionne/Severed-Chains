@@ -7,15 +7,13 @@ import legend.game.scripting.FlowControl;
 import legend.game.scripting.ScriptState;
 import org.legendofdragoon.modloader.registries.RegistryEntry;
 
-public abstract class Item extends RegistryEntry implements InventoryEntry, Cloneable {
+public abstract class Item extends RegistryEntry implements InventoryEntry {
   private final int icon;
   private final int price;
-  private int quantity;
 
   public Item(final int icon, final int price) {
     this.icon = icon;
     this.price = price;
-    this.quantity = 1;
   }
 
   @Override
@@ -40,16 +38,6 @@ public abstract class Item extends RegistryEntry implements InventoryEntry, Clon
   @Override
   public int getPrice() {
     return this.price;
-  }
-
-  @Override
-  public int getQuantity() {
-    return this.quantity;
-  }
-
-  @Override
-  public void setQuantity(final int quantity) {
-    this.quantity = quantity;
   }
 
   /** Item can't be stolen by enemies */
@@ -131,20 +119,5 @@ public abstract class Item extends RegistryEntry implements InventoryEntry, Clon
     ALLIES,
     ENEMIES,
     ALL,
-  }
-
-  @Override
-  public Object clone() {
-    try {
-      return super.clone();
-    } catch(final CloneNotSupportedException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public Item cloneItem() {
-    final Item item = (Item)this.clone();
-    item.setQuantity(1);
-    return item;
   }
 }

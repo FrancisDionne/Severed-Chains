@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static legend.core.GameEngine.EVENTS;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
 import static legend.game.Scus94491BpeSegment_8002.renderCentredText;
 import static legend.game.Scus94491BpeSegment_8002.renderRightText;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
@@ -40,7 +41,7 @@ public class ItemListMenu extends ListMenu {
   protected void drawListEntry(final int index, final int x, final int y, final int trim) {
     renderText(I18n.translate(this.combatItems_800c6988.get(index).item), x, y, TextColour.WHITE, trim);
     renderText("\u011d", x + 143, y, TextColour.WHITE, trim);
-    renderRightText(String.valueOf(this.combatItems_800c6988.get(index).item.getQuantity()), x + 168, y, TextColour.WHITE, trim);
+    renderRightText(String.valueOf(getInventoryEntryQuantity(this.combatItems_800c6988.get(index).item)), x + 168, y, TextColour.WHITE, trim);
   }
 
   @Override

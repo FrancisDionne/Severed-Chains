@@ -11,6 +11,8 @@ import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.Renderable58;
 
+import java.util.List;
+
 import static legend.game.SItem.FUN_80104b60;
 import static legend.game.SItem.allocateUiElement;
 import static legend.game.SItem.characterCount_8011d7c4;
@@ -28,11 +30,11 @@ import static legend.game.SItem.useItemGlyphs_801141fc;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.allocateRenderable;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
+import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryItems;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.takeItemId;
 import static legend.game.Scus94491BpeSegment_8002.unloadRenderable;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
-import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.saveListDownArrow_800bdb98;
 import static legend.game.Scus94491BpeSegment_800b.saveListUpArrow_800bdb94;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
@@ -151,7 +153,7 @@ public class UseItemScreen extends MenuScreen {
     }
 
     //LAB_80102ee8
-    renderMenuItems(16, 10, this.menuItems, slotScroll, 5, saveListUpArrow_800bdb94, saveListDownArrow_800bdb98);
+    renderMenuItems(16, 10, this.menuItems, slotScroll, 5, saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, true);
 
     if(selectedSlot + slotScroll < this.menuItems.size()) {
       renderString(194, 16, I18n.translate(this.menuItems.get(selectedSlot + slotScroll).item_00.getDescriptionTranslationKey()), allocate);
@@ -189,8 +191,9 @@ public class UseItemScreen extends MenuScreen {
   private int getUsableItemsInMenu() {
     this.menuItems.clear();
 
-    for(int i = 0; i < gameState_800babc8.items_2e9.size(); i++) {
-      final Item item = gameState_800babc8.items_2e9.get(i);
+    final List<Item> items = getUniqueInventoryItems();
+    for(int i = 0; i < items.size(); i++) {
+      final Item item = items.get(i);
 
       if(item.canBeUsed(Item.UsageLocation.MENU)) {
         final MenuEntryStruct04<Item> menuEntry = MenuEntryStruct04.make(item);

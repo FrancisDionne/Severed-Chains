@@ -33,6 +33,7 @@ import static legend.core.GameEngine.bootMods;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8005.collidedPrimitiveIndex_80052c38;
 import static legend.game.Scus94491BpeSegment_8005.submapCut_80052c30;
@@ -109,8 +110,6 @@ public class CampaignSelectionScreen extends MenuScreen {
       submapCut_80052c30 = gameState_800babc8.submapCut_a8;
       collidedPrimitiveIndex_80052c38 = gameState_800babc8.submapCut_a8;
 
-      this.retrofit();
-
       if(gameState_800babc8.submapCut_a8 == 264) { // Somewhere in Home of Giganto
         submapScene_80052c34 = 53;
       }
@@ -179,37 +178,5 @@ public class CampaignSelectionScreen extends MenuScreen {
     }
 
     return InputPropagation.PROPAGATE;
-  }
-
-  private void retrofit() {
-    final List<Item> items = new ArrayList<>();
-    for(final Item item : gameState_800babc8.items_2e9) {
-      if(item.getQuantity() > 0) { //Means the items are already in that format
-        break;
-      }
-      final Item itm = items.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), item.getRegistryId().entryId())).findFirst().orElse(null);
-      if(itm != null) {
-        itm.setQuantity(itm.getQuantity() + 1);
-      } else {
-        items.add(item);
-      }
-    }
-    gameState_800babc8.items_2e9.clear();
-    gameState_800babc8.items_2e9.addAll(items);
-
-    final List<Equipment> equips = new ArrayList<>();
-    for(final Equipment equip : gameState_800babc8.equipment_1e8) {
-      if(equip.getQuantity() > 0) { //Means the items are already in that format
-        break;
-      }
-      final Equipment itm = equips.stream().filter((e) -> Objects.equals(e.getRegistryId().entryId(), equip.getRegistryId().entryId())).findFirst().orElse(null);
-      if(itm != null) {
-        itm.setQuantity(itm.getQuantity() + 1);
-      } else {
-        equips.add(equip);
-      }
-    }
-    gameState_800babc8.equipment_1e8.clear();
-    gameState_800babc8.equipment_1e8.addAll(equips);
   }
 }

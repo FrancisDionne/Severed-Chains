@@ -605,7 +605,7 @@ public class DabasScreen extends MenuScreen {
     renderCentredText(Take_8011d058, 94, this.getDabasMenuY(0) + 2, selectedSlot == 0 ? TextColour.RED : !this.hasItems && this.gold == 0 ? TextColour.MIDDLE_BROWN : TextColour.BROWN);
     renderCentredText(Discard_8011d05c, 94, this.getDabasMenuY(1) + 2, selectedSlot == 1 ? TextColour.RED : !this.hasItems ? TextColour.MIDDLE_BROWN : TextColour.BROWN);
     renderCentredText(NextDig_8011d064, 94, this.getDabasMenuY(2) + 2, selectedSlot == 2 ? TextColour.RED : !this.newDigEnabled ? TextColour.MIDDLE_BROWN : TextColour.BROWN);
-    renderMenuItems(194, 37, this.menuItems, 0, 6, null, null);
+    renderMenuItems(194, 37, this.menuItems, 0, 6, null, null, false);
     renderEightDigitNumber(100, 147, this.gold, 0x2);
 
     if(this.specialItem != null) {

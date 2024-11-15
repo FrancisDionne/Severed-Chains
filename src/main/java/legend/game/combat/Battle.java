@@ -3615,11 +3615,9 @@ public class Battle extends EngineState {
           if((flags & 0x2000) == 0) { // Hasn't already dropped loot
             for(final CombatantStruct1a8.ItemDrop drop : enemyCombatant.drops) {
               if(simpleRand() * 100 >> 16 < drop.chance()) {
-                if(drop.item() instanceof Equipment) {
-                  final Equipment equipment = ((Equipment)drop.item()).cloneEquipment();
+                if(drop.item() instanceof final Equipment equipment) {
                   itemsDroppedByEnemies_800bc928.add(new EnemyDrop(equipment.getIcon(), I18n.translate(equipment), () -> giveEquipment(equipment), () -> equipmentOverflow.add(equipment)));
-                } else if(drop.item() instanceof Item) {
-                  final Item item = ((Item)drop.item()).cloneItem();
+                } else if(drop.item() instanceof final Item item) {
                   itemsDroppedByEnemies_800bc928.add(new EnemyDrop(item.getIcon(), I18n.translate(item), () -> giveItem(item), () -> itemOverflow.add(item)));
                 }
 

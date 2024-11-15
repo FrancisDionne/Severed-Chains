@@ -68,6 +68,9 @@ import static legend.game.Scus94491BpeSegment_8002.allocateRenderable;
 import static legend.game.Scus94491BpeSegment_8002.clearCharacterStats;
 import static legend.game.Scus94491BpeSegment_8002.clearEquipmentStats;
 import static legend.game.Scus94491BpeSegment_8002.copyPlayingSounds;
+import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
+import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryEquipments;
+import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryItems;
 import static legend.game.Scus94491BpeSegment_8002.giveEquipment;
 import static legend.game.Scus94491BpeSegment_8002.giveItem;
 import static legend.game.Scus94491BpeSegment_8002.loadMenuTexture;
@@ -900,8 +903,9 @@ public final class SItem {
     if(items != null) {
       items.clear();
 
-      for(int i = 0; i < gameState_800babc8.items_2e9.size(); i++) {
-        final Item item = gameState_800babc8.items_2e9.get(i);
+      final List<Item> uniqueItems = getUniqueInventoryItems();
+      for(int i = 0; i < uniqueItems.size(); i++) {
+        final Item item = uniqueItems.get(i);
         final MenuEntryStruct04<Item> menuEntry = MenuEntryStruct04.make(item);
         items.add(menuEntry);
       }
@@ -910,12 +914,13 @@ public final class SItem {
     if(equipments != null) {
       equipments.clear();
 
+      final List<Equipment> uniqueEquips = getUniqueInventoryEquipments();
       int equipmentIndex;
-      for(equipmentIndex = 0; equipmentIndex < gameState_800babc8.equipment_1e8.size(); equipmentIndex++) {
-        final Equipment equipment = gameState_800babc8.equipment_1e8.get(equipmentIndex);
+      for(equipmentIndex = 0; equipmentIndex < uniqueEquips.size(); equipmentIndex++) {
+        final Equipment equipment = uniqueEquips.get(equipmentIndex);
         final MenuEntryStruct04<Equipment> menuEntry = MenuEntryStruct04.make(equipment);
 
-        if(a0 != 0 && !gameState_800babc8.equipment_1e8.get(equipmentIndex).canBeDiscarded()) {
+        if(a0 != 0 && !uniqueEquips.get(equipmentIndex).canBeDiscarded()) {
           menuEntry.flags_02 = 0x2000;
         }
 
@@ -1679,7 +1684,7 @@ public final class SItem {
   }
 
   @Method(0x80109410L)
-  public static void renderMenuItems(final int x, final int y, final MenuEntries<?> menuItems, final int slotScroll, final int itemCount, @Nullable final Renderable58 a5, @Nullable final Renderable58 a6) {
+  public static void renderMenuItems(final int x, final int y, final MenuEntries<?> menuItems, final int slotScroll, final int itemCount, @Nullable final Renderable58 a5, @Nullable final Renderable58 a6, final boolean displayQuantity) {
     int s3 = slotScroll;
 
     //LAB_8010947c
@@ -1688,8 +1693,8 @@ public final class SItem {
       final MenuEntryStruct04<?> menuItem = menuItems.get(s3);
       String text = I18n.translate(menuItem.getNameTranslationKey());
 
-      if(menuItem.item_00 instanceof InventoryEntry) {
-        final int quantity = ((InventoryEntry)(menuItem.item_00)).getQuantity();
+      if(menuItem.item_00 instanceof final InventoryEntry entry) {
+        final int quantity = displayQuantity ? getInventoryEntryQuantity(entry) : 0;
         text = text + (quantity > 1 ? " (" + quantity + ')' : "");
       }
 

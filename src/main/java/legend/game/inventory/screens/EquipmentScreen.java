@@ -10,12 +10,8 @@ import legend.game.types.EquipmentSlot;
 import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.Renderable58;
-import org.legendofdragoon.modloader.registries.RegistryId;
 
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import static legend.game.SItem.FUN_801034cc;
 import static legend.game.SItem.FUN_80104b60;
@@ -36,12 +32,13 @@ import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.addHp;
 import static legend.game.Scus94491BpeSegment_8002.addMp;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
+import static legend.game.Scus94491BpeSegment_8002.getFirstIndexOfInventoryEntry;
+import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryEquipments;
 import static legend.game.Scus94491BpeSegment_8002.giveEquipment;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
-import static legend.game.Scus94491BpeSegment_8002.setInventoryFromDisplay;
+import static legend.game.Scus94491BpeSegment_8002.sortEquipmentInventory;
 import static legend.game.Scus94491BpeSegment_8002.takeEquipment;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
-import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 
 public class EquipmentScreen extends MenuScreen {
   private int loadingStage;
@@ -134,8 +131,9 @@ public class EquipmentScreen extends MenuScreen {
   private int getEquippableItemsForCharacter(final int charIndex) {
     this.menuItems.clear();
 
-    for(int equipmentSlot = 0; equipmentSlot < gameState_800babc8.equipment_1e8.size(); equipmentSlot++) {
-      final Equipment equipment = gameState_800babc8.equipment_1e8.get(equipmentSlot);
+    final List<Equipment> equipments = getUniqueInventoryEquipments();
+    for(int equipmentSlot = 0; equipmentSlot < equipments.size(); equipmentSlot++) {
+      final Equipment equipment = equipments.get(equipmentSlot);
       if(canEquip(equipment, charIndex)) {
         final MenuEntryStruct04<Equipment> menuEntry = MenuEntryStruct04.make(equipment);
         menuEntry.itemSlot_01 = equipmentSlot;
@@ -162,7 +160,7 @@ public class EquipmentScreen extends MenuScreen {
       this._800bdba0 = allocateUiElement(53, 0x3c, 358, this.menuHighlightPositionY(3));
     }
 
-    renderMenuItems(194, 92, this.menuItems, slotScroll, 4, this._800bdb9c, this._800bdba0);
+    renderMenuItems(194, 92, this.menuItems, slotScroll, 4, this._800bdb9c, this._800bdba0, true);
 
     if(slotIndex + slotScroll < this.menuItems.size()) {
       renderString(194, 178, I18n.translate(this.menuItems.get(slotIndex + slotScroll).item_00.getDescriptionTranslationKey()), allocate);
@@ -223,7 +221,8 @@ public class EquipmentScreen extends MenuScreen {
         if(itemIndex < this.menuItems.size()) {
           final Equipment equipment = this.menuItems.get(itemIndex).item_00;
           final EquipItemResult previousEquipment = equipItem(equipment, characterIndices_800bdbb8[this.charSlot]);
-          takeEquipment(this.menuItems.get(itemIndex).itemSlot_01);
+          final int indexOfItemToEquip = getFirstIndexOfInventoryEntry(equipment);
+          takeEquipment(indexOfItemToEquip);
 
           if(previousEquipment.previousEquipment != null) {
             giveEquipment(previousEquipment.previousEquipment);
@@ -348,7 +347,8 @@ public class EquipmentScreen extends MenuScreen {
     if(itemIndex < this.menuItems.size()) {
       final Equipment equipment = this.menuItems.get(itemIndex).item_00;
       final EquipItemResult previousEquipment = equipItem(equipment, characterIndices_800bdbb8[this.charSlot]);
-      takeEquipment(this.menuItems.get(itemIndex).itemSlot_01);
+      final int indexOfItemToEquip = getFirstIndexOfInventoryEntry(equipment);
+      takeEquipment(indexOfItemToEquip);
 
       if(previousEquipment.previousEquipment != null) {
         giveEquipment(previousEquipment.previousEquipment);
@@ -358,6 +358,9 @@ public class EquipmentScreen extends MenuScreen {
       loadCharacterStats();
       addHp(characterIndices_800bdbb8[this.charSlot], 0);
       addMp(characterIndices_800bdbb8[this.charSlot], 0);
+
+      this.getEquippableItemsForCharacter(characterIndices_800bdbb8[this.charSlot]);
+
       this.loadingStage = 2;
     }
   }
@@ -365,9 +368,8 @@ public class EquipmentScreen extends MenuScreen {
   private void menuItemSort() {
     playMenuSound(2);
     final MenuEntries<Equipment> equipment = new MenuEntries<>();
-    loadItemsAndEquipmentForDisplay(equipment, null, 1);
-    equipment.sort();
-    setInventoryFromDisplay(equipment, gameState_800babc8.equipment_1e8, equipment.size());
+    sortEquipmentInventory();
+    this.getEquippableItemsForCharacter(characterIndices_800bdbb8[this.charSlot]);
     this.loadingStage = 2;
   }
 
