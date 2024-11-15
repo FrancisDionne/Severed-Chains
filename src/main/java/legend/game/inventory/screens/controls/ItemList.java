@@ -9,6 +9,7 @@ import legend.game.inventory.screens.Control;
 import legend.game.inventory.screens.InputPropagation;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.Renderable58;
+import org.legendofdragoon.modloader.registries.RegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
@@ -37,8 +38,8 @@ public class ItemList<T> extends Control {
     this(
       entry -> {
         String text = I18n.translate(entry.getNameTranslationKey());
-        if(entry.item_00 instanceof final InventoryEntry inventoryEntry) {
-          final int quantity = getInventoryEntryQuantity(inventoryEntry);
+        if(entry.item_00 instanceof final RegistryEntry e) {
+          final int quantity = getInventoryEntryQuantity(e);
           if(quantity > 1) {
             text += " (" + quantity + ')';
           }

@@ -46,6 +46,7 @@ import legend.game.types.UiFile;
 import legend.game.types.UiPart;
 import legend.game.types.UiType;
 import legend.game.unpacker.FileData;
+import org.legendofdragoon.modloader.registries.RegistryEntry;
 import org.legendofdragoon.modloader.registries.RegistryId;
 
 import javax.annotation.Nullable;
@@ -1693,7 +1694,7 @@ public final class SItem {
       final MenuEntryStruct04<?> menuItem = menuItems.get(s3);
       String text = I18n.translate(menuItem.getNameTranslationKey());
 
-      if(menuItem.item_00 instanceof final InventoryEntry entry) {
+      if(menuItem.item_00 instanceof final RegistryEntry entry) {
         final int quantity = displayQuantity ? getInventoryEntryQuantity(entry) : 0;
         text = text + (quantity > 1 ? " (" + quantity + ')' : "");
       }

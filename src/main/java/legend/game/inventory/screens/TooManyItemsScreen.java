@@ -468,7 +468,7 @@ public class TooManyItemsScreen extends MenuScreen {
       list.remove(index);
 
       if(getInventoryEntryQuantity(discardedItem) > 0) {
-        if(!compareInventoryEntries(discardedItem, newItem.item_00)) {
+        if(!compareInventoryEntries(discardedItem, isItem ? (Item)newItem.item_00 : (Equipment)newItem.item_00)) {
           if(isItem) {
             this.items.add((MenuEntryStruct04<Item>)(MenuEntryStruct04)newItem);
           } else {
@@ -476,7 +476,7 @@ public class TooManyItemsScreen extends MenuScreen {
           }
         }
       } else {
-        if(getInventoryEntryQuantity(newItem.item_00) < 1) {
+        if(getInventoryEntryQuantity(isItem ? (Item)newItem.item_00 : (Equipment)newItem.item_00) < 1) {
           if(isItem) {
             this.items.set(this.invIndex + this.invScroll, (MenuEntryStruct04<Item>)(MenuEntryStruct04)newItem);
           } else {

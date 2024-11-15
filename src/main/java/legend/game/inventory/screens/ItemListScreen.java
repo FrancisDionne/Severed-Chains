@@ -13,6 +13,7 @@ import legend.game.modding.coremod.CoreMod;
 import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.MessageBoxResult;
+import org.legendofdragoon.modloader.registries.RegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -148,7 +149,7 @@ public class ItemListScreen extends MenuScreen {
 
   private <T> void discard(final MessageBoxResult result, final ItemList<T> list, final List<T> inv) {
     if(result == MessageBoxResult.YES) {
-      final InventoryEntry entry = (InventoryEntry)list.getSelectedItem().item_00;
+      final RegistryEntry entry = (RegistryEntry)list.getSelectedItem().item_00;
       final int index = getFirstIndexOfInventoryEntry(entry);
 
       inv.remove(index);

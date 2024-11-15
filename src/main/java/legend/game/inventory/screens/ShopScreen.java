@@ -651,12 +651,13 @@ public class ShopScreen extends MenuScreen {
                   index = getFirstIndexOfInventoryEntry((Item)list.get(slot));
                   entry = gameState_800babc8.items_2e9.get(index);
                   success = takeItem(index);
+                  wasStack = getFirstIndexOfInventoryEntry((Item)entry) > -1;
                 } else {
                   index = getFirstIndexOfInventoryEntry((Equipment)list.get(slot));
                   entry = gameState_800babc8.equipment_1e8.get(index);
                   success = takeEquipment(index);
+                  wasStack = getFirstIndexOfInventoryEntry((Equipment)entry) > -1;
                 }
-                wasStack = getFirstIndexOfInventoryEntry(entry) > -1;
 
                 if(success) {
                   final ShopSellPriceEvent event = EVENTS.postEvent(new ShopSellPriceEvent(shopId_8007a3b4, entry, entry.getPrice()));
@@ -1007,12 +1008,12 @@ public class ShopScreen extends MenuScreen {
           final int count;
           if(this.shopType2 != 0) {
             entry = (Item)list.get(slot);
-            final int index = getFirstIndexOfInventoryEntry(entry);
+            final int index = getFirstIndexOfInventoryEntry((Item)entry);
             taken = takeItem(index);
             count = list.size();
           } else {
             entry = (Equipment)list.get(slot);
-            final int index = getFirstIndexOfInventoryEntry(entry);
+            final int index = getFirstIndexOfInventoryEntry((Equipment)entry);
             taken = takeEquipment(index);
             count = list.size();
           }

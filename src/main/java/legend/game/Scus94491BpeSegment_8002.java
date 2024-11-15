@@ -1149,6 +1149,13 @@ public final class Scus94491BpeSegment_8002 {
     sortItems(items);
   }
 
+  public static <T extends InventoryEntry> List<T> sortItems(final List<T> list) {
+    final Comparator<T> compare = Comparator
+      .comparingInt((T item) -> item.getIcon())
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    return list.stream().sorted(compare).collect(Collectors.toList());
+  }
+
   public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemComparator() {
     return Comparator
       .comparingInt((MenuEntryStruct04<T> item) -> item.getIcon())
@@ -1163,15 +1170,8 @@ public final class Scus94491BpeSegment_8002 {
     gameState_800babc8.items_2e9 = sortItems(gameState_800babc8.items_2e9);
   }
 
-  public static <T extends InventoryEntry> List<T> sortItems(final List<T> list) {
-    final Comparator<T> compare = Comparator
-      .comparingInt((T item) -> item.getIcon())
-      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
-    return list.stream().sorted(compare).collect(Collectors.toList());
-  }
-
   @Method(0x80023a88L)
-  public static void sortItems() {
+  public static void sortBattleItems() {
     final List<MenuEntryStruct04<Item>> items = new ArrayList<>();
 
     for(final Item item : gameState_800babc8.items_2e9) {
@@ -4074,14 +4074,19 @@ public final class Scus94491BpeSegment_8002 {
     randSeed = seed;
   }
 
-  public static int getInventoryEntryQuantity(final InventoryEntry entry) {
-    if(entry instanceof final Item item) {
-      return (int)gameState_800babc8.items_2e9.stream().filter((e) -> compareInventoryEntries(e, entry)).count();
-    }
-    if(entry instanceof final Equipment equipment) {
-      return (int)gameState_800babc8.equipment_1e8.stream().filter((e) -> compareInventoryEntries(e, entry)).count();
-    }
-    return 0;
+  public static <T extends RegistryEntry> int getInventoryEntryQuantity(final T entry) {
+    final List<?> list = entry instanceof Item ? gameState_800babc8.items_2e9 : gameState_800babc8.equipment_1e8;
+    return (int)list.stream().filter((e) -> compareInventoryEntries((RegistryEntry)e, entry)).count();
+  }
+
+  public static <T extends RegistryEntry> int getFirstIndexOfInventoryEntry(final T entry) {
+    final List<?> list = entry instanceof Item ? gameState_800babc8.items_2e9 : gameState_800babc8.equipment_1e8;
+    final int index = (int)list.stream().takeWhile((e) -> !compareInventoryEntries((RegistryEntry)e, entry)).count();
+    return index < list.size() ? index : -1;
+  }
+
+  public static <T extends RegistryEntry> boolean compareInventoryEntries(final T entry1, final T entry2) {
+    return Objects.equals(entry1.getRegistryId().toString(), entry2.getRegistryId().toString());
   }
 
   public static List<Item> getUniqueInventoryItems() {
@@ -4098,27 +4103,5 @@ public final class Scus94491BpeSegment_8002 {
 
   public static int getInventoryEquipmentCount() {
     return getUniqueInventoryEquipments().stream().mapToInt(Scus94491BpeSegment_8002::getInventoryEntryQuantity).sum();
-  }
-
-  public static int getFirstIndexOfInventoryEntry(final InventoryEntry entry) {
-    int index = -1;
-    if (entry instanceof final Item item) {
-      index = (int)gameState_800babc8.items_2e9.stream().takeWhile((e) -> !compareInventoryEntries(e, entry)).count();
-      index = index < gameState_800babc8.items_2e9.size() ? index : -1;
-    } else if (entry instanceof final Equipment equipment) {
-      index = (int)gameState_800babc8.equipment_1e8.stream().takeWhile((e) -> !compareInventoryEntries(e, entry)).count();
-      index = index < gameState_800babc8.equipment_1e8.size() ? index : -1;
-    }
-    return index;
-  }
-
-  public static boolean compareInventoryEntries(final InventoryEntry entry1, final InventoryEntry entry2) {
-    if(entry1 instanceof final Item item1 && entry2 instanceof final Item item2) {
-      return Objects.equals(item1.getRegistryId().toString(), item2.getRegistryId().toString());
-    }
-    if(entry1 instanceof final Equipment equipment1 && entry2 instanceof final Equipment equipment2) {
-      return Objects.equals(equipment1.getRegistryId().toString(), equipment2.getRegistryId().toString());
-    }
-    return false;
   }
 }
