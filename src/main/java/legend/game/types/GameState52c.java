@@ -56,8 +56,8 @@ public class GameState52c {
   public final int[] chestFlags_1c4 = new int[8];
 //  public final ShortRef equipmentCount_1e4;
 //  public final ShortRef itemCount_1e6;
-  public List<Equipment> equipment_1e8 = new ArrayList<>();
-  public List<Item> items_2e9 = new ArrayList<>();
+  public final List<Equipment> equipment_1e8 = new ArrayList<>();
+  public final List<Item> items_2e9 = new ArrayList<>();
 
   /** Only used during loading */
   public final IntList equipmentIds_1e8 = new IntArrayList();

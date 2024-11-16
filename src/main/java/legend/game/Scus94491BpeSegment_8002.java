@@ -1149,11 +1149,13 @@ public final class Scus94491BpeSegment_8002 {
     sortItems(items);
   }
 
-  public static <T extends InventoryEntry> List<T> sortItems(final List<T> list) {
-    final Comparator<T> compare = Comparator
+  public static <T extends InventoryEntry> void sortItems(final List<T> list) {
+    final Comparator<T> comparator = Comparator
       .comparingInt((T item) -> item.getIcon())
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
-    return list.stream().sorted(compare).collect(Collectors.toList());
+    final List<T> newList = list.stream().sorted(comparator).toList();
+    list.clear();
+    list.addAll(newList);
   }
 
   public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemComparator() {
@@ -1163,11 +1165,11 @@ public final class Scus94491BpeSegment_8002 {
   }
 
   public static void sortEquipmentInventory() {
-    gameState_800babc8.equipment_1e8 = sortItems(gameState_800babc8.equipment_1e8);
+    sortItems(gameState_800babc8.equipment_1e8);
   }
 
   public static void sortItemInventory() {
-    gameState_800babc8.items_2e9 = sortItems(gameState_800babc8.items_2e9);
+    sortItems(gameState_800babc8.items_2e9);
   }
 
   @Method(0x80023a88L)
