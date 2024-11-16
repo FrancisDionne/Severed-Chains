@@ -19,6 +19,7 @@ import legend.core.opengl.TmdObjLoader;
 import legend.game.EngineState;
 import legend.game.EngineStateEnum;
 import legend.game.Scus94491BpeSegment;
+import legend.game.Scus94491BpeSegment_8002;
 import legend.game.characters.Element;
 import legend.game.characters.Stat;
 import legend.game.characters.StatMod;
@@ -193,7 +194,6 @@ import static legend.game.Scus94491BpeSegment_8002.loadModelStandardAnimation;
 import static legend.game.Scus94491BpeSegment_8002.loadPlayerModelAndAnimation;
 import static legend.game.Scus94491BpeSegment_8002.prepareObjTable2;
 import static legend.game.Scus94491BpeSegment_8002.scriptDeallocateAllTextboxes;
-import static legend.game.Scus94491BpeSegment_8002.sortItems;
 import static legend.game.Scus94491BpeSegment_8002.sssqResetStuff;
 import static legend.game.Scus94491BpeSegment_8002.takeItemId;
 import static legend.game.Scus94491BpeSegment_8003.GetTPage;
@@ -7610,7 +7610,7 @@ public class Battle extends EngineState {
       spGained_800bc950[charSlot] = 0;
     }
 
-    sortItems();
+    Scus94491BpeSegment_8002.sortBattleItems();
   }
 
   @Method(0x800ee8c4L)
