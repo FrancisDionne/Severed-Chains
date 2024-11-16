@@ -36,6 +36,7 @@ import legend.game.combat.deff.Anim;
 import legend.game.combat.deff.DeffManager7cc;
 import legend.game.combat.deff.DeffPart;
 import legend.game.combat.deff.LoadedDeff24;
+import legend.game.combat.effects.AdditionButtonFeedbackText;
 import legend.game.combat.effects.AdditionCharEffectData0c;
 import legend.game.combat.effects.AdditionNameTextEffect1c;
 import legend.game.combat.effects.AdditionSparksEffect08;
@@ -89,6 +90,7 @@ import legend.game.combat.types.StageDeffThing08;
 import legend.game.combat.ui.BattleHud;
 import legend.game.combat.ui.BattleMenuStruct58;
 import legend.game.combat.ui.UiBox;
+import legend.game.debugger.CombatDebuggerController;
 import legend.game.fmv.Fmv;
 import legend.game.i18n.I18n;
 import legend.game.inventory.Equipment;
@@ -147,6 +149,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.GTE;
@@ -266,6 +269,7 @@ import static legend.game.combat.environment.Ambiance.stageAmbiance_801134fc;
 import static legend.game.combat.environment.BattleCamera.UPDATE_REFPOINT;
 import static legend.game.combat.environment.BattleCamera.UPDATE_VIEWPOINT;
 import static legend.game.combat.environment.StageData.stageData_80109a98;
+import static legend.game.modding.coremod.CoreMod.ADDITION_BUTTON_MODE_CONFIG;
 
 public class Battle extends EngineState {
   private static final Logger LOGGER = LogManager.getFormatterLogger(Battle.class);
@@ -481,8 +485,6 @@ public class Battle extends EngineState {
   };
   public static final int[] charWidthAdjustTable_800fa7cc = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, -1, -1, 0, 1, -1, 0, 4, 2, -1, 1, -2, 0, -2, 0, -1, -2, 0, 1, -1, -1, -2, -1, 0, 0, 1, 1, 1, 1, 1, 3, 1, 1, 5, 4, 1, 5, -2, 1, 1, 1, 1, 3, 2, 3, 1, 1, -3, 1, 1, 2, 4, 2, -1, 6};
 
-  public static final String[] additionNames_800fa8d4 = {"Double Slash", "Volcano", "Burning Rush", "Crush Dance", "Madness Hero", "Moon Strike", "Blazing Dynamo", "", "Harpoon", "Spinning Cane", "Rod Typhoon", "Gust of Wind Dance", "Flower Storm", "", "Whip Smack", "More & More", "Hard Blade", "Demon's Dance", "", "Pursuit", "Inferno", "Bone Crush", "", "Double Smack", "Hammer Spin", "Cool Boogie", "Cat's Cradle", "Perky Step", "", "Double Punch", "Ferry of Styx", "Summon 4 Gods", "5-Ring Shattering", "Hex Hammer", "Omni-Sweep", "Harpoon", "Spinning Cane", "Rod Typhoon", "Gust of Wind Dance", "Flower Storm"};
-
   /** Next 4 globals are related to SpTextEffect40 */
   private int _800faa90;
   private int _800faa92;
@@ -588,6 +590,9 @@ public class Battle extends EngineState {
 
       if(battleLoaded_800bc94c) {
         this.renderBattleEnvironment();
+        if (SEffe.additionButtonFeedbackText != null) {
+          SEffe.additionButtonFeedbackText.renderAdditionFeedbackTexture();
+        }
       }
     } else {
       //LAB_8001870c
@@ -1490,6 +1495,16 @@ public class Battle extends EngineState {
     this.initPlayerBattleEntityStats();
 
     pregameLoadingStage_800bb10c++;
+
+    if (CombatDebuggerController.autoPunchingBagMode) {
+      CombatDebuggerController.punchingBagMode();
+    }
+
+    if (CONFIG.getConfig(ADDITION_BUTTON_MODE_CONFIG.get()) == AdditionButtonMode.FEEDBACK) {
+      SEffe.additionButtonFeedbackText = new AdditionButtonFeedbackText();
+    } else {
+      SEffe.additionButtonFeedbackText = null;
+    }
   }
 
   @Method(0x800c791cL)
@@ -4470,7 +4485,7 @@ public class Battle extends EngineState {
 
   @Method(0x800d3968L)
   public int[] setAdditionNameDisplayCoords(final int addition) {
-    final String additionName = additionNames_800fa8d4[addition];
+    final String additionName = AdditionConfigs.additionNames_800fa8d4[addition];
 
     int additionDisplayWidth = 0;
     //LAB_800d39b8
@@ -4496,7 +4511,7 @@ public class Battle extends EngineState {
       final ScriptState<AdditionNameTextEffect1c> state = SCRIPTS.allocateScriptState("AdditionNameTextEffect1c", additionStruct);
       state.loadScriptFile(doNothingScript_8004f650);
       state.setTicker((s, effect) -> additionStruct.tickAdditionNameEffect(s, this._800faa9d));
-      final String additionName = additionNames_800fa8d4[addition];
+      final String additionName = AdditionConfigs.additionNames_800fa8d4[addition];
 
       //LAB_800d3e5c
       //LAB_800d3e7c
@@ -4626,8 +4641,15 @@ public class Battle extends EngineState {
   @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "translucency", description = "The translucency mode")
   @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "brightness", description = "The brightness")
   @Method(0x800d46d4L)
-  public FlowControl scriptRenderButtonPressHudElement(final RunningScript<?> script) {
-    renderButtonPressHudElement1(script.params_20[0].get(), script.params_20[1].get(), script.params_20[2].get(), Translucency.of(script.params_20[3].get()), script.params_20[4].get());
+  public FlowControl scriptRenderButtonPressHudElement(final RunningScript<?> script) { // Magic Item Mash
+    final AdditionButtonStyle style = CONFIG.getConfig(CoreMod.ADDITION_BUTTON_STYLE_CONFIG.get());
+    final int type = script.params_20[0].get();
+    final boolean isButtonType = type == 33 || type == 35; // 33 = Button Up, 35 = Button Down
+    if (!isButtonType || style == AdditionButtonStyle.PLAYSTATION) {
+      renderButtonPressHudElement1(type, script.params_20[1].get(), script.params_20[2].get(), Translucency.of(script.params_20[3].get()), script.params_20[4].get());
+    } else if (style == AdditionButtonStyle.XBOX) {
+      renderButtonPressHudElement1(AdditionButtonFeedbackText.xboxAFrames[type == 35 ? 2 : 0], 2);
+    }
     return FlowControl.CONTINUE;
   }
 
@@ -8624,9 +8646,43 @@ public class Battle extends EngineState {
 
     //LAB_801091dc
     this.cameraScriptMainTableJumpIndex_800c6748 = openingCamera + 1;
-    this.hud.currentCameraPositionIndicesIndex_800c66b0 = simpleRand() & 3;
+    this.hud.currentCameraPositionIndicesIndex_800c66b0 = this.getStartingCameraAngleIndex();
     this.currentCameraIndex_800c6780 = this.currentStageData_800c6718.cameraPosIndices_18[this.hud.currentCameraPositionIndicesIndex_800c66b0];
     battleFlags_800bc960 |= 0x2;
+  }
+
+  private int getStartingCameraAngleIndex() {
+    final PreferredBattleCameraAngle config = CONFIG.getConfig(CoreMod.PREFERRED_BATTLE_CAMERA_ANGLE.get());
+    if (config != PreferredBattleCameraAngle.NORMAL) {
+      int filteredArrayIndex = 0;
+      final int[] filteredIndices = new int[this.currentStageData_800c6718.cameraPosIndices_18.length];
+      final int[] cameraAngles = switch(config) {
+        case PreferredBattleCameraAngle.PLAYER -> BattleCamera.playerCameraAngles;
+        case PreferredBattleCameraAngle.SIDE -> BattleCamera.sideCameraAngles;
+        case PreferredBattleCameraAngle.ENEMY -> BattleCamera.enemyCameraAngles;
+        default -> throw new IllegalArgumentException("Couldn't match the config " + config + " to a camera angles preset array");
+      };
+
+      for (int i = 0; i < this.currentStageData_800c6718.cameraPosIndices_18.length; i++) {
+        if (this.cameraArrayContainsIndex(this.currentStageData_800c6718.cameraPosIndices_18[i], cameraAngles)) {
+          filteredIndices[filteredArrayIndex] = i;
+          filteredArrayIndex++;
+        }
+        if (filteredArrayIndex > 0) {
+          return filteredIndices[new Random().nextInt(filteredArrayIndex)];
+        }
+      }
+    }
+    return simpleRand() & 3; //Falls back to the default behavior
+  }
+
+  private boolean cameraArrayContainsIndex(final int index, final int[] array) {
+    for (int i = 0; i < array.length; i++) {
+      if (array[i] == index) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Method(0x80109808L)
