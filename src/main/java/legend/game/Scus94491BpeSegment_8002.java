@@ -169,7 +169,7 @@ public final class Scus94491BpeSegment_8002 {
   private static Obj textboxSelectionObj;
   private static final MV textboxSelectionTransforms = new MV();
 
-  public static final int EQUIPMENT_MAX_AMOUNT = 255;
+  public static final int EQUIPMENT_MAX_AMOUNT = 5;
 
   @Method(0x80020008L)
   public static void sssqResetStuff() {
@@ -1149,13 +1149,11 @@ public final class Scus94491BpeSegment_8002 {
     sortItems(items);
   }
 
-  public static <T extends InventoryEntry> void sortItems(final List<T> list) {
+  public static <T extends InventoryEntry> List<T> sortItems(final List<T> list) {
     final Comparator<T> comparator = Comparator
       .comparingInt((T item) -> item.getIcon())
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
-    final List<T> newList = list.stream().sorted(comparator).toList();
-    list.clear();
-    list.addAll(newList);
+    return list.stream().sorted(comparator).collect(Collectors.toList());
   }
 
   public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemComparator() {
@@ -1165,11 +1163,15 @@ public final class Scus94491BpeSegment_8002 {
   }
 
   public static void sortEquipmentInventory() {
-    sortItems(gameState_800babc8.equipment_1e8);
+    final List<Equipment> list = sortItems(gameState_800babc8.equipment_1e8);
+    gameState_800babc8.equipment_1e8.clear();
+    gameState_800babc8.equipment_1e8.addAll(list);
   }
 
   public static void sortItemInventory() {
-    sortItems(gameState_800babc8.items_2e9);
+    final List<Item> list = sortItems(gameState_800babc8.items_2e9);
+    gameState_800babc8.items_2e9.clear();
+    gameState_800babc8.items_2e9.addAll(list);
   }
 
   @Method(0x80023a88L)
