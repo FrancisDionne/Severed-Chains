@@ -162,9 +162,8 @@ public class EquipmentScreen extends MenuScreen {
 
     renderMenuItems(194, 92, this.menuItems, slotScroll, 4, this._800bdb9c, this._800bdba0, true);
 
-    if(slotIndex + slotScroll < this.menuItems.size()) {
-      renderString(194, 178, I18n.translate(this.menuItems.get(slotIndex + slotScroll).item_00.getDescriptionTranslationKey()), allocate);
-    }
+    final String text = slotIndex + slotScroll < this.menuItems.size() ? I18n.translate(this.menuItems.get(slotIndex + slotScroll).item_00.getDescriptionTranslationKey()) : "";
+    renderString(194, 178, text, allocate);
   }
 
   private int menuHighlightPositionY(final int slot) {
