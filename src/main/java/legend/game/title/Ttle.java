@@ -405,7 +405,7 @@ public class Ttle extends EngineState {
       }
 
       whichMenu_800bdc38 = WhichMenu.UNLOAD;
-    }, "fadeOutForCategorizeSave"), () -> false);
+    }, this.getClass().toString() + ".fadeOutForCategorizeSave"), () -> false);
   }
 
   private void fadeOutForMemcard() {
@@ -425,7 +425,7 @@ public class Ttle extends EngineState {
       }
 
       whichMenu_800bdc38 = WhichMenu.UNLOAD;
-    }, "fadeOutForMemcard"), () -> false);
+    }, this.getClass().toString() + ".fadeOutForMemcard"), () -> false);
   }
 
   private void fadeOutToMenu(final Supplier<MenuScreen> destScreen, final BooleanSupplier transition) {

@@ -1,6 +1,9 @@
 package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
+import legend.game.combat.ui.FooterAction;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.Equipment;
@@ -58,6 +61,10 @@ public class TooManyItemsScreen extends MenuScreen {
   private final MenuEntries<Equipment> equipment = new MenuEntries<>();
   private final MenuEntries<Item> items = new MenuEntries<>();
   private final MenuEntries<InventoryEntry> droppedItems = new MenuEntries<>();
+
+  public TooManyItemsScreen() {
+    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
+  }
 
   @Override
   protected void render() {
@@ -184,6 +191,8 @@ public class TooManyItemsScreen extends MenuScreen {
         }
       }
     }
+
+    MenuFooter.render(this.getClass().toString());
   }
 
   private void FUN_8010fd80(final boolean allocate, final InventoryEntry inv, final int slotIndex, final int slotScroll, final long a4) {
