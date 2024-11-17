@@ -70,27 +70,29 @@ public final class MenuFooter {
     int x = 358;
 
     for(final FooterAction footAction : actionsMap.get(key)) {
-      final int orthoOffsetX = (int)RENDERER.getWidescreenOrthoOffsetX();
-      final String text = getText(footAction);
-      final int textWidth = textWidth(text);
-      x = x - textWidth;
+      if (footAction != null) {
+        final int orthoOffsetX = (int)RENDERER.getWidescreenOrthoOffsetX();
+        final String text = getText(footAction);
+        final int textWidth = textWidth(text);
+        x = x - textWidth;
 
-      SItem.renderText(text, orthoOffsetX + x, 226, TextColour.BROWN);
+        SItem.renderText(text, orthoOffsetX + x, 226, TextColour.BROWN);
 
-      x -= 14;
+        x -= 14;
 
-      m.translation(orthoOffsetX + x, 226, 120);
-      m.scale(12, 12, 1f);
+        m.translation(orthoOffsetX + x, 226, 120);
+        m.scale(12, 12, 1f);
 
-      RENDERER
-        .queueOrthoModel(quad, m, QueuedModelStandard.class)
-        .texture(getTexture(footAction));
+        RENDERER
+          .queueOrthoModel(quad, m, QueuedModelStandard.class)
+          .texture(getTexture(footAction));
 
-      x -= 8;
+        x -= 8;
+      }
     }
   }
 
-  public static void setFooterActions(final String key, final FooterAction action1, @Nullable final FooterAction action2, @Nullable final FooterAction action3, @Nullable final FooterAction action4, @Nullable final FooterAction action5) {
+  public static void setFooterActions(final String key, @Nullable final FooterAction action1, @Nullable final FooterAction action2, @Nullable final FooterAction action3, @Nullable final FooterAction action4, @Nullable final FooterAction action5) {
     final List<FooterAction> actions;
     if(!actionsMap.containsKey(key)) {
       actions = new ArrayList<>();
@@ -99,7 +101,7 @@ public final class MenuFooter {
       actions = actionsMap.get(key);
     }
     actions.clear();
-    actions.add(action1);
+    if(action1 != null) actions.add(action1);
     if(action2 != null) actions.add(action2);
     if(action3 != null) actions.add(action3);
     if(action4 != null) actions.add(action4);
@@ -136,5 +138,9 @@ public final class MenuFooter {
 
   public static void setTypicalFooterActions(final String key) {
     setFooterActions(key, true, null, null, null);
+  }
+
+  public static void clearFooterActions(final String key) {
+    setFooterActions(key, null, null, null, null, null);
   }
 }
