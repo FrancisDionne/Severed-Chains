@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.game.DabasManager;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.i18n.I18n;
 import legend.game.input.Input;
 import legend.game.input.InputAction;
@@ -79,6 +80,7 @@ public class DabasScreen extends MenuScreen {
 
   public DabasScreen(final Runnable unload) {
     this.unload = unload;
+    MenuFooter.setTypicalFooterActions(this.getClass().toString());
   }
 
   @Override
@@ -229,6 +231,8 @@ public class DabasScreen extends MenuScreen {
         this.unload.run();
       }
     }
+
+    MenuFooter.render(this.getClass().toString());
   }
 
   private void takeItems() {

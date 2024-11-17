@@ -1,5 +1,8 @@
 package legend.game.inventory.screens;
 
+import legend.game.combat.ui.FooterAction;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.Equipment;
@@ -14,6 +17,7 @@ import legend.game.types.MenuEntryStruct04;
 import legend.game.types.MessageBoxResult;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.List;
 
 import static legend.core.GameEngine.CONFIG;
@@ -116,6 +120,8 @@ public class ItemListScreen extends MenuScreen {
     }
 
     this.updateDescription(this.itemList.getSelectedItem());
+
+    MenuFooter.setFooterActions(this.getClass().toString(), true, new FooterAction(FooterActions.DISCARD, InputAction.BUTTON_WEST), new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
   }
 
   private void updateDescription(@Nullable final MenuEntryStruct04<?> item) {
@@ -129,7 +135,7 @@ public class ItemListScreen extends MenuScreen {
 
   @Override
   protected void render() {
-
+    MenuFooter.render(this.getClass().toString());
   }
 
   private <T> void showDiscardMenu(final ItemList<T> list, final List<T> inv) {

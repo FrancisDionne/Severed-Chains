@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.EquipItemResult;
@@ -115,6 +116,10 @@ public class ShopScreen extends MenuScreen {
   private double scrollAccumulator;
   private int mouseX;
   private int mouseY;
+
+  public ShopScreen() {
+    MenuFooter.setTypicalFooterActions(this.getClass().toString());
+  }
 
   @Override
   protected void render() {
@@ -283,6 +288,8 @@ public class ShopScreen extends MenuScreen {
 
       case UNLOAD_19 -> whichMenu_800bdc38 = WhichMenu.UNLOAD;
     }
+
+    MenuFooter.render(this.getClass().toString());
   }
 
   private void scroll(final int scroll) {

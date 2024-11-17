@@ -2,6 +2,9 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
+import legend.game.combat.ui.FooterAction;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.EquipItemResult;
@@ -53,6 +56,7 @@ public class EquipmentScreen extends MenuScreen {
 
   public EquipmentScreen(final Runnable unload) {
     this.unload = unload;
+    MenuFooter.setFooterActions(this.getClass().toString(), true, new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
   }
 
   @Override
@@ -157,6 +161,8 @@ public class EquipmentScreen extends MenuScreen {
     if(slotIndex + slotScroll < this.menuItems.size()) {
       renderString(194, 178, I18n.translate(this.menuItems.get(slotIndex + slotScroll).item_00.getDescriptionTranslationKey()), allocate);
     }
+
+    MenuFooter.render(this.getClass().toString());
   }
 
   private int menuHighlightPositionY(final int slot) {

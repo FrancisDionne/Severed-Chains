@@ -1,5 +1,8 @@
 package legend.game.inventory.screens;
 
+import legend.game.combat.ui.FooterAction;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.input.InputAction;
 
 import static legend.game.SItem.FUN_801034cc;
@@ -35,6 +38,7 @@ public class StatusScreen extends MenuScreen {
 
   public StatusScreen(final Runnable unload) {
     this.unload = unload;
+    MenuFooter.setFooterActions(this.getClass().toString(), new FooterAction(FooterActions.BACK, InputAction.BUTTON_EAST));
   }
 
   @Override
@@ -80,6 +84,8 @@ public class StatusScreen extends MenuScreen {
         this.unload.run();
       }
     }
+
+    MenuFooter.render(this.getClass().toString());
   }
 
   private void scroll(final int slot) {

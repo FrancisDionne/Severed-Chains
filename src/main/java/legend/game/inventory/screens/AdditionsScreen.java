@@ -1,10 +1,12 @@
 package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.input.InputAction;
 import legend.game.types.MenuAdditionInfo;
 import legend.game.types.Renderable58;
 
+import java.awt.*;
 import java.util.Arrays;
 
 import static legend.game.SItem.FUN_801034cc;
@@ -45,6 +47,7 @@ public class AdditionsScreen extends MenuScreen {
   public AdditionsScreen(final Runnable unload) {
     this.unload = unload;
     Arrays.setAll(this.additions, i -> new MenuAdditionInfo());
+    MenuFooter.setTypicalFooterActions(this.getClass().toString());
   }
 
   @Override
@@ -101,6 +104,7 @@ public class AdditionsScreen extends MenuScreen {
         this.unload.run();
       }
     }
+    MenuFooter.render(this.getClass().toString());
   }
 
   private void renderAdditions(final int charSlot, final MenuAdditionInfo[] additions, final int selectedAdditionOffset, final long a4) {

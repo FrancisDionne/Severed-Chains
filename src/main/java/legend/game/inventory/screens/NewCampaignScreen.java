@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
 import legend.game.SItem;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.input.InputAction;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
@@ -81,6 +82,8 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
         this.unload = true;
       }
     });
+
+    MenuFooter.setTypicalFooterActions(this.getClass().toString());
   }
 
   @Override
@@ -101,6 +104,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
       playMenuSound(2);
       whichMenu_800bdc38 = WhichMenu.UNLOAD;
     }
+    MenuFooter.render(this.getClass().toString());
   }
 
   private void menuEscape() {

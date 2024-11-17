@@ -2,6 +2,9 @@ package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
 import legend.game.SItem;
+import legend.game.combat.ui.FooterAction;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.input.InputAction;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
@@ -67,6 +70,8 @@ public class CampaignSelectionScreen extends MenuScreen {
     for(final Campaign campaign : SAVES.loadAllCampaigns()) {
       this.campaignList.addEntry(campaign);
     }
+
+    MenuFooter.setFooterActions(this.getClass().toString(), true, new FooterAction(FooterActions.DELETE, InputAction.BUTTON_WEST));
   }
 
   private void onSelection(final Campaign campaign) {
@@ -126,7 +131,7 @@ public class CampaignSelectionScreen extends MenuScreen {
   @Override
   protected void render() {
     SItem.renderCentredText("Campaigns", 188, 10, TextColour.BROWN);
-    SItem.renderText("\u011f Delete", 297, 226, TextColour.BROWN);
+    MenuFooter.render(this.getClass().toString());
   }
 
   private void menuDelete() {

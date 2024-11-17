@@ -1,6 +1,9 @@
 package legend.game.inventory.screens;
 
 import legend.game.SItem;
+import legend.game.combat.ui.FooterAction;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.BigList;
@@ -64,12 +67,14 @@ public class SaveGameScreen extends MenuScreen {
     for(final SavedGame save : this.saves) {
       this.saveList.addEntry(save);
     }
+
+    MenuFooter.setFooterActions(this.getClass().toString(), true, new FooterAction(FooterActions.DELETE, InputAction.BUTTON_WEST));
   }
 
   @Override
   protected void render() {
     SItem.renderCentredText("Save Game", 188, 10, TextColour.BROWN);
-    SItem.renderText("\u011f Delete", 297, 226, TextColour.BROWN);
+    MenuFooter.render(this.getClass().toString());
   }
 
   private void onSelection(@Nullable final SavedGame save) {

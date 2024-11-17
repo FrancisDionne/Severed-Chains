@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
 import legend.game.SItem;
+import legend.game.combat.ui.MenuFooter;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.controls.Background;
@@ -51,6 +52,9 @@ public class OptionsCategoryScreen extends VerticalLayoutScreen {
         this.addRow(I18n.translate(CoreMod.MOD_ID + ".config.category." + category.name().toLowerCase(Locale.US) + ".label"), button);
       }
     }
+
+    this.menuFooterRenderKey = this.getClass().toString();
+    MenuFooter.setTypicalFooterActions(this.menuFooterRenderKey);
   }
 
   @Override
