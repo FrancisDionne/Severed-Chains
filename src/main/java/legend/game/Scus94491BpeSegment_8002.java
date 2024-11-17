@@ -169,7 +169,7 @@ public final class Scus94491BpeSegment_8002 {
   private static Obj textboxSelectionObj;
   private static final MV textboxSelectionTransforms = new MV();
 
-  public static final int EQUIPMENT_MAX_AMOUNT = 5;
+  public static final int EQUIPMENT_MAX_AMOUNT = 255;
 
   @Method(0x80020008L)
   public static void sssqResetStuff() {
