@@ -70,25 +70,23 @@ public final class MenuFooter {
     int x = 358;
 
     for(final FooterAction footAction : actionsMap.get(key)) {
-      if (footAction != null) {
-        final int orthoOffsetX = (int)RENDERER.getWidescreenOrthoOffsetX();
-        final String text = getText(footAction);
-        final int textWidth = textWidth(text);
-        x = x - textWidth;
+      final int orthoOffsetX = (int)RENDERER.getWidescreenOrthoOffsetX();
+      final String text = getText(footAction);
+      final int textWidth = textWidth(text);
+      x = x - textWidth;
 
-        SItem.renderText(text, orthoOffsetX + x, 226, TextColour.BROWN);
+      SItem.renderText(text, orthoOffsetX + x, 226, TextColour.BROWN);
 
-        x -= 14;
+      x -= 14;
 
-        m.translation(orthoOffsetX + x, 226, 120);
-        m.scale(12, 12, 1f);
+      m.translation(orthoOffsetX + x, 226, 120);
+      m.scale(12, 12, 1f);
 
-        RENDERER
-          .queueOrthoModel(quad, m, QueuedModelStandard.class)
-          .texture(getTexture(footAction));
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(getTexture(footAction));
 
-        x -= 8;
-      }
+      x -= 8;
     }
   }
 
