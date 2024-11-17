@@ -17,7 +17,6 @@ import legend.game.types.MenuEntryStruct04;
 import legend.game.types.MessageBoxResult;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.List;
 
 import static legend.core.GameEngine.CONFIG;

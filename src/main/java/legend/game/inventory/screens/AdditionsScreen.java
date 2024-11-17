@@ -6,7 +6,6 @@ import legend.game.input.InputAction;
 import legend.game.types.MenuAdditionInfo;
 import legend.game.types.Renderable58;
 
-import java.awt.*;
 import java.util.Arrays;
 
 import static legend.game.SItem.FUN_801034cc;
