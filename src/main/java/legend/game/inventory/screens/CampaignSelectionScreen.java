@@ -71,7 +71,7 @@ public class CampaignSelectionScreen extends MenuScreen {
       this.campaignList.addEntry(campaign);
     }
 
-    MenuFooter.setFooterActions(this.getClass().toString(), true, new FooterAction(FooterActions.DELETE, InputAction.BUTTON_WEST));
+    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.DELETE, InputAction.BUTTON_WEST));
   }
 
   private void onSelection(final Campaign campaign) {

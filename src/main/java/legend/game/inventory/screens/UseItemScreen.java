@@ -73,7 +73,7 @@ public class UseItemScreen extends MenuScreen {
 
   public UseItemScreen(final Runnable unload) {
     this.unload = unload;
-    MenuFooter.setFooterActions(this.getClass().toString(), true, new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
+    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
   }
 
   @Override

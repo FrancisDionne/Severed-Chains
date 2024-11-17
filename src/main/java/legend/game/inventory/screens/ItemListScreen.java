@@ -120,7 +120,7 @@ public class ItemListScreen extends MenuScreen {
 
     this.updateDescription(this.itemList.getSelectedItem());
 
-    MenuFooter.setFooterActions(this.getClass().toString(), true, new FooterAction(FooterActions.DISCARD, InputAction.BUTTON_WEST), new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
+    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.DISCARD, InputAction.BUTTON_WEST), new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
   }
 
   private void updateDescription(@Nullable final MenuEntryStruct04<?> item) {

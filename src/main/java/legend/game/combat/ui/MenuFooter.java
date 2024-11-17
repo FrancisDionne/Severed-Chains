@@ -119,20 +119,20 @@ public final class MenuFooter {
     setFooterActions(key, action1, action2, action3, action4, null);
   }
 
-  public static void setFooterActions(final String key, final boolean typicalButtons, @Nullable final FooterAction action3, @Nullable final FooterAction action4, @Nullable final FooterAction action5) {
+  public static void setTypicalFooterActions(final String key, @Nullable final FooterAction action3, @Nullable final FooterAction action4, @Nullable final FooterAction action5) {
     setFooterActions(key, new FooterAction(FooterActions.SELECT, InputAction.BUTTON_SOUTH), new FooterAction(FooterActions.BACK, InputAction.BUTTON_EAST), action3, action4, action5);
   }
 
-  public static void setFooterActions(final String key, final boolean typicalButtons, @Nullable final FooterAction action3, @Nullable final FooterAction action4) {
-    setFooterActions(key, typicalButtons, action3, action4, null);
+  public static void setTypicalFooterActions(final String key, @Nullable final FooterAction action3, @Nullable final FooterAction action4) {
+    setTypicalFooterActions(key, action3, action4, null);
   }
 
-  public static void setFooterActions(final String key, final boolean typicalButtons, @Nullable final FooterAction action3) {
-    setFooterActions(key, typicalButtons, action3, null, null);
+  public static void setTypicalFooterActions(final String key, @Nullable final FooterAction action3) {
+    setTypicalFooterActions(key, action3, null, null);
   }
 
   public static void setTypicalFooterActions(final String key) {
-    setFooterActions(key, true, null, null, null);
+    setTypicalFooterActions(key, null, null, null);
   }
 
   public static void clearFooterActions(final String key) {

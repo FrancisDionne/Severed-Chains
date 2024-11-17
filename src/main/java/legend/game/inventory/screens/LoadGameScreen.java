@@ -60,7 +60,7 @@ public class LoadGameScreen extends MenuScreen {
       this.saveList.addEntry(save);
     }
 
-    MenuFooter.setFooterActions(this.getClass().toString(), true, new FooterAction(FooterActions.DELETE, InputAction.BUTTON_WEST));
+    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.DELETE, InputAction.BUTTON_WEST));
   }
 
   private void onSelection(final SavedGame save) {
