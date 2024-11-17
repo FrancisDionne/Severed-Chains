@@ -460,15 +460,15 @@ public class TooManyItemsScreen extends MenuScreen {
       playMenuSound(40);
     } else {
       final List<?> list = isItem ? gameState_800babc8.items_2e9 : gameState_800babc8.equipment_1e8;
-      final Item discardedItem = this.items.get(this.invIndex + this.invScroll).item_00;
-      final int index = getFirstIndexOfInventoryEntry(discardedItem);
+      final InventoryEntry discardedItem = (isItem ? this.items : this.equipment).get(this.invIndex + this.invScroll).item_00;
+      final int index = getFirstIndexOfInventoryEntry(isItem ? (Item)discardedItem : (Equipment)discardedItem);
       final MenuEntryStruct04<?> entry = MenuEntryStruct04.make(isItem ? (Item)list.get(index) : (Equipment)list.get(index));
       this.droppedItems.set(this.dropIndex, (MenuEntryStruct04<InventoryEntry>)entry);
 
       list.remove(index);
 
-      if(getInventoryEntryQuantity(discardedItem) > 0) {
-        if(!compareInventoryEntries(discardedItem, isItem ? (Item)newItem.item_00 : (Equipment)newItem.item_00)) {
+      if(getInventoryEntryQuantity(isItem ? (Item)discardedItem : (Equipment)discardedItem) > 0) {
+        if(!compareInventoryEntries(isItem ? (Item)discardedItem : (Equipment)discardedItem, isItem ? (Item)newItem.item_00 : (Equipment)newItem.item_00)) {
           if(isItem) {
             this.items.add((MenuEntryStruct04<Item>)(MenuEntryStruct04)newItem);
           } else {
