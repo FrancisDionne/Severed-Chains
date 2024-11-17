@@ -94,8 +94,8 @@ public final class MenuFooter {
       actionsMap.put(key, actions);
     } else {
       actions = actionsMap.get(key);
+      actions.clear();
     }
-    actions.clear();
     if(action1 != null) actions.add(action1);
     if(action2 != null) actions.add(action2);
     if(action3 != null) actions.add(action3);
