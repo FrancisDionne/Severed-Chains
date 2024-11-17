@@ -38,18 +38,18 @@ public final class MenuFooter {
     Texture.png(Path.of("gfx", "ui", "menuButton_Circle.png")),    //3
   };
 
-  private static Texture getTexture(final FooterAction footerAction) {
-    return switch(footerAction.input) {
+  private static Texture getTexture(final InputAction inputAction) {
+    return switch(inputAction) {
       case InputAction.BUTTON_SOUTH -> textures[0];
-      case InputAction.BUTTON_NORTH -> textures[2];
       case InputAction.BUTTON_WEST -> textures[1];
+      case InputAction.BUTTON_NORTH -> textures[2];
       case InputAction.BUTTON_EAST -> textures[3];
       default -> null;
     };
   }
 
-  private static String getText(final FooterAction footerAction) {
-    return switch(footerAction.action) {
+  private static String getText(final FooterActions footerAction) {
+    return switch(footerAction) {
       case FooterActions.DELETE -> "Delete";
       case FooterActions.SORT -> "Sort";
       case FooterActions.FILTER -> "Filter";
@@ -67,7 +67,7 @@ public final class MenuFooter {
       int x = 358 + (int)RENDERER.getWidescreenOrthoOffsetX();
 
       for(final FooterAction footAction : actionsMap.get(key)) {
-        final String text = getText(footAction);
+        final String text = getText(footAction.action);
         final int textWidth = textWidth(text);
         x -= textWidth;
 
@@ -80,7 +80,7 @@ public final class MenuFooter {
 
         RENDERER
           .queueOrthoModel(quad, m, QueuedModelStandard.class)
-          .texture(getTexture(footAction));
+          .texture(getTexture(footAction.input));
 
         x -= 8;
       }
