@@ -117,10 +117,6 @@ public class ShopScreen extends MenuScreen {
   private int mouseX;
   private int mouseY;
 
-  public ShopScreen() {
-    MenuFooter.setTypicalFooterActions(this.getClass().toString());
-  }
-
   @Override
   protected void render() {
     switch(this.menuState) {
@@ -289,7 +285,7 @@ public class ShopScreen extends MenuScreen {
       case UNLOAD_19 -> whichMenu_800bdc38 = WhichMenu.UNLOAD;
     }
 
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions();
   }
 
   private void scroll(final int scroll) {

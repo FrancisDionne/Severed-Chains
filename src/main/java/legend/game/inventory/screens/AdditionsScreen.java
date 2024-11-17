@@ -46,7 +46,6 @@ public class AdditionsScreen extends MenuScreen {
   public AdditionsScreen(final Runnable unload) {
     this.unload = unload;
     Arrays.setAll(this.additions, i -> new MenuAdditionInfo());
-    MenuFooter.setTypicalFooterActions(this.getClass().toString());
   }
 
   @Override
@@ -103,7 +102,7 @@ public class AdditionsScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions();
   }
 
   private void renderAdditions(final int charSlot, final MenuAdditionInfo[] additions, final int selectedAdditionOffset, final long a4) {

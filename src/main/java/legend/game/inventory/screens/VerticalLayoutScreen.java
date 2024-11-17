@@ -29,8 +29,6 @@ public class VerticalLayoutScreen extends MenuScreen {
   private final Glyph upArrow;
   private final Glyph downArrow;
 
-  protected String menuFooterRenderKey;
-
   public VerticalLayoutScreen() {
     this.highlight = this.addControl(new Brackets());
     this.highlight.setPos(26, 30);
@@ -122,7 +120,7 @@ public class VerticalLayoutScreen extends MenuScreen {
 
   @Override
   protected void render() {
-    MenuFooter.render(this.menuFooterRenderKey);
+    MenuFooter.render();
   }
 
   @Override

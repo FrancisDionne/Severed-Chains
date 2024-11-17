@@ -48,8 +48,7 @@ public class ModsScreen extends VerticalLayoutScreen {
       this.addRow(I18n.translate(modId + ".name"), checkbox);
     }
 
-    this.menuFooterRenderKey = this.getClass().toString();
-    MenuFooter.setTypicalFooterActions(this.menuFooterRenderKey);
+    MenuFooter.setTypicalActions();
   }
 
   private boolean isRequired(final String modId) {

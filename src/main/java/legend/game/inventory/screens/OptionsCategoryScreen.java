@@ -53,8 +53,7 @@ public class OptionsCategoryScreen extends VerticalLayoutScreen {
       }
     }
 
-    this.menuFooterRenderKey = this.getClass().toString();
-    MenuFooter.setTypicalFooterActions(this.menuFooterRenderKey);
+    MenuFooter.setTypicalActions();
   }
 
   @Override

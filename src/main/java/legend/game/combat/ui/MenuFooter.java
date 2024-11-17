@@ -6,15 +6,15 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
 import legend.game.SItem;
+import legend.game.input.Input;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.TextColour;
+import legend.game.modding.coremod.CoreMod;
 import org.joml.Matrix4f;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Arrays;
 
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
@@ -28,7 +28,7 @@ public final class MenuFooter {
     .bpp(Bpp.BITS_24)
     .build();
 
-  private static final HashMap<String, List<FooterAction>> actionsMap = new HashMap<>();
+  private static final FooterAction[] actions = new FooterAction[5];
 
   public static Texture[] textures = {
     Texture.png(Path.of("gfx", "ui", "menuButton_Cross.png")),     //0
@@ -61,11 +61,13 @@ public final class MenuFooter {
   private MenuFooter() {
   }
 
-  public static void render(final String key) {
-    if(actionsMap.containsKey(key)) {
-      int x = 358 + (int)RENDERER.getWidescreenOrthoOffsetX();
+  public static void render() {
+    int x = 358 + 8 + (int)RENDERER.getWidescreenOrthoOffsetX();
 
-      for(final FooterAction footAction : actionsMap.get(key)) {
+    for(final FooterAction footAction : actions) {
+      if(footAction != null) {
+        x -= 8;
+
         final String text = getText(footAction.action);
         final int textWidth = textWidth(text);
         x -= textWidth;
@@ -80,61 +82,88 @@ public final class MenuFooter {
         RENDERER
           .queueOrthoModel(quad, m, QueuedModelStandard.class)
           .texture(getTexture(footAction.input));
-
-        x -= 8;
       }
     }
   }
 
-  public static void setFooterActions(final String key, @Nullable final FooterAction action1, @Nullable final FooterAction action2, @Nullable final FooterAction action3, @Nullable final FooterAction action4, @Nullable final FooterAction action5) {
-    final List<FooterAction> actions;
-    if(!actionsMap.containsKey(key)) {
-      actions = new ArrayList<>();
-      actionsMap.put(key, actions);
-    } else {
-      actions = actionsMap.get(key);
-      actions.clear();
+  private static FooterAction newFooterAction(@Nullable final FooterActions action) {
+    if(action == null) {
+      return null;
     }
-    if(action1 != null) actions.add(action1);
-    if(action2 != null) actions.add(action2);
-    if(action3 != null) actions.add(action3);
-    if(action4 != null) actions.add(action4);
-    if(action5 != null) actions.add(action5);
+    final InputAction input = switch(action) {
+      case FooterActions.BACK -> InputAction.BUTTON_EAST;
+      case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD -> InputAction.BUTTON_WEST;
+      case FooterActions.SORT -> InputAction.BUTTON_NORTH;
+      case FooterActions.SELECT -> InputAction.BUTTON_SOUTH;
+    };
+    return new FooterAction(action, input);
   }
 
-  public static void setFooterActions(final String key, final FooterAction action1) {
-    setFooterActions(key, action1, null, null, null, null);
+  public static void setFootActions(@Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    actions[0] = newFooterAction(action1);
+    actions[1] = newFooterAction(action2);
+    actions[2] = newFooterAction(action3);
+    actions[3] = newFooterAction(action4);
+    actions[4] = newFooterAction(action5);
   }
 
-  public static void setFooterActions(final String key, final FooterAction action1, final FooterAction action2) {
-    setFooterActions(key, action1, action2, null, null, null);
+  public static void setTypicalActions() {
+    setFootActions(FooterActions.SELECT, FooterActions.BACK, null, null, null);
   }
 
-  public static void setFooterActions(final String key, final FooterAction action1, final FooterAction action2, final FooterAction action3) {
-    setFooterActions(key, action1, action2, action3, null, null);
+  public static void renderFooterActions(@Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    if (!compareFooterActions(action1, action2, action3, action4, action5)) {
+      setFootActions(action1, action2, action3, action4, action5);
+    }
+    render();
   }
 
-  public static void setFooterActions(final String key, final FooterAction action1, final FooterAction action2, final FooterAction action3, final FooterAction action4) {
-    setFooterActions(key, action1, action2, action3, action4, null);
+  public static void renderFooterActions(final FooterActions action1) {
+    renderFooterActions(action1, null, null, null, null);
   }
 
-  public static void setTypicalFooterActions(final String key, @Nullable final FooterAction action3, @Nullable final FooterAction action4, @Nullable final FooterAction action5) {
-    setFooterActions(key, new FooterAction(FooterActions.SELECT, InputAction.BUTTON_SOUTH), new FooterAction(FooterActions.BACK, InputAction.BUTTON_EAST), action3, action4, action5);
+  public static void renderFooterActions(final FooterActions action1, final FooterActions action2) {
+    renderFooterActions(action1, action2, null, null, null);
   }
 
-  public static void setTypicalFooterActions(final String key, @Nullable final FooterAction action3, @Nullable final FooterAction action4) {
-    setTypicalFooterActions(key, action3, action4, null);
+  public static void renderFooterActions(final FooterActions action1, final FooterActions action2, final FooterActions action3) {
+    renderFooterActions(action1, action2, action3, null, null);
   }
 
-  public static void setTypicalFooterActions(final String key, @Nullable final FooterAction action3) {
-    setTypicalFooterActions(key, action3, null, null);
+  public static void renderFooterActions(final FooterActions action1, final FooterActions action2, final FooterActions action3, final FooterActions action4) {
+    renderFooterActions(action1, action2, action3, action4, null);
   }
 
-  public static void setTypicalFooterActions(final String key) {
-    setTypicalFooterActions(key, null, null, null);
+  public static void renderTypicalFooterActions(@Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    renderFooterActions(FooterActions.SELECT, FooterActions.BACK, action3, action4, action5);
   }
 
-  public static void clearFooterActions(final String key) {
-    actionsMap.remove(key);
+  public static void renderTypicalFooterActions(@Nullable final FooterActions action3, @Nullable final FooterActions action4) {
+    renderTypicalFooterActions(action3, action4, null);
+  }
+
+  public static void renderTypicalFooterActions(@Nullable final FooterActions action3) {
+    renderTypicalFooterActions(action3, null, null);
+  }
+
+  public static void renderTypicalFooterActions() {
+    renderTypicalFooterActions(null, null, null);
+  }
+
+  private static boolean compareFooterActions(@Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    if (!compareFooterAction(actions[0], action1)) return false;
+    if (!compareFooterAction(actions[1], action2)) return false;
+    if (!compareFooterAction(actions[2], action3)) return false;
+    if (!compareFooterAction(actions[3], action4)) return false;
+    if (!compareFooterAction(actions[4], action5)) return false;
+    return true;
+  }
+
+  private static boolean compareFooterAction(@Nullable final FooterAction action1, @Nullable final FooterActions action2) {
+    return (action1 == null && action2 == null) || (action1 != null && action2 != null && action1.action == action2);
+  }
+
+  public static void clearFooterActions() {
+    Arrays.fill(actions, null);
   }
 }

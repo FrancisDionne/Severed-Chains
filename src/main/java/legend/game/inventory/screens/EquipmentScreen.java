@@ -56,7 +56,6 @@ public class EquipmentScreen extends MenuScreen {
 
   public EquipmentScreen(final Runnable unload) {
     this.unload = unload;
-    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
   }
 
   @Override
@@ -162,7 +161,7 @@ public class EquipmentScreen extends MenuScreen {
       renderString(194, 178, I18n.translate(this.menuItems.get(slotIndex + slotScroll).item_00.getDescriptionTranslationKey()), allocate);
     }
 
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions(FooterActions.SORT);
   }
 
   private int menuHighlightPositionY(final int slot) {

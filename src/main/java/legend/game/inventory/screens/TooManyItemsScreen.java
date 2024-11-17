@@ -62,10 +62,6 @@ public class TooManyItemsScreen extends MenuScreen {
   private final MenuEntries<Item> items = new MenuEntries<>();
   private final MenuEntries<InventoryEntry> droppedItems = new MenuEntries<>();
 
-  public TooManyItemsScreen() {
-    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
-  }
-
   @Override
   protected void render() {
     switch(this.menuState) {
@@ -192,7 +188,7 @@ public class TooManyItemsScreen extends MenuScreen {
       }
     }
 
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions(FooterActions.SORT);
   }
 
   private void FUN_8010fd80(final boolean allocate, final InventoryEntry inv, final int slotIndex, final int slotScroll, final long a4) {

@@ -38,7 +38,6 @@ public class StatusScreen extends MenuScreen {
 
   public StatusScreen(final Runnable unload) {
     this.unload = unload;
-    MenuFooter.setFooterActions(this.getClass().toString(), new FooterAction(FooterActions.BACK, InputAction.BUTTON_EAST));
   }
 
   @Override
@@ -85,7 +84,7 @@ public class StatusScreen extends MenuScreen {
       }
     }
 
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderFooterActions(FooterActions.BACK);
   }
 
   private void scroll(final int slot) {

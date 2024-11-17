@@ -70,8 +70,6 @@ public class CampaignSelectionScreen extends MenuScreen {
     for(final Campaign campaign : SAVES.loadAllCampaigns()) {
       this.campaignList.addEntry(campaign);
     }
-
-    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.DELETE, InputAction.BUTTON_WEST));
   }
 
   private void onSelection(final Campaign campaign) {
@@ -131,7 +129,7 @@ public class CampaignSelectionScreen extends MenuScreen {
   @Override
   protected void render() {
     SItem.renderCentredText("Campaigns", 188, 10, TextColour.BROWN);
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions(FooterActions.DELETE);
   }
 
   private void menuDelete() {

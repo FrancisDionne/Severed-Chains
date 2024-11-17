@@ -67,14 +67,12 @@ public class SaveGameScreen extends MenuScreen {
     for(final SavedGame save : this.saves) {
       this.saveList.addEntry(save);
     }
-
-    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.DELETE, InputAction.BUTTON_WEST));
   }
 
   @Override
   protected void render() {
     SItem.renderCentredText("Save Game", 188, 10, TextColour.BROWN);
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions(FooterActions.DELETE);
   }
 
   private void onSelection(@Nullable final SavedGame save) {

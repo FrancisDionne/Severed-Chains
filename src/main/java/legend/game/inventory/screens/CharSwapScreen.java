@@ -2,8 +2,6 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
-import legend.game.combat.ui.FooterAction;
-import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.MenuFooter;
 import legend.game.input.InputAction;
 import legend.game.modding.coremod.CoreMod;
@@ -41,7 +39,6 @@ public class CharSwapScreen extends MenuScreen {
 
   public CharSwapScreen(final Runnable unload) {
     this.unload = unload;
-    MenuFooter.setTypicalFooterActions(this.getClass().toString());
   }
 
   @Override
@@ -81,7 +78,7 @@ public class CharSwapScreen extends MenuScreen {
       }
     }
 
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions();
   }
 
   private void renderCharacterSwapScreen(final int a0) {

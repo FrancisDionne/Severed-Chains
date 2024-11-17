@@ -119,8 +119,6 @@ public class ItemListScreen extends MenuScreen {
     }
 
     this.updateDescription(this.itemList.getSelectedItem());
-
-    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.DISCARD, InputAction.BUTTON_WEST), new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
   }
 
   private void updateDescription(@Nullable final MenuEntryStruct04<?> item) {
@@ -134,7 +132,7 @@ public class ItemListScreen extends MenuScreen {
 
   @Override
   protected void render() {
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions(FooterActions.DISCARD, FooterActions.SORT);
   }
 
   private <T> void showDiscardMenu(final ItemList<T> list, final List<T> inv) {

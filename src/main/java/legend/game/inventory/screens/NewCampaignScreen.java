@@ -82,8 +82,6 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
         this.unload = true;
       }
     });
-
-    MenuFooter.setTypicalFooterActions(this.getClass().toString());
   }
 
   @Override
@@ -104,7 +102,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
       playMenuSound(2);
       whichMenu_800bdc38 = WhichMenu.UNLOAD;
     }
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions();
   }
 
   private void menuEscape() {

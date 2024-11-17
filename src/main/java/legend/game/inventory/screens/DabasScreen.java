@@ -80,7 +80,6 @@ public class DabasScreen extends MenuScreen {
 
   public DabasScreen(final Runnable unload) {
     this.unload = unload;
-    MenuFooter.setTypicalFooterActions(this.getClass().toString());
   }
 
   @Override
@@ -232,7 +231,7 @@ public class DabasScreen extends MenuScreen {
       }
     }
 
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions();
   }
 
   private void takeItems() {

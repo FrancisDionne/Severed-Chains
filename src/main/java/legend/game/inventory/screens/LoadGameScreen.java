@@ -59,8 +59,6 @@ public class LoadGameScreen extends MenuScreen {
     for(final SavedGame save : SAVES.loadAllSaves(campaign.filename())) {
       this.saveList.addEntry(save);
     }
-
-    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.DELETE, InputAction.BUTTON_WEST));
   }
 
   private void onSelection(final SavedGame save) {
@@ -82,7 +80,7 @@ public class LoadGameScreen extends MenuScreen {
   @Override
   protected void render() {
     SItem.renderCentredText("Load Game", 188, 10, TextColour.BROWN);
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions(FooterActions.DELETE);
   }
 
   private void menuDelete() {

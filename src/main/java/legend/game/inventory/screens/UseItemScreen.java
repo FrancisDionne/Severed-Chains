@@ -73,7 +73,6 @@ public class UseItemScreen extends MenuScreen {
 
   public UseItemScreen(final Runnable unload) {
     this.unload = unload;
-    MenuFooter.setTypicalFooterActions(this.getClass().toString(), new FooterAction(FooterActions.SORT, InputAction.BUTTON_NORTH));
   }
 
   @Override
@@ -131,7 +130,7 @@ public class UseItemScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    MenuFooter.render(this.getClass().toString());
+    MenuFooter.renderTypicalFooterActions(FooterActions.SORT);
   }
 
   private void scroll(final int scroll) {
