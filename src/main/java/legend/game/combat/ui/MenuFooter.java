@@ -139,6 +139,6 @@ public final class MenuFooter {
   }
 
   public static void clearFooterActions(final String key) {
-    setFooterActions(key, null, null, null, null, null);
+    actionsMap.remove(key);
   }
 }
