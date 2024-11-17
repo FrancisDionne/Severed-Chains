@@ -22,7 +22,6 @@ import static legend.game.Scus94491BpeSegment_8002.textWidth;
 public final class MenuFooter {
   private static final Matrix4f m = new Matrix4f();
   private static final Obj quad = new QuadBuilder("Footer Text background")
-    .rgb(1.0f, 1.0f, 1.0f)
     .size(1.0f, 1.0f)
     .uv(0.0f, 0.0f)
     .uvSize(1.0f, 1.0f)
