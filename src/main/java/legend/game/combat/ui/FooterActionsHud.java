@@ -74,6 +74,7 @@ public final class FooterActionsHud {
       case FooterActionColor.FOOTER_LIME -> TextColour.FOOTER_LIME;
       case FooterActionColor.FOOTER_YELLOW -> TextColour.FOOTER_YELLOW;
       case FooterActionColor.FOOTER_ORANGE -> TextColour.FOOTER_ORANGE;
+      case FooterActionColor.FOOTER_HIDDEN -> null;
     };
   }
 
@@ -81,39 +82,43 @@ public final class FooterActionsHud {
   }
 
   public static void render() {
-    final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
-    int x;
-    final int y;
     final TextColour color = getColor();
 
-    if(style == 1) { // Battle
-      x = 250;
-      y = 227;
-    } else { // Menu
-      x = 358;
-      y = 226;
-    }
+    if (color != null) {
+      final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+      int x;
+      final int y;
 
-    x += 8;
 
-    for(final FooterAction footAction : actions) {
-      if(footAction != null) {
-        x -= 8;
+      if(style == 1) { // Battle
+        x = 250;
+        y = 227;
+      } else { // Menu
+        x = 358;
+        y = 226;
+      }
 
-        final String text = getText(footAction.action);
-        final int textWidth = textWidth(text);
-        x -= textWidth;
+      x += 8;
 
-        SItem.renderText(text, x, y, color);
+      for(final FooterAction footAction : actions) {
+        if(footAction != null) {
+          x -= 8;
 
-        x -= 14;
+          final String text = getText(footAction.action);
+          final int textWidth = textWidth(text);
+          x -= textWidth;
 
-        m.translation(x + xOffset, y, 120);
-        m.scale(12, 12, 1);
+          SItem.renderText(text, x, y, color);
 
-        RENDERER
-          .queueOrthoModel(quad, m, QueuedModelStandard.class)
-          .texture(getTexture(footAction.input));
+          x -= 14;
+
+          m.translation(x + xOffset, y, 120);
+          m.scale(12, 12, 1);
+
+          RENDERER
+            .queueOrthoModel(quad, m, QueuedModelStandard.class)
+            .texture(getTexture(footAction.input));
+        }
       }
     }
   }

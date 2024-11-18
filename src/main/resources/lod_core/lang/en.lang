@@ -73,6 +73,7 @@ lod_core.config.battle_transition_mode.FAST=Fast
 lod_core.config.battle_transition_mode.INSTANT=Instant
 lod_core.config.unlock_party.label=Unlock Party
 lod_core.config.footer_action_color.label=Footer Actions Color
+lod_core.config.footer_action_color.FOOTER_HIDDEN=Hidden
 lod_core.config.footer_action_color.FOOTER_BROWN=Brown
 lod_core.config.footer_action_color.FOOTER_WHITE=White
 lod_core.config.footer_action_color.FOOTER_GREY=Gray
