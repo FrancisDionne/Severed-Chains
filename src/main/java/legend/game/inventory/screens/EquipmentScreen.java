@@ -2,9 +2,8 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
-import legend.game.combat.ui.FooterAction;
 import legend.game.combat.ui.FooterActions;
-import legend.game.combat.ui.MenuFooter;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.EquipItemResult;
@@ -161,7 +160,7 @@ public class EquipmentScreen extends MenuScreen {
       renderString(194, 178, I18n.translate(this.menuItems.get(slotIndex + slotScroll).item_00.getDescriptionTranslationKey()), allocate);
     }
 
-    MenuFooter.renderTypicalFooterActions(FooterActions.SORT);
+    FooterActionsHud.renderMenuActions(FooterActions.SORT, null, null);
   }
 
   private int menuHighlightPositionY(final int slot) {

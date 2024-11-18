@@ -1,7 +1,7 @@
 package legend.game.inventory.screens;
 
 import legend.game.SItem;
-import legend.game.combat.ui.MenuFooter;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.types.MessageBoxResult;
 
@@ -29,6 +29,6 @@ public class FullScreenInputScreen extends MenuScreen {
   @Override
   protected void render() {
     SItem.renderCentredText(this.prompt, 188, 25, TextColour.BROWN, 240);
-    MenuFooter.renderTypicalFooterActions();
+    FooterActionsHud.renderMenuActions(null, null, null);
   }
 }

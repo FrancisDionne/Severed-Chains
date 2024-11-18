@@ -2,9 +2,8 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
-import legend.game.combat.ui.FooterAction;
 import legend.game.combat.ui.FooterActions;
-import legend.game.combat.ui.MenuFooter;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.Item;
@@ -130,7 +129,7 @@ public class UseItemScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    MenuFooter.renderTypicalFooterActions(FooterActions.SORT);
+    FooterActionsHud.renderMenuActions(FooterActions.SORT, null, null);
   }
 
   private void scroll(final int scroll) {

@@ -1,7 +1,7 @@
 package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
-import legend.game.combat.ui.MenuFooter;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
 import legend.game.types.MenuAdditionInfo;
 import legend.game.types.Renderable58;
@@ -102,7 +102,7 @@ public class AdditionsScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    MenuFooter.renderTypicalFooterActions();
+    FooterActionsHud.renderMenuActions(null, null, null);
   }
 
   private void renderAdditions(final int charSlot, final MenuAdditionInfo[] additions, final int selectedAdditionOffset, final long a4) {

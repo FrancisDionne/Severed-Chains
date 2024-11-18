@@ -2,9 +2,8 @@ package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
 import legend.game.SItem;
-import legend.game.combat.ui.FooterAction;
 import legend.game.combat.ui.FooterActions;
-import legend.game.combat.ui.MenuFooter;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
@@ -129,7 +128,7 @@ public class CampaignSelectionScreen extends MenuScreen {
   @Override
   protected void render() {
     SItem.renderCentredText("Campaigns", 188, 10, TextColour.BROWN);
-    MenuFooter.renderTypicalFooterActions(FooterActions.DELETE);
+    FooterActionsHud.renderMenuActions(FooterActions.DELETE, null, null);
   }
 
   private void menuDelete() {

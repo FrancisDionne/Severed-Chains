@@ -1,6 +1,6 @@
 package legend.game.inventory.screens;
 
-import legend.game.combat.ui.MenuFooter;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.controls.Background;
@@ -48,7 +48,7 @@ public class ModsScreen extends VerticalLayoutScreen {
       this.addRow(I18n.translate(modId + ".name"), checkbox);
     }
 
-    MenuFooter.setTypicalActions();
+    FooterActionsHud.setMenuActions(null, null, null);
   }
 
   private boolean isRequired(final String modId) {

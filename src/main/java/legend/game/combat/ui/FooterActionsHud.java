@@ -6,7 +6,6 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
 import legend.game.SItem;
-import legend.game.input.Input;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.coremod.CoreMod;
@@ -16,12 +15,13 @@ import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
 
-public final class MenuFooter {
+public final class FooterActionsHud {
   private static final Matrix4f m = new Matrix4f();
-  private static final Obj quad = new QuadBuilder("Footer Text background")
+  private static final Obj quad = new QuadBuilder("Footer Text Background")
     .size(1.0f, 1.0f)
     .uv(0.0f, 0.0f)
     .uvSize(1.0f, 1.0f)
@@ -29,6 +29,7 @@ public final class MenuFooter {
     .build();
 
   private static final FooterAction[] actions = new FooterAction[5];
+  private static int style = 0; //0 = Menu, 1 = Battle
 
   public static Texture[] textures = {
     Texture.png(Path.of("gfx", "ui", "menuButton_Cross.png")),     //0
@@ -55,14 +56,45 @@ public final class MenuFooter {
       case FooterActions.DISCARD -> "Discard";
       case FooterActions.SELECT -> "Select";
       case FooterActions.BACK -> "Back";
+      case FooterActions.ADDITIONS -> "Additions";
     };
   }
 
-  private MenuFooter() {
+  private static TextColour getColor() {
+    return switch(CONFIG.getConfig(CoreMod.FOOTER_ACTION_COLOR_CONFIG.get())) {
+      case FooterActionColor.FOOTER_BROWN -> TextColour.FOOTER_BROWN;
+      case FooterActionColor.FOOTER_WHITE -> TextColour.FOOTER_WHITE;
+      case FooterActionColor.FOOTER_GREY -> TextColour.FOOTER_GREY;
+      case FooterActionColor.FOOTER_RED -> TextColour.FOOTER_RED;
+      case FooterActionColor.FOOTER_PINK -> TextColour.FOOTER_PINK;
+      case FooterActionColor.FOOTER_PURPLE -> TextColour.FOOTER_PURPLE;
+      case FooterActionColor.FOOTER_BLUE -> TextColour.FOOTER_BLUE;
+      case FooterActionColor.FOOTER_AQUA -> TextColour.FOOTER_AQUA;
+      case FooterActionColor.FOOTER_GREEN -> TextColour.FOOTER_GREEN;
+      case FooterActionColor.FOOTER_LIME -> TextColour.FOOTER_LIME;
+      case FooterActionColor.FOOTER_YELLOW -> TextColour.FOOTER_YELLOW;
+      case FooterActionColor.FOOTER_ORANGE -> TextColour.FOOTER_ORANGE;
+    };
+  }
+
+  private FooterActionsHud() {
   }
 
   public static void render() {
-    int x = 358 + 8 + (int)RENDERER.getWidescreenOrthoOffsetX();
+    final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+    int x;
+    final int y;
+    final TextColour color = getColor();
+
+    if(style == 1) {
+      x = 250;
+      y = 227;
+    } else {
+      x = 358;
+      y = 226;
+    }
+
+    x += 8;
 
     for(final FooterAction footAction : actions) {
       if(footAction != null) {
@@ -72,12 +104,12 @@ public final class MenuFooter {
         final int textWidth = textWidth(text);
         x -= textWidth;
 
-        SItem.renderText(text, x, 226, TextColour.BROWN);
+        SItem.renderText(text, x, y, color);
 
         x -= 14;
 
-        m.translation(x, 226, 120);
-        m.scale(12, 12, 1f);
+        m.translation(x + xOffset, y, 120);
+        m.scale(12, 12, 1);
 
         RENDERER
           .queueOrthoModel(quad, m, QueuedModelStandard.class)
@@ -93,61 +125,44 @@ public final class MenuFooter {
     final InputAction input = switch(action) {
       case FooterActions.BACK -> InputAction.BUTTON_EAST;
       case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD -> InputAction.BUTTON_WEST;
-      case FooterActions.SORT -> InputAction.BUTTON_NORTH;
+      case FooterActions.SORT, FooterActions.ADDITIONS -> InputAction.BUTTON_NORTH;
       case FooterActions.SELECT -> InputAction.BUTTON_SOUTH;
     };
     return new FooterAction(action, input);
   }
 
-  public static void setFootActions(@Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
-    actions[0] = newFooterAction(action1);
-    actions[1] = newFooterAction(action2);
-    actions[2] = newFooterAction(action3);
-    actions[3] = newFooterAction(action4);
-    actions[4] = newFooterAction(action5);
+  public static void setFootActions(final int style, @Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    FooterActionsHud.style = style;
+    if(!compareFooterActions(action1, action2, action3, action4, action5)) {
+      actions[0] = newFooterAction(action1);
+      actions[1] = newFooterAction(action2);
+      actions[2] = newFooterAction(action3);
+      actions[3] = newFooterAction(action4);
+      actions[4] = newFooterAction(action5);
+    }
   }
 
-  public static void setTypicalActions() {
-    setFootActions(FooterActions.SELECT, FooterActions.BACK, null, null, null);
-  }
-
-  public static void renderFooterActions(@Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
-    if (!compareFooterActions(action1, action2, action3, action4, action5)) {
-      setFootActions(action1, action2, action3, action4, action5);
+  public static void renderActions(final int style, @Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    if(!compareFooterActions(action1, action2, action3, action4, action5)) {
+      setFootActions(style, action1, action2, action3, action4, action5);
     }
     render();
   }
 
-  public static void renderFooterActions(final FooterActions action1) {
-    renderFooterActions(action1, null, null, null, null);
+  public static void setMenuActions(@Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    setFootActions(0, FooterActions.SELECT, FooterActions.BACK, action3, action4, action5);
   }
 
-  public static void renderFooterActions(final FooterActions action1, final FooterActions action2) {
-    renderFooterActions(action1, action2, null, null, null);
+  public static void renderMenuActions(@Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    renderActions(0, FooterActions.SELECT, FooterActions.BACK, action3, action4, action5);
   }
 
-  public static void renderFooterActions(final FooterActions action1, final FooterActions action2, final FooterActions action3) {
-    renderFooterActions(action1, action2, action3, null, null);
+  public static void setBattleActions(@Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    setFootActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, action4, action5);
   }
 
-  public static void renderFooterActions(final FooterActions action1, final FooterActions action2, final FooterActions action3, final FooterActions action4) {
-    renderFooterActions(action1, action2, action3, action4, null);
-  }
-
-  public static void renderTypicalFooterActions(@Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
-    renderFooterActions(FooterActions.SELECT, FooterActions.BACK, action3, action4, action5);
-  }
-
-  public static void renderTypicalFooterActions(@Nullable final FooterActions action3, @Nullable final FooterActions action4) {
-    renderTypicalFooterActions(action3, action4, null);
-  }
-
-  public static void renderTypicalFooterActions(@Nullable final FooterActions action3) {
-    renderTypicalFooterActions(action3, null, null);
-  }
-
-  public static void renderTypicalFooterActions() {
-    renderTypicalFooterActions(null, null, null);
+  public static void renderBattleActions(@Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+    renderActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, action4, action5);
   }
 
   private static boolean compareFooterActions(@Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {

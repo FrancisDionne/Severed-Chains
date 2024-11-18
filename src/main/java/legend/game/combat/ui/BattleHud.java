@@ -429,6 +429,8 @@ public class BattleHud {
           if(charDisplay._14[2] < 6) {
             charDisplay._14[2]++;
           }
+
+          FooterActionsHud.renderBattleActions(null, null);
         }
         //LAB_800efc9c
       }

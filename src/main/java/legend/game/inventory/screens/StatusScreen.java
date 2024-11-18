@@ -1,8 +1,7 @@
 package legend.game.inventory.screens;
 
-import legend.game.combat.ui.FooterAction;
 import legend.game.combat.ui.FooterActions;
-import legend.game.combat.ui.MenuFooter;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
 
 import static legend.game.SItem.FUN_801034cc;
@@ -84,7 +83,7 @@ public class StatusScreen extends MenuScreen {
       }
     }
 
-    MenuFooter.renderFooterActions(FooterActions.BACK);
+    FooterActionsHud.renderActions(0, FooterActions.BACK, null, null, null, null);
   }
 
   private void scroll(final int slot) {
