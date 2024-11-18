@@ -430,7 +430,7 @@ public class BattleHud {
             charDisplay._14[2]++;
           }
 
-          FooterActionsHud.renderBattleActions(null, null);
+          FooterActionsHud.renderBattleActions();
         }
         //LAB_800efc9c
       }

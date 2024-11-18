@@ -78,7 +78,7 @@ public class CharSwapScreen extends MenuScreen {
       }
     }
 
-    FooterActionsHud.renderMenuActions(null, null, null);
+    FooterActionsHud.renderMenuActions();
   }
 
   private void renderCharacterSwapScreen(final int a0) {

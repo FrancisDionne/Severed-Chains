@@ -86,10 +86,10 @@ public final class FooterActionsHud {
     final int y;
     final TextColour color = getColor();
 
-    if(style == 1) {
+    if(style == 1) { // Battle
       x = 250;
       y = 227;
-    } else {
+    } else { // Menu
       x = 358;
       y = 226;
     }
@@ -157,12 +157,20 @@ public final class FooterActionsHud {
     renderActions(0, FooterActions.SELECT, FooterActions.BACK, action3, action4, action5);
   }
 
+  public static void renderMenuActions() {
+    renderActions(0, FooterActions.SELECT, FooterActions.BACK, null, null, null);
+  }
+
   public static void setBattleActions(@Nullable final FooterActions action4, @Nullable final FooterActions action5) {
     setFootActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, action4, action5);
   }
 
   public static void renderBattleActions(@Nullable final FooterActions action4, @Nullable final FooterActions action5) {
     renderActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, action4, action5);
+  }
+
+  public static void renderBattleActions() {
+    renderActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, null, null);
   }
 
   private static boolean compareFooterActions(@Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {

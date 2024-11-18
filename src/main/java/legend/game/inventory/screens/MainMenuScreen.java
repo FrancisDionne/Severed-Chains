@@ -229,7 +229,7 @@ public class MainMenuScreen extends MenuScreen {
       }
     }
 
-    FooterActionsHud.renderMenuActions(null, null, null);
+    FooterActionsHud.renderMenuActions();
   }
 
   private void renderInventoryMenu(final long a2) {

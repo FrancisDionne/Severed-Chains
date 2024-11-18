@@ -102,7 +102,7 @@ public class AdditionsScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    FooterActionsHud.renderMenuActions(null, null, null);
+    FooterActionsHud.renderMenuActions();
   }
 
   private void renderAdditions(final int charSlot, final MenuAdditionInfo[] additions, final int selectedAdditionOffset, final long a4) {

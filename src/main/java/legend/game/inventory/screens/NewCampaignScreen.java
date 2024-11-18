@@ -102,7 +102,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
       playMenuSound(2);
       whichMenu_800bdc38 = WhichMenu.UNLOAD;
     }
-    FooterActionsHud.renderMenuActions(null, null, null);
+    FooterActionsHud.renderMenuActions();
   }
 
   private void menuEscape() {

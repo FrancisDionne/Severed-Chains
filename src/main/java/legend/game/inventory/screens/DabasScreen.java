@@ -231,7 +231,7 @@ public class DabasScreen extends MenuScreen {
       }
     }
 
-    FooterActionsHud.renderMenuActions(null, null, null);
+    FooterActionsHud.renderMenuActions();
   }
 
   private void takeItems() {

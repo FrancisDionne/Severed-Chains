@@ -285,7 +285,7 @@ public class ShopScreen extends MenuScreen {
       case UNLOAD_19 -> whichMenu_800bdc38 = WhichMenu.UNLOAD;
     }
 
-    FooterActionsHud.renderMenuActions(null, null, null);
+    FooterActionsHud.renderMenuActions();
   }
 
   private void scroll(final int scroll) {
