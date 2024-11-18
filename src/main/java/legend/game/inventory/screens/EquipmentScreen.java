@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
+import legend.core.opengl.Texture;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
@@ -61,6 +62,9 @@ public class EquipmentScreen extends MenuScreen {
   public EquipmentScreen(final Runnable unload) {
     this.unload = unload;
     this.filter = -1;
+
+    FooterActionsHud.setMenuActions(FooterActions.FILTER, FooterActions.SORT, null);
+    this.setFilterFooter();
   }
 
   @Override
@@ -167,7 +171,7 @@ public class EquipmentScreen extends MenuScreen {
     final String text = slotIndex + slotScroll < this.menuItems.size() ? I18n.translate(this.menuItems.get(slotIndex + slotScroll).item_00.getDescriptionTranslationKey()) : "";
     renderString(194, 178, text, allocate);
 
-    FooterActionsHud.renderMenuActions(FooterActions.SORT, null, null);
+    FooterActionsHud.renderMenuActions(FooterActions.FILTER, FooterActions.SORT, null);
   }
 
   private int menuHighlightPositionY(final int slot) {
@@ -383,6 +387,20 @@ public class EquipmentScreen extends MenuScreen {
     this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
     this.equipmentCount = this.getEquippableItemsForCharacter(characterIndices_800bdbb8[this.charSlot]);
     this.slotScroll = MathHelper.clamp(this.slotScroll, 0, Math.max(0, this.equipmentCount - 4));
+    this.setFilterFooter();
+  }
+
+  private void setFilterFooter() {
+    final Texture texture = switch(this.filter) {
+      case 0 -> FooterActionsHud.textures[5];
+      case 1 -> FooterActionsHud.textures[6];
+      case 2 -> FooterActionsHud.textures[7];
+      case 3 -> FooterActionsHud.textures[8];
+      case 4 -> FooterActionsHud.textures[9];
+      default -> FooterActionsHud.textures[4];
+    };
+
+    FooterActionsHud.setSecondaryText(2, texture);
   }
 
   @Override
