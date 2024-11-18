@@ -1,6 +1,7 @@
 package legend.game.combat.ui;
 
 public enum FooterActionColor {
+  FOOTER_HIDDEN,
   FOOTER_BROWN,
   FOOTER_WHITE,
   FOOTER_GREY,

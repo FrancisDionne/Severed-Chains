@@ -70,6 +70,7 @@ lod_core.config.preferred_battle_camera_angle.PLAYER=Prefer Player Side
 lod_core.config.preferred_battle_camera_angle.SIDE=Prefer Sideways
 lod_core.config.preferred_battle_camera_angle.ENEMY=Prefer Enemy Side
 lod_core.config.footer_action_color.label=Footer Actions Color
+lod_core.config.footer_action_color.FOOTER_HIDDEN=Hidden
 lod_core.config.footer_action_color.FOOTER_BROWN=Brown
 lod_core.config.footer_action_color.FOOTER_WHITE=White
 lod_core.config.footer_action_color.FOOTER_GREY=Gray
