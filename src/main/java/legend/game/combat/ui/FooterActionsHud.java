@@ -32,10 +32,16 @@ public final class FooterActionsHud {
   private static int style = 0; //0 = Menu, 1 = Battle
 
   public static Texture[] textures = {
-    Texture.png(Path.of("gfx", "ui", "menuButton_Cross.png")),     //0
-    Texture.png(Path.of("gfx", "ui", "menuButton_Square.png")),    //1
-    Texture.png(Path.of("gfx", "ui", "menuButton_Triangle.png")),  //2
-    Texture.png(Path.of("gfx", "ui", "menuButton_Circle.png")),    //3
+    Texture.png(Path.of("gfx", "ui", "menuButton_Cross.png")),      //0
+    Texture.png(Path.of("gfx", "ui", "menuButton_Square.png")),     //1
+    Texture.png(Path.of("gfx", "ui", "menuButton_Triangle.png")),   //2
+    Texture.png(Path.of("gfx", "ui", "menuButton_Circle.png")),     //3
+    Texture.png(Path.of("gfx", "ui", "icon-all-equip.png")),        //4
+    Texture.png(Path.of("gfx", "ui", "icon-weapon.png")),           //5
+    Texture.png(Path.of("gfx", "ui", "icon-helmet.png")),           //6
+    Texture.png(Path.of("gfx", "ui", "icon-armor.png")),            //7
+    Texture.png(Path.of("gfx", "ui", "icon-boots.png")),            //8
+    Texture.png(Path.of("gfx", "ui", "icon-ring.png")),             //9
   };
 
   private static Texture getTexture(final InputAction inputAction) {
@@ -84,11 +90,13 @@ public final class FooterActionsHud {
   public static void render() {
     final TextColour color = getColor();
 
+
     if (color != null) {
       final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
       int x;
       final int y;
-
+      String text;
+      int textWidth;
 
       if(style == 1) { // Battle
         x = 250;
@@ -104,8 +112,35 @@ public final class FooterActionsHud {
         if(footAction != null) {
           x -= 8;
 
-          final String text = getText(footAction.action);
-          final int textWidth = textWidth(text);
+          if(footAction.secondaryTexture != null) {
+            text = ")";
+            textWidth = textWidth(text);
+            x -= textWidth;
+
+            SItem.renderText(text, x, y + 1, color);
+
+            x -= 11;
+
+            m.translation(x + xOffset, y, 120);
+            m.scale(12, 12, 1);
+
+            RENDERER
+              .queueOrthoModel(quad, m, QueuedModelStandard.class)
+              .texture(footAction.secondaryTexture);
+
+            x -= 1;
+
+            text = "(";
+            textWidth = textWidth(text);
+            x -= textWidth;
+
+            SItem.renderText(text, x, y + 1, color);
+
+            x -= 2;
+          }
+
+          text = getText(footAction.action);
+          textWidth = textWidth(text);
           x -= textWidth;
 
           SItem.renderText(text, x, y, color);
@@ -176,6 +211,12 @@ public final class FooterActionsHud {
 
   public static void renderBattleActions() {
     renderActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, null, null);
+  }
+
+  public static void setSecondaryText(final int actionIndex, final Texture texture) {
+    if(actions[actionIndex] != null) {
+      actions[actionIndex].secondaryTexture = texture;
+    }
   }
 
   private static boolean compareFooterActions(@Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
