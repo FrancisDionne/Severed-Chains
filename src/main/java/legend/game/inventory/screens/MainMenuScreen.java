@@ -1,6 +1,7 @@
 package legend.game.inventory.screens;
 
 import legend.game.EngineStateEnum;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
@@ -227,6 +228,8 @@ public class MainMenuScreen extends MenuScreen {
         }
       }
     }
+
+    FooterActionsHud.renderMenuActions();
   }
 
   private void renderInventoryMenu(final long a2) {

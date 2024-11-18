@@ -1,6 +1,7 @@
 package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.controls.Brackets;
 import legend.game.inventory.screens.controls.Button;
@@ -119,7 +120,7 @@ public class VerticalLayoutScreen extends MenuScreen {
 
   @Override
   protected void render() {
-
+    FooterActionsHud.render();
   }
 
   @Override

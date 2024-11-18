@@ -28,6 +28,7 @@ import legend.game.modding.coremod.config.ControllerKeybindsConfigEntry;
 import legend.game.modding.coremod.config.AdditionSettingsConfigEntry;
 import legend.game.modding.coremod.config.EnabledModsConfigEntry;
 import legend.game.modding.coremod.config.EncounterRateConfigEntry;
+import legend.game.modding.coremod.config.FooterActionColorConfigEntry;
 import legend.game.modding.coremod.config.FullscreenConfigEntry;
 import legend.game.modding.coremod.config.HighQualityProjectionConfigEntry;
 import legend.game.modding.coremod.config.IndicatorModeConfigEntry;
@@ -135,7 +136,8 @@ public class CoreMod {
   public static final RegistryDelegate<BattleTransitionModeConfigEntry> BATTLE_TRANSITION_MODE_CONFIG = register("battle_transition_mode", BattleTransitionModeConfigEntry::new);
   public static final RegistryDelegate<PreferredBattleCameraAngleConfigEntry> PREFERRED_BATTLE_CAMERA_ANGLE = register("preferred_battle_camera_angle", PreferredBattleCameraAngleConfigEntry::new);
   public static final RegistryDelegate<BoolConfigEntry> UNLOCK_PARTY_CONFIG = register("unlock_party", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY));
-
+  public static final RegistryDelegate<FooterActionColorConfigEntry> FOOTER_ACTION_COLOR_CONFIG = CONFIG_REGISTRAR.register("footer_action_color", FooterActionColorConfigEntry::new);
+  
   public static final RegistryDelegate<ConfigEntry<Void>> GENERAL_ADDITION_GROUP_CONFIG = register("general_addition_group", GeneralAdditionGroupConfigEntry::new);
   public static final RegistryDelegate<AdditionButtonStyleConfigEntry> ADDITION_BUTTON_STYLE_CONFIG = register("addition_button_style", AdditionButtonStyleConfigEntry::new);
 
@@ -150,6 +152,8 @@ public class CoreMod {
   public static final RegistryDelegate<ConfigEntry<Void>> DRAGOON_ADDITION_GROUP_CONFIG = register("dragoon_addition_group", DragoonAdditionGroupConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionModeConfigEntry> DRAGOON_ADDITION_MODE_CONFIG = register("dragoon_addition_mode", DragoonAdditionModeConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionDifficultyConfigEntry> DRAGOON_ADDITION_DIFFICULTY_CONFIG = register("dragoon_addition_difficulty", DragoonAdditionDifficultyConfigEntry::new);
+
+
 
   public static final Formula<Integer, Integer> PHYSICAL_DAMAGE_FORMULA = Formula.make(PhysicalDamageFormula::calculatePhysicalDamage, builder -> builder
     .then(PhysicalDamageFormula::applyElementalInteractions)

@@ -1,6 +1,7 @@
 package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.controls.Background;
@@ -53,6 +54,8 @@ public class OptionsScreen extends VerticalLayoutScreen {
           this.addRow(label, configEntry.makeEditControl(config.getConfig(configEntry), config)).setZ(35);
         }
       });
+
+    FooterActionsHud.setMenuActions(null, null, null);
   }
 
   @Override

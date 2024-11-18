@@ -28,6 +28,7 @@ lod_core.config.resolution.ORIGINAL=240p (original)
 lod_core.config.resolution._480=480p
 lod_core.config.resolution._720=720p
 lod_core.config.resolution._1080=1080p
+lod_core.config.resolution._1440=1440p
 lod_core.config.resolution._4K=4K
 lod_core.config.resolution._8K=8K
 lod_core.config.resolution.NATIVE=Native (window size)
@@ -68,6 +69,19 @@ lod_core.config.preferred_battle_camera_angle.NORMAL=Random
 lod_core.config.preferred_battle_camera_angle.PLAYER=Prefer Player Side
 lod_core.config.preferred_battle_camera_angle.SIDE=Prefer Sideways
 lod_core.config.preferred_battle_camera_angle.ENEMY=Prefer Enemy Side
+lod_core.config.footer_action_color.label=Footer Actions Color
+lod_core.config.footer_action_color.FOOTER_BROWN=Brown
+lod_core.config.footer_action_color.FOOTER_WHITE=White
+lod_core.config.footer_action_color.FOOTER_GREY=Gray
+lod_core.config.footer_action_color.FOOTER_RED=Red
+lod_core.config.footer_action_color.FOOTER_PINK=Pink
+lod_core.config.footer_action_color.FOOTER_PURPLE=Purple
+lod_core.config.footer_action_color.FOOTER_BLUE=Blue
+lod_core.config.footer_action_color.FOOTER_AQUA=Aqua
+lod_core.config.footer_action_color.FOOTER_GREEN=Green
+lod_core.config.footer_action_color.FOOTER_LIME=Lime
+lod_core.config.footer_action_color.FOOTER_YELLOW=Yellow
+lod_core.config.footer_action_color.FOOTER_ORANGE=Orange
 
 # Addition Settings
 lod_core.config.addition_settings.label=Additions

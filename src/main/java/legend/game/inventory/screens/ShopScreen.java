@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.EquipItemResult;
@@ -292,6 +293,8 @@ public class ShopScreen extends MenuScreen {
 
       case UNLOAD_19 -> whichMenu_800bdc38 = WhichMenu.UNLOAD;
     }
+
+    FooterActionsHud.renderMenuActions();
   }
 
   private void scroll(final int scroll) {

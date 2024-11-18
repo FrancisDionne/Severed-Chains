@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.game.DabasManager;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.input.Input;
 import legend.game.input.InputAction;
@@ -229,6 +230,8 @@ public class DabasScreen extends MenuScreen {
         this.unload.run();
       }
     }
+
+    FooterActionsHud.renderMenuActions();
   }
 
   private void takeItems() {

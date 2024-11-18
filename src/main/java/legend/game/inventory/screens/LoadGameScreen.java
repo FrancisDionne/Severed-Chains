@@ -1,6 +1,8 @@
 package legend.game.inventory.screens;
 
 import legend.game.SItem;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.BigList;
@@ -77,7 +79,7 @@ public class LoadGameScreen extends MenuScreen {
   @Override
   protected void render() {
     SItem.renderCentredText("Load Game", 188, 10, TextColour.BROWN);
-    SItem.renderText("\u011f Delete", 297, 226, TextColour.BROWN);
+    FooterActionsHud.renderMenuActions(FooterActions.DELETE, null, null);
   }
 
   private void menuDelete() {

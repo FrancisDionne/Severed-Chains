@@ -1,6 +1,7 @@
 package legend.game.inventory.screens;
 
 import legend.game.SItem;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.types.MessageBoxResult;
 
@@ -13,7 +14,7 @@ import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 public class FullScreenInputScreen extends MenuScreen {
   private final String prompt;
 
-  public FullScreenInputScreen(final String prompt, final String subprompt, final String defaultText, final BiConsumer<MessageBoxResult, String> onResult) {
+  public FullScreenInputScreen(final String prompt, final String subprompt, final String defaultText, final BiConsumer<MessageBoxResult, String> onResult, final String footerRenderKey) {
     deallocateRenderables(0xff);
     startFadeEffect(2, 10);
 
@@ -28,5 +29,6 @@ public class FullScreenInputScreen extends MenuScreen {
   @Override
   protected void render() {
     SItem.renderCentredText(this.prompt, 188, 25, TextColour.BROWN, 240);
+    FooterActionsHud.renderMenuActions();
   }
 }

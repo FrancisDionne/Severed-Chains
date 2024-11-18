@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.types.ActiveStatsa0;
@@ -76,6 +77,8 @@ public class CharSwapScreen extends MenuScreen {
         this.unload.run();
       }
     }
+
+    FooterActionsHud.renderMenuActions();
   }
 
   private void renderCharacterSwapScreen(final int a0) {

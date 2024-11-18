@@ -1,5 +1,7 @@
 package legend.game.inventory.screens;
 
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.Equipment;
@@ -135,7 +137,7 @@ public class ItemListScreen extends MenuScreen {
 
   @Override
   protected void render() {
-
+    FooterActionsHud.renderMenuActions(FooterActions.DISCARD, FooterActions.SORT, null);
   }
 
   private <T> void showDiscardMenu(final ItemList<T> list, final List<T> inv) {

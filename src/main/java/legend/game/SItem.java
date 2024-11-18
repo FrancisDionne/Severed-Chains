@@ -829,6 +829,12 @@ public final class SItem {
     } else if(colour == TextColour.MIDDLE_BROWN) {
       //LAB_80103d20
       shadowColour = TextColour.LIGHT_BROWN;
+    } else if(colour.toString().startsWith("FOOTER")){
+      if (colour == TextColour.FOOTER_BROWN) {
+        shadowColour = TextColour.MIDDLE_BROWN;
+      } else {
+        shadowColour = TextColour.DARK_GREY;
+      }
     } else {
       shadowColour = TextColour.MIDDLE_BROWN;
     }
