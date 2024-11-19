@@ -208,7 +208,7 @@ public class TooManyItemsScreen extends MenuScreen {
     renderMenuItems(16, 33, this.droppedItems, 0, Math.min(5, this.droppedItems.size()), saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, false);
 
     if((a4 & 0x1) != 0 && !allocate) {
-      renderString(16, 164, I18n.translate(inv.getDescriptionTranslationKey()), false);
+      renderString(16, 140, I18n.translate(inv.getDescriptionTranslationKey()), false);
     }
 
     renderText(Acquired_item_8011c2f8, 32, 22, TextColour.BROWN);
@@ -225,9 +225,9 @@ public class TooManyItemsScreen extends MenuScreen {
           renderString(194, 164, I18n.translate(this.items.get(slotScroll + slotIndex).getDescriptionTranslationKey()), allocate);
         }
 
-        final Renderable58 renderable = allocateOneFrameGlyph(137, 84, 140);
-        renderable.clut_30 = 0x7ceb;
-        renderText(Press_to_sort_8011d024, 37, 140, TextColour.BROWN);
+//        final Renderable58 renderable = allocateOneFrameGlyph(137, 84, 140);
+//        renderable.clut_30 = 0x7ceb;
+//        renderText(Press_to_sort_8011d024, 37, 140, TextColour.BROWN);
       }
     } else {
       renderText(Armed_item_8011c314, 210, 22, TextColour.BROWN);
@@ -241,9 +241,9 @@ public class TooManyItemsScreen extends MenuScreen {
           renderString(194, 164, I18n.translate(this.equipment.get(slotScroll + slotIndex).getDescriptionTranslationKey()), allocate);
         }
 
-        final Renderable58 renderable = allocateOneFrameGlyph(137, 84, 140);
-        renderable.clut_30 = 0x7ceb;
-        renderText(Press_to_sort_8011d024, 37, 140, TextColour.BROWN);
+//        final Renderable58 renderable = allocateOneFrameGlyph(137, 84, 140);
+//        renderable.clut_30 = 0x7ceb;
+//        renderText(Press_to_sort_8011d024, 37, 140, TextColour.BROWN);
       }
     }
   }

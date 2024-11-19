@@ -93,15 +93,15 @@ public class ItemListScreen extends MenuScreen {
     this.addControl(Glyph.glyph(83)).setPos( 16, 164); // Button prompt pane
     this.addControl(Glyph.glyph(91)).setPos(194, 173); // Description pane
 
-    this.addControl(new Label("Press   to sort")).setPos(30, 179);
-    this.addControl(new Label("Press   to discard")).setPos(30, 194);
+//    this.addControl(new Label("Press   to sort")).setPos(30, 179);
+//    this.addControl(new Label("Press   to discard")).setPos(30, 194);
 
-    final Glyph sortButton = this.addControl(Glyph.glyph(0x89));
-    final Glyph discardButton = this.addControl(Glyph.glyph(0x88));
-    sortButton.setPos(81, 179);
-    sortButton.getRenderable().clut_30 = 0x7ceb;
-    discardButton.setPos(81, 194);
-    discardButton.getRenderable().clut_30 = 0x7ceb;
+//    final Glyph sortButton = this.addControl(Glyph.glyph(0x89));
+//    final Glyph discardButton = this.addControl(Glyph.glyph(0x88));
+//    sortButton.setPos(81, 179);
+//    sortButton.getRenderable().clut_30 = 0x7ceb;
+//    discardButton.setPos(81, 194);
+//    discardButton.getRenderable().clut_30 = 0x7ceb;
 
     this.description.setPos(194, 178);
 
