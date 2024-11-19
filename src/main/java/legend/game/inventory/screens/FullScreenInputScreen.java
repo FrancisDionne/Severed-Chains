@@ -14,7 +14,7 @@ import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 public class FullScreenInputScreen extends MenuScreen {
   private final String prompt;
 
-  public FullScreenInputScreen(final String prompt, final String subprompt, final String defaultText, final BiConsumer<MessageBoxResult, String> onResult, final String footerRenderKey) {
+  public FullScreenInputScreen(final String prompt, final String subprompt, final String defaultText, final BiConsumer<MessageBoxResult, String> onResult) {
     deallocateRenderables(0xff);
     startFadeEffect(2, 10);
 
