@@ -41,6 +41,7 @@ import legend.game.tmd.UvAdjustmentMetrics14;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.CContainer;
 import legend.game.types.CharacterData2c;
+import legend.game.types.EquipmentSlot;
 import legend.game.types.LodString;
 import legend.game.types.MagicStuff08;
 import legend.game.types.MenuEntryStruct04;
@@ -1156,6 +1157,19 @@ public final class Scus94491BpeSegment_8002 {
     return list.stream().sorted(comparator).collect(Collectors.toList());
   }
 
+  public static List<Equipment> sortEquipment(final List<Equipment> list) {
+    final Comparator<Equipment> comparator = Comparator
+      .comparing((Equipment item) -> item.getIcon())
+      .thenComparing(x -> {
+        if(x.slot == EquipmentSlot.WEAPON) {
+          return x.attack1_0a + x.magicAttack_11 + x.attackHit_14 + x.magicHit_15 + x.speed_0f;
+        }
+        return x.defence_12 + x.magicDefence_13 + x.attackAvoid_16 + x.magicAvoid_17 + x.speed_0f;
+      }, Comparator.reverseOrder())
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    return list.stream().sorted(comparator).collect(Collectors.toList());
+  }
+
   public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemComparator() {
     return Comparator
       .comparingInt((MenuEntryStruct04<T> item) -> item.getIcon())
@@ -1163,7 +1177,7 @@ public final class Scus94491BpeSegment_8002 {
   }
 
   public static void sortEquipmentInventory() {
-    final List<Equipment> list = sortItems(gameState_800babc8.equipment_1e8);
+    final List<Equipment> list = sortEquipment(gameState_800babc8.equipment_1e8);
     gameState_800babc8.equipment_1e8.clear();
     gameState_800babc8.equipment_1e8.addAll(list);
   }
