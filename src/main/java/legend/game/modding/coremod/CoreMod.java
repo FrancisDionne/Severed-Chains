@@ -4,6 +4,7 @@ import legend.core.GameEngine;
 import legend.core.opengl.SubmapWidescreenMode;
 import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
+import legend.game.combat.ui.ControllerStyle;
 import legend.game.input.InputAction;
 import legend.game.modding.coremod.config.AdditionModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionOverlayConfigEntry;
@@ -14,6 +15,7 @@ import legend.game.modding.coremod.config.ControllerConfigEntry;
 import legend.game.modding.coremod.config.ControllerDeadzoneConfigEntry;
 import legend.game.modding.coremod.config.ControllerKeybindConfigEntry;
 import legend.game.modding.coremod.config.ControllerKeybindsConfigEntry;
+import legend.game.modding.coremod.config.ControllerStyleConfigEntry;
 import legend.game.modding.coremod.config.EnabledModsConfigEntry;
 import legend.game.modding.coremod.config.EncounterRateConfigEntry;
 import legend.game.modding.coremod.config.FooterActionColorConfigEntry;
@@ -83,6 +85,7 @@ public class CoreMod {
 
   /** Config isn't actually used, but adds a button to the options screen to open the keybinds screen */
   public static final RegistryDelegate<ConfigEntry<Void>> CONTROLLER_KEYBINDS_CONFIG = CONFIG_REGISTRAR.register("controller_keybinds", ControllerKeybindsConfigEntry::new);
+  public static final RegistryDelegate<ControllerStyleConfigEntry> CONTROLLER_STYLE_CONFIG = CONFIG_REGISTRAR.register("controller_style", ControllerStyleConfigEntry::new);
 
   public static final Map<InputAction, RegistryDelegate<ControllerKeybindConfigEntry>> KEYBIND_CONFIGS = new EnumMap<>(InputAction.class);
   static {
