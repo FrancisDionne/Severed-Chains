@@ -32,19 +32,46 @@ public final class FooterActionsHud {
   private static int style = 0; //0 = Menu, 1 = Battle
 
   public static Texture[] textures = {
-    Texture.png(Path.of("gfx", "ui", "menuButton_Cross.png")),      //0
-    Texture.png(Path.of("gfx", "ui", "menuButton_Square.png")),     //1
-    Texture.png(Path.of("gfx", "ui", "menuButton_Triangle.png")),   //2
-    Texture.png(Path.of("gfx", "ui", "menuButton_Circle.png")),     //3
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Playstation_Cross.png")),      //0
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Playstation_Square.png")),     //1
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Playstation_Triangle.png")),   //2
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Playstation_Circle.png")),     //3
     Texture.png(Path.of("gfx", "ui", "icon-all-equip.png")),        //4
     Texture.png(Path.of("gfx", "ui", "icon-weapon.png")),           //5
     Texture.png(Path.of("gfx", "ui", "icon-helmet.png")),           //6
     Texture.png(Path.of("gfx", "ui", "icon-armor.png")),            //7
     Texture.png(Path.of("gfx", "ui", "icon-boots.png")),            //8
     Texture.png(Path.of("gfx", "ui", "icon-ring.png")),             //9
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Xbox_A.png")),     //10
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Xbox_B.png")),     //11
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Xbox_X.png")),     //12
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Xbox_Y.png")),     //13
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Nintendo_A.png")),     //14
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Nintendo_B.png")),     //15
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Nintendo_X.png")),     //16
+    Texture.png(Path.of("gfx", "ui", "Small_Button_Nintendo_Y.png")),     //17
   };
 
   private static Texture getTexture(final InputAction inputAction) {
+    final ControllerStyle style = CONFIG.getConfig(CoreMod.CONTROLLER_STYLE_CONFIG.get());
+    if (style == ControllerStyle.XBOX) {
+      return switch(inputAction) {
+        case InputAction.BUTTON_SOUTH -> textures[10];
+        case InputAction.BUTTON_WEST -> textures[12];
+        case InputAction.BUTTON_NORTH -> textures[13];
+        case InputAction.BUTTON_EAST -> textures[11];
+        default -> null;
+      };
+    }
+    if (style == ControllerStyle.NINTENDO) {
+      return switch(inputAction) {
+        case InputAction.BUTTON_SOUTH -> textures[14];
+        case InputAction.BUTTON_WEST -> textures[16];
+        case InputAction.BUTTON_NORTH -> textures[17];
+        case InputAction.BUTTON_EAST -> textures[15];
+        default -> null;
+      };
+    }
     return switch(inputAction) {
       case InputAction.BUTTON_SOUTH -> textures[0];
       case InputAction.BUTTON_WEST -> textures[1];

@@ -12,6 +12,10 @@ lod_core.config.category.other.label=Other
 # Global config
 lod_core.config.render_scale.label=Render Scale
 lod_core.config.controller.label=Controller
+lod_core.config.controller_style.label=Controller Style
+lod_core.config.controller_style.PLAYSTATION=Playstation
+lod_core.config.controller_style.XBOX=Xbox
+lod_core.config.controller_style.NINTENDO=Nintendo
 lod_core.config.controller_keybinds.label=Controller Keybinds
 lod_core.config.controller_keybinds.configure=Configure...
 lod_core.config.controller_deadzone.label=Controller Deadzone
