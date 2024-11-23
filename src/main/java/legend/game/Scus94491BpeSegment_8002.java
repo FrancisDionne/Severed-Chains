@@ -1157,7 +1157,14 @@ public final class Scus94491BpeSegment_8002 {
     return list.stream().sorted(comparator).collect(Collectors.toList());
   }
 
-  public static List<Equipment> sortEquipment(final List<Equipment> list) {
+  public static List<Equipment> sortEquipmentByAlpha(final List<Equipment> list) {
+    final Comparator<Equipment> comparator = Comparator
+      .comparing((Equipment item) -> item.getIcon())
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    return list.stream().sorted(comparator).collect(Collectors.toList());
+  }
+
+  public static List<Equipment> sortEquipmentByPower(final List<Equipment> list) {
     final Comparator<Equipment> comparator = Comparator
       .comparing((Equipment item) -> item.getIcon())
       .thenComparing(x -> {
@@ -1176,8 +1183,8 @@ public final class Scus94491BpeSegment_8002 {
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
   }
 
-  public static void sortEquipmentInventory() {
-    final List<Equipment> list = sortEquipment(gameState_800babc8.equipment_1e8);
+  public static void sortEquipmentInventory(final int sortType) {
+    final List<Equipment> list = sortType == 1 ? sortEquipmentByPower(gameState_800babc8.equipment_1e8) : sortEquipmentByAlpha(gameState_800babc8.equipment_1e8);
     gameState_800babc8.equipment_1e8.clear();
     gameState_800babc8.equipment_1e8.addAll(list);
   }

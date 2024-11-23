@@ -50,6 +50,8 @@ public final class FooterActionsHud {
     Texture.png(Path.of("gfx", "ui", "Small_Button_Nintendo_B.png")),     //15
     Texture.png(Path.of("gfx", "ui", "Small_Button_Nintendo_X.png")),     //16
     Texture.png(Path.of("gfx", "ui", "Small_Button_Nintendo_Y.png")),     //17
+    Texture.png(Path.of("gfx", "ui", "icon-sort-alpha-asc.png")),     //18
+    Texture.png(Path.of("gfx", "ui", "icon-sort-power-desc.png")),     //19
   };
 
   private static Texture getTexture(final InputAction inputAction) {

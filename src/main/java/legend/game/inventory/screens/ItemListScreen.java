@@ -187,7 +187,7 @@ public class ItemListScreen extends MenuScreen {
     this.itemList.sort(menuItemComparator());
     this.equipmentList.sort(menuItemComparator());
     sortItemInventory();
-    sortEquipmentInventory();
+    sortEquipmentInventory(0);
   }
 
   @Override

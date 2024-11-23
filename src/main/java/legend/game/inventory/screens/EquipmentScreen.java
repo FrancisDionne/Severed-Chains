@@ -52,6 +52,7 @@ public class EquipmentScreen extends MenuScreen {
   private int selectedSlot;
   private int charSlot;
   private int equipmentCount;
+  private int sort;
   private int filter;
   private Renderable58 itemHighlight;
   private Renderable58 _800bdb9c;
@@ -62,6 +63,7 @@ public class EquipmentScreen extends MenuScreen {
   public EquipmentScreen(final Runnable unload) {
     this.unload = unload;
     this.filter = -1;
+    this.sort = -1;
 
     FooterActionsHud.setMenuActions(FooterActions.FILTER, FooterActions.SORT, null);
     this.setFilterFooter();
@@ -373,14 +375,26 @@ public class EquipmentScreen extends MenuScreen {
   }
 
   private void menuItemSort() {
+    this.sort = this.sort + 1 <= 1 ? this.sort + 1 : 0;
+    this.setSortFooter();
     playMenuSound(2);
     final MenuEntries<Equipment> equipment = new MenuEntries<>();
-    sortEquipmentInventory();
+    sortEquipmentInventory(this.sort);
     this.getEquippableItemsForCharacter(characterIndices_800bdbb8[this.charSlot]);
     this.loadingStage = 2;
   }
 
+  private void setSortFooter() {
+    final Texture texture = switch(this.sort) {
+      case 0 -> FooterActionsHud.textures[18];
+      default -> FooterActionsHud.textures[19];
+    };
+
+    FooterActionsHud.setSecondaryText(3, texture);
+  }
+
   private void filterItems() {
+    playMenuSound(2);
     this.filter = this.filter + 1 < EquipmentSlot.values().length ? this.filter + 1 : -1;
     this.slotScroll = 0;
     this.selectedSlot = 0;
