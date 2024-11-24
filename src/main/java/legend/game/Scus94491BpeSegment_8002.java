@@ -1159,20 +1159,27 @@ public final class Scus94491BpeSegment_8002 {
 
   public static List<Equipment> sortEquipmentByAlpha(final List<Equipment> list) {
     final Comparator<Equipment> comparator = Comparator
-      .comparing((Equipment item) -> item.getIcon())
+      .comparing((Equipment item) -> item.slot.ordinal())
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
     return list.stream().sorted(comparator).collect(Collectors.toList());
   }
 
   public static List<Equipment> sortEquipmentByPower(final List<Equipment> list) {
     final Comparator<Equipment> comparator = Comparator
-      .comparing((Equipment item) -> item.getIcon())
+      .comparing((Equipment item) -> item.slot.ordinal())
       .thenComparing(x -> {
         if(x.slot == EquipmentSlot.WEAPON) {
           return x.attack1_0a + x.magicAttack_11 + x.attackHit_14 + x.magicHit_15 + x.speed_0f;
         }
         return x.defence_12 + x.magicDefence_13 + x.attackAvoid_16 + x.magicAvoid_17 + x.speed_0f;
       }, Comparator.reverseOrder())
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    return list.stream().sorted(comparator).collect(Collectors.toList());
+  }
+
+  public static List<Equipment> sortEquipmentByIcon(final List<Equipment> list) {
+    final Comparator<Equipment> comparator = Comparator
+      .comparing((Equipment item) -> item.getIcon())
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
     return list.stream().sorted(comparator).collect(Collectors.toList());
   }
@@ -1184,7 +1191,11 @@ public final class Scus94491BpeSegment_8002 {
   }
 
   public static void sortEquipmentInventory(final int sortType) {
-    final List<Equipment> list = sortType == 1 ? sortEquipmentByPower(gameState_800babc8.equipment_1e8) : sortEquipmentByAlpha(gameState_800babc8.equipment_1e8);
+    final List<Equipment> list = switch(sortType) {
+      case 1 -> sortEquipmentByPower(gameState_800babc8.equipment_1e8);
+      case 2 -> sortEquipmentByIcon(gameState_800babc8.equipment_1e8);
+      default -> sortEquipmentByAlpha(gameState_800babc8.equipment_1e8);
+    };
     gameState_800babc8.equipment_1e8.clear();
     gameState_800babc8.equipment_1e8.addAll(list);
   }

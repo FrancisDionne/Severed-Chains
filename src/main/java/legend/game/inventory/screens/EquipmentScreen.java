@@ -375,7 +375,7 @@ public class EquipmentScreen extends MenuScreen {
   }
 
   private void menuItemSort() {
-    this.sort = this.sort + 1 <= 1 ? this.sort + 1 : 0;
+    this.sort = this.sort + 1 <= 2 ? this.sort + 1 : 0;
     this.setSortFooter();
     playMenuSound(2);
     final MenuEntries<Equipment> equipment = new MenuEntries<>();
@@ -386,8 +386,9 @@ public class EquipmentScreen extends MenuScreen {
 
   private void setSortFooter() {
     final Texture texture = switch(this.sort) {
-      case 0 -> FooterActionsHud.textures[18];
-      default -> FooterActionsHud.textures[19];
+      case 1 -> FooterActionsHud.textures[19];
+      case 2 -> FooterActionsHud.textures[20];
+      default -> FooterActionsHud.textures[18];
     };
 
     FooterActionsHud.setSecondaryText(3, texture);
