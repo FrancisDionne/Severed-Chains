@@ -8,8 +8,8 @@ import legend.lodmod.LodMod;
 import static legend.game.Scus94491BpeSegment_8006.battleState_8006e398;
 
 public class UltimateWargodEquipment extends Equipment {
-  public UltimateWargodEquipment(final int price) {
-    super(price, 0, 0x8, 0x20, 0xf5, LodMod.NO_ELEMENT.get(), 0, new ElementSet(), new ElementSet(), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  public UltimateWargodEquipment(final int equipmentId, final int price) {
+    super(equipmentId, price, 0, 0x8, 0x20, 0xf5, LodMod.NO_ELEMENT.get(), 0, new ElementSet(), new ElementSet(), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false, false, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   }
 
   @Override
