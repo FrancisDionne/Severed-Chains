@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import legend.core.Config;
 import legend.core.DebugHelper;
+import legend.core.GameEngine;
 import legend.core.MathHelper;
 import legend.core.QueuedModelStandard;
 import legend.core.audio.sequencer.assets.BackgroundMusic;
@@ -24,6 +25,7 @@ import legend.game.combat.environment.BattlePreloadedEntities_18cb0;
 import legend.game.combat.environment.EncounterData38;
 import legend.game.combat.environment.StageData2c;
 import legend.game.debugger.Debugger;
+import legend.game.inventory.Equipment;
 import legend.game.inventory.WhichMenu;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.RenderEvent;
@@ -52,6 +54,7 @@ import legend.game.types.TextboxBorderMetrics0c;
 import legend.game.types.Translucency;
 import legend.game.unpacker.FileData;
 import legend.game.unpacker.Unpacker;
+import legend.lodmod.LodMod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -74,6 +77,8 @@ import static legend.core.GameEngine.SEQUENCER;
 import static legend.core.GameEngine.SPU;
 import static legend.game.Scus94491BpeSegment_8002.FUN_80020ed8;
 import static legend.game.Scus94491BpeSegment_8002.adjustRumbleOverTime;
+import static legend.game.Scus94491BpeSegment_8002.giveEquipment;
+import static legend.game.Scus94491BpeSegment_8002.giveItem;
 import static legend.game.Scus94491BpeSegment_8002.handleTextboxAndText;
 import static legend.game.Scus94491BpeSegment_8002.loadAndRenderMenus;
 import static legend.game.Scus94491BpeSegment_8002.rand;
@@ -359,6 +364,27 @@ public final class Scus94491BpeSegment {
         }
       }
 
+<<<<<<< Updated upstream
+=======
+      if (key == GLFW_KEY_F8) {
+        gameState_800babc8.equipment_1e8.clear();
+        for(int i = 0; i < LodMod.EQUIPMENT_IDS.length; i++) {
+          final String d = LodMod.EQUIPMENT_IDS[i];
+          if(d.length() > 2) {
+            final Equipment equip = GameEngine.REGISTRIES.equipment.getEntry(LodMod.id(LodMod.EQUIPMENT_IDS[i])).get();
+            if(equip != null) {
+              giveEquipment(equip);
+              for(int c = 0; c < 9; c++) {
+                if(SItem.canEquip(equip, c)) {
+                  System.out.println(i + "." + LodMod.EQUIPMENT_IDS[i] + ": " + equip.getTranslationKey() + " [" + c + "]");
+                }
+              }
+            }
+          }
+        }
+      }
+
+>>>>>>> Stashed changes
       if(key == GLFW_KEY_F12) {
         if(!Debugger.isRunning()) {
           try {
