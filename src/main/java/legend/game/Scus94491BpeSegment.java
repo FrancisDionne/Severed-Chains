@@ -363,28 +363,7 @@ public final class Scus94491BpeSegment {
           voice.volumeRight.set(0);
         }
       }
-
-<<<<<<< Updated upstream
-=======
-      if (key == GLFW_KEY_F8) {
-        gameState_800babc8.equipment_1e8.clear();
-        for(int i = 0; i < LodMod.EQUIPMENT_IDS.length; i++) {
-          final String d = LodMod.EQUIPMENT_IDS[i];
-          if(d.length() > 2) {
-            final Equipment equip = GameEngine.REGISTRIES.equipment.getEntry(LodMod.id(LodMod.EQUIPMENT_IDS[i])).get();
-            if(equip != null) {
-              giveEquipment(equip);
-              for(int c = 0; c < 9; c++) {
-                if(SItem.canEquip(equip, c)) {
-                  System.out.println(i + "." + LodMod.EQUIPMENT_IDS[i] + ": " + equip.getTranslationKey() + " [" + c + "]");
-                }
-              }
-            }
-          }
-        }
-      }
-
->>>>>>> Stashed changes
+      
       if(key == GLFW_KEY_F12) {
         if(!Debugger.isRunning()) {
           try {
