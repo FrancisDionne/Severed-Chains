@@ -160,7 +160,7 @@ public class LodMod {
       case 152 -> 26; //Bracelet
       case 143, 144, 146 -> 27; //Earring
       case 109 -> 28; //Bell
-      case 5555 -> 29; //Bag
+      case -2 -> 29; //Bag
       case 118, 119, 120, 123, 151 -> 30; //Shawl
       case -1 -> 31; //Shoulder?
       case 156, 157 -> 32; //Horn
