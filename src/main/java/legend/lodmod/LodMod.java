@@ -130,6 +130,44 @@ public class LodMod {
     "", "", "", "", "", "", "", ""
   };
 
+  public static int getEquipmentIcon(final int equipID, final int defaultValue) {
+    return switch(equipID) {
+      case 0, 1, 2, 3, 4, 5, 6, 7 -> 0;       //Swords
+      case 8, 9, 10, 11, 12 -> 1;             //Axes
+      case 13, 14, 15, 16, 17, 18, 19 -> 0;   //Rapiers
+      case 20, 21, 22, 23, 24, 25, 26 -> 3;   //Spears
+      case 27, 28, 29, 30, 31, 32, 33 -> 4;   //Bows
+      case 34, 35, 36, 37, 38, 39 -> 2;       //Hammers
+      case 40, 41, 42, 43, 44, 45 -> 6;       //Knuckles
+      case 62, 63 -> 8;                           //Leather Armor
+      case 47, 51, 52, 56, 61, 67, 68, 69, 70, 74 -> 10;                  //Heavy Armor
+      case 46, 48, 49, 54, 64 -> 11;                  //Mail Armor
+      case 50, 66, 73 -> 9;                           //Magic Armor
+      case 53, 55 -> 13;                      //Fur Armor
+      case 57, 58, 59, 60, 71 -> 14;                      //Light Armor
+      case 65, 72 -> 12;                      //Dress
+      case 76, 81, 83 -> 16;                      //Bandana
+      case 77, 78, 79, 80, 89, 90  -> 18;                      //Helmet
+      case 82, 91 -> 17;                      //Hat
+      case 84, 85, 86, 88 -> 15;                      //Hair Accessory
+      case 95, 96, 100, 101 -> 19;                      //Shoes
+      case 93, 97, 98, 99 -> 21;                      //Boots
+      case 94 -> 20;                      //Knee
+      case 103, 106, 107, 111, 153 -> 22;                      //Bangle
+      case 104, 113, 114, 117, 121, 124, 125, 126, 131, 133, 142 -> 23;                      //Ring
+      case 108, 110, 122, 127, 128, 148 -> 24;                      //Necklace
+      case 105, 112, 115, 116, 130, 134, 135, 136, 137, 138, 139, 140, 149, 150, 154, 155 -> 25;                      //Medallion
+      case 152 -> 26;                      //Bracelet
+      case 143, 144, 146 -> 27;                      //Earring
+      case 109 -> 28;                      //Bell
+      case 5555 -> 29;                      //Bag
+      case 118, 119, 120, 123, 151 -> 30;                      //Shawl
+      case 7777 -> 31;                      //Shoulder?
+      case 156, 157 -> 32;                      //Horn
+      default -> defaultValue;
+    };
+  }
+
   @EventListener
   public static void registerItems(final ItemRegistryEvent event) {
     LodItems.register(event);
@@ -142,11 +180,11 @@ public class LodMod {
 
       if(!name.isEmpty()) {
         event.register(id(name), switch(equipmentId) {
-          case 0x20 -> new DetonateArrowEquipment(itemPrices_80114310[equipmentId]);
-          case 0x2c -> new DestroyerMaceEquipment(itemPrices_80114310[equipmentId]);
-          case 0x9c -> new WargodCallingEquipment(itemPrices_80114310[equipmentId]);
-          case 0x9d -> new UltimateWargodEquipment(itemPrices_80114310[equipmentId]);
-          default -> Equipment.fromFile(itemPrices_80114310[equipmentId], Unpacker.loadFile("equipment/" + equipmentId + ".deqp"));
+          case 0x20 -> new DetonateArrowEquipment(equipmentId, itemPrices_80114310[equipmentId]);
+          case 0x2c -> new DestroyerMaceEquipment(equipmentId, itemPrices_80114310[equipmentId]);
+          case 0x9c -> new WargodCallingEquipment(equipmentId, itemPrices_80114310[equipmentId]);
+          case 0x9d -> new UltimateWargodEquipment(equipmentId, itemPrices_80114310[equipmentId]);
+          default -> Equipment.fromFile(equipmentId, itemPrices_80114310[equipmentId], Unpacker.loadFile("equipment/" + equipmentId + ".deqp"));
         });
       }
     }
