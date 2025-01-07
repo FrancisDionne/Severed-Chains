@@ -102,6 +102,7 @@ public class CoreMod {
   public static final RegistryDelegate<ControllerConfigEntry> CONTROLLER_CONFIG = register("controller", ControllerConfigEntry::new);
   public static final RegistryDelegate<ControllerDeadzoneConfigEntry> CONTROLLER_DEADZONE_CONFIG = register("controller_deadzone", ControllerDeadzoneConfigEntry::new);
   public static final RegistryDelegate<BoolConfigEntry> RECEIVE_INPUT_ON_INACTIVE_WINDOW_CONFIG = register("receive_input_on_inactive_window", () -> new BoolConfigEntry(false, ConfigStorageLocation.GLOBAL, ConfigCategory.CONTROLS));
+  public static final RegistryDelegate<BoolConfigEntry> DISABLE_MOUSE_INPUT_CONFIG = CONFIG_REGISTRAR.register("disable_mouse_input", DisableMouseInputConfigEntry::new);
   public static final RegistryDelegate<BoolConfigEntry> RUMBLE_CONFIG = register("rumble", () -> new BoolConfigEntry(true, ConfigStorageLocation.GLOBAL, ConfigCategory.CONTROLS));
   public static final RegistryDelegate<BoolConfigEntry> ALLOW_WIDESCREEN_CONFIG = register("allow_widescreen", AllowWidescreenConfigEntry::new);
   public static final RegistryDelegate<SubmapWidescreenModeConfig> SUBMAP_WIDESCREEN_MODE_CONFIG = register("submap_widescreen_mode", SubmapWidescreenModeConfig::new);
