@@ -17,6 +17,8 @@ import java.util.Arrays;
 
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.RENDERER;
+import static legend.game.SItem.UI_TEXT;
+import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
 
 public final class FooterActionsHud {
@@ -147,7 +149,7 @@ public final class FooterActionsHud {
             textWidth = textWidth(text);
             x -= textWidth;
 
-            SItem.renderText(text, x, y + 1, color);
+            renderText(text, x, y + 1, UI_TEXT);
 
             x -= 11;
 
@@ -164,7 +166,7 @@ public final class FooterActionsHud {
             textWidth = textWidth(text);
             x -= textWidth;
 
-            SItem.renderText(text, x, y + 1, color);
+            renderText(text, x, y + 1, UI_TEXT);
 
             x -= 2;
           }
@@ -173,7 +175,7 @@ public final class FooterActionsHud {
           textWidth = textWidth(text);
           x -= textWidth;
 
-          SItem.renderText(text, x, y, color);
+          renderText(text, x, y, UI_TEXT);
 
           x -= 14;
 
