@@ -1,6 +1,10 @@
 package legend.core;
 
 import legend.core.audio.AudioThread;
+import legend.core.audio.EffectsOverTimeGranularity;
+import legend.core.audio.InterpolationPrecision;
+import legend.core.audio.PitchResolution;
+import legend.core.audio.SampleRate;
 import legend.core.gpu.Gpu;
 import legend.core.gte.Gte;
 import legend.core.opengl.Mesh;
@@ -17,6 +21,7 @@ import legend.core.opengl.fonts.FontManager;
 import legend.core.opengl.fonts.TextStream;
 import legend.core.spu.Spu;
 import legend.game.EngineStateEnum;
+import legend.game.Main;
 import legend.game.Scus94491BpeSegment_8002;
 import legend.game.fmv.Fmv;
 import legend.game.input.Input;
@@ -50,7 +55,6 @@ import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.Set;
 
 import static legend.game.SItem.albertXpTable_801138c0;
@@ -122,7 +126,7 @@ public final class GameEngine {
     GTE = new Gte();
     GPU = new Gpu();
     SPU = new Spu();
-    AUDIO_THREAD = new AudioThread(100, true, 24, 9);
+    AUDIO_THREAD = new AudioThread(true, 24, InterpolationPrecision.Double, PitchResolution.Quadruple, SampleRate._48000, EffectsOverTimeGranularity.Finer);
 
     hardwareThread = Thread.currentThread();
     hardwareThread.setName("Hardware");
@@ -239,6 +243,10 @@ public final class GameEngine {
 
     AUDIO_THREAD.init();
     AUDIO_THREAD.getSequencer().setVolume(CONFIG.getConfig(CoreMod.MUSIC_VOLUME_CONFIG.get()));
+    AUDIO_THREAD.changeInterpolationBitDepth(CONFIG.getConfig(CoreMod.MUSIC_INTERPOLATION_PRECISION_CONFIG.get()));
+    AUDIO_THREAD.changePitchResolution(CONFIG.getConfig(CoreMod.MUSIC_PITCH_RESOLUTION_CONFIG.get()));
+    AUDIO_THREAD.changeSampleRate(CONFIG.getConfig(CoreMod.MUSIC_SAMPLE_RATE_CONFIG.get()));
+    AUDIO_THREAD.changeEffectsOverTimeGranularity(CONFIG.getConfig(CoreMod.MUSIC_EFFECTS_OVER_TIME_GRANULARITY_CONFIG.get()));
 
     SPU.init();
     RENDERER.init();
@@ -265,7 +273,7 @@ public final class GameEngine {
     final Set<String> missingMods = MOD_ACCESS.loadMods(modIds);
 
     // Initialize language
-    LANG_ACCESS.initialize(MODS, Locale.getDefault());
+    LANG_ACCESS.initialize(MODS, Main.ORIGINAL_LOCALE);
 
     // Initialize event bus and find all event handlers
     EVENT_ACCESS.initialize(MODS);

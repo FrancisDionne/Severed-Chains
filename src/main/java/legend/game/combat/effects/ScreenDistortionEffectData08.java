@@ -98,7 +98,7 @@ public class ScreenDistortionEffectData08 implements Effect<EffectManagerParams.
           final int x = (int)(MathHelper.sin(angle2) * multiplierX);
           final int y = (int)(row * whichHalf + rowOffset);
 
-          addLineToEffect(builder, GPU.getOffsetX() - 160.0f - x, GPU.getOffsetY() + y, 1.0f - v * inverseScreenHeight, manager.params_10.colour_1c.x / 255.0f, manager.params_10.colour_1c.y / 255.0f, manager.params_10.colour_1c.z / 255.0f);
+          this.addLineToEffect(builder, GPU.getOffsetX() - 160.0f - x, GPU.getOffsetY() + y, 1.0f - v * inverseScreenHeight, manager.params_10.colour_1c.x / 255.0f, manager.params_10.colour_1c.y / 255.0f, manager.params_10.colour_1c.z / 255.0f);
 
           angle2 += whichHalf * 0.05f;
         }
@@ -126,19 +126,14 @@ public class ScreenDistortionEffectData08 implements Effect<EffectManagerParams.
       .rgb(r, g, b)
       .addVertex(1.0f, y, 0.0f)
       .uv(x / 320.0f + 1.0f, v)
-      .rgb(r, g, b)
       .addVertex(0.0f, y + 1.0f, 0.0f)
       .uv(x / 320.0f, v - 1.0f / 240.0f)
-      .rgb(r, g, b)
       .addVertex(1.0f, y, 0.0f)
       .uv(x / 320.0f + 1.0f, v)
-      .rgb(r, g, b)
       .addVertex(0.0f, y + 1.0f, 0.0f)
       .uv(x / 320.0f, v - 1.0f / 240.0f)
-      .rgb(r, g, b)
       .addVertex(1.0f, y + 1.0f, 0.0f)
-      .uv(x / 320.0f + 1.0f, v - 1.0f / 240.0f)
-      .rgb(r, g, b);
+      .uv(x / 320.0f + 1.0f, v - 1.0f / 240.0f);
   }
 
   @Method(0x801097e0L)

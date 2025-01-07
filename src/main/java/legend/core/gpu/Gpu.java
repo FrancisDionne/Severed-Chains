@@ -27,8 +27,6 @@ import static legend.core.GameEngine.RENDERER;
 import static legend.core.MathHelper.colour15To24;
 import static legend.core.MathHelper.colour24To15;
 import static legend.game.Scus94491BpeSegment.orderingTableSize_1f8003c8;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_EQUAL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_MINUS;
 import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
 import static org.lwjgl.opengl.GL11C.GL_BLEND;
 import static org.lwjgl.opengl.GL11C.GL_RGBA;
@@ -97,20 +95,6 @@ public class Gpu {
 
   public void init() {
     RENDERER.events().onResize((window1, width, height) -> this.updateDisplayTexture(width, height));
-
-    RENDERER.events().onKeyPress((window, key, scancode, mods) -> {
-      if(key == GLFW_KEY_EQUAL) {
-        if(mods == 0) {
-          Config.setGameSpeedMultiplier(Math.min(Config.getGameSpeedMultiplier() + 1, 16));
-        }
-      }
-
-      if(key == GLFW_KEY_MINUS) {
-        if(mods == 0) {
-          Config.setGameSpeedMultiplier(Math.max(Config.getGameSpeedMultiplier() - 1, 1));
-        }
-      }
-    });
 
     this.vramShader = ShaderManager.getShader(RenderEngine.SIMPLE_SHADER);
     this.vramShaderOptions = this.vramShader.makeOptions();

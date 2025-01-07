@@ -10,7 +10,6 @@ import legend.core.gte.MV;
 import legend.core.memory.Method;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
-import legend.game.Scus94491BpeSegment_8002;
 import legend.game.characters.Element;
 import legend.game.characters.VitalsStat;
 import legend.game.combat.Battle;
@@ -25,7 +24,6 @@ import legend.game.combat.environment.SpBarBorderMetrics04;
 import legend.game.combat.types.BattleHudStatLabelMetrics0c;
 import legend.game.input.Input;
 import legend.game.input.InputAction;
-import legend.game.inventory.screens.TextColour;
 import legend.game.modding.events.battle.StatDisplayEvent;
 import legend.game.scripting.ScriptState;
 import legend.game.types.Translucency;
@@ -40,10 +38,12 @@ import java.util.Arrays;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.RENDERER;
+import static legend.game.SItem.UI_WHITE;
 import static legend.game.Scus94491BpeSegment.centreScreenX_1f8003dc;
 import static legend.game.Scus94491BpeSegment.centreScreenY_1f8003de;
 import static legend.game.Scus94491BpeSegment.playSound;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.Scus94491BpeSegment_8004.additionCounts_8004f5c0;
 import static legend.game.Scus94491BpeSegment_8006.battleState_8006e398;
@@ -811,7 +811,7 @@ public class BattleHud {
         }
 
         this.battleUiName.render(element.colour);
-        Scus94491BpeSegment_8002.renderText(str, 160 - textWidth(str) / 2, 24, TextColour.WHITE, 0);
+        renderText(str, 160 - textWidth(str) / 2, 24, UI_WHITE);
       }
     }
     //LAB_800f0f2c
@@ -1580,31 +1580,31 @@ public class BattleHud {
         }
 
         // Dragoon
-        if(Input.pressedThisFrame((InputAction.JOYSTICK_RIGHT_BUTTON_UP))) {
+        if(Input.pressedThisFrame((InputAction.BATTLE_DRAGOON))) {
           selectedAction = this.battleMenu_800c6c34.isIconEnabled(iconFlags_800c7194[4]) ? iconFlags_800c7194[4] : 0;
           this.checkInvalidSelectedAction(selectedAction);
         }
 
         // Special
-        if(Input.pressedThisFrame((InputAction.JOYSTICK_RIGHT_BUTTON_DOWN))) {
+        if(Input.pressedThisFrame((InputAction.BATTLE_SPECIAL))) {
           selectedAction = this.battleMenu_800c6c34.isIconEnabled(iconFlags_800c7194[7]) ? iconFlags_800c7194[7] : 0;
           this.checkInvalidSelectedAction(selectedAction);
         }
 
         // Escape
-        if(Input.pressedThisFrame((InputAction.BUTTON_SHOULDER_LEFT_1))) {
+        if(Input.pressedThisFrame((InputAction.BATTLE_ESCAPE))) {
           selectedAction = this.battleMenu_800c6c34.isIconEnabled(iconFlags_800c7194[3]) ? iconFlags_800c7194[3] : 0;
           this.checkInvalidSelectedAction(selectedAction);
         }
 
         // Guard
-        if(Input.pressedThisFrame((InputAction.BUTTON_SHOULDER_RIGHT_1))) {
+        if(Input.pressedThisFrame((InputAction.BATTLE_GUARD))) {
           selectedAction = this.battleMenu_800c6c34.isIconEnabled(iconFlags_800c7194[1]) ? iconFlags_800c7194[1] : 0;
           this.checkInvalidSelectedAction(selectedAction);
         }
 
         // Item Menu | Dragoon Spells
-        if(Input.pressedThisFrame((InputAction.BUTTON_WEST))) {
+        if(Input.pressedThisFrame((InputAction.BATTLE_ITEMS))) {
           selectedAction = this.battleMenu_800c6c34.retrieveIconEnabled(iconFlags_800c7194[2], iconFlags_800c7194[6]);
           this.checkInvalidSelectedAction(selectedAction);
         }

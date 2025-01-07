@@ -25,9 +25,11 @@ import legend.game.combat.environment.EncounterData38;
 import legend.game.combat.environment.StageData2c;
 import legend.game.debugger.CombatDebuggerController;
 import legend.game.debugger.Debugger;
+import legend.game.input.InputAction;
 import legend.game.inventory.WhichMenu;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.RenderEvent;
+import legend.game.modding.events.battle.BattleMusicEvent;
 import legend.game.scripting.FlowControl;
 import legend.game.scripting.OpType;
 import legend.game.scripting.Param;
@@ -136,14 +138,14 @@ import static legend.game.Scus94491BpeSegment_8007.clearRed_8007a3a8;
 import static legend.game.Scus94491BpeSegment_8007.vsyncMode_8007a3b8;
 import static legend.game.Scus94491BpeSegment_800b._800bc9a8;
 import static legend.game.Scus94491BpeSegment_800b._800bd0f0;
-import static legend.game.Scus94491BpeSegment_800b.dissolveRowCount_800bd710;
-import static legend.game.Scus94491BpeSegment_800b.dissolveIterationsPerformed_800bd714;
 import static legend.game.Scus94491BpeSegment_800b._800bd740;
 import static legend.game.Scus94491BpeSegment_800b.battleDissolveTicks;
 import static legend.game.Scus94491BpeSegment_800b.battleFlags_800bc960;
 import static legend.game.Scus94491BpeSegment_800b.clearBlue_800babc0;
 import static legend.game.Scus94491BpeSegment_800b.clearGreen_800bb104;
 import static legend.game.Scus94491BpeSegment_800b.dissolveDarkening_800bd700;
+import static legend.game.Scus94491BpeSegment_800b.dissolveIterationsPerformed_800bd714;
+import static legend.game.Scus94491BpeSegment_800b.dissolveRowCount_800bd710;
 import static legend.game.Scus94491BpeSegment_800b.drgnBinIndex_800bc058;
 import static legend.game.Scus94491BpeSegment_800b.encounterId_800bb0f8;
 import static legend.game.Scus94491BpeSegment_800b.fullScreenEffect_800bb140;
@@ -161,9 +163,9 @@ import static legend.game.Scus94491BpeSegment_800b.tickCount_800bb0fc;
 import static legend.game.Scus94491BpeSegment_800b.victoryMusic;
 import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
 import static legend.game.Scus94491BpeSegment_800c.sequenceData_800c4ac8;
-import static legend.game.combat.environment.StageData.stageData_80109a98;
+import static legend.game.combat.environment.StageData.getEncounterStageData;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_DELETE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F12;
+
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F8;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
@@ -184,6 +186,7 @@ public final class Scus94491BpeSegment {
   public static int centreScreenY_1f8003de;
   public static int displayWidth_1f8003e0;
   public static int displayHeight_1f8003e4;
+  /** Deprecated */
   public static int zOffset_1f8003e8;
   public static int tmdGp0Tpage_1f8003ec;
   public static int tmdGp0CommandId_1f8003ee;
@@ -352,6 +355,21 @@ public final class Scus94491BpeSegment {
 
   @Method(0x80011e1cL)
   public static void gameLoop() {
+    RENDERER.events().onPressedThisFrame((window, inputAction) -> {
+      if(inputAction == InputAction.DEBUGGER) {
+        if(!Debugger.isRunning()) {
+          try {
+            Platform.setImplicitExit(false);
+            new Thread(() -> Application.launch(Debugger.class)).start();
+          } catch(final Exception e) {
+            LOGGER.info("Failed to start debugger", e);
+          }
+        } else {
+          Platform.runLater(Debugger::show);
+        }
+      }
+    });
+
     RENDERER.events().onKeyPress((window, key, scancode, mods) -> {
       // Add killswitch in case sounds get stuck on
       if(key == GLFW_KEY_DELETE) {
@@ -366,19 +384,6 @@ public final class Scus94491BpeSegment {
         CombatDebuggerController.autoPunchingBagMode = !CombatDebuggerController.autoPunchingBagMode;
         if (CombatDebuggerController.autoPunchingBagMode) {
           CombatDebuggerController.punchingBagMode();
-        }
-      }
-
-      if(key == GLFW_KEY_F12) {
-        if(!Debugger.isRunning()) {
-          try {
-            Platform.setImplicitExit(false);
-            new Thread(() -> Application.launch(Debugger.class)).start();
-          } catch(final Exception e) {
-            LOGGER.info("Failed to start script debugger", e);
-          }
-        } else {
-          Platform.runLater(Debugger::show);
         }
       }
 
@@ -482,7 +487,7 @@ public final class Scus94491BpeSegment {
 
       // Failsafe if we run too far behind (also applies to pausing in IDE)
       if(interval >= NANOS_PER_TICK * 3) {
-        LOGGER.warn("Sequencer running behind, skipping ticks to catch up");
+        LOGGER.debug("Sequencer running behind, skipping ticks to catch up");
         interval = NANOS_PER_TICK;
         time = System.nanoTime() - interval;
       }
@@ -2340,7 +2345,7 @@ public final class Scus94491BpeSegment {
   public static void musicPackageLoadedCallback(final List<FileData> files, final int fileIndex, final boolean startSequence) {
     LOGGER.info("Music package %d loaded", fileIndex);
 
-    playMusicPackage(new BackgroundMusic(files, fileIndex), startSequence);
+    playMusicPackage(new BackgroundMusic(files, fileIndex, AUDIO_THREAD.getSequencer().getSampleRate()), startSequence);
     loadedDrgnFiles_800bcf78.updateAndGet(val -> val & ~0x80);
   }
 
@@ -2364,7 +2369,7 @@ public final class Scus94491BpeSegment {
     unloadSoundFile(5);
     unloadSoundFile(6);
 
-    final StageData2c stageData = stageData_80109a98[encounterId_800bb0f8];
+    final StageData2c stageData = getEncounterStageData(encounterId_800bb0f8);
 
     if(stageData.musicIndex_04 != 0xff) {
       stopMusicSequence();
@@ -2384,9 +2389,11 @@ public final class Scus94491BpeSegment {
         default -> parseMelbuVictory(stageData.musicIndex_04 & 0x1f);
       };
 
+      final var battleMusicEvent = EVENTS.postEvent(new BattleMusicEvent(victoryType, musicIndex, stageData));
+
       loadedDrgnFiles_800bcf78.updateAndGet(val -> val | 0x4000);
 
-      loadEncounterMusic(musicIndex, victoryType);
+      loadEncounterMusic(battleMusicEvent.musicIndex, battleMusicEvent.victoryType);
     }
 
     //LAB_8001df9c
@@ -2850,8 +2857,8 @@ public final class Scus94491BpeSegment {
 
   @Method(0x8001fb44L)
   public static void FUN_8001fb44(final List<FileData> files, final int fileIndex, final int victoryType) {
-    final BackgroundMusic bgm = new BackgroundMusic(files, fileIndex);
-    bgm.setVolume(40);
+    final BackgroundMusic bgm = new BackgroundMusic(files, fileIndex, AUDIO_THREAD.getSequencer().getSampleRate());
+    bgm.setVolume(40 / 128.0f);
 
     loadDrgnDir(0, victoryType, victoryFiles -> loadVictoryMusic(victoryFiles, bgm));
 
@@ -2870,7 +2877,7 @@ public final class Scus94491BpeSegment {
 
   private static void loadVictoryMusic(final List<FileData> files, final BackgroundMusic battleMusic) {
     victoryMusic = battleMusic.createVictoryMusic(files);
-    victoryMusic.setVolume(40);
+    victoryMusic.setVolume(40 / 128.0f);
   }
 
   @ScriptDescription("Load some kind of audio package")

@@ -16,8 +16,6 @@ import java.nio.FloatBuffer;
 import java.util.Arrays;
 
 import static legend.core.GameEngine.GPU;
-import static legend.game.Scus94491BpeSegment.zOffset_1f8003e8;
-import static legend.game.Scus94491BpeSegment.zShift_1f8003c4;
 
 public abstract class QueuedModel<Options extends ShaderOptionsBase<Options>, T extends QueuedModel<Options, T>> {
   protected final RenderBatch batch;
@@ -32,7 +30,8 @@ public abstract class QueuedModel<Options extends ShaderOptionsBase<Options>, T 
   final Vector2f tpageOverride = new Vector2f();
   final Vector2f uvOffset = new Vector2f();
 
-  final Rect4i scissor = new Rect4i();
+  final Rect4i worldScissor = new Rect4i();
+  final Rect4i modelScissor = new Rect4i();
 
   private final Vector3f tempColour = new Vector3f();
 
@@ -108,7 +107,7 @@ public abstract class QueuedModel<Options extends ShaderOptionsBase<Options>, T 
    * Note: origin is top-left corner
    */
   public T scissor(final int x, final int y, final int w, final int h) {
-    this.scissor.set(x, y, w, h);
+    this.modelScissor.set(x, y, w, h);
     //noinspection unchecked
     return (T)this;
   }
@@ -117,7 +116,7 @@ public abstract class QueuedModel<Options extends ShaderOptionsBase<Options>, T 
    * Note: origin is top-left corner
    */
   public T scissor(final Rect4i scissor) {
-    this.scissor.set(scissor);
+    this.modelScissor.set(scissor);
     //noinspection unchecked
     return (T)this;
   }
@@ -157,11 +156,11 @@ public abstract class QueuedModel<Options extends ShaderOptionsBase<Options>, T 
     this.clutOverride.zero();
     this.tpageOverride.zero();
     this.uvOffset.zero();
-    this.scissor.set(0, 0, 0, 0);
+    this.modelScissor.set(0, 0, 0, 0);
     this.vertexCount = 0;
     Arrays.fill(this.textures, null);
     this.texturesUsed = false;
-    this.depthOffset(zOffset_1f8003e8 * (1 << zShift_1f8003c4));
+    this.worldScissor.set(this.batch.engine.scissorStack.top());
   }
 
   void setTransforms(final MV transforms) {
@@ -184,6 +183,14 @@ public abstract class QueuedModel<Options extends ShaderOptionsBase<Options>, T 
     }
   }
 
+  public Rect4i worldScissor() {
+    return this.worldScissor;
+  }
+
+  public Rect4i modelScissor() {
+    return this.modelScissor;
+  }
+
   public boolean hasTranslucency() {
     return this.obj.hasTranslucency();
   }
@@ -203,7 +210,6 @@ public abstract class QueuedModel<Options extends ShaderOptionsBase<Options>, T 
 
   protected void updateColours(@Nullable final Translucency translucency) {
     switch(translucency) {
-      case B_MINUS_F -> this.shaderOptions.colour(this.colour.mul(-1.0f, this.tempColour));
       case B_PLUS_QUARTER_F -> this.shaderOptions.colour(this.colour.mul(0.25f, this.tempColour));
       case null, default -> this.shaderOptions.colour(this.colour);
     }

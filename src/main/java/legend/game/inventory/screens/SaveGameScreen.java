@@ -1,6 +1,5 @@
 package legend.game.inventory.screens;
 
-import legend.game.SItem;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
@@ -19,10 +18,12 @@ import java.io.IOException;
 import java.util.List;
 
 import static legend.core.GameEngine.SAVES;
+import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8005.collidedPrimitiveIndex_80052c38;
 import static legend.game.Scus94491BpeSegment_8005.submapCutForSave_800cb450;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
@@ -70,7 +71,7 @@ public class SaveGameScreen extends MenuScreen {
 
   @Override
   protected void render() {
-    SItem.renderCentredText("Save Game", 188, 10, TextColour.BROWN);
+    renderText("Save Game", 188, 10, UI_TEXT_CENTERED);
     FooterActionsHud.renderMenuActions(FooterActions.DELETE, null, null);
   }
 

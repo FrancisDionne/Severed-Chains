@@ -1,12 +1,9 @@
 package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
-import legend.game.SItem;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
-import legend.game.inventory.Equipment;
-import legend.game.inventory.Item;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.BigList;
@@ -22,9 +19,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static legend.core.GameEngine.CONFIG;
@@ -32,11 +26,12 @@ import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.MODS;
 import static legend.core.GameEngine.SAVES;
 import static legend.core.GameEngine.bootMods;
+import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
-import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8005.collidedPrimitiveIndex_80052c38;
 import static legend.game.Scus94491BpeSegment_8005.submapCut_80052c30;
 import static legend.game.Scus94491BpeSegment_8005.submapScene_80052c34;
@@ -133,7 +128,7 @@ public class CampaignSelectionScreen extends MenuScreen {
 
   @Override
   protected void render() {
-    SItem.renderCentredText("Campaigns", 188, 10, TextColour.BROWN);
+    renderText("Campaigns", 188, 10, UI_TEXT_CENTERED);
     FooterActionsHud.renderMenuActions(FooterActions.DELETE, null, null);
   }
 

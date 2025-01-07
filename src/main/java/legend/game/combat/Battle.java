@@ -240,6 +240,7 @@ import static legend.game.Scus94491BpeSegment_800b.itemOverflow;
 import static legend.game.Scus94491BpeSegment_800b.itemsDroppedByEnemies_800bc928;
 import static legend.game.Scus94491BpeSegment_800b.livingCharCount_800bc97c;
 import static legend.game.Scus94491BpeSegment_800b.livingCharIds_800bc968;
+import static legend.game.Scus94491BpeSegment_800b.loadingMonsterModels;
 import static legend.game.Scus94491BpeSegment_800b.postBattleAction_800bc974;
 import static legend.game.Scus94491BpeSegment_800b.postCombatMainCallbackIndex_800bc91c;
 import static legend.game.Scus94491BpeSegment_800b.pregameLoadingStage_800bb10c;
@@ -270,8 +271,8 @@ import static legend.game.combat.SEffe.scriptGetPositionScalerAttachmentVelocity
 import static legend.game.combat.environment.Ambiance.stageAmbiance_801134fc;
 import static legend.game.combat.environment.BattleCamera.UPDATE_REFPOINT;
 import static legend.game.combat.environment.BattleCamera.UPDATE_VIEWPOINT;
-import static legend.game.combat.environment.StageData.stageData_80109a98;
 import static legend.game.modding.coremod.CoreMod.ADDITION_BUTTON_MODE_CONFIG;
+import static legend.game.combat.environment.StageData.getEncounterStageData;
 
 public class Battle extends EngineState {
   private static final Logger LOGGER = LogManager.getFormatterLogger(Battle.class);
@@ -858,7 +859,7 @@ public class Battle extends EngineState {
     functions[605] = SEffe::scriptAllocateLmbAnimation;
     functions[606] = SEffe::allocateDeffTmd;
     functions[607] = this::FUN_800e99bc;
-    functions[608] = SEffe::FUN_801181a8;
+    functions[608] = SEffe::scriptSetLmbDeffFlag;
 
     functions[610] = this::scriptLoadCmbAnimation;
     functions[611] = SEffe::scriptAttachEffectToBobj;
@@ -881,7 +882,7 @@ public class Battle extends EngineState {
     functions[628] = SEffe::allocateDeffTmdRenderer;
     functions[629] = SEffe::scriptAttackEffectToBobjRelative;
     functions[630] = SEffe::scriptGetEffectRotation;
-    functions[631] = SEffe::FUN_801181f0;
+    functions[631] = SEffe::scriptSetLmbManagerTransformMetrics;
     functions[632] = SEffe::scriptAllocateBuggedEffect;
 
     functions[634] = SEffe::scriptWaitForXaToLoad;
@@ -986,7 +987,7 @@ public class Battle extends EngineState {
     functions[1010] = this::scriptUseItem;
     functions[1011] = this::scriptApplyEquipmentEffect;
 
-    functions[1020] = this::scriptSetCombatantCharSlot;
+    functions[1020] = this::scriptSetCombatantVramSlot;
     return functions;
   }
 
@@ -1114,11 +1115,13 @@ public class Battle extends EngineState {
     return FlowControl.CONTINUE;
   }
 
-  @ScriptDescription("Changes char slot of a combatant")
+  @ScriptDescription("Changes vram slot of a combatant")
   @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "combatantIndex", description = "Combatant ID")
-  @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "charSlot", description = "Target character slot")
-  private FlowControl scriptSetCombatantCharSlot(final RunningScript<BattleEntity27c> script) {
-    this.combatants_8005e398[script.params_20[0].get()].charSlot_19c = script.params_20[1].get();
+  @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "vramSlot", description = "Target vram slot")
+  private FlowControl scriptSetCombatantVramSlot(final RunningScript<BattleEntity27c> script) {
+    this.unsetMonsterTextureSlotUsed(this.combatants_8005e398[script.params_20[0].get()].vramSlot_1a0);
+    this.combatants_8005e398[script.params_20[0].get()].vramSlot_1a0 = script.params_20[1].get();
+    this.setMonsterTextureSlotUsed(this.combatants_8005e398[script.params_20[0].get()].vramSlot_1a0);
     return FlowControl.CONTINUE;
   }
 
@@ -1318,6 +1321,8 @@ public class Battle extends EngineState {
 
   @Method(0x800c7524L)
   public void initBattle() {
+    new Tim(Unpacker.loadFile("shadow.tim")).uploadToGpu();
+
     this.FUN_800c8624();
 
     gameState_800babc8._b4++;
@@ -1512,6 +1517,17 @@ public class Battle extends EngineState {
   @Method(0x800c791cL)
   public void loadEncounterAssets() {
     this.loadEnemyTextures();
+
+    // Count total monsters
+    loadingMonsterModels.set(0);
+    for(int i = 0; i < this.combatantCount_800c66a0; i++) {
+      final CombatantStruct1a8 combatant = this.getCombatant(i);
+      if(combatant.charSlot_19c < 0) { // Monster
+        loadingMonsterModels.incrementAndGet();
+      }
+
+      //LAB_800fc050
+    }
 
     //LAB_800fc030
     for(int i = 0; i < this.combatantCount_800c66a0; i++) {
@@ -2088,14 +2104,15 @@ public class Battle extends EngineState {
 
         if(charSlot < 0) {
           combatant.flags_19e = 0x1;
+          combatant.vramSlot_1a0 = this.findFreeMonsterTextureSlot(a0);
         } else {
           //LAB_800c8f90
           combatant.flags_19e = 0x5;
+          combatant.vramSlot_1a0 = charSlot + 1;
         }
 
         //LAB_800c8f94
         combatant.charSlot_19c = charSlot;
-        combatant.vramSlot_1a0 = 0;
         combatant.charIndex_1a2 = a0;
         combatant._1a4 = -1;
         combatant._1a6 = -1;
@@ -2234,6 +2251,10 @@ public class Battle extends EngineState {
     }
 
     combatant.flags_19e &= 0xffdf;
+
+    if(isMonster) {
+      loadingMonsterModels.decrementAndGet();
+    }
   }
 
   @Method(0x800c952cL)
@@ -2613,18 +2634,6 @@ public class Battle extends EngineState {
     final int vramSlot;
 
     if(combatant != null) {
-      //LAB_800ca77c
-      if(combatant.vramSlot_1a0 == 0) {
-        final int charSlot = combatant.charSlot_19c;
-
-        if(charSlot < 0) {
-          combatant.vramSlot_1a0 = this.findFreeMonsterTextureSlot(combatant.charIndex_1a2);
-        } else {
-          //LAB_800ca7c4
-          combatant.vramSlot_1a0 = charSlot + 1;
-        }
-      }
-
       vramSlot = combatant.vramSlot_1a0;
     } else {
       vramSlot = 0;
@@ -7349,6 +7358,7 @@ public class Battle extends EngineState {
 
         if(part.obj != null) {
           RENDERER.queueModel(part.obj, lw, QueuedModelBattleTmd.class)
+            .depthOffset(stage.z_5e8 * 4)
             .lightDirection(lightDirectionMatrix_800c34e8)
             .lightColour(lightColourMatrix_800c3508)
             .backgroundColour(GTE.backgroundColour)
@@ -8637,7 +8647,7 @@ public class Battle extends EngineState {
 
   @Method(0x80109050L)
   private void loadStageDataAndControllerScripts() {
-    this.currentStageData_800c6718 = stageData_80109a98[encounterId_800bb0f8];
+    this.currentStageData_800c6718 = getEncounterStageData(encounterId_800bb0f8);
 
     this.playerBattleScript_800c66fc = new ScriptFile("player_combat_script", Unpacker.loadFile("player_combat_script").getBytes());
 

@@ -14,6 +14,7 @@ import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.QuaternionCamera;
 import legend.core.opengl.RenderState;
 import legend.core.opengl.Resolution;
+import legend.core.opengl.ScissorStack;
 import legend.core.opengl.Shader;
 import legend.core.opengl.ShaderManager;
 import legend.core.opengl.ShaderOptions;
@@ -28,6 +29,8 @@ import legend.core.opengl.Window;
 import legend.core.opengl.fonts.Font;
 import legend.core.opengl.fonts.FontManager;
 import legend.game.combat.Battle;
+import legend.game.input.Input;
+import legend.game.input.InputAction;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.types.Translucency;
 import org.apache.logging.log4j.LogManager;
@@ -59,9 +62,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F10;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F11;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F2;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F5;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F9;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_M;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
@@ -85,6 +87,7 @@ import static org.lwjgl.opengl.GL11C.GL_LINEAR;
 import static org.lwjgl.opengl.GL11C.GL_LINE_SMOOTH;
 import static org.lwjgl.opengl.GL11C.GL_NEAREST;
 import static org.lwjgl.opengl.GL11C.GL_RGBA;
+import static org.lwjgl.opengl.GL11C.GL_RGBA16;
 import static org.lwjgl.opengl.GL11C.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
@@ -99,7 +102,6 @@ import static org.lwjgl.opengl.GL11C.glPolygonMode;
 import static org.lwjgl.opengl.GL11C.glViewport;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_DEPTH_ATTACHMENT;
-import static org.lwjgl.opengl.GL31C.GL_RGBA16_SNORM;
 
 public class RenderEngine {
   private static final Logger LOGGER = LogManager.getFormatterLogger(RenderEngine.class);
@@ -109,7 +111,8 @@ public class RenderEngine {
 
   private final List<RenderBatch> batches = new ArrayList<>();
   private final RenderBatch mainBatch;
-  private final RenderState state = new RenderState(this);
+  public final ScissorStack scissorStack;
+  private final RenderState state;
 
   private Camera camera2d;
   private Camera camera3d;
@@ -249,6 +252,7 @@ public class RenderEngine {
   private int renderWidth;
   /** The actual height for rendering (taking into account resolution config) */
   private int renderHeight;
+  private float renderAspectRatio;
 
   private long lastFrame;
   private double vsyncCount;
@@ -282,8 +286,12 @@ public class RenderEngine {
   private boolean frameAdvance;
   private boolean reloadShaders;
 
+  private int frameSkipIndex;
+
   public RenderEngine() {
     this.mainBatch = new RenderBatch(this, () -> this.vdfUniform, this.vdfBuffer, this.lightBuffer);
+    this.scissorStack = new ScissorStack(this, this.mainBatch);
+    this.state = new RenderState(this, this.scissorStack);
   }
 
   /**
@@ -306,6 +314,10 @@ public class RenderEngine {
     for(int i = 0; i < this.batches.size(); i++) {
       this.batches.get(i).reset();
     }
+  }
+
+  public float getNativeAspectRatio() {
+    return this.mainBatch.aspectRatio;
   }
 
   /** NOTE: you must call {@link #updateProjections} yourself */
@@ -346,12 +358,20 @@ public class RenderEngine {
     return this.renderHeight;
   }
 
+  public float getRenderAspectRatio() {
+    return this.renderAspectRatio;
+  }
+
   public void setProjectionDepth(final float depth) {
     this.mainBatch.setProjectionDepth(depth);
   }
 
   public void updateProjections() {
     this.mainBatch.updateProjections();
+  }
+
+  public boolean expandedSubmap() {
+    return this.mainBatch.expandedSubmap;
   }
 
   public Window.Events events() {
@@ -429,6 +449,7 @@ public class RenderEngine {
     this.window.events.onResize(this::onResize);
 
     this.window.events.onMouseMove(this::onMouseMove);
+    this.window.events.onPressedThisFrame(this::onPressedThisFrame);
     this.window.events.onKeyPress(this::onKeyPress);
     this.window.events.onKeyRelease(this::onKeyRelease);
 
@@ -533,7 +554,9 @@ public class RenderEngine {
     this.renderBufferQuad.persistent = true;
 
     this.window.events.onDraw(() -> {
-      this.pre();
+      if(this.frameSkipIndex == 0) {
+        this.pre();
+      }
 
       EVENTS.clearStaleRefs();
 
@@ -551,14 +574,40 @@ public class RenderEngine {
       }
 
       if(this.frameAdvanceSingle || this.frameAdvance) {
+        this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
         this.resetBatches();
         this.renderCallback.run();
+
+        // Delete stuff marked for deletion
+        Obj.deleteObjects();
+        Texture.deleteTextures();
+
+        this.scissorStack.reset();
+
         if(this.frameAdvanceSingle) {
           this.frameAdvanceSingle = false;
         }
       }
 
       if(!this.paused) {
+        if(this.frameSkipIndex == 0) {
+          for(int i = 0; i < this.batches.size(); i++) {
+            this.batches.get(i).modelPool.ignoreQueues = false;
+            this.batches.get(i).orthoPool.ignoreQueues = false;
+          }
+
+          this.mainBatch.modelPool.ignoreQueues = false;
+          this.mainBatch.orthoPool.ignoreQueues = false;
+        } else {
+          for(int i = 0; i < this.batches.size(); i++) {
+            this.batches.get(i).modelPool.ignoreQueues = true;
+            this.batches.get(i).orthoPool.ignoreQueues = true;
+          }
+
+          this.mainBatch.modelPool.ignoreQueues = true;
+          this.mainBatch.orthoPool.ignoreQueues = true;
+        }
+
         this.renderCallback.run();
       }
 
@@ -570,15 +619,25 @@ public class RenderEngine {
         }
 
         this.renderBuffers[this.renderBufferIndex].bind();
-        this.clearColour();
 
-        // Render batches
-        for(int i = 0; i < this.batches.size(); i++) {
-          final RenderBatch batch = this.batches.get(i);
-          this.renderBatch(batch);
+        if(this.frameSkipIndex == 0) {
+          this.clearColour();
+
+          // Render batches
+          for(int i = 0; i < this.batches.size(); i++) {
+            final RenderBatch batch = this.batches.get(i);
+            this.renderBatch(batch);
+          }
+
+          this.renderBatch(this.mainBatch);
         }
 
-        this.renderBatch(this.mainBatch);
+        // Fix for GH#1885
+        // Don't know why it's broken or why this fixes it. The scissoring for the text is somehow getting
+        // applied to the render buffer rendering. Resetting the scissor rect to the full screen fixes it.
+        this.state.fullScreenScissor();
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // set render states
         glDisable(GL_DEPTH_TEST);
@@ -587,8 +646,7 @@ public class RenderEngine {
 
         // bind backbuffer
         FrameBuffer.unbind();
-        this.setClearColour(0.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // use screen shader
         screenShader.use();
@@ -604,13 +662,21 @@ public class RenderEngine {
 
       // If we're paused, don't reset the pool so that we keep rendering the same scene over and over again
       if(!this.paused) {
-        this.resetBatches();
+        if(this.frameSkipIndex == 0) {
+          this.resetBatches();
 
-        this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
+          // Delete stuff marked for deletion
+          Obj.deleteObjects();
+          Texture.deleteTextures();
 
-        // Delete stuff marked for deletion
-        Obj.deleteObjects();
-        Texture.deleteTextures();
+          this.scissorStack.reset();
+        }
+
+        if(this.frameSkipIndex == Config.getGameSpeedMultiplier() - 1) {
+          this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
+        }
+
+        this.frameSkipIndex = (this.frameSkipIndex + 1) % Config.getGameSpeedMultiplier();
       }
 
       this.fps = 1_000_000_000.0f / (System.nanoTime() - this.lastFrame);
@@ -639,20 +705,27 @@ public class RenderEngine {
     }
 
     this.state.initBatch(batch);
+    this.state.enableScissor();
 
     this.clearDepth();
 
+    glPolygonMode(GL_FRONT_AND_BACK, this.wireframeMode ? GL_LINE : GL_FILL);
     this.setProjectionMode(batch, ProjectionMode._3D);
     this.renderPool(batch.modelPool, true);
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     this.setProjectionMode(batch, ProjectionMode._2D);
     this.renderPool(batch.orthoPool, false);
 
+    glPolygonMode(GL_FRONT_AND_BACK, this.wireframeMode ? GL_LINE : GL_FILL);
     this.setProjectionMode(batch, ProjectionMode._3D);
     this.renderPoolTranslucent(batch, batch.modelPool);
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     this.setProjectionMode(batch, ProjectionMode._2D);
     this.renderPoolTranslucent(batch, batch.orthoPool);
+
+    this.state.disableScissor();
   }
 
   private void renderPool(final QueuePool<QueuedModel<?, ?>> pool, final boolean backFaceCulling) {
@@ -687,9 +760,7 @@ public class RenderEngine {
       final QueuedModel<?, ?> entry = pool.get(i);
       entry.useShader(modelIndex, 1);
 
-      if(entry.scissor.w != 0) {
-        this.state.scissor(entry.scissor);
-      }
+      this.state.scissor(entry);
 
       if(entry.shouldRender(null)) {
         if(backFaceCulling) {
@@ -711,10 +782,6 @@ public class RenderEngine {
             entry.render(translucency);
           }
         }
-      }
-
-      if(entry.scissor.w != 0) {
-        this.state.disableScissor();
       }
     }
   }
@@ -751,9 +818,7 @@ public class RenderEngine {
       if(entry.hasTranslucency()) {
         entry.useShader(modelIndex, 2);
 
-        if(entry.scissor.w != 0) {
-          this.state.scissor(entry.scissor);
-        }
+        this.state.scissor(entry);
 
         entry.useTexture();
 
@@ -768,17 +833,13 @@ public class RenderEngine {
         }
 
         if(entry.shouldRender(Translucency.B_MINUS_F)) {
-          Translucency.B_PLUS_F.setGlState(); // yes B-F uses negated additive blending
+          Translucency.B_MINUS_F.setGlState();
           entry.render(Translucency.B_MINUS_F);
         }
 
         if(entry.shouldRender(Translucency.B_PLUS_QUARTER_F)) {
           Translucency.B_PLUS_F.setGlState();
           entry.render(Translucency.B_PLUS_QUARTER_F);
-        }
-
-        if(entry.scissor.w != 0) {
-          this.state.disableScissor();
         }
       }
     }
@@ -964,6 +1025,8 @@ public class RenderEngine {
       this.renderHeight = res.verticalResolution;
     }
 
+    this.renderAspectRatio = (float)this.renderWidth / (float)this.renderHeight;
+
     // glLineWidth has been removed on M3 macs
     if(!this.isMac()) {
       glLineWidth(Math.max(1, this.renderHeight / 480.0f));
@@ -984,7 +1047,7 @@ public class RenderEngine {
 
       this.renderTextures[i] = Texture.create(builder -> {
         builder.size(this.renderWidth, this.renderHeight);
-        builder.internalFormat(GL_RGBA16_SNORM);
+        builder.internalFormat(GL_RGBA16);
         builder.dataFormat(GL_RGBA);
         builder.dataType(GL_UNSIGNED_BYTE);
         builder.magFilter(GL_NEAREST);
@@ -1043,6 +1106,25 @@ public class RenderEngine {
     }
   }
 
+  private void onPressedThisFrame(final Window window, final InputAction inputAction) {
+    switch(inputAction) {
+      case InputAction.TOGGLE_FULL_SCREEN -> Config.switchFullScreen();
+      case InputAction.SPEED_UP -> Config.setGameSpeedMultiplier(Math.min(Config.getGameSpeedMultiplier() + 1, 16));
+      case InputAction.SLOW_DOWN -> Config.setGameSpeedMultiplier(Math.max(Config.getGameSpeedMultiplier() - 1, 1));
+      case InputAction.PAUSE -> this.togglePause = !this.togglePause;
+      case InputAction.FRAME_ADVANCE -> {
+        if(this.paused) {
+          this.frameAdvanceSingle = true;
+        }
+      }
+      case InputAction.FRAME_ADVANCE_HOLD -> {
+        if(this.paused) {
+          this.frameAdvance = true;
+        }
+      }
+    }
+  }
+
   private void onKeyPress(final Window window, final int key, final int scancode, final int mods) {
     if(this.allowMovement) {
       switch(key) {
@@ -1053,10 +1135,6 @@ public class RenderEngine {
         case GLFW_KEY_SPACE -> this.movingUp = true;
         case GLFW_KEY_LEFT_SHIFT -> this.movingDown = true;
         case GLFW_KEY_ESCAPE -> this.window.close();
-        case GLFW_KEY_TAB -> {
-          this.wireframeMode = !this.wireframeMode;
-          glPolygonMode(GL_FRONT_AND_BACK, this.wireframeMode ? GL_LINE : GL_FILL);
-        }
       }
     } else if(key == GLFW_KEY_TAB) {
       if((mods & GLFW_MOD_SHIFT) != 0) {
@@ -1072,18 +1150,10 @@ public class RenderEngine {
         case 1 -> System.out.println("Switched to legacy rendering");
         case 2 -> System.out.println("Switched to VRAM rendering");
       }
+    } else if(key == GLFW_KEY_F2) {
+      this.wireframeMode = !this.wireframeMode;
     } else if(key == GLFW_KEY_F5) {
       this.reloadShaders = true;
-    } else if(key == GLFW_KEY_F11) {
-      this.togglePause = !this.togglePause;
-    } else if(key == GLFW_KEY_F9) {
-      if(this.paused) {
-        this.frameAdvanceSingle = true;
-      }
-    } else if(key == GLFW_KEY_F10) {
-      if(this.paused) {
-        this.frameAdvance = true;
-      }
     }
 
     if(key == GLFW_KEY_M && (mods & GLFW_MOD_CONTROL) != 0) {
@@ -1091,9 +1161,13 @@ public class RenderEngine {
       LOGGER.info("Allow movement: %b", this.allowMovement);
 
       if(this.allowMovement) {
-        this.window.hideCursor();
+        this.window.disableCursor();
       } else {
-        this.window.showCursor();
+        if(CONFIG.getConfig(CoreMod.DISABLE_MOUSE_INPUT_CONFIG.get()) && !Input.getController().getGuid().isEmpty()) {
+          this.window.hideCursor();
+        } else {
+          this.window.showCursor();
+        }
       }
     }
   }

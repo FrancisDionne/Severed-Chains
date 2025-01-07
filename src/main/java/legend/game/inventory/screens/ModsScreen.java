@@ -5,7 +5,6 @@ import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Checkbox;
-import legend.game.inventory.screens.controls.Label;
 import legend.game.modding.coremod.CoreMod;
 import legend.lodmod.LodMod;
 
@@ -37,7 +36,7 @@ public class ModsScreen extends VerticalLayoutScreen {
       if(!this.isRequired(modId)) {
         checkbox = new Checkbox();
         checkbox.setChecked(enabledMods.contains(modId));
-        checkbox.setHorizontalAlign(Label.HorizontalAlign.RIGHT);
+        checkbox.setHorizontalAlign(HorizontalAlign.RIGHT);
 
         checkbox.onChecked(() -> enabledMods.add(modId));
         checkbox.onUnchecked(() -> enabledMods.remove(modId));
