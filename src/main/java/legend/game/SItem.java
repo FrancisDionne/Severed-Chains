@@ -844,7 +844,11 @@ public final class SItem {
         final char current = text.charAt(i);
         final int charWidth = Scus94491BpeSegment_8002.charWidth(current);
 
-        if(currentWidth + charWidth > maxWidth) {
+        if(current == '\n') {
+          temp.add(text.substring(startIndex, i));
+          currentWidth = 0;
+          startIndex = i + 1;
+        } else if(currentWidth + charWidth > maxWidth) {
           boolean advanceOverSpace = false;
           for(int backtrack = 0; backtrack < 10; backtrack++) {
             if(text.charAt(i - backtrack) == ' ') {
@@ -1437,7 +1441,7 @@ public final class SItem {
     //LAB_80107e90
     final int status = gameState_800babc8.charData_32c[charIndex].status_10;
 
-    if((tickCount_800bb0fc & 0x10) == 0) {
+    if(tickCount_800bb0fc / currentEngineState_8004dd04.tickMultiplier() % 32 < 16) {
       return false;
     }
 

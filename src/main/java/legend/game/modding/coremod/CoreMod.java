@@ -28,6 +28,7 @@ import legend.game.modding.coremod.config.ControllerKeybindConfigEntry;
 import legend.game.modding.coremod.config.ControllerKeybindsConfigEntry;
 import legend.game.modding.coremod.config.AdditionSettingsConfigEntry;
 import legend.game.modding.coremod.config.ControllerStyleConfigEntry;
+import legend.game.modding.coremod.config.CreateCrashSaveConfigEntry;
 import legend.game.modding.coremod.config.EnabledModsConfigEntry;
 import legend.game.modding.coremod.config.EncounterRateConfigEntry;
 import legend.game.modding.coremod.config.FooterActionColorConfigEntry;
@@ -44,10 +45,13 @@ import legend.game.modding.coremod.config.MusicSampleRateConfigEntry;
 import legend.game.modding.coremod.config.MusicVolumeConfigEntry;
 import legend.game.modding.coremod.config.DisableMouseInputConfigEntry;
 import legend.game.modding.coremod.config.ResolutionConfig;
+import legend.game.modding.coremod.config.SaveAnywhereConfig;
 import legend.game.modding.coremod.config.SecondaryCharacterXpMultiplierConfigEntry;
 import legend.game.modding.coremod.config.SubmapWidescreenModeConfig;
 import legend.game.modding.coremod.config.TransformationModeConfigEntry;
+import legend.game.modding.coremod.config.UnlockPartyConfig;
 import legend.game.saves.BoolConfigEntry;
+import legend.game.saves.CampaignNameConfigEntry;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigEntry;
 import legend.game.saves.ConfigRegistryEvent;
@@ -90,7 +94,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
 import static org.lwjgl.glfw.GLFW.GLFW_MOD_ALT;
 
 /** Core mod that contains engine-level content. Game can not run without it. */
-@Mod(id = CoreMod.MOD_ID)
+@Mod(id = CoreMod.MOD_ID, version = "^3.0.0")
 @EventListener
 public class CoreMod {
   public static final String MOD_ID = "lod_core";
@@ -116,6 +120,7 @@ public class CoreMod {
   public static final RegistryDelegate<MusicPitchResolutionConfigEntry> MUSIC_PITCH_RESOLUTION_CONFIG = CONFIG_REGISTRAR.register("music_pitch_resolution", MusicPitchResolutionConfigEntry::new);
   public static final RegistryDelegate<MusicSampleRateConfigEntry> MUSIC_SAMPLE_RATE_CONFIG = CONFIG_REGISTRAR.register("music_sample_rate", MusicSampleRateConfigEntry::new);
   public static final RegistryDelegate<MusicEffectsOverTimeGranularityConfigEntry> MUSIC_EFFECTS_OVER_TIME_GRANULARITY_CONFIG = CONFIG_REGISTRAR.register("music_effects_over_time_granularity", MusicEffectsOverTimeGranularityConfigEntry::new);
+  public static final RegistryDelegate<CreateCrashSaveConfigEntry> CREATE_CRASH_SAVE_CONFIG = CONFIG_REGISTRAR.register("create_crash_save", CreateCrashSaveConfigEntry::new);
 
   /** Config isn't actually used, but adds a button to the options screen to open the keybinds screen */
   public static final RegistryDelegate<ConfigEntry<Void>> CONTROLLER_KEYBINDS_CONFIG = register("controller_keybinds", ControllerKeybindsConfigEntry::new);
@@ -158,6 +163,7 @@ public class CoreMod {
   }
 
   // Per-campaign config
+  public static final RegistryDelegate<CampaignNameConfigEntry> CAMPAIGN_NAME = CONFIG_REGISTRAR.register("campaign_name", CampaignNameConfigEntry::new);
   public static final RegistryDelegate<EnabledModsConfigEntry> ENABLED_MODS_CONFIG = register("enabled_mods", EnabledModsConfigEntry::new);
   public static final RegistryDelegate<IndicatorModeConfigEntry> INDICATOR_MODE_CONFIG = register("indicator_mode", IndicatorModeConfigEntry::new);
   public static final RegistryDelegate<InventorySizeConfigEntry> INVENTORY_SIZE_CONFIG = register("inventory_size", InventorySizeConfigEntry::new);
@@ -180,6 +186,7 @@ public class CoreMod {
 
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_GROUP_CONFIG = register("addition_group", AdditionGroupConfigEntry::new);
   public static final RegistryDelegate<AdditionModeConfigEntry> ADDITION_MODE_CONFIG = register("addition_mode", AdditionModeConfigEntry::new);
+  public static final RegistryDelegate<BoolConfigEntry> AUTO_DRAGOON_ADDITION_CONFIG = CONFIG_REGISTRAR.register("auto_dragoon_addition", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY));
   public static final RegistryDelegate<AdditionDifficultyConfigEntry> ADDITION_DIFFICULTY_CONFIG = register("addition_difficulty", AdditionDifficultyConfigEntry::new);
   public static final RegistryDelegate<AdditionTimingModeConfigEntry> ADDITION_TIMING_MODE_CONFIG = register("addition_timing_mode", AdditionTimingModeConfigEntry::new);
   public static final RegistryDelegate<AdditionTimingOffsetConfigEntry> ADDITION_TIMING_OFFSET_CONFIG = register("addition_timing_offset", AdditionTimingOffsetConfigEntry::new);
@@ -189,8 +196,6 @@ public class CoreMod {
   public static final RegistryDelegate<ConfigEntry<Void>> DRAGOON_ADDITION_GROUP_CONFIG = register("dragoon_addition_group", DragoonAdditionGroupConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionModeConfigEntry> DRAGOON_ADDITION_MODE_CONFIG = register("dragoon_addition_mode", DragoonAdditionModeConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionDifficultyConfigEntry> DRAGOON_ADDITION_DIFFICULTY_CONFIG = register("dragoon_addition_difficulty", DragoonAdditionDifficultyConfigEntry::new);
-
-
 
   public static final Formula<Integer, Integer> PHYSICAL_DAMAGE_FORMULA = Formula.make(PhysicalDamageFormula::calculatePhysicalDamage, builder -> builder
     .then(PhysicalDamageFormula::applyElementalInteractions)
