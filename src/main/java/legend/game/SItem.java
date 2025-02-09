@@ -826,35 +826,6 @@ public final class SItem {
     }
   }
 
-  @Method(0x80103cc4L)
-  public static void renderText(final String text, final int x, final int y, final TextColour colour) {
-    final TextColour shadowColour;
-    if(colour == TextColour.WHITE) {
-      shadowColour = TextColour.BLACK;
-    } else if(colour == TextColour.LIME) {
-      //LAB_80103d18
-      shadowColour = TextColour.GREEN;
-    } else if(colour == TextColour.MIDDLE_BROWN) {
-      //LAB_80103d20
-      shadowColour = TextColour.LIGHT_BROWN;
-    } else if(colour.toString().startsWith("FOOTER")){
-      if (colour == TextColour.FOOTER_BROWN) {
-        shadowColour = TextColour.MIDDLE_BROWN;
-      } else {
-        shadowColour = TextColour.DARK_GREY;
-      }
-    } else {
-      shadowColour = TextColour.MIDDLE_BROWN;
-    }
-
-    //LAB_80103d24
-    //LAB_80103d28
-    Scus94491BpeSegment_8002.renderText(text, x    , y    , colour, 0);
-    Scus94491BpeSegment_8002.renderText(text, x    , y + 1, shadowColour, 0);
-    Scus94491BpeSegment_8002.renderText(text, x + 1, y    , shadowColour, 0);
-    Scus94491BpeSegment_8002.renderText(text, x + 1, y + 1, shadowColour, 0);
-  }
-
   @Method(0x80103e90L)
   public static void renderMenuCentredText(final String text, final int x, int y, final int maxWidth) {
     final String[] split;
