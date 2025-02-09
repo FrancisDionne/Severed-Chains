@@ -15,7 +15,7 @@ import static legend.game.Scus94491BpeSegment.startFadeEffect;
 
 public class AdditionSettingsConfigEntry extends ConfigEntry<Void> {
   public AdditionSettingsConfigEntry() {
-    super(null, ConfigStorageLocation.GLOBAL, ConfigCategory.GAMEPLAY, o -> new byte[0], bytes -> null);
+    super(null, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, o -> new byte[0], bytes -> null);
 
     this.setEditControl((current, configCollection) -> {
       final Button button = new Button(I18n.translate(CoreMod.MOD_ID + ".config.addition_settings.configure"));
