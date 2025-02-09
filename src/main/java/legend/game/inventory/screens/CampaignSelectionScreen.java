@@ -58,11 +58,6 @@ public class CampaignSelectionScreen extends MenuScreen {
     title.setPos(0, 10);
     title.setWidth(this.getWidth());
 
-    final Label hotkeys = this.addControl(new Label(I18n.translate("lod_core.ui.campaign_selection.hotkeys", "\u0120", "\u011f")));
-    hotkeys.getFontOptions().set(UI_TEXT).horizontalAlign(HorizontalAlign.RIGHT);
-    hotkeys.setPos(10, 226);
-    hotkeys.setWidth(this.getWidth() - 20);
-
     final SaveCard saveCard = this.addControl(new SaveCard());
     saveCard.setPos(16, 160);
 
@@ -146,7 +141,7 @@ public class CampaignSelectionScreen extends MenuScreen {
 
   @Override
   protected void render() {
-    FooterActionsHud.renderMenuActions(FooterActions.DELETE, null, null);
+    FooterActionsHud.renderMenuActions(FooterActions.DELETE, FooterActions.MODS, null);
   }
 
   private void menuMods() {

@@ -5,7 +5,6 @@ import legend.core.gpu.Bpp;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
-import legend.game.SItem;
 import legend.game.input.InputAction;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.coremod.CoreMod;
@@ -92,6 +91,8 @@ public final class FooterActionsHud {
       case FooterActions.SELECT -> "Select";
       case FooterActions.BACK -> "Back";
       case FooterActions.ADDITIONS -> "Additions";
+      case FooterActions.HELP -> "Help";
+      case FooterActions.MODS -> "Mods";
     };
   }
 
@@ -193,7 +194,7 @@ public final class FooterActionsHud {
     final InputAction input = switch(action) {
       case FooterActions.BACK -> InputAction.BUTTON_EAST;
       case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD -> InputAction.BUTTON_WEST;
-      case FooterActions.SORT, FooterActions.ADDITIONS -> InputAction.BUTTON_NORTH;
+      case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS -> InputAction.BUTTON_NORTH;
       case FooterActions.SELECT -> InputAction.BUTTON_SOUTH;
     };
     return new FooterAction(action, input);

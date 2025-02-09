@@ -1,6 +1,7 @@
 package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
+import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
@@ -73,7 +74,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
         }
       });
 
-    FooterActionsHud.setMenuActions(null, null, null);
+    FooterActionsHud.setMenuActions(FooterActions.HELP, null, null);
   }
 
   @Override
@@ -105,6 +106,5 @@ public class OptionsScreen extends VerticalLayoutScreen {
   @Override
   protected void render() {
     super.render();
-    renderText(I18n.translate("lod_core.ui.options.help_hotkey", "\u0120"), 334, 226, this.fontOptions);
   }
 }

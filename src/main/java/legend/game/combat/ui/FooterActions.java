@@ -7,5 +7,7 @@ public enum FooterActions {
   DISCARD,
   SELECT,
   BACK,
-  ADDITIONS
+  ADDITIONS,
+  HELP,
+  MODS
 }
