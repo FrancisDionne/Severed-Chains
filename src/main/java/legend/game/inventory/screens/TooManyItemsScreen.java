@@ -220,9 +220,10 @@ public class TooManyItemsScreen extends MenuScreen {
           renderString(194, 164, I18n.translate(this.items.get(slotScroll + slotIndex).getDescriptionTranslationKey()), allocate);
         }
 
-        final Renderable58 renderable = allocateOneFrameGlyph(137, 84, 140);
-        renderable.clut_30 = 0x7ceb;
-        renderText(Press_to_sort_8011d024, 37, 140, UI_TEXT);
+        //Commented in case we want to keep it, but it's redundant info with the footers now
+        //final Renderable58 renderable = allocateOneFrameGlyph(137, 84, 140);
+        //renderable.clut_30 = 0x7ceb;
+        //renderText(Press_to_sort_8011d024, 37, 140, UI_TEXT);
       }
     } else {
       renderText(Armed_item_8011c314, 210, 22, UI_TEXT);
@@ -236,9 +237,10 @@ public class TooManyItemsScreen extends MenuScreen {
           renderString(194, 164, I18n.translate(this.equipment.get(slotScroll + slotIndex).getDescriptionTranslationKey()), allocate);
         }
 
-        final Renderable58 renderable = allocateOneFrameGlyph(137, 84, 140);
-        renderable.clut_30 = 0x7ceb;
-        renderText(Press_to_sort_8011d024, 37, 140, UI_TEXT);
+        //Commented in case we want to keep it, but it's redundant info with the footers now
+        //final Renderable58 renderable = allocateOneFrameGlyph(137, 84, 140);
+        //renderable.clut_30 = 0x7ceb;
+        //renderText(Press_to_sort_8011d024, 37, 140, UI_TEXT);
       }
     }
   }
