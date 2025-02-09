@@ -146,7 +146,6 @@ public class CampaignSelectionScreen extends MenuScreen {
 
   @Override
   protected void render() {
-    renderText("Campaigns", 188, 10, UI_TEXT_CENTERED);
     FooterActionsHud.renderMenuActions(FooterActions.DELETE, null, null);
   }
 
