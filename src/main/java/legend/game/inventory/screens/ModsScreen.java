@@ -1,5 +1,6 @@
 package legend.game.inventory.screens;
 
+import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.input.InputAction;
@@ -79,7 +80,7 @@ public class ModsScreen extends VerticalLayoutScreen {
       }
     }
 
-    FooterActionsHud.setMenuActions(null, null, null);
+    FooterActionsHud.setMenuActions(FooterActions.HELP, null, null);
   }
 
   private boolean isRequired(final String modId) {
@@ -115,6 +116,5 @@ public class ModsScreen extends VerticalLayoutScreen {
   @Override
   protected void render() {
     super.render();
-    renderText(I18n.translate("lod_core.ui.mods.hotkeys", "\u0120"), 334, 226, this.fontOptions);
   }
 }
