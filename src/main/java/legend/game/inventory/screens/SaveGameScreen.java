@@ -1,6 +1,5 @@
 package legend.game.inventory.screens;
 
-import legend.game.SItem;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.input.InputAction;
@@ -19,10 +18,13 @@ import java.io.IOException;
 import java.util.List;
 
 import static legend.core.GameEngine.SAVES;
+import static legend.game.SItem.UI_TEXT;
+import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8005.collidedPrimitiveIndex_80052c38;
 import static legend.game.Scus94491BpeSegment_8005.submapCutForSave_800cb450;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
@@ -62,15 +64,20 @@ public class SaveGameScreen extends MenuScreen {
 
     this.saveList.addEntry(null);
 
-    this.saves = SAVES.loadAllSaves(gameState_800babc8.campaignName);
+    this.saves = gameState_800babc8.campaign.loadAllSaves();
     for(final SavedGame save : this.saves) {
       this.saveList.addEntry(save);
     }
   }
 
   @Override
+  public void setFocus(@Nullable final Control control) {
+    super.setFocus(this.saveList);
+  }
+
+  @Override
   protected void render() {
-    SItem.renderCentredText("Save Game", 188, 10, TextColour.BROWN);
+    renderText("Save Game", 188, 10, UI_TEXT_CENTERED);
     FooterActionsHud.renderMenuActions(FooterActions.DELETE, null, null);
   }
 
@@ -86,7 +93,7 @@ public class SaveGameScreen extends MenuScreen {
 
   private void onNewSaveResult(final MessageBoxResult result, final String name) {
     if(result == MessageBoxResult.YES) {
-      if(SAVES.saveExists(gameState_800babc8.campaignName, name)) {
+      if(gameState_800babc8.campaign.saveExists(name)) {
         menuStack.pushScreen(new MessageBoxScreen("Save name already\nin use", 0, result1 -> { }));
         return;
       }
@@ -131,7 +138,7 @@ public class SaveGameScreen extends MenuScreen {
       menuStack.pushScreen(new MessageBoxScreen("Are you sure you want to\ndelete this save?", 2, result -> {
         if(result == MessageBoxResult.YES) {
           try {
-            SAVES.deleteSave(this.saveList.getSelected().state.campaignName, this.saveList.getSelected().fileName);
+            this.saveList.getSelected().state.campaign.deleteSave(this.saveList.getSelected().fileName);
             this.saves.removeIf(save -> save.fileName.equals(this.saveList.getSelected().fileName));
             this.saveList.removeEntry(this.saveList.getSelected());
           } catch(final IOException e) {

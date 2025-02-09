@@ -28,7 +28,7 @@ public class FullScreenInputScreen extends MenuScreen {
 
   @Override
   protected void render() {
-    SItem.renderCentredText(this.prompt, 188, 25, TextColour.BROWN, 240);
+    SItem.renderMenuCentredText(this.prompt, 188, 25, 240);
     FooterActionsHud.renderMenuActions();
   }
 }

@@ -27,6 +27,7 @@ public abstract class Submap {
   public abstract void prepareSobjModel(final SubmapObject210 sobj);
   public abstract void finishLoading();
 
+  public abstract void preDraw();
   public abstract void draw();
   public abstract void drawEnv(final MV[] sobjMatrices);
   public abstract void unload();
@@ -34,7 +35,8 @@ public abstract class Submap {
   public abstract void calcGoodScreenOffset(final float x, final float y, final Vector2f out);
 
   public abstract int getEncounterRate();
-  public abstract void generateEncounter();
+  public abstract void prepareEncounter();
+  public abstract void prepareEncounter(final int encounterId);
 
   public boolean hasEncounters() {
     return this.getEncounterRate() != 0;

@@ -158,7 +158,6 @@ import static legend.game.SItem.loadCharacterStats;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.FUN_80013404;
 import static legend.game.Scus94491BpeSegment.battlePreloadedEntities_1f8003f4;
-import static legend.game.Scus94491BpeSegment.centreScreenX_1f8003dc;
 import static legend.game.Scus94491BpeSegment.centreScreenY_1f8003de;
 import static legend.game.Scus94491BpeSegment.displayHeight_1f8003e4;
 import static legend.game.Scus94491BpeSegment.displayWidth_1f8003e0;
@@ -237,6 +236,7 @@ import static legend.game.Scus94491BpeSegment_800b.itemOverflow;
 import static legend.game.Scus94491BpeSegment_800b.itemsDroppedByEnemies_800bc928;
 import static legend.game.Scus94491BpeSegment_800b.livingCharCount_800bc97c;
 import static legend.game.Scus94491BpeSegment_800b.livingCharIds_800bc968;
+import static legend.game.Scus94491BpeSegment_800b.loadingMonsterModels;
 import static legend.game.Scus94491BpeSegment_800b.postBattleAction_800bc974;
 import static legend.game.Scus94491BpeSegment_800b.postCombatMainCallbackIndex_800bc91c;
 import static legend.game.Scus94491BpeSegment_800b.pregameLoadingStage_800bb10c;
@@ -267,7 +267,7 @@ import static legend.game.combat.SEffe.scriptGetPositionScalerAttachmentVelocity
 import static legend.game.combat.environment.Ambiance.stageAmbiance_801134fc;
 import static legend.game.combat.environment.BattleCamera.UPDATE_REFPOINT;
 import static legend.game.combat.environment.BattleCamera.UPDATE_VIEWPOINT;
-import static legend.game.combat.environment.StageData.stageData_80109a98;
+import static legend.game.combat.environment.StageData.getEncounterStageData;
 
 public class Battle extends EngineState {
   private static final Logger LOGGER = LogManager.getFormatterLogger(Battle.class);
@@ -853,7 +853,7 @@ public class Battle extends EngineState {
     functions[605] = SEffe::scriptAllocateLmbAnimation;
     functions[606] = SEffe::allocateDeffTmd;
     functions[607] = this::FUN_800e99bc;
-    functions[608] = SEffe::FUN_801181a8;
+    functions[608] = SEffe::scriptSetLmbDeffFlag;
 
     functions[610] = this::scriptLoadCmbAnimation;
     functions[611] = SEffe::scriptAttachEffectToBobj;
@@ -876,7 +876,7 @@ public class Battle extends EngineState {
     functions[628] = SEffe::allocateDeffTmdRenderer;
     functions[629] = SEffe::scriptAttackEffectToBobjRelative;
     functions[630] = SEffe::scriptGetEffectRotation;
-    functions[631] = SEffe::FUN_801181f0;
+    functions[631] = SEffe::scriptSetLmbManagerTransformMetrics;
     functions[632] = SEffe::scriptAllocateBuggedEffect;
 
     functions[634] = SEffe::scriptWaitForXaToLoad;
@@ -981,7 +981,7 @@ public class Battle extends EngineState {
     functions[1010] = this::scriptUseItem;
     functions[1011] = this::scriptApplyEquipmentEffect;
 
-    functions[1020] = this::scriptSetCombatantCharSlot;
+    functions[1020] = this::scriptSetCombatantVramSlot;
     return functions;
   }
 
@@ -1109,11 +1109,13 @@ public class Battle extends EngineState {
     return FlowControl.CONTINUE;
   }
 
-  @ScriptDescription("Changes char slot of a combatant")
+  @ScriptDescription("Changes vram slot of a combatant")
   @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "combatantIndex", description = "Combatant ID")
-  @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "charSlot", description = "Target character slot")
-  private FlowControl scriptSetCombatantCharSlot(final RunningScript<BattleEntity27c> script) {
-    this.combatants_8005e398[script.params_20[0].get()].charSlot_19c = script.params_20[1].get();
+  @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "vramSlot", description = "Target vram slot")
+  private FlowControl scriptSetCombatantVramSlot(final RunningScript<BattleEntity27c> script) {
+    this.unsetMonsterTextureSlotUsed(this.combatants_8005e398[script.params_20[0].get()].vramSlot_1a0);
+    this.combatants_8005e398[script.params_20[0].get()].vramSlot_1a0 = script.params_20[1].get();
+    this.setMonsterTextureSlotUsed(this.combatants_8005e398[script.params_20[0].get()].vramSlot_1a0);
     return FlowControl.CONTINUE;
   }
 
@@ -1313,6 +1315,8 @@ public class Battle extends EngineState {
 
   @Method(0x800c7524L)
   public void initBattle() {
+    new Tim(Unpacker.loadFile("shadow.tim")).uploadToGpu();
+
     this.FUN_800c8624();
 
     gameState_800babc8._b4++;
@@ -1497,6 +1501,17 @@ public class Battle extends EngineState {
   @Method(0x800c791cL)
   public void loadEncounterAssets() {
     this.loadEnemyTextures();
+
+    // Count total monsters
+    loadingMonsterModels.set(0);
+    for(int i = 0; i < this.combatantCount_800c66a0; i++) {
+      final CombatantStruct1a8 combatant = this.getCombatant(i);
+      if(combatant.charSlot_19c < 0) { // Monster
+        loadingMonsterModels.incrementAndGet();
+      }
+
+      //LAB_800fc050
+    }
 
     //LAB_800fc030
     for(int i = 0; i < this.combatantCount_800c66a0; i++) {
@@ -1884,10 +1899,13 @@ public class Battle extends EngineState {
 
   @Method(0x800c8774L)
   public void loadStageTmdAndAnim(final String modelName, final List<FileData> files) {
+    LOGGER.info("Battle stage %s loaded", modelName);
+
     this.setStageHasNoModel();
 
     if(files.get(0).size() > 0 && files.get(1).size() > 0 && files.get(2).size() > 0) {
       final BattleStage stage = battlePreloadedEntities_1f8003f4.stage_963c;
+      stage.name = modelName;
       this.loadStageTmd(stage, new CContainer(modelName, files.get(0), 10), new TmdAnimationFile(files.get(1)));
       stage.coord2_558.coord.transfer.set(0, 0, 0);
       stage.param_5a8.rotate.set(0.0f, MathHelper.TWO_PI / 4.0f, 0.0f);
@@ -1923,20 +1941,13 @@ public class Battle extends EngineState {
       this.mcqOffsetX_800c6774 += this.mcqStepX_800c676c;
       this.mcqOffsetY_800c6778 += this.mcqStepY_800c6770;
       final int x0 = (this.mcqBaseOffsetX_800c66cc * MathHelper.radToPsxDeg(this.camera_800c67f0.calculateXAngleFromRefpointToViewpoint()) / 0x1000 + this.mcqOffsetX_800c6774) % mcq.screenWidth_14;
-      final int x1 = x0 - mcq.screenWidth_14;
-      final int x2 = x0 + mcq.screenWidth_14;
       int y = this.mcqOffsetY_800c6778 - MathHelper.radToPsxDeg(MathHelper.floorMod(this.camera_800c67f0.calculateYAngleFromRefpointToViewpoint() + MathHelper.PI, MathHelper.TWO_PI)) + 1888;
 
-      battlePreloadedEntities_1f8003f4.skyboxTransforms.transfer.set(x0, y, 60000.0f);
-      RENDERER.queueOrthoModel(battlePreloadedEntities_1f8003f4.skyboxObj, battlePreloadedEntities_1f8003f4.skyboxTransforms, QueuedModelStandard.class)
-        .monochrome(this.mcqColour_800fa6dc / 128.0f);
+      final float totalWidth = RENDERER.getProjectionWidth() * RENDERER.getRenderAspectRatio() / RENDERER.getNativeAspectRatio();
+      final int segments = (int)Math.ceil(totalWidth / mcq.screenWidth_14);
 
-      battlePreloadedEntities_1f8003f4.skyboxTransforms.transfer.set(x1, y, 60000.0f);
-      RENDERER.queueOrthoModel(battlePreloadedEntities_1f8003f4.skyboxObj, battlePreloadedEntities_1f8003f4.skyboxTransforms, QueuedModelStandard.class)
-        .monochrome(this.mcqColour_800fa6dc / 128.0f);
-
-      if(x2 <= centreScreenX_1f8003dc * 2) {
-        battlePreloadedEntities_1f8003f4.skyboxTransforms.transfer.set(x2, y, 60000.0f);
+      for(int i = -1; i < segments + 1; i++) {
+        battlePreloadedEntities_1f8003f4.skyboxTransforms.transfer.set(-totalWidth / 2.0f + i * mcq.screenWidth_14 + x0, y, 60000.0f);
         RENDERER.queueOrthoModel(battlePreloadedEntities_1f8003f4.skyboxObj, battlePreloadedEntities_1f8003f4.skyboxTransforms, QueuedModelStandard.class)
           .monochrome(this.mcqColour_800fa6dc / 128.0f);
       }
@@ -1966,28 +1977,43 @@ public class Battle extends EngineState {
 
   @Method(0x800c8b20L)
   public void loadStage(final int stage) {
+    LOGGER.info("Loading battle stage %d", stage);
+
     if(battlePreloadedEntities_1f8003f4.skyboxObj != null) {
       battlePreloadedEntities_1f8003f4.skyboxObj.delete();
       battlePreloadedEntities_1f8003f4.skyboxObj = null;
     }
 
-    loadDrgnDir(0, 2497 + stage, files -> {
-      if(files.get(1).hasVirtualSize()) {
-        this.loadStageMcq(new McqHeader(files.get(1)));
+    // GH#1931
+    // Disable texture animations so we don't corrupt the texture of the loading stage due to the old stage model still being loaded...
+    if(stage_800bda0c != null) {
+      for(int i = 0; i < 10; i++) {
+        stage_800bda0c._618[i] = 0;
       }
+    }
 
-      if(files.get(2).size() != 0) {
-        this.loadStageTim(files.get(2));
-      }
+    // ... and defer loading to the next frame so that any texture animations currently in the pipeline finish
+    RENDERER.addTask(() -> {
+      loadDrgnDir(0, 2497 + stage, files -> {
+        if(files.get(1).hasVirtualSize()) {
+          this.loadStageMcq(new McqHeader(files.get(1)));
+        }
+
+        if(files.get(2).size() != 0) {
+          this.loadStageTim(files.get(2));
+        }
+      });
+
+      loadDrgnDir(0, (2497 + stage) + "/0", files -> this.loadStageTmdAndAnim("DRGN0/" + (2497 + stage) + "/0", files));
     });
-
-    loadDrgnDir(0, (2497 + stage) + "/0", files -> this.loadStageTmdAndAnim("DRGN0/" + (2497 + stage) + "/0", files));
 
     this.currentStage_800c66a4 = stage;
   }
 
   @Method(0x800c8c84L)
   public void loadStageTim(final FileData data) {
+    LOGGER.info("Battle stage texture loaded");
+
     final Tim tim = new Tim(data);
 
     GPU.uploadData15(tim.getImageRect(), tim.getImageData());
@@ -2017,6 +2043,8 @@ public class Battle extends EngineState {
 
   @Method(0x800c8d64L)
   public void loadStageMcq(final McqHeader mcq) {
+    LOGGER.info("Battle stage skybox loaded");
+
     final int x;
     if((battleFlags_800bc960 & 0x80) != 0) {
       x = 320;
@@ -2073,14 +2101,15 @@ public class Battle extends EngineState {
 
         if(charSlot < 0) {
           combatant.flags_19e = 0x1;
+          combatant.vramSlot_1a0 = this.findFreeMonsterTextureSlot(a0);
         } else {
           //LAB_800c8f90
           combatant.flags_19e = 0x5;
+          combatant.vramSlot_1a0 = charSlot + 1;
         }
 
         //LAB_800c8f94
         combatant.charSlot_19c = charSlot;
-        combatant.vramSlot_1a0 = 0;
         combatant.charIndex_1a2 = a0;
         combatant._1a4 = -1;
         combatant._1a6 = -1;
@@ -2219,6 +2248,10 @@ public class Battle extends EngineState {
     }
 
     combatant.flags_19e &= 0xffdf;
+
+    if(isMonster) {
+      loadingMonsterModels.decrementAndGet();
+    }
   }
 
   @Method(0x800c952cL)
@@ -2598,18 +2631,6 @@ public class Battle extends EngineState {
     final int vramSlot;
 
     if(combatant != null) {
-      //LAB_800ca77c
-      if(combatant.vramSlot_1a0 == 0) {
-        final int charSlot = combatant.charSlot_19c;
-
-        if(charSlot < 0) {
-          combatant.vramSlot_1a0 = this.findFreeMonsterTextureSlot(combatant.charIndex_1a2);
-        } else {
-          //LAB_800ca7c4
-          combatant.vramSlot_1a0 = charSlot + 1;
-        }
-      }
-
       vramSlot = combatant.vramSlot_1a0;
     } else {
       vramSlot = 0;
@@ -7327,6 +7348,7 @@ public class Battle extends EngineState {
 
         if(part.obj != null) {
           RENDERER.queueModel(part.obj, lw, QueuedModelBattleTmd.class)
+            .depthOffset(stage.z_5e8 * 4)
             .lightDirection(lightDirectionMatrix_800c34e8)
             .lightColour(lightColourMatrix_800c3508)
             .backgroundColour(GTE.backgroundColour)
@@ -8605,7 +8627,7 @@ public class Battle extends EngineState {
 
   @Method(0x80109050L)
   private void loadStageDataAndControllerScripts() {
-    this.currentStageData_800c6718 = stageData_80109a98[encounterId_800bb0f8];
+    this.currentStageData_800c6718 = getEncounterStageData(encounterId_800bb0f8);
 
     this.playerBattleScript_800c66fc = new ScriptFile("player_combat_script", Unpacker.loadFile("player_combat_script").getBytes());
 
