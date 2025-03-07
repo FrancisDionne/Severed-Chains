@@ -12,6 +12,9 @@ import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
 import legend.game.types.MessageBoxResult;
+import legend.game.types.Translucency;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
@@ -21,13 +24,14 @@ import java.util.List;
 import java.util.function.Function;
 
 import static legend.core.GameEngine.CONFIG;
+import static legend.core.GameEngine.RENDERER;
+import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.cacheCharacterSlots;
 import static legend.game.SItem.canSave_8011dc88;
 import static legend.game.SItem.chapterNames_80114248;
 import static legend.game.SItem.fadeOutArrow;
 import static legend.game.SItem.loadCharacterStats;
 import static legend.game.SItem.menuStack;
-import static legend.game.SItem.renderCentredText;
 import static legend.game.SItem.renderCharacter;
 import static legend.game.SItem.submapNames_8011c108;
 import static legend.game.SItem.worldMapNames_8011c1ec;
@@ -35,6 +39,7 @@ import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.getTimestampPart;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8004.engineState_8004dd20;
 import static legend.game.Scus94491BpeSegment_8005.standingInSavePoint_8005a368;
 import static legend.game.Scus94491BpeSegment_800b.continentIndex_800bf0b0;
@@ -46,8 +51,8 @@ import static legend.game.Scus94491BpeSegment_800b.renderablePtr_800bdba8;
 import static legend.game.Scus94491BpeSegment_800b.saveListDownArrow_800bdb98;
 import static legend.game.Scus94491BpeSegment_800b.saveListUpArrow_800bdb94;
 import static legend.game.Scus94491BpeSegment_800b.submapId_800bd808;
+import static legend.game.Scus94491BpeSegment_800b.textZ_800bdf00;
 import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class MainMenuScreen extends MenuScreen {
   private int loadingStage;
@@ -84,6 +89,7 @@ public class MainMenuScreen extends MenuScreen {
     this.addButton("Inventory", this::showItemListScreen);
     this.addButton("Goods", this::showGoodsScreen);
     this.addButton("Diiig", this::showDabasScreen);
+    this.addButton("", () -> { }).hide();
     this.addButton("Quit", () -> menuStack.pushScreen(new MessageBoxScreen("Quit to main menu?", 2, result -> {
       if(result == MessageBoxResult.YES) {
         this.menuEscape();
@@ -95,34 +101,32 @@ public class MainMenuScreen extends MenuScreen {
     this.addButton("Replace", this::showCharSwapScreen);
     this.addButton("Options", this::showOptionsScreen);
     this.addButton("", () -> { }).hide();
+    this.addButton("", () -> { }).hide();
     this.addButton("Save", this::showSaveScreen).setDisabled(!canSave_8011dc88);
 
     for(int i = 0; i < 3; i++) {
       this.addCharCard(i);
     }
 
-    this.setFocus(this.menuButtons.get(0));
+    this.setFocus(this.menuButtons.getFirst());
   }
 
   private Button addButton(final String text, final Runnable onClick) {
     final int index = this.menuButtons.size();
 
     final Button button = this.addControl(new Button(text));
-    button.setPos(30 + index / 6 * 65, 92 + (index % 6) * 13);
+    button.setPos(21 + index / 7 * 74, 79 + (index % 7) * 13);
+    button.setWidth(72);
 
-    button.onHoverIn(() -> this.setFocus(button));
+    button.onHoverIn(() -> {
+      playMenuSound(1);
+      this.setFocus(button);
+    });
 
     button.onLostFocus(() -> button.setTextColour(TextColour.BROWN));
     button.onGotFocus(() -> button.setTextColour(TextColour.RED));
 
-    button.onMouseClick((x, y, button1, mods) -> {
-      if(button1 == GLFW_MOUSE_BUTTON_LEFT && mods == 0) {
-        onClick.run();
-        return InputPropagation.HANDLED;
-      }
-
-      return InputPropagation.PROPAGATE;
-    });
+    button.onPressed(onClick::run);
 
     button.onPressedWithRepeatPulse(inputAction -> {
       switch(inputAction) {
@@ -164,7 +168,6 @@ public class MainMenuScreen extends MenuScreen {
             this.setFocus(otherButton);
           }
         }
-        case BUTTON_SOUTH -> onClick.run();
       }
 
       return InputPropagation.HANDLED;
@@ -241,7 +244,7 @@ public class MainMenuScreen extends MenuScreen {
     this.renderNumber(128, 184, getTimestampPart(gameState_800babc8.timestamp_a0, 0), 3);
     this.renderNumber(152, 184, getTimestampPart(gameState_800babc8.timestamp_a0, 1), 2, 0x1);
     this.renderNumber(170, 184, getTimestampPart(gameState_800babc8.timestamp_a0, 2), 2, 0x1);
-    renderCentredText(chapterNames_80114248[gameState_800babc8.chapterIndex_98], 94, 24, TextColour.BROWN);
+    renderText(chapterNames_80114248[gameState_800babc8.chapterIndex_98], 94, 24, UI_TEXT_CENTERED);
 
     final String name;
     if(engineState_8004dd20 == EngineStateEnum.SUBMAP_05) {
@@ -250,7 +253,18 @@ public class MainMenuScreen extends MenuScreen {
       name = worldMapNames_8011c1ec[continentIndex_800bf0b0];
     }
 
-    renderCentredText(name, 90, 38, TextColour.BROWN);
+    // The retail lines between the buttons are too short, so we just draw more line where the texture ends
+    final Matrix4f transforms = new Matrix4f();
+    for(int i = 0; i < 6; i++) {
+      final int x = 106;
+      final int y = 93 + i * 13;
+      RENDERER.queueLine(transforms, textZ_800bdf00 * 4.0f + 5, new Vector2f(x, y), new Vector2f(x + 59, y))
+        .translucency(Translucency.B_MINUS_F)
+        .colour(2.0f / 256, 20.0f / 256, 12.0f / 256)
+      ;
+    }
+
+    renderText(name, 90, 38, UI_TEXT_CENTERED);
   }
 
   private void menuEscape() {
@@ -302,7 +316,7 @@ public class MainMenuScreen extends MenuScreen {
   private void showOptionsScreen() {
     menuStack.pushScreen(new OptionsCategoryScreen(CONFIG, EnumSet.allOf(ConfigStorageLocation.class), () -> {
       ConfigStorage.saveConfig(CONFIG, ConfigStorageLocation.GLOBAL, Path.of("config.dcnf"));
-      ConfigStorage.saveConfig(CONFIG, ConfigStorageLocation.CAMPAIGN, Path.of("saves", gameState_800babc8.campaignName, "campaign_config.dcnf"));
+      ConfigStorage.saveConfig(CONFIG, ConfigStorageLocation.CAMPAIGN, gameState_800babc8.campaign.path.resolve("campaign_config.dcnf"));
       menuStack.popScreen();
       this.loadingStage = 0;
     }));

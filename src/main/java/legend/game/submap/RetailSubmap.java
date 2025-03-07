@@ -2,6 +2,7 @@ package legend.game.submap;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import legend.core.Config;
 import legend.core.QueuedModel;
 import legend.core.QueuedModelStandard;
 import legend.core.QueuedModelTmd;
@@ -18,7 +19,9 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
 import legend.core.opengl.TmdObjLoader;
+import legend.game.modding.events.submap.SubmapEncounterRateEvent;
 import legend.game.modding.events.submap.SubmapEnvironmentTextureEvent;
+import legend.game.modding.events.submap.SubmapGenerateEncounterEvent;
 import legend.game.modding.events.submap.SubmapObjectTextureEvent;
 import legend.game.scripting.ScriptFile;
 import legend.game.tim.Tim;
@@ -30,7 +33,7 @@ import legend.game.types.MoonMusic08;
 import legend.game.types.NewRootStruct;
 import legend.game.types.TmdAnimationFile;
 import legend.game.unpacker.FileData;
-import legend.game.unpacker.Unpacker;
+import legend.game.unpacker.Loader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Math;
@@ -212,7 +215,7 @@ public class RetailSubmap extends Submap {
 
       loadDrgnDir(drgnIndex.get() + 2, fileIndex.get() + 1, files -> allLoaded(assetsCount, 3, () -> assets.addAll(files), prepareSobjsAndComplete));
       loadDrgnDir(drgnIndex.get() + 2, fileIndex.get() + 2, files -> allLoaded(assetsCount, 3, () -> scripts.addAll(files), prepareSobjsAndComplete));
-      Unpacker.loadDirectory("SECT/DRGN" + (20 + drgnIndex.get()) + ".BIN/" + (fileIndex.get() + 1) + "/textures", files -> allLoaded(assetsCount, 3, () -> textures.addAll(files), prepareSobjsAndComplete));
+      Loader.loadDirectory("SECT/DRGN" + (20 + drgnIndex.get()) + ".BIN/" + (fileIndex.get() + 1) + "/textures", files -> allLoaded(assetsCount, 3, () -> textures.addAll(files), prepareSobjsAndComplete));
 
       // Load 3D overlay
       if(cutFileIndex != 0) {
@@ -399,13 +402,33 @@ public class RetailSubmap extends Submap {
 
   @Override
   public int getEncounterRate() {
-    return encounterData_800f64c4[this.cut].rate_02;
+    final var encounterRate = encounterData_800f64c4[this.cut].rate_02;
+    final var encounterRateEvent = EVENTS.postEvent(new SubmapEncounterRateEvent(encounterRate, this.cut));
+
+    return encounterRateEvent.encounterRate;
   }
 
   @Override
-  public void generateEncounter() {
-    encounterId_800bb0f8 = sceneEncounterIds_800f74c4[encounterData_800f64c4[this.cut].scene_00][this.randomEncounterIndex()];
-    battleStage_800bb0f4 = encounterData_800f64c4[this.cut].stage_03;
+  public void prepareEncounter(final int encounterId, final boolean useBattleStage) {
+    final var sceneId = encounterData_800f64c4[this.cut].scene_00;
+    final var scene = sceneEncounterIds_800f74c4[sceneId];
+    final var battleStageId = useBattleStage ? battleStage_800bb0f4 : encounterData_800f64c4[this.cut].stage_03;
+
+    final var generateEncounterEvent = EVENTS.postEvent(new SubmapGenerateEncounterEvent(encounterId, battleStageId, this.cut, sceneId, scene));
+    encounterId_800bb0f8 = generateEncounterEvent.encounterId;
+    battleStage_800bb0f4 = generateEncounterEvent.battleStageId;
+
+    if(Config.combatStage()) {
+      battleStage_800bb0f4 = Config.getCombatStage();
+    }
+  }
+
+  @Override
+  public void prepareEncounter(final boolean useBattleStage) {
+    final var sceneId = encounterData_800f64c4[this.cut].scene_00;
+    final var scene = sceneEncounterIds_800f74c4[sceneId];
+    final var encounterId = scene[this.randomEncounterIndex()];
+    this.prepareEncounter(encounterId, useBattleStage);
   }
 
   @Override
@@ -1054,6 +1077,12 @@ public class RetailSubmap extends Submap {
   }
 
   @Override
+  public void preDraw() {
+    RENDERER.scissorStack.push();
+    RENDERER.scissorStack.setRescale(this.backgroundRect.x + Math.round(GPU.getOffsetX() + this.submapOffsetX_800cb560 + this.screenOffset.x), this.backgroundRect.y, this.backgroundRect.w, this.backgroundRect.h);
+  }
+
+  @Override
   @Method(0x800e7954L)
   public void drawEnv(final MV[] sobjMatrices) {
     this.animateAndRenderSubmapModel(this.submapCutMatrix_800d4bb0);
@@ -1154,7 +1183,7 @@ public class RetailSubmap extends Submap {
         }
 
         //LAB_800e7d50
-        if(maxZ > metrics.z_20 || minZ < metrics.z_20) {
+        if(Math.round(maxZ) > metrics.z_20 || Math.round(minZ) < metrics.z_20) {
           //LAB_800e7d64
           envZs[i] = (maxZ + minZ) / 2;
         } else {
@@ -1312,6 +1341,7 @@ public class RetailSubmap extends Submap {
 
       RENDERER.queueModel(dobj2.obj, matrix, lw, QueuedModelTmd.class)
         .screenspaceOffset(GPU.getOffsetX() + GTE.getScreenOffsetX() - 184, GPU.getOffsetY() + GTE.getScreenOffsetY() - 120)
+        .depthOffset(model.zOffset_a0 * 4)
         .lightDirection(lightDirectionMatrix_800c34e8)
         .lightColour(lightColourMatrix_800c3508)
         .backgroundColour(GTE.backgroundColour)
@@ -1398,7 +1428,7 @@ public class RetailSubmap extends Submap {
     }
 
     //LAB_8001c7ec
-    if(AUDIO_THREAD.isMusicPlaying()) {
+    if(!AUDIO_THREAD.isMusicPlaying()) {
       return -2;
     }
 

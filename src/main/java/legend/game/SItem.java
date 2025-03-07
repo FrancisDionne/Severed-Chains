@@ -1,6 +1,7 @@
 package legend.game;
 
 import legend.core.MathHelper;
+import legend.core.QueuedModelStandard;
 import legend.core.audio.sequencer.assets.BackgroundMusic;
 import legend.core.gpu.Bpp;
 import legend.core.memory.Method;
@@ -14,6 +15,9 @@ import legend.game.inventory.EquipItemResult;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
+import legend.game.inventory.ItemIcon;
+import legend.game.inventory.screens.FontOptions;
+import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.inventory.screens.MenuStack;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.coremod.CoreMod;
@@ -54,7 +58,9 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
+import static legend.core.GameEngine.AUDIO_THREAD;
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.REGISTRIES;
@@ -76,6 +82,7 @@ import static legend.game.Scus94491BpeSegment_8002.giveEquipment;
 import static legend.game.Scus94491BpeSegment_8002.giveItem;
 import static legend.game.Scus94491BpeSegment_8002.loadMenuTexture;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.sssqResetStuff;
 import static legend.game.Scus94491BpeSegment_8002.takeEquipmentId;
 import static legend.game.Scus94491BpeSegment_8002.takeItemId;
@@ -109,16 +116,24 @@ public final class SItem {
   public static final MenuStack menuStack = new MenuStack();
   private static BackgroundMusic menuMusic;
 
+  public static final FontOptions UI_TEXT = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN);
+  public static final FontOptions UI_TEXT_DISABLED = new FontOptions().colour(TextColour.MIDDLE_BROWN).shadowColour(TextColour.LIGHT_BROWN);
+  public static final FontOptions UI_TEXT_SELECTED = new FontOptions().colour(TextColour.RED).shadowColour(TextColour.MIDDLE_BROWN);
+  public static final FontOptions UI_TEXT_CENTERED = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).horizontalAlign(HorizontalAlign.CENTRE);
+  public static final FontOptions UI_TEXT_DISABLED_CENTERED = new FontOptions().colour(TextColour.MIDDLE_BROWN).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE);
+  public static final FontOptions UI_TEXT_SELECTED_CENTERED = new FontOptions().colour(TextColour.RED).shadowColour(TextColour.MIDDLE_BROWN).horizontalAlign(HorizontalAlign.CENTRE);
+  public static final FontOptions UI_WHITE = new FontOptions().colour(TextColour.WHITE);
+
   public static final int[] charDragoonSpiritIndices_800fba58 = {0, 2, 5, 6, 4, 2, 1, 3, 5};
   public static final MenuStatus08[] menuStatus_800fba7c = {
-    new MenuStatus08("Petrify", TextColour.MIDDLE_BROWN),
-    new MenuStatus08("Charmed", TextColour.MIDDLE_BROWN),
-    new MenuStatus08("Confused", TextColour.MIDDLE_BROWN),
-    new MenuStatus08("Fear", TextColour.PURPLE),
-    new MenuStatus08("Stunned", TextColour.MIDDLE_BROWN),
-    new MenuStatus08("", TextColour.MIDDLE_BROWN),
-    new MenuStatus08("Dspirit", TextColour.CYAN),
-    new MenuStatus08("Poison", TextColour.LIME),
+    new MenuStatus08("Petrify", new FontOptions().colour(TextColour.MIDDLE_BROWN).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE)),
+    new MenuStatus08("Charmed", new FontOptions().colour(TextColour.MIDDLE_BROWN).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE)),
+    new MenuStatus08("Confused", new FontOptions().colour(TextColour.MIDDLE_BROWN).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE)),
+    new MenuStatus08("Fear", new FontOptions().colour(TextColour.PURPLE).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE)),
+    new MenuStatus08("Stunned", new FontOptions().colour(TextColour.MIDDLE_BROWN).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE)),
+    new MenuStatus08("", new FontOptions().colour(TextColour.MIDDLE_BROWN).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE)),
+    new MenuStatus08("Dspirit", new FontOptions().colour(TextColour.CYAN).shadowColour(TextColour.MIDDLE_BROWN).horizontalAlign(HorizontalAlign.CENTRE)),
+    new MenuStatus08("Poison", new FontOptions().colour(TextColour.LIME).shadowColour(TextColour.GREEN).horizontalAlign(HorizontalAlign.CENTRE)),
   };
 
   /** Note: arrays run into the next array's first element */
@@ -287,41 +302,6 @@ public final class SItem {
     "Albert", "Meru", "Kongol", "Miranda",
   };
 
-  public static final int[] itemPrices_80114310 = {
-    10, 30, 75, 125, 175, 200, 250, 225,
-    100, 150, 175, 200, 250, 30, 100, 150,
-    175, 200, 250, 80, 10, 50, 125, 150,
-    200, 250, 70, 10, 25, 75, 125, 175,
-    200, 250, 100, 125, 150, 200, 250, 200,
-    50, 125, 150, 225, 250, 175, 10, 25,
-    75, 100, 150, 400, 400, 75, 125, 200,
-    400, 30, 75, 125, 150, 400, 10, 25,
-    75, 100, 150, 400, 400, 400, 250, 250,
-    250, 250, 5000, 1, 5, 20, 50, 75,
-    100, 100, 5, 30, 75, 100, 125, 1,
-    300, 5000, 250, 250, 1, 5, 50, 75,
-    5, 50, 75, 150, 250, 150, 1, 100,
-    100, 100, 150, 100, 150, 150, 200, 100,
-    100, 300, 300, 500, 500, 500, 150, 150,
-    300, 500, 500, 500, 250, 250, 250, 250,
-    250, 250, 250, 250, 250, 250, 250, 250,
-    250, 250, 250, 250, 250, 100, 500, 500,
-    500, 1, 500, 1, 500, 5000, 2500, 2500,
-    5, 50, 50, 25, 500, 5000, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-
-    2, 5, 5, 5, 1, 5, 5, 5,
-    50, 5, 5, 5, 15, 10, 5, 10,
-    10, 10, 10, 10, 10, 1, 10, 10,
-    10, 10, 10, 1, 10, 10, 15, 2,
-    200, 50, 1, 200, 200, 25, 200, 15,
-    200, 60, 100, 200, 200, 200, 200, 1,
-    200, 10, 10, 10, 10, 10, 10, 10,
-    10, 25, 200, 0, 0, 0, 0, 0,
-  };
   public static final MenuGlyph06[] glyphs_80114510 = {
     new MenuGlyph06(69, 0, 0),
     new MenuGlyph06(70, 192, 0),
@@ -593,7 +573,7 @@ public final class SItem {
   }
 
   private static void menuMusicLoaded(final List<FileData> files) {
-    menuMusic = new BackgroundMusic(files, 5815);
+    menuMusic = new BackgroundMusic(files, 5815, AUDIO_THREAD.getSampleRate());
   }
 
   /** FUN_8001e010 with param 0 */
@@ -605,6 +585,7 @@ public final class SItem {
     unloadSoundFile(8);
     unloadSoundFile(8);
 
+    menuMusic.reset();
     playMusicPackage(menuMusic, true);
   }
 
@@ -757,12 +738,26 @@ public final class SItem {
   }
 
   @Method(0x80103910L)
-  public static Renderable58 renderItemIcon(final int glyph, final int x, final int y, final int flags) {
+  public static Renderable58 renderItemIcon(final ItemIcon icon, final int x, final int y, final int flags) {
     final Renderable58 renderable = allocateRenderable(uiFile_800bdc3c.itemIcons_c6a4(), null);
     renderable.flags_00 |= flags | Renderable58.FLAG_NO_ANIMATION;
-    renderable.glyph_04 = glyph;
-    renderable.startGlyph_10 = glyph;
-    renderable.endGlyph_14 = glyph;
+    renderable.glyph_04 = icon.resolve().icon;
+    renderable.startGlyph_10 = renderable.glyph_04;
+    renderable.endGlyph_14 = renderable.glyph_04;
+    renderable.tpage_2c = 0x19;
+    renderable.clut_30 = 0;
+    renderable.x_40 = x;
+    renderable.y_44 = y;
+    return renderable;
+  }
+
+  @Method(0x80103910L)
+  public static Renderable58 renderCharacterPortrait(final int charId, final int x, final int y, final int flags) {
+    final Renderable58 renderable = allocateRenderable(uiFile_800bdc3c.itemIcons_c6a4(), null);
+    renderable.flags_00 |= flags | Renderable58.FLAG_NO_ANIMATION;
+    renderable.glyph_04 = 48 + charId;
+    renderable.startGlyph_10 = renderable.glyph_04;
+    renderable.endGlyph_14 = renderable.glyph_04;
     renderable.tpage_2c = 0x19;
     renderable.clut_30 = 0;
     renderable.x_40 = x;
@@ -818,48 +813,29 @@ public final class SItem {
     }
   }
 
-  @Method(0x80103cc4L)
-  public static void renderText(final String text, final int x, final int y, final TextColour colour) {
-    final TextColour shadowColour;
-    if(colour == TextColour.WHITE) {
-      shadowColour = TextColour.BLACK;
-    } else if(colour == TextColour.LIME) {
-      //LAB_80103d18
-      shadowColour = TextColour.GREEN;
-    } else if(colour == TextColour.MIDDLE_BROWN) {
-      //LAB_80103d20
-      shadowColour = TextColour.LIGHT_BROWN;
-    } else {
-      shadowColour = TextColour.MIDDLE_BROWN;
-    }
-
-    //LAB_80103d24
-    //LAB_80103d28
-    Scus94491BpeSegment_8002.renderText(text, x    , y    , colour, 0);
-    Scus94491BpeSegment_8002.renderText(text, x    , y + 1, shadowColour, 0);
-    Scus94491BpeSegment_8002.renderText(text, x + 1, y    , shadowColour, 0);
-    Scus94491BpeSegment_8002.renderText(text, x + 1, y + 1, shadowColour, 0);
+  @Method(0x80103e90L)
+  public static void renderMenuCentredText(final String text, final int x, int y, final int maxWidth, final FontOptions options) {
+    renderMenuCentredText(text, x, y, maxWidth, options, null);
   }
 
   @Method(0x80103e90L)
-  public static void renderCentredText(final String text, final int x, final int y, final TextColour colour) {
-    renderText(text, x - textWidth(text) / 2, y, colour);
-  }
-
-  @Method(0x80103e90L)
-  public static void renderCentredText(final String text, final int x, int y, final TextColour colour, final int maxWidth) {
+  public static void renderMenuCentredText(final String text, final int x, int y, final int maxWidth, final FontOptions options, @Nullable final Consumer<QueuedModelStandard> queueCallback) {
     final String[] split;
-    if(textWidth(text) <= maxWidth) {
+    if(textWidth(text) * options.getSize() <= maxWidth) {
       split = new String[] {text};
     } else {
       final List<String> temp = new ArrayList<>();
-      int currentWidth = 0;
+      float currentWidth = 0.0f;
       int startIndex = 0;
       for(int i = 0; i < text.length(); i++) {
         final char current = text.charAt(i);
-        final int charWidth = Scus94491BpeSegment_8002.charWidth(current);
+        final float charWidth = Scus94491BpeSegment_8002.charWidth(current) * options.getSize();
 
-        if(currentWidth + charWidth > maxWidth) {
+        if(current == '\n') {
+          temp.add(text.substring(startIndex, i));
+          currentWidth = 0;
+          startIndex = i + 1;
+        } else if(currentWidth + charWidth > maxWidth) {
           boolean advanceOverSpace = false;
           for(int backtrack = 0; backtrack < 10; backtrack++) {
             if(text.charAt(i - backtrack) == ' ') {
@@ -887,7 +863,7 @@ public final class SItem {
 
     for(int i = 0; i < split.length; i++) {
       final String str = split[i];
-      renderText(str, x - textWidth(str) / 2, y, colour);
+      renderText(str, x - textWidth(str) * options.getSize() / 2.0f, y, options, queueCallback);
       y += textHeight(str);
     }
   }
@@ -1452,7 +1428,7 @@ public final class SItem {
     //LAB_80107e90
     final int status = gameState_800babc8.charData_32c[charIndex].status_10;
 
-    if((tickCount_800bb0fc & 0x10) == 0) {
+    if(tickCount_800bb0fc / currentEngineState_8004dd04.tickMultiplier() % 32 < 16) {
       return false;
     }
 
@@ -1499,7 +1475,7 @@ public final class SItem {
     }
 
     final MenuStatus08 menuStatus = menuStatus_800fba7c[statusIndex - 1];
-    renderCentredText(menuStatus.text_00, x + 24, y, menuStatus.colour_04);
+    renderText(menuStatus.text_00, x + 24, y, menuStatus.colour_04);
 
     //LAB_80107f8c
     return true;
@@ -1545,8 +1521,8 @@ public final class SItem {
       }
 
       //LAB_80108218
-      if(!renderCharacterStatusEffect(x + 48, y + 3, charId)) {
-        renderText(characterNames_801142dc[charId], x + 48, y + 3, TextColour.BROWN);
+      if(!renderCharacterStatusEffect(x + 46, y + 3, charId)) {
+        renderText(characterNames_801142dc[charId], x + 49, y + 3, UI_TEXT);
       }
     }
 
@@ -1660,7 +1636,7 @@ public final class SItem {
     //LAB_80108f98
     for(final EquipmentSlot slot : EquipmentSlot.values()) {
       if(charData.equipment_14.get(slot) != null) {
-        renderText(I18n.translate(charData.equipment_14.get(slot)), 220, 19 + slot.ordinal() * 14, TextColour.BROWN);
+        renderText(I18n.translate(charData.equipment_14.get(slot)), 220, 19 + slot.ordinal() * 14, UI_TEXT);
       }
     }
 
@@ -1679,7 +1655,7 @@ public final class SItem {
 //        nextNewLine = string.length();
 //      }
 
-      renderText(string, x + 2, y + 4, TextColour.BROWN);
+      renderText(string, x + 2, y + 4, UI_TEXT);
 //      pos = nextNewLine;
 //    }
   }
@@ -1700,15 +1676,15 @@ public final class SItem {
       }
 
       //LAB_801094ac
-      renderText(text, x + 21, y + FUN_800fc814(i) + 2, (menuItem.flags_02 & 0x6000) == 0 ? TextColour.BROWN : TextColour.MIDDLE_BROWN);
+      renderText(I18n.translate(menuItem.getNameTranslationKey()), x + 21, y + FUN_800fc814(i) + 2, (menuItem.flags_02 & 0x6000) == 0 ? UI_TEXT : UI_TEXT_DISABLED);
       renderItemIcon(menuItem.getIcon(), x + 4, y + FUN_800fc814(i), 0x8);
 
       final int s0 = menuItem.flags_02;
       if((s0 & 0x1000) != 0) {
-        renderItemIcon(48 | s0 & 0xf, x + 148, y + FUN_800fc814(i) - 1, 0x8).clut_30 = (500 + (s0 & 0xf) & 0x1ff) << 6 | 0x2b;
+        renderCharacterPortrait(s0 & 0xf, x + 148, y + FUN_800fc814(i) - 1, 0x8).clut_30 = (500 + (s0 & 0xf) & 0x1ff) << 6 | 0x2b;
         //LAB_80109574
       } else if((s0 & 0x2000) != 0) {
-        renderItemIcon(58, x + 148, y + FUN_800fc814(i) - 1, 0x8).clut_30 = 0x7eaa;
+        renderItemIcon(ItemIcon.WARNING, x + 148, y + FUN_800fc814(i) - 1, 0x8).clut_30 = 0x7eaa;
       }
 
       //LAB_801095a4
@@ -1787,15 +1763,19 @@ public final class SItem {
       case 3:
         textZ_800bdf00 = 31;
         final int x = messageBox.x_1c + 60;
-        int y = messageBox.y_1e + 7;
+        int y = messageBox.y_1e + 14;
 
         messageBox.ticks_10++;
 
         if(messageBox.text_00 != null) {
+          y -= messageBox.text_00.length * 12 / 2;
+
           for(final String line : messageBox.text_00) {
-            renderCentredText(line, x, y, TextColour.BROWN);
-            y += 14;
+            renderText(line, x, y, UI_TEXT_CENTERED);
+            y += 12;
           }
+
+          y -= (messageBox.text_00.length - 1) * 3;
         }
 
         //LAB_8010eeac
@@ -1815,7 +1795,7 @@ public final class SItem {
         if(messageBox.type_15 == 2) {
           //LAB_8010ef10
           if(messageBox.highlightRenderable_04 == null) {
-            renderable = allocateUiElement(125, 125, messageBox.x_1c + 45, messageBox.menuIndex_18 * 14 + y + 5);
+            renderable = allocateUiElement(125, 125, messageBox.x_1c + 45, messageBox.menuIndex_18 * 12 + y + 5);
             messageBox.highlightRenderable_04 = renderable;
             renderable.heightScale_38 = 0;
             renderable.widthScale = 0;
@@ -1825,8 +1805,8 @@ public final class SItem {
           //LAB_8010ef64
           textZ_800bdf00 = 30;
 
-          renderCentredText(messageBox.yes, messageBox.x_1c + 60, y + 7, messageBox.menuIndex_18 == 0 ? TextColour.RED : TextColour.BROWN);
-          renderCentredText(messageBox.no, messageBox.x_1c + 60, y + 21, messageBox.menuIndex_18 == 0 ? TextColour.BROWN : TextColour.RED);
+          renderText(messageBox.yes, messageBox.x_1c + 60, y + 7, messageBox.menuIndex_18 == 0 ? UI_TEXT_SELECTED_CENTERED : UI_TEXT_CENTERED);
+          renderText(messageBox.no, messageBox.x_1c + 60, y + 21, messageBox.menuIndex_18 == 0 ? UI_TEXT_CENTERED : UI_TEXT_SELECTED_CENTERED);
 
           textZ_800bdf00 = 33;
         }

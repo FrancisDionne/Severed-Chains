@@ -4,7 +4,6 @@ import legend.core.gpu.Bpp;
 import legend.core.gte.MV;
 import legend.core.opengl.BasicCamera;
 import legend.core.opengl.Camera;
-import legend.core.opengl.FontShaderOptions;
 import legend.core.opengl.FrameBuffer;
 import legend.core.opengl.LegacyTextBuilder;
 import legend.core.opengl.LineBuilder;
@@ -14,6 +13,7 @@ import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.QuaternionCamera;
 import legend.core.opengl.RenderState;
 import legend.core.opengl.Resolution;
+import legend.core.opengl.ScissorStack;
 import legend.core.opengl.Shader;
 import legend.core.opengl.ShaderManager;
 import legend.core.opengl.ShaderOptions;
@@ -25,9 +25,10 @@ import legend.core.opengl.SimpleShaderOptions;
 import legend.core.opengl.Texture;
 import legend.core.opengl.VoidShaderOptions;
 import legend.core.opengl.Window;
-import legend.core.opengl.fonts.Font;
-import legend.core.opengl.fonts.FontManager;
+import legend.game.EngineState;
 import legend.game.combat.Battle;
+import legend.game.input.Input;
+import legend.game.input.InputAction;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.types.Translucency;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +43,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.EnumMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -55,13 +58,14 @@ import static legend.core.GameEngine.GTE;
 import static legend.core.MathHelper.PI;
 import static legend.core.MathHelper.clamp;
 import static legend.game.Scus94491BpeSegment_8004.currentEngineState_8004dd04;
+import static legend.game.Scus94491BpeSegment_800c.worldToScreenMatrix_800c3548;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F10;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F11;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F2;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F4;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F5;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F9;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_M;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
@@ -74,23 +78,20 @@ import static org.lwjgl.opengl.GL11C.GL_BLEND;
 import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_COMPONENT;
-import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11C.GL_FILL;
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11C.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11C.GL_LESS;
 import static org.lwjgl.opengl.GL11C.GL_LINE;
 import static org.lwjgl.opengl.GL11C.GL_LINEAR;
 import static org.lwjgl.opengl.GL11C.GL_LINE_SMOOTH;
 import static org.lwjgl.opengl.GL11C.GL_NEAREST;
 import static org.lwjgl.opengl.GL11C.GL_RGBA;
+import static org.lwjgl.opengl.GL11C.GL_RGBA16;
 import static org.lwjgl.opengl.GL11C.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11C.glClear;
 import static org.lwjgl.opengl.GL11C.glClearColor;
-import static org.lwjgl.opengl.GL11C.glDepthFunc;
 import static org.lwjgl.opengl.GL11C.glDepthMask;
 import static org.lwjgl.opengl.GL11C.glDisable;
 import static org.lwjgl.opengl.GL11C.glEnable;
@@ -99,17 +100,16 @@ import static org.lwjgl.opengl.GL11C.glPolygonMode;
 import static org.lwjgl.opengl.GL11C.glViewport;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_DEPTH_ATTACHMENT;
-import static org.lwjgl.opengl.GL31C.GL_RGBA16_SNORM;
 
 public class RenderEngine {
   private static final Logger LOGGER = LogManager.getFormatterLogger(RenderEngine.class);
 
   public static int legacyMode;
-  public boolean usePs1Gpu = true;
 
   private final List<RenderBatch> batches = new ArrayList<>();
   private final RenderBatch mainBatch;
-  private final RenderState state = new RenderState(this);
+  public final ScissorStack scissorStack;
+  private final RenderState state;
 
   private Camera camera2d;
   private Camera camera3d;
@@ -136,16 +136,6 @@ public class RenderEngine {
     }
   );
 
-  public static final ShaderType<FontShaderOptions> FONT_SHADER = new ShaderType<>(
-    options -> loadShader("simple", "font", options),
-    shader -> {
-      shader.bindUniformBlock("transforms", Shader.UniformBuffer.TRANSFORM);
-      shader.bindUniformBlock("transforms2", Shader.UniformBuffer.TRANSFORM2);
-      final Shader<FontShaderOptions>.UniformVec3 colour = shader.new UniformVec3("colour");
-      return () -> new FontShaderOptions(colour);
-    }
-  );
-
   public static final ShaderType<ShaderOptionsStandard> STANDARD_SHADER = new ShaderType<>(
     options -> loadShader("standard", "standard", options),
     shader -> {
@@ -160,9 +150,11 @@ public class RenderEngine {
       final Shader<ShaderOptionsStandard>.UniformVec2 uvOffset = shader.new UniformVec2("uvOffset");
       final Shader<ShaderOptionsStandard>.UniformVec2 clutOverride = shader.new UniformVec2("clutOverride");
       final Shader<ShaderOptionsStandard>.UniformVec2 tpageOverride = shader.new UniformVec2("tpageOverride");
-      final Shader<ShaderOptionsStandard>.UniformFloat translucency = shader.new UniformFloat("translucency");
       final Shader<ShaderOptionsStandard>.UniformFloat discardTranslucency = shader.new UniformFloat("discardTranslucency");
-      return () -> new ShaderOptionsStandard(modelIndex, recolour, uvOffset, clutOverride, tpageOverride, discardTranslucency, translucency);
+      final Shader<ShaderOptionsStandard>.UniformFloat translucency = shader.new UniformFloat("translucency");
+      final Shader<ShaderOptionsStandard>.UniformFloat alpha = shader.new UniformFloat("alpha");
+      final Shader<ShaderOptionsStandard>.UniformFloat useTextureAlpha = shader.new UniformFloat("useTextureAlpha");
+      return () -> new ShaderOptionsStandard(modelIndex, recolour, uvOffset, clutOverride, tpageOverride, discardTranslucency, translucency, alpha, useTextureAlpha);
     }
   );
 
@@ -225,6 +217,8 @@ public class RenderEngine {
   private final Texture[] renderTextures = new Texture[RENDER_BUFFER_COUNT];
   private Texture depthTexture;
   private int renderBufferIndex;
+  /** Set when resizing the window so that the render buffers will be resized on the next frame */
+  private boolean resizeRenderBuffers;
 
   // Text
   public Texture textTexture;
@@ -245,6 +239,7 @@ public class RenderEngine {
   private int renderWidth;
   /** The actual height for rendering (taking into account resolution config) */
   private int renderHeight;
+  private float renderAspectRatio;
 
   private long lastFrame;
   private double vsyncCount;
@@ -278,8 +273,14 @@ public class RenderEngine {
   private boolean frameAdvance;
   private boolean reloadShaders;
 
+  private int frameSkipIndex;
+
+  private final Deque<Runnable> tasks = new LinkedList<>();
+
   public RenderEngine() {
     this.mainBatch = new RenderBatch(this, () -> this.vdfUniform, this.vdfBuffer, this.lightBuffer);
+    this.scissorStack = new ScissorStack(this, this.mainBatch);
+    this.state = new RenderState(this);
   }
 
   /**
@@ -304,33 +305,32 @@ public class RenderEngine {
     }
   }
 
-  /** NOTE: you must call {@link #updateProjections} yourself */
-  public void setAllowWidescreen(final boolean allowWidescreen) {
-    this.mainBatch.setAllowWidescreen(allowWidescreen);
+  public float getNativeAspectRatio() {
+    return this.mainBatch.aspectRatio;
   }
 
-  public boolean getAllowWidescreen() {
-    return this.mainBatch.allowWidescreen;
+  public void setRenderMode(final EngineState.RenderMode renderMode) {
+    this.mainBatch.setRenderMode(renderMode);
   }
 
-  /** NOTE: you must call {@link #updateProjections} yourself */
-  public void setAllowHighQualityProjection(final boolean allowHighQualityProjection) {
-    this.mainBatch.setAllowHighQualityProjection(allowHighQualityProjection);
+  public EngineState.RenderMode getRenderMode() {
+    return this.mainBatch.getRenderMode();
   }
 
-  public float getWidthSquisher() {
-    return this.mainBatch.widthSquisher;
+  public float getWidescreenOrthoOffsetX() {
+    return this.mainBatch.widescreenOrthoOffsetX;
   }
 
-  public void setProjectionSize(final float width, final float height) {
+  public void setProjectionSize(final int width, final int height) {
     this.mainBatch.setProjectionSize(width, height);
+    this.updateResolution();
   }
 
-  public float getProjectionWidth() {
+  public int getProjectionWidth() {
     return this.mainBatch.getProjectionWidth();
   }
 
-  public float getProjectionHeight() {
+  public int getProjectionHeight() {
     return this.mainBatch.getProjectionHeight();
   }
 
@@ -340,6 +340,10 @@ public class RenderEngine {
 
   public int getRenderHeight() {
     return this.renderHeight;
+  }
+
+  public float getRenderAspectRatio() {
+    return this.renderAspectRatio;
   }
 
   public void setProjectionDepth(final float depth) {
@@ -414,10 +418,17 @@ public class RenderEngine {
     return this.renderTextures[Math.floorMod(this.renderBufferIndex - 1, RENDER_BUFFER_COUNT)];
   }
 
+  /** Submit a task to be run at the start of the next frame */
+  public void addTask(final Runnable task) {
+    synchronized(this.tasks) {
+      this.tasks.push(task);
+    }
+  }
+
   public void init() {
     this.camera2d = new BasicCamera(0.0f, 0.0f);
     this.camera3d = new QuaternionCamera(0.0f, 0.0f, 0.0f);
-    this.window = new Window("Severed Chains " + Version.VERSION, Config.windowWidth(), Config.windowHeight());
+    this.window = new Window("Severed Chains " + Version.FULL_VERSION, Config.windowWidth(), Config.windowHeight());
     this.window.setFpsLimit(60);
 
     glEnable(GL_LINE_SMOOTH);
@@ -425,11 +436,11 @@ public class RenderEngine {
     this.window.events.onResize(this::onResize);
 
     this.window.events.onMouseMove(this::onMouseMove);
+    this.window.events.onPressedThisFrame(this::onPressedThisFrame);
     this.window.events.onKeyPress(this::onKeyPress);
     this.window.events.onKeyRelease(this::onKeyRelease);
 
     ShaderManager.addShader(SIMPLE_SHADER);
-    ShaderManager.addShader(FONT_SHADER);
     final Shader<VoidShaderOptions> screenShader = ShaderManager.addShader(SCREEN_SHADER);
     this.standardShader = ShaderManager.addShader(STANDARD_SHADER);
     this.standardShaderOptions = this.standardShader.makeOptions();
@@ -437,12 +448,6 @@ public class RenderEngine {
     this.tmdShaderOptions = this.tmdShader.makeOptions();
     this.battleTmdShader = ShaderManager.addShader(BATTLE_TMD_SHADER);
     this.battleTmdShaderOptions = this.battleTmdShader.makeOptions();
-
-    try {
-      FontManager.add("default", new Font(Paths.get("gfx/fonts/consolas.ttf")));
-    } catch(final IOException e) {
-      throw new RuntimeException("Failed to load font", e);
-    }
 
     this.transformsUniform = new Shader.UniformBuffer((long)this.transformsBuffer.capacity() * Float.BYTES, Shader.UniformBuffer.TRANSFORM);
     this.transforms2Uniform = ShaderManager.addUniformBuffer("transforms2", new Shader.UniformBuffer((long)this.transforms2Buffer.capacity() * Float.BYTES, Shader.UniformBuffer.TRANSFORM2));
@@ -529,7 +534,21 @@ public class RenderEngine {
     this.renderBufferQuad.persistent = true;
 
     this.window.events.onDraw(() -> {
-      this.pre();
+      synchronized(this.tasks) {
+        Runnable task;
+        while((task = this.tasks.poll()) != null) {
+          task.run();
+        }
+      }
+
+      if(this.resizeRenderBuffers) {
+        this.resizeRenderBuffers = false;
+        this.resizeRenderBuffers();
+      }
+
+      if(this.frameSkipIndex == 0) {
+        this.pre();
+      }
 
       EVENTS.clearStaleRefs();
 
@@ -541,24 +560,56 @@ public class RenderEngine {
           this.frameAdvanceSingle = false;
           this.frameAdvance = false;
           this.resetBatches();
+
+          // Delete stuff marked for deletion
+          Obj.deleteObjects();
+          Texture.deleteTextures();
+
+          this.scissorStack.reset();
         } else {
           this.renderCallback.run();
         }
       }
 
       if(this.frameAdvanceSingle || this.frameAdvance) {
+        // Delete stuff marked for deletion
+        Obj.deleteObjects();
+        Texture.deleteTextures();
+
+        this.scissorStack.reset();
+
+        this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
         this.resetBatches();
         this.renderCallback.run();
+
         if(this.frameAdvanceSingle) {
           this.frameAdvanceSingle = false;
         }
       }
 
       if(!this.paused) {
+        if(this.frameSkipIndex == 0) {
+          for(int i = 0; i < this.batches.size(); i++) {
+            this.batches.get(i).modelPool.ignoreQueues = false;
+            this.batches.get(i).orthoPool.ignoreQueues = false;
+          }
+
+          this.mainBatch.modelPool.ignoreQueues = false;
+          this.mainBatch.orthoPool.ignoreQueues = false;
+        } else {
+          for(int i = 0; i < this.batches.size(); i++) {
+            this.batches.get(i).modelPool.ignoreQueues = true;
+            this.batches.get(i).orthoPool.ignoreQueues = true;
+          }
+
+          this.mainBatch.modelPool.ignoreQueues = true;
+          this.mainBatch.orthoPool.ignoreQueues = true;
+        }
+
         this.renderCallback.run();
       }
 
-      if(legacyMode == 0 && this.usePs1Gpu) {
+      if(legacyMode == 0) {
         // Gross hack bro
         if(currentEngineState_8004dd04 instanceof final Battle battle && battle._800c6930 != null) {
           this.battleTmdShader.use();
@@ -566,25 +617,34 @@ public class RenderEngine {
         }
 
         this.renderBuffers[this.renderBufferIndex].bind();
-        this.clearColour();
 
-        // Render batches
-        for(int i = 0; i < this.batches.size(); i++) {
-          final RenderBatch batch = this.batches.get(i);
-          this.renderBatch(batch);
+        if(this.frameSkipIndex == 0) {
+          this.clearColour();
+
+          // Render batches
+          for(int i = 0; i < this.batches.size(); i++) {
+            final RenderBatch batch = this.batches.get(i);
+            this.renderBatch(batch);
+          }
+
+          this.renderBatch(this.mainBatch);
         }
 
-        this.renderBatch(this.mainBatch);
+        // Fix for GH#1885
+        // Don't know why it's broken or why this fixes it. The scissoring for the text is somehow getting
+        // applied to the render buffer rendering. Resetting the scissor rect to the full screen fixes it.
+        this.state.fullScreenScissor();
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // set render states
-        glDisable(GL_DEPTH_TEST);
+        this.state.disableDepthTest();
         glDepthMask(true); // enable depth writes so glClear won't ignore clearing the depth buffer
         glDisable(GL_BLEND);
 
         // bind backbuffer
         FrameBuffer.unbind();
-        this.setClearColour(0.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // use screen shader
         screenShader.use();
@@ -600,13 +660,21 @@ public class RenderEngine {
 
       // If we're paused, don't reset the pool so that we keep rendering the same scene over and over again
       if(!this.paused) {
-        this.resetBatches();
+        if(this.frameSkipIndex == 0) {
+          this.resetBatches();
 
-        this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
+          // Delete stuff marked for deletion
+          Obj.deleteObjects();
+          Texture.deleteTextures();
 
-        // Delete stuff marked for deletion
-        Obj.deleteObjects();
-        Texture.deleteTextures();
+          this.scissorStack.reset();
+        }
+
+        if(this.frameSkipIndex == Config.getGameSpeedMultiplier() - 1) {
+          this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
+        }
+
+        this.frameSkipIndex = (this.frameSkipIndex + 1) % Config.getGameSpeedMultiplier();
       }
 
       this.fps = 1_000_000_000.0f / (System.nanoTime() - this.lastFrame);
@@ -635,30 +703,33 @@ public class RenderEngine {
     }
 
     this.state.initBatch(batch);
+    this.state.enableScissor();
 
     this.clearDepth();
 
+    glPolygonMode(GL_FRONT_AND_BACK, this.wireframeMode ? GL_LINE : GL_FILL);
     this.setProjectionMode(batch, ProjectionMode._3D);
     this.renderPool(batch.modelPool, true);
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     this.setProjectionMode(batch, ProjectionMode._2D);
     this.renderPool(batch.orthoPool, false);
 
+    glPolygonMode(GL_FRONT_AND_BACK, this.wireframeMode ? GL_LINE : GL_FILL);
     this.setProjectionMode(batch, ProjectionMode._3D);
     this.renderPoolTranslucent(batch, batch.modelPool);
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     this.setProjectionMode(batch, ProjectionMode._2D);
     this.renderPoolTranslucent(batch, batch.orthoPool);
+
+    this.state.disableScissor();
   }
 
   private void renderPool(final QueuePool<QueuedModel<?, ?>> pool, final boolean backFaceCulling) {
     if(pool.isEmpty()) {
       return;
     }
-
-    // Render if the depth is less than what is currently in the depth buffer
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
 
     // Update the depth mask so nothing further away than this will render
     glDepthMask(true);
@@ -682,35 +753,32 @@ public class RenderEngine {
 
       final QueuedModel<?, ?> entry = pool.get(i);
       entry.useShader(modelIndex, 1);
+      this.state.enableDepthTest(entry.opaqueDepthComparator);
 
-      if(entry.scissor.w != 0) {
-        this.state.scissor(entry.scissor);
-      }
+      this.state.scissor(entry);
 
-      if(entry.shouldRender(null)) {
-        if(backFaceCulling) {
-          this.state.backfaceCulling(entry.obj.useBackfaceCulling());
+      for(int layer = 0; layer < entry.getLayers(); layer++) {
+        if(entry.shouldRender(null, layer)) {
+          if(backFaceCulling) {
+            this.state.backfaceCulling(entry.obj.useBackfaceCulling());
+          }
+
+          entry.useTexture();
+          entry.render(null, layer);
         }
 
-        entry.useTexture();
-        entry.render(null);
-      }
+        // First pass of translucency rendering - renders opaque pixels with translucency bit not set for translucent primitives
+        if(entry.hasTranslucency(layer)) {
+          for(int translucencyIndex = 0; translucencyIndex < Translucency.FOR_RENDERING.length; translucencyIndex++) {
+            final Translucency translucency = Translucency.FOR_RENDERING[translucencyIndex];
 
-      // First pass of translucency rendering - renders opaque pixels with translucency bit not set for translucent primitives
-      if(entry.hasTranslucency()) {
-        for(int translucencyIndex = 0; translucencyIndex < Translucency.FOR_RENDERING.length; translucencyIndex++) {
-          final Translucency translucency = Translucency.FOR_RENDERING[translucencyIndex];
-
-          if(entry.shouldRender(translucency)) {
-            this.state.backfaceCulling(false);
-            entry.useTexture();
-            entry.render(translucency);
+            if(entry.shouldRender(translucency, layer)) {
+              this.state.backfaceCulling(false);
+              entry.useTexture();
+              entry.render(translucency, layer);
+            }
           }
         }
-      }
-
-      if(entry.scissor.w != 0) {
-        this.state.disableScissor();
       }
     }
   }
@@ -724,8 +792,6 @@ public class RenderEngine {
 
     // Do not update the depth mask so that we don't prevent things further away than this from rendering
     glDepthMask(false);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
 
     glEnable(GL_BLEND);
 
@@ -746,35 +812,32 @@ public class RenderEngine {
 
       if(entry.hasTranslucency()) {
         entry.useShader(modelIndex, 2);
+        this.state.enableDepthTest(entry.translucentDepthComparator);
 
-        if(entry.scissor.w != 0) {
-          this.state.scissor(entry.scissor);
-        }
+        this.state.scissor(entry);
 
         entry.useTexture();
 
-        if(entry.shouldRender(Translucency.HALF_B_PLUS_HALF_F)) {
-          Translucency.HALF_B_PLUS_HALF_F.setGlState();
-          entry.render(Translucency.HALF_B_PLUS_HALF_F);
-        }
+        for(int layer = 0; layer < entry.getLayers(); layer++) {
+          if(entry.shouldRender(Translucency.HALF_B_PLUS_HALF_F, layer)) {
+            Translucency.HALF_B_PLUS_HALF_F.setGlState();
+            entry.render(Translucency.HALF_B_PLUS_HALF_F, layer);
+          }
 
-        if(entry.shouldRender(Translucency.B_PLUS_F)) {
-          Translucency.B_PLUS_F.setGlState();
-          entry.render(Translucency.B_PLUS_F);
-        }
+          if(entry.shouldRender(Translucency.B_PLUS_F, layer)) {
+            Translucency.B_PLUS_F.setGlState();
+            entry.render(Translucency.B_PLUS_F, layer);
+          }
 
-        if(entry.shouldRender(Translucency.B_MINUS_F)) {
-          Translucency.B_PLUS_F.setGlState(); // yes B-F uses negated additive blending
-          entry.render(Translucency.B_MINUS_F);
-        }
+          if(entry.shouldRender(Translucency.B_MINUS_F, layer)) {
+            Translucency.B_MINUS_F.setGlState();
+            entry.render(Translucency.B_MINUS_F, layer);
+          }
 
-        if(entry.shouldRender(Translucency.B_PLUS_QUARTER_F)) {
-          Translucency.B_PLUS_F.setGlState();
-          entry.render(Translucency.B_PLUS_QUARTER_F);
-        }
-
-        if(entry.scissor.w != 0) {
-          this.state.disableScissor();
+          if(entry.shouldRender(Translucency.B_PLUS_QUARTER_F, layer)) {
+            Translucency.B_PLUS_F.setGlState();
+            entry.render(Translucency.B_PLUS_QUARTER_F, layer);
+          }
         }
       }
     }
@@ -783,26 +846,38 @@ public class RenderEngine {
   private void handleMovement() {
     if(this.movingLeft) {
       this.camera3d.strafe(-MOVE_SPEED * 200);
+      this.camera3d.getView().get3x3(worldToScreenMatrix_800c3548);
+      this.camera3d.getView().getTranslation(worldToScreenMatrix_800c3548.transfer);
     }
 
     if(this.movingRight) {
       this.camera3d.strafe(MOVE_SPEED * 200);
+      this.camera3d.getView().get3x3(worldToScreenMatrix_800c3548);
+      this.camera3d.getView().getTranslation(worldToScreenMatrix_800c3548.transfer);
     }
 
     if(this.movingForward) {
       this.camera3d.move(-MOVE_SPEED * 200);
+      this.camera3d.getView().get3x3(worldToScreenMatrix_800c3548);
+      this.camera3d.getView().getTranslation(worldToScreenMatrix_800c3548.transfer);
     }
 
     if(this.movingBackward) {
       this.camera3d.move(MOVE_SPEED * 200);
+      this.camera3d.getView().get3x3(worldToScreenMatrix_800c3548);
+      this.camera3d.getView().getTranslation(worldToScreenMatrix_800c3548.transfer);
     }
 
     if(this.movingUp) {
       this.camera3d.jump(-MOVE_SPEED * 200);
+      this.camera3d.getView().get3x3(worldToScreenMatrix_800c3548);
+      this.camera3d.getView().getTranslation(worldToScreenMatrix_800c3548.transfer);
     }
 
     if(this.movingDown) {
       this.camera3d.jump(MOVE_SPEED * 200);
+      this.camera3d.getView().get3x3(worldToScreenMatrix_800c3548);
+      this.camera3d.getView().getTranslation(worldToScreenMatrix_800c3548.transfer);
     }
   }
 
@@ -833,7 +908,7 @@ public class RenderEngine {
   }
 
   public void setProjectionMode(final RenderBatch batch, final ProjectionMode projectionMode) {
-    final boolean highQualityProjection = batch.allowHighQualityProjection && CONFIG.getConfig(CoreMod.HIGH_QUALITY_PROJECTION_CONFIG.get());
+    final boolean highQualityProjection = batch.renderMode == EngineState.RenderMode.PERSPECTIVE && CONFIG.getConfig(CoreMod.HIGH_QUALITY_PROJECTION_CONFIG.get());
 
     // znear
     this.projectionBuffer.put(0, 0.0f);
@@ -932,10 +1007,9 @@ public class RenderEngine {
     try {
       this.window.run();
     } catch(final Throwable t) {
-      LOGGER.error("Shutting down due to exception:", t);
       this.window.close();
+      throw t;
     } finally {
-      FontManager.free();
       Window.free();
     }
   }
@@ -953,12 +1027,18 @@ public class RenderEngine {
 
     final Resolution res = CONFIG.getConfig(CoreMod.RESOLUTION_CONFIG.get());
     if(res == Resolution.NATIVE) {
-      this.renderWidth = width;
+      this.renderWidth = (int)(width * (this.mainBatch.projectionWidth / 320.0f));
       this.renderHeight = height;
     } else {
-      this.renderWidth = (int)((float)res.verticalResolution / height * width);
+      this.renderWidth = (int)((float)res.verticalResolution / height * width * (this.mainBatch.projectionWidth / 320.0f));
       this.renderHeight = res.verticalResolution;
     }
+
+    this.renderAspectRatio = (float)this.renderWidth / (float)this.renderHeight;
+
+    // Force the internal resolution to an even multiple of 240 to fix lines in the UI
+    this.renderHeight = MathHelper.nextMultiple(this.renderHeight, 240);
+    this.renderWidth = (int)(this.renderHeight * this.renderAspectRatio);
 
     // glLineWidth has been removed on M3 macs
     if(!this.isMac()) {
@@ -968,6 +1048,10 @@ public class RenderEngine {
     // Projections
     this.updateProjections();
 
+    this.resizeRenderBuffers = true;
+  }
+
+  private void resizeRenderBuffers() {
     for(int i = 0; i < this.batches.size(); i++) {
       this.batches.get(i).updateProjections();
     }
@@ -980,7 +1064,7 @@ public class RenderEngine {
 
       this.renderTextures[i] = Texture.create(builder -> {
         builder.size(this.renderWidth, this.renderHeight);
-        builder.internalFormat(GL_RGBA16_SNORM);
+        builder.internalFormat(GL_RGBA16);
         builder.dataFormat(GL_RGBA);
         builder.dataType(GL_UNSIGNED_BYTE);
         builder.magFilter(GL_NEAREST);
@@ -998,7 +1082,6 @@ public class RenderEngine {
       builder.dataFormat(GL_DEPTH_COMPONENT);
       builder.dataType(GL_FLOAT);
     });
-
 
     // Render buffers
     for(int i = 0; i < this.renderBuffers.length; i++) {
@@ -1036,6 +1119,27 @@ public class RenderEngine {
       this.lastY = y;
 
       this.camera3d.look(-this.yaw, -this.pitch);
+      this.camera3d.getView().get3x3(worldToScreenMatrix_800c3548);
+      this.camera3d.getView().getTranslation(worldToScreenMatrix_800c3548.transfer);
+    }
+  }
+
+  private void onPressedThisFrame(final Window window, final InputAction inputAction) {
+    switch(inputAction) {
+      case InputAction.TOGGLE_FULL_SCREEN -> Config.switchFullScreen();
+      case InputAction.SPEED_UP -> Config.setGameSpeedMultiplier(Math.min(Config.getGameSpeedMultiplier() + 1, 16));
+      case InputAction.SLOW_DOWN -> Config.setGameSpeedMultiplier(Math.max(Config.getGameSpeedMultiplier() - 1, 1));
+      case InputAction.PAUSE -> this.togglePause = !this.togglePause;
+      case InputAction.FRAME_ADVANCE -> {
+        if(this.paused) {
+          this.frameAdvanceSingle = true;
+        }
+      }
+      case InputAction.FRAME_ADVANCE_HOLD -> {
+        if(this.paused) {
+          this.frameAdvance = true;
+        }
+      }
     }
   }
 
@@ -1049,10 +1153,6 @@ public class RenderEngine {
         case GLFW_KEY_SPACE -> this.movingUp = true;
         case GLFW_KEY_LEFT_SHIFT -> this.movingDown = true;
         case GLFW_KEY_ESCAPE -> this.window.close();
-        case GLFW_KEY_TAB -> {
-          this.wireframeMode = !this.wireframeMode;
-          glPolygonMode(GL_FRONT_AND_BACK, this.wireframeMode ? GL_LINE : GL_FILL);
-        }
       }
     } else if(key == GLFW_KEY_TAB) {
       if((mods & GLFW_MOD_SHIFT) != 0) {
@@ -1068,18 +1168,12 @@ public class RenderEngine {
         case 1 -> System.out.println("Switched to legacy rendering");
         case 2 -> System.out.println("Switched to VRAM rendering");
       }
+    } else if(key == GLFW_KEY_F2) {
+      this.wireframeMode = !this.wireframeMode;
     } else if(key == GLFW_KEY_F5) {
       this.reloadShaders = true;
-    } else if(key == GLFW_KEY_F11) {
-      this.togglePause = !this.togglePause;
-    } else if(key == GLFW_KEY_F9) {
-      if(this.paused) {
-        this.frameAdvanceSingle = true;
-      }
-    } else if(key == GLFW_KEY_F10) {
-      if(this.paused) {
-        this.frameAdvance = true;
-      }
+    } else if(key == GLFW_KEY_F4 && (mods & GLFW_MOD_CONTROL) != 0 && (mods & GLFW_MOD_SHIFT) != 0) {
+      throw new RuntimeException("Can't say I didn't warn you");
     }
 
     if(key == GLFW_KEY_M && (mods & GLFW_MOD_CONTROL) != 0) {
@@ -1087,9 +1181,13 @@ public class RenderEngine {
       LOGGER.info("Allow movement: %b", this.allowMovement);
 
       if(this.allowMovement) {
-        this.window.hideCursor();
+        this.window.disableCursor();
       } else {
-        this.window.showCursor();
+        if(CONFIG.getConfig(CoreMod.DISABLE_MOUSE_INPUT_CONFIG.get()) && !Input.getController().getGuid().isEmpty()) {
+          this.window.hideCursor();
+        } else {
+          this.window.showCursor();
+        }
       }
     }
   }

@@ -92,13 +92,12 @@ public class GuardEffect06 implements Effect<EffectManagerParams.VoidType> {
           .addVertex(pos[i + 1].x, pos[i + 1].y, 0.0f)
           .rgb(manager.params_10.colour_1c.x / 255.0f, manager.params_10.colour_1c.y / 255.0f, manager.params_10.colour_1c.z / 255.0f)
           .addVertex(pos[i + 2].x, pos[i + 2].y, 0.0f)
-          .rgb(manager.params_10.colour_1c.x / 255.0f, manager.params_10.colour_1c.y / 255.0f, manager.params_10.colour_1c.z / 255.0f)
           .addVertex(pos[    0].x, pos[    0].y, 0.0f)
           .monochrome(r / 255.0f);
       }
 
       final Obj obj = builder.build();
-      this.transforms.transfer.set(GPU.getOffsetX(), GPU.getOffsetY(), effectZ + managerZ);
+      this.transforms.transfer.set(GPU.getOffsetX(), GPU.getOffsetY(), (effectZ + managerZ) * 4.0f);
       RENDERER.queueOrthoModel(obj, this.transforms, QueuedModelStandard.class);
       obj.delete(); // Mark for deletion after this frame
 
@@ -133,7 +132,7 @@ public class GuardEffect06 implements Effect<EffectManagerParams.VoidType> {
         for(int n = 0; n < 5; n++) {
           //LAB_800d2ee8
           // Radiant lines of shield effect
-          RENDERER.queueLine(new Matrix4f(), effectZ + managerZ, pos[n + 1], pos[n + 2])
+          RENDERER.queueLine(new Matrix4f(), (effectZ + managerZ) * 4.0f, pos[n + 1], pos[n + 2])
             .translucency(Translucency.B_PLUS_F)
             .colour(r / 255.0f, g / 255.0f, b / 255.0f)
             .screenspaceOffset(GPU.getOffsetX(), GPU.getOffsetY());

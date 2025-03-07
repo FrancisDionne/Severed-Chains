@@ -21,8 +21,13 @@ import legend.game.combat.bent.BattleEntityTypeRegistryEvent;
 import legend.game.combat.deff.RegisterDeffsEvent;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.EquipmentRegistryEvent;
+import legend.game.inventory.IconMapEvent;
+import legend.game.inventory.IconSet;
+import legend.game.inventory.ItemIcon;
 import legend.game.inventory.ItemRegistryEvent;
+import legend.game.inventory.ShopRegistryEvent;
 import legend.game.inventory.SpellRegistryEvent;
+import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.coremod.elements.DarkElement;
 import legend.game.modding.coremod.elements.DivineElement;
 import legend.game.modding.coremod.elements.EarthElement;
@@ -38,11 +43,7 @@ import legend.game.modding.events.inventory.GatherAttackItemsEvent;
 import legend.game.modding.events.inventory.GatherRecoveryItemsEvent;
 import legend.game.types.EquipmentSlot;
 import legend.game.types.SpellStats0c;
-import legend.game.unpacker.Unpacker;
-import legend.lodmod.equipment.DestroyerMaceEquipment;
-import legend.lodmod.equipment.DetonateArrowEquipment;
-import legend.lodmod.equipment.UltimateWargodEquipment;
-import legend.lodmod.equipment.WargodCallingEquipment;
+import legend.game.unpacker.Loader;
 import org.legendofdragoon.modloader.Mod;
 import org.legendofdragoon.modloader.events.EventListener;
 import org.legendofdragoon.modloader.registries.Registrar;
@@ -51,13 +52,13 @@ import org.legendofdragoon.modloader.registries.RegistryId;
 
 import java.util.Map;
 
-import static legend.game.SItem.itemPrices_80114310;
+import static legend.core.GameEngine.CONFIG;
 import static legend.game.Scus94491BpeSegment_8005.spellCombatDescriptions_80052018;
 import static legend.game.Scus94491BpeSegment_8005.spells_80052734;
 import static legend.game.combat.Battle.spellStats_800fa0b8;
 
 /** Will eventually contain standard LOD content. Will be able to be disabled for total overhaul mods. */
-@Mod(id = LodMod.MOD_ID)
+@Mod(id = LodMod.MOD_ID, version = "^3.0.0")
 @EventListener
 public class LodMod {
   public static final String MOD_ID = "lod";
@@ -130,6 +131,22 @@ public class LodMod {
     "", "", "", "", "", "", "", ""
   };
 
+  public static final String[] SHOP_IDS = {
+    "bale_equipment_shop", "serdio_item_shop", "lohan_equipment_shop", "lohan_item_shop",
+    "kazas_equipment_shop", "kazas_fort_item_shop", "fletz_equipment_shop", "fletz_item_shop",
+    "donau_equipment_shop", "donau_item_shop", "queen_fury_equipment_shop", "queen_fury_item_shop",
+    "fueno_equipment_shop", "fueno_item_shop", "furni_equipment_shop", "furni_item_shop",
+    "deningrad_equipment_shop", "deningrad_item_shop", "wingly_forest_equipment_shop", "wingly_forest_item_shop",
+    "vellweb_equipment_shop", "vellweb_item_shop", "ulara_equipment_shop", "ulara_item_shop",
+    "rouge_equipment_shop", "rouge_item_shop", "moon_equipment_shop", "moon_item_shop",
+    "hellena_01_item_shop", "kashua_equipment_shop", "kashua_item_shop", "fletz_accessory_shop",
+    "forest_item_shop", "kazas_fort_equipment_shop", "volcano_item_shop", "zenebatos_equipment_shop",
+    "zenebatos_item_shop", "hellena_02_item_shop", "unknown_shop_01", "empty_shop", "empty_shop", "empty_shop"
+    , "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop"
+    , "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop",
+    "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop",
+  };
+
   @EventListener
   public static void registerItems(final ItemRegistryEvent event) {
     LodItems.register(event);
@@ -137,19 +154,12 @@ public class LodMod {
 
   @EventListener
   public static void registerEquipment(final EquipmentRegistryEvent event) {
-    for(int equipmentId = 0; equipmentId < 192; equipmentId++) {
-      final String name = EQUIPMENT_IDS[equipmentId];
+    LodEquipment.register(event);
+  }
 
-      if(!name.isEmpty()) {
-        event.register(id(name), switch(equipmentId) {
-          case 0x20 -> new DetonateArrowEquipment(itemPrices_80114310[equipmentId]);
-          case 0x2c -> new DestroyerMaceEquipment(itemPrices_80114310[equipmentId]);
-          case 0x9c -> new WargodCallingEquipment(itemPrices_80114310[equipmentId]);
-          case 0x9d -> new UltimateWargodEquipment(itemPrices_80114310[equipmentId]);
-          default -> Equipment.fromFile(itemPrices_80114310[equipmentId], Unpacker.loadFile("equipment/" + equipmentId + ".deqp"));
-        });
-      }
-    }
+  @EventListener
+  public static void registerShops(final ShopRegistryEvent event) {
+    LodShops.register(event);
   }
 
   @EventListener
@@ -158,7 +168,7 @@ public class LodMod {
       if(spellStats_800fa0b8[spellId] == null) {
         final String name = spellId < 84 ? spells_80052734[spellId] : "Spell " + spellId;
         final String desc = spellId < 84 ? spellCombatDescriptions_80052018[spellId] : "";
-        spellStats_800fa0b8[spellId] = SpellStats0c.fromFile(name, desc, Unpacker.loadFile("spells/" + spellId + ".dspl"));
+        spellStats_800fa0b8[spellId] = SpellStats0c.fromFile(name, desc, Loader.loadFile("spells/" + spellId + ".dspl"));
       }
     }
   }
@@ -310,5 +320,46 @@ public class LodMod {
     miranda.put(EquipmentSlot.ACCESSORY, LodEquipment.BRACELET.get());
 
     event.gameState.gold_94 = 20;
+  }
+
+  @EventListener
+  public static void createIconMapping(final IconMapEvent event) {
+    if(CONFIG.getConfig(CoreMod.ICON_SET.get()) == IconSet.RETAIL) {
+      // Remap all the expanded icons to retail icons
+      event.addMapping(ItemIcon.AXE, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.HAMMER, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.SPEAR, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.BOW, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.MACE, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.KNUCKLE, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.BOXING_GLOVE, ItemIcon.SWORD);
+
+      event.addMapping(ItemIcon.CLOTHES, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.ROBE, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.BREASTPLATE, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.RED_DRESS, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.LOINCLOTH, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.WARRIOR_DRESS, ItemIcon.ARMOR);
+
+      event.addMapping(ItemIcon.CROWN, ItemIcon.HELM);
+      event.addMapping(ItemIcon.HAIRBAND, ItemIcon.HELM);
+      event.addMapping(ItemIcon.BANDANA, ItemIcon.HELM);
+      event.addMapping(ItemIcon.HAT, ItemIcon.HELM);
+
+      event.addMapping(ItemIcon.SHOES, ItemIcon.BOOTS);
+      event.addMapping(ItemIcon.KNEEPIECE, ItemIcon.BOOTS);
+
+      event.addMapping(ItemIcon.BRACELET, ItemIcon.RING);
+      event.addMapping(ItemIcon.AMULET, ItemIcon.RING);
+      event.addMapping(ItemIcon.STONE, ItemIcon.RING);
+      event.addMapping(ItemIcon.JEWELLERY, ItemIcon.RING);
+      event.addMapping(ItemIcon.PIN, ItemIcon.RING);
+      event.addMapping(ItemIcon.BELL, ItemIcon.RING);
+      event.addMapping(ItemIcon.BAG, ItemIcon.RING);
+      event.addMapping(ItemIcon.CLOAK, ItemIcon.RING);
+      event.addMapping(ItemIcon.SCARF, ItemIcon.RING);
+      event.addMapping(ItemIcon.GLOVE, ItemIcon.RING);
+      event.addMapping(ItemIcon.HORN, ItemIcon.RING);
+    }
   }
 }
