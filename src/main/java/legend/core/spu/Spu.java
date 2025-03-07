@@ -2,6 +2,8 @@ package legend.core.spu;
 
 import legend.core.MathHelper;
 import legend.core.audio.GenericSource;
+import legend.core.audio.SampleRate;
+import legend.game.modding.coremod.CoreMod;
 import legend.game.sound.ReverbConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,6 +11,8 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import static legend.core.GameEngine.AUDIO_THREAD;
+import static legend.core.GameEngine.CONFIG;
+import static legend.core.audio.AudioThread.BASE_SAMPLE_RATE;
 import static org.lwjgl.openal.AL10.AL_FORMAT_STEREO16;
 
 public class Spu {
@@ -16,7 +20,7 @@ public class Spu {
   private static final Marker SPU_MARKER = MarkerManager.getMarker("SPU");
 
   private static final int SOUND_TPS = 60;
-  private static final int SAMPLES_PER_TICK = 44_100 / SOUND_TPS;
+  private static final int SAMPLES_PER_TICK = BASE_SAMPLE_RATE / SOUND_TPS;
 
   private GenericSource source;
 
@@ -25,6 +29,7 @@ public class Spu {
   private final float[] reverbWorkArea = new float[0x4_0000];
   public final Voice[] voices = new Voice[24];
 
+  private float playerVolume;
   private int mainVolumeL;
   private int mainVolumeR;
   private int reverbOutputVolumeL;
@@ -71,7 +76,14 @@ public class Spu {
   }
 
   public void init() {
-    this.source = AUDIO_THREAD.addSource(new GenericSource(AL_FORMAT_STEREO16, 44100));
+    synchronized(this) {
+      this.source = AUDIO_THREAD.addSource(new GenericSource(AL_FORMAT_STEREO16, BASE_SAMPLE_RATE));
+      this.playerVolume = CONFIG.getConfig(CoreMod.SFX_VOLUME_CONFIG.get()) * CONFIG.getConfig(CoreMod.MASTER_VOLUME_CONFIG.get());
+    }
+  }
+
+  public void setPlayerVolume(final float volume) {
+    this.playerVolume = volume;
   }
 
   private short reverbL;
@@ -158,14 +170,12 @@ public class Spu {
         sumRight = MathHelper.clamp(sumRight, -0x8000, 0x7fff) * (short)this.mainVolumeR >> 15;
 
         //Add to samples bytes to output list
-        this.spuOutput[dataIndex++] = (short)sumLeft;
-        this.spuOutput[dataIndex++] = (short)sumRight;
+        this.spuOutput[dataIndex++] = (short)(sumLeft * this.playerVolume);
+        this.spuOutput[dataIndex++] = (short)(sumRight * this.playerVolume);
       }
 
-      synchronized(this.source) {
-        if(this.source.canBuffer()) {
-          this.source.bufferOutput(this.spuOutput);
-        }
+      if(this.source.canBuffer()) {
+        this.source.bufferOutput(this.spuOutput);
       }
     }
   }
@@ -453,7 +463,7 @@ public class Spu {
 
   public void setReverb(final ReverbConfig reverb) {
     synchronized(Spu.class) {
-      this.reverb.set(reverb);
+      this.reverb.set(reverb, SampleRate._44100);
     }
   }
 

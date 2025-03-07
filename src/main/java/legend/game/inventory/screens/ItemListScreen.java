@@ -21,7 +21,8 @@ import static legend.game.SItem.loadItemsAndEquipmentForDisplay;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
-import static legend.game.Scus94491BpeSegment_8002.menuItemComparator;
+import static legend.game.Scus94491BpeSegment_8002.menuEquipmentSlotComparator;
+import static legend.game.Scus94491BpeSegment_8002.menuItemIconComparator;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.setInventoryFromDisplay;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
@@ -30,7 +31,7 @@ public class ItemListScreen extends MenuScreen {
   private final Runnable unload;
 
   private final ItemList<Item> itemList = new ItemList<>();
-  private final ItemList<Equipment> equipmentList = new ItemList<>();
+  private final ItemList<Equipment> equipmentList = new ItemList<>(i -> gameState_800babc8.equipment_1e8.size());
   private final Label description = new Label("");
 
   public ItemListScreen(final Runnable unload) {
@@ -55,6 +56,7 @@ public class ItemListScreen extends MenuScreen {
     });
     this.itemList.onPressedThisFrame(inputAction -> {
       if(inputAction == InputAction.DPAD_RIGHT || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_RIGHT) {
+        playMenuSound(1);
         this.setFocus(this.equipmentList);
         this.equipmentList.select(this.itemList.getSelectedIndex());
         return InputPropagation.HANDLED;
@@ -72,6 +74,7 @@ public class ItemListScreen extends MenuScreen {
     });
     this.equipmentList.onPressedThisFrame(inputAction -> {
       if(inputAction == InputAction.DPAD_LEFT || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_LEFT) {
+        playMenuSound(1);
         this.setFocus(this.itemList);
         this.itemList.select(this.equipmentList.getSelectedIndex());
         return InputPropagation.HANDLED;
@@ -167,8 +170,8 @@ public class ItemListScreen extends MenuScreen {
 
   private void menuSort() {
     playMenuSound(2);
-    this.itemList.sort(menuItemComparator());
-    this.equipmentList.sort(menuItemComparator());
+    this.itemList.sort(menuItemIconComparator());
+    this.equipmentList.sort(menuEquipmentSlotComparator());
     setInventoryFromDisplay(this.itemList.getItems(), gameState_800babc8.items_2e9, this.itemList.getItems().size());
     setInventoryFromDisplay(this.equipmentList.getItems(), gameState_800babc8.equipment_1e8, this.equipmentList.getItems().size());
   }

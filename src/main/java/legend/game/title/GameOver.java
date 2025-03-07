@@ -13,12 +13,10 @@ import legend.game.input.Input;
 import legend.game.input.InputAction;
 import legend.game.types.McqHeader;
 import legend.game.unpacker.FileData;
-import legend.game.unpacker.Unpacker;
+import legend.game.unpacker.Loader;
 
 import static legend.core.GameEngine.GPU;
-import static legend.core.GameEngine.MODS;
 import static legend.core.GameEngine.RENDERER;
-import static legend.core.GameEngine.bootMods;
 import static legend.game.Scus94491BpeSegment.loadDrgnFile;
 import static legend.game.Scus94491BpeSegment.resizeDisplay;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
@@ -36,8 +34,8 @@ public class GameOver extends EngineState {
   private final MV transforms = new MV();
 
   @Override
-  public boolean allowsWidescreen() {
-    return false;
+  public RenderMode getRenderMode() {
+    return RenderMode.LEGACY;
   }
 
   @Method(0x800c7558L)
@@ -67,9 +65,7 @@ public class GameOver extends EngineState {
   public void tick() {
     switch(this.loadingStage) {
       case 0 -> {
-        if(Unpacker.getLoadingFileCount() == 0) {
-          bootMods(MODS.getAllModIds());
-
+        if(Loader.getLoadingFileCount() == 0) {
           resetSubmapToNewGame();
           resizeDisplay(640, 240);
           this.loadingStage = 1;

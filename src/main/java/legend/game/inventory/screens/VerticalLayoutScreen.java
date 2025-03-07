@@ -13,16 +13,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_END;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_HOME;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_DOWN;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_UP;
 
 public class VerticalLayoutScreen extends MenuScreen {
-  private static final int MAX_VISIBLE_ENTRIES = 9;
+  private static final int MAX_VISIBLE_ENTRIES = 14;
 
   private final Brackets highlight;
   private int highlightedRow = -1;
 
   private int scroll;
+  /** Allows list wrapping, but only on new input */
+  private boolean allowWrapY = true;
 
-  private final List<Control> rows = new ArrayList<>();
+  private final List<Label> rows = new ArrayList<>();
   private final List<Control> configControls = new ArrayList<>();
 
   private final Glyph upArrow;
@@ -31,24 +37,26 @@ public class VerticalLayoutScreen extends MenuScreen {
   public VerticalLayoutScreen() {
     this.highlight = this.addControl(new Brackets());
     this.highlight.setPos(26, 30);
-    this.highlight.setSize(320, 20);
+    this.highlight.setSize(320, 14);
     this.highlight.setClut(0xfc29);
 
     this.upArrow = this.addControl(Glyph.uiElement(61, 68));
     this.downArrow = this.addControl(Glyph.uiElement(53, 60));
   }
 
-  public <T extends Control> T addRow(final String name, @Nullable final T control) {
+  public <T extends Control> Label addRow(final String name, @Nullable final T control) {
     final Label label = this.addControl(new Label(name));
     label.setVerticalAlign(Label.VerticalAlign.CENTRE);
-    label.setSize(this.getWidth() - 64, 16);
-    label.setPos(32, 32 + this.rows.size() * 20);
+    label.setSize(this.getWidth() - 64, 11);
+    label.setPos(32, 32 + this.rows.size() * 13);
+    label.setScale(0.66f);
 
     if(control != null) {
       label.onGotFocus(() -> this.setFocus(control));
 
-      control.setSize(140, 16);
-      control.setPos(label.getWidth() - control.getWidth(), 0);
+      control.setSize(140, 11);
+      control.setPos(this.getWidth() - 64 - control.getWidth(), 0);
+      control.setScale(0.66f);
       label.addControl(control);
       this.configControls.add(control);
     } else {
@@ -56,13 +64,17 @@ public class VerticalLayoutScreen extends MenuScreen {
     }
 
     this.rows.add(label);
-    this.updateEntries();
 
     if(this.rows.size() == 1) {
       this.highlightRow(0);
     }
 
-    return control;
+    this.updateEntries();
+    return label;
+  }
+
+  public Label getHighlightedRow() {
+    return this.rows.get(this.highlightedRow);
   }
 
   private void highlightRow(final int index) {
@@ -93,13 +105,13 @@ public class VerticalLayoutScreen extends MenuScreen {
 
   private void updateEntries() {
     for(int i = 0; i < this.rows.size(); i++) {
-      final Control save = this.rows.get(i);
+      final Control control = this.rows.get(i);
 
       if(i >= this.scroll && i < this.scroll + MAX_VISIBLE_ENTRIES) {
-        save.setY(32 + (i - this.scroll) * 20);
-        save.show();
+        control.setY(32 + (i - this.scroll) * 13);
+        control.show();
       } else {
-        save.hide();
+        control.hide();
       }
     }
 
@@ -111,7 +123,7 @@ public class VerticalLayoutScreen extends MenuScreen {
     }
 
     this.upArrow.setVisibility(this.scroll > 0);
-    this.upArrow.setPos(this.getWidth() - 20, 0);
+    this.upArrow.setPos(this.getWidth() - 20, 6);
 
     this.downArrow.setVisibility(this.rows.size() - this.scroll > MAX_VISIBLE_ENTRIES);
     this.downArrow.setPos(this.getWidth() - 20, this.getHeight() - 24);
@@ -129,7 +141,7 @@ public class VerticalLayoutScreen extends MenuScreen {
     }
 
     for(int i = 0; i < this.visibleEntries(); i++) {
-      if(MathHelper.inBox(x, y, 34, 30 + i * 20, 320, 20) && this.highlightedRow != this.scroll + i) {
+      if(MathHelper.inBox(x, y, 26, 30 + i * 13, 319, 13) && this.highlightedRow != this.scroll + i) {
         playMenuSound(1);
         this.highlightRow(this.scroll + i);
         return InputPropagation.HANDLED;
@@ -162,24 +174,165 @@ public class VerticalLayoutScreen extends MenuScreen {
     return InputPropagation.HANDLED;
   }
 
+  private void menuNavigateUp() {
+    final int optionCount = this.rows.size();
+    if(this.highlightedRow > this.scroll) {
+      playMenuSound(1);
+      this.highlightRow(this.highlightedRow - 1);
+    } else if(this.scroll > 0) {
+      playMenuSound(1);
+      this.scroll--;
+      this.updateEntries();
+      this.highlightRow(Math.floorMod(this.highlightedRow - 1, optionCount));
+    } else if(optionCount > 1 && this.allowWrapY) {
+      playMenuSound(1);
+      this.highlightRow(optionCount - 1);
+      this.scroll = Math.max(0, optionCount - MAX_VISIBLE_ENTRIES);
+      this.updateEntries();
+    }
+  }
+
+  private void menuNavigateDown() {
+    final int optionCount = this.rows.size();
+    if(this.highlightedRow < this.scroll + this.visibleEntries() - 1) {
+      playMenuSound(1);
+      this.highlightRow(this.highlightedRow + 1);
+    } else if(this.highlightedRow != optionCount - 1) {
+      playMenuSound(1);
+      this.highlightRow(this.highlightedRow + 1);
+      this.scroll++;
+      this.updateEntries();
+    } else if(optionCount > 1 && this.allowWrapY) {
+      playMenuSound(1);
+      this.highlightRow(0);
+      this.scroll = 0;
+      this.updateEntries();
+    }
+  }
+
+  private void menuNavigateTop() {
+    if(this.highlightedRow != this.scroll) {
+      playMenuSound(1);
+      this.highlightRow(this.scroll);
+    }
+  }
+
+  private void menuNavigateBottom() {
+    final int targetRow = this.scroll + this.visibleEntries() - 1;
+    if(this.highlightedRow != targetRow) {
+      playMenuSound(1);
+      this.highlightRow(targetRow);
+    }
+  }
+
+  private void menuNavigatePageUp() {
+    if(this.scroll - MAX_VISIBLE_ENTRIES > 0) {
+      playMenuSound(1);
+      this.highlightRow(this.highlightedRow - MAX_VISIBLE_ENTRIES);
+      this.scroll -= MAX_VISIBLE_ENTRIES;
+      this.updateEntries();
+    } else if(this.scroll != 0) {
+      playMenuSound(1);
+      this.highlightRow(this.highlightedRow - this.scroll);
+      this.scroll = 0;
+      this.updateEntries();
+    }
+  }
+
+  private void menuNavigatePageDown() {
+    final int optionCount = this.rows.size();
+    if(this.scroll + MAX_VISIBLE_ENTRIES < optionCount - MAX_VISIBLE_ENTRIES) {
+      playMenuSound(1);
+      this.highlightRow(this.highlightedRow + MAX_VISIBLE_ENTRIES);
+      this.scroll += MAX_VISIBLE_ENTRIES;
+      this.updateEntries();
+    } else if(this.scroll != optionCount - this.visibleEntries()) {
+      playMenuSound(1);
+      this.highlightRow(this.highlightedRow + (optionCount - this.visibleEntries() - this.scroll));
+      this.scroll = optionCount - this.visibleEntries();
+      this.updateEntries();
+    }
+  }
+
+  private void menuNavigateHome() {
+    if(this.highlightedRow != 0 || this.scroll != 0) {
+      playMenuSound(1);
+      this.highlightRow(0);
+      this.scroll = 0;
+      this.updateEntries();
+    }
+  }
+
+  private void menuNavigateEnd() {
+    final int optionCount = this.rows.size();
+    if(this.highlightedRow != optionCount - 1 || this.scroll != Math.max(0, optionCount - MAX_VISIBLE_ENTRIES)) {
+      playMenuSound(1);
+      this.highlightRow(optionCount - 1);
+      this.scroll = Math.max(0, optionCount - MAX_VISIBLE_ENTRIES);
+      this.updateEntries();
+    }
+  }
+
+  @Override
+  protected InputPropagation keyPress(final int key, final int scancode, final int mods) {
+    if(super.keyPress(key, scancode, mods) == InputPropagation.HANDLED) {
+      return InputPropagation.HANDLED;
+    }
+
+    switch(key) {
+      case GLFW_KEY_HOME -> {
+        this.menuNavigateHome();
+        return InputPropagation.HANDLED;
+      }
+
+      case GLFW_KEY_END -> {
+        this.menuNavigateEnd();
+        return InputPropagation.HANDLED;
+      }
+
+      case GLFW_KEY_PAGE_UP -> {
+        this.menuNavigatePageUp();
+        return InputPropagation.HANDLED;
+      }
+
+      case GLFW_KEY_PAGE_DOWN -> {
+        this.menuNavigatePageDown();
+        return InputPropagation.HANDLED;
+      }
+    }
+
+    return InputPropagation.PROPAGATE;
+  }
+
   @Override
   protected InputPropagation pressedThisFrame(final InputAction inputAction) {
     if(super.pressedThisFrame(inputAction) == InputPropagation.HANDLED) {
       return InputPropagation.HANDLED;
     }
 
-    if(inputAction == InputAction.BUTTON_SOUTH) {
-      final Control control = this.configControls.get(this.highlightedRow);
-
-      if(control != null) {
-        if(control instanceof final Button button) {
-          this.deferAction(button::press);
-        } else {
-          this.deferAction(control::focus);
-        }
+    switch(inputAction) {
+      case BUTTON_SHOULDER_LEFT_1 -> {
+        this.menuNavigateTop();
+        return InputPropagation.HANDLED;
       }
 
-      return InputPropagation.HANDLED;
+      case BUTTON_SHOULDER_LEFT_2 -> {
+        this.menuNavigateBottom();
+        return InputPropagation.HANDLED;
+      }
+
+      case BUTTON_SOUTH -> {
+        final Control control = this.configControls.get(this.highlightedRow);
+        if(control != null) {
+          if(control instanceof final Button button) {
+            this.deferAction(button::press);
+          } else {
+            this.deferAction(control::focus);
+          }
+
+          return InputPropagation.HANDLED;
+        }
+      }
     }
 
     return InputPropagation.PROPAGATE;
@@ -193,107 +346,40 @@ public class VerticalLayoutScreen extends MenuScreen {
 
     switch(inputAction) {
       case DPAD_UP, JOYSTICK_LEFT_BUTTON_UP -> {
-        if(this.highlightedRow > this.scroll) {
-          playMenuSound(1);
-          this.highlightRow(Math.floorMod(this.highlightedRow - 1, this.rows.size()));
-          return InputPropagation.HANDLED;
-        }
-
-        if(this.scroll > 0) {
-          playMenuSound(1);
-          this.scroll--;
-          this.updateEntries();
-          this.highlightRow(Math.floorMod(this.highlightedRow - 1, this.rows.size()));
-          return InputPropagation.HANDLED;
-        }
+        this.menuNavigateUp();
+        this.allowWrapY = false;
+        return InputPropagation.HANDLED;
       }
 
       case DPAD_DOWN, JOYSTICK_LEFT_BUTTON_DOWN -> {
-        if(this.highlightedRow < this.scroll + this.visibleEntries() - 1) {
-          playMenuSound(1);
-          this.highlightRow(this.highlightedRow + 1);
-          return InputPropagation.HANDLED;
-        }
-
-        if(this.scroll < this.rows.size() - MAX_VISIBLE_ENTRIES) {
-          playMenuSound(1);
-          this.scroll++;
-          this.updateEntries();
-          this.highlightRow(this.highlightedRow + 1);
-          return InputPropagation.HANDLED;
-        }
-      }
-
-      case BUTTON_SHOULDER_LEFT_1 -> {
-        playMenuSound(1);
-        if(this.scroll == 0) {
-          this.highlightRow(0);
-        } else {
-          this.highlightRow(this.scroll);
-        }
+        this.menuNavigateDown();
+        this.allowWrapY = false;
         return InputPropagation.HANDLED;
       }
 
-      case BUTTON_SHOULDER_LEFT_2 -> {
-        if(this.visibleEntries() >= MAX_VISIBLE_ENTRIES) {
-          if(this.scroll == 0) {
-            playMenuSound(1);
-            this.highlightRow(MAX_VISIBLE_ENTRIES - 1);
-          } else {
-            playMenuSound(1);
-            this.highlightRow(this.scroll + MAX_VISIBLE_ENTRIES - 1);
-          }
-          return InputPropagation.HANDLED;
-        }
-
-        playMenuSound(1);
-        this.highlightRow(this.rows.size() - 1);
+      case BUTTON_SHOULDER_RIGHT_1 -> {
+        this.menuNavigatePageUp();
         return InputPropagation.HANDLED;
-      }
-
-      case BUTTON_SHOULDER_RIGHT_1 ->  {
-        if(this.rows.size() > MAX_VISIBLE_ENTRIES) {
-          if(this.highlightedRow - MAX_VISIBLE_ENTRIES > 0) {
-            playMenuSound(1);
-            this.highlightedRow -= MAX_VISIBLE_ENTRIES;
-            this.scroll = Math.max(0, this.highlightedRow - MAX_VISIBLE_ENTRIES);
-            this.updateEntries();
-            this.highlightRow(this.highlightedRow);
-            return InputPropagation.HANDLED;
-          }
-
-          if(this.highlightedRow != 0) {
-            playMenuSound(1);
-            this.highlightedRow = 0;
-            this.scroll = 0;
-            this.updateEntries();
-            this.highlightRow(this.highlightedRow);
-            return InputPropagation.HANDLED;
-          }
-        }
       }
 
       case BUTTON_SHOULDER_RIGHT_2 -> {
-        if(this.rows.size() > MAX_VISIBLE_ENTRIES) {
-          if(this.highlightedRow + MAX_VISIBLE_ENTRIES < this.rows.size()) {
-            playMenuSound(1);
-            this.highlightedRow += MAX_VISIBLE_ENTRIES;
-            this.scroll = this.highlightedRow - MAX_VISIBLE_ENTRIES + 1;
-            this.updateEntries();
-            this.highlightRow(this.highlightedRow);
-            return InputPropagation.HANDLED;
-          }
-
-          if(this.highlightedRow != this.rows.size() - 1) {
-            playMenuSound(1);
-            this.highlightedRow = this.rows.size() - 1;
-            this.scroll = this.rows.size() - MAX_VISIBLE_ENTRIES;
-            this.updateEntries();
-            this.highlightRow(this.highlightedRow);
-            return InputPropagation.HANDLED;
-          }
-        }
+        this.menuNavigatePageDown();
+        return InputPropagation.HANDLED;
       }
+    }
+
+    return InputPropagation.PROPAGATE;
+  }
+
+  @Override
+  protected InputPropagation releasedThisFrame(final InputAction inputAction) {
+    if(super.releasedThisFrame(inputAction) == InputPropagation.HANDLED) {
+      return InputPropagation.HANDLED;
+    }
+
+    if(inputAction == InputAction.DPAD_UP || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_UP || inputAction == InputAction.DPAD_DOWN || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_DOWN) {
+      this.allowWrapY = true;
+      return InputPropagation.HANDLED;
     }
 
     return InputPropagation.PROPAGATE;

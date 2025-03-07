@@ -1,6 +1,8 @@
 package legend.game.inventory.screens;
 
+import legend.game.input.Input;
 import legend.game.input.InputAction;
+import legend.game.modding.coremod.CoreMod;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,6 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import static legend.core.GameEngine.CONFIG;
 
 public abstract class ControlHost implements Iterable<Control> {
   private final List<Control> controls = new ArrayList<>();
@@ -80,6 +84,14 @@ public abstract class ControlHost implements Iterable<Control> {
     return this.controls.iterator();
   }
 
+  protected List<Control> getControls() {
+    return this.controls;
+  }
+
+  protected Control getControl(final int index) {
+    return index > -1 && index < this.controls.size() ? this.controls.get(index) : null;
+  }
+
   protected Control findControlAt(final int x, final int y) {
     return this.findControlAt(x, y, false);
   }
@@ -109,6 +121,10 @@ public abstract class ControlHost implements Iterable<Control> {
   }
 
   protected InputPropagation mouseMove(final int x, final int y) {
+    if(CONFIG.getConfig(CoreMod.DISABLE_MOUSE_INPUT_CONFIG.get()) && !Input.getController().getGuid().isEmpty()) {
+      return InputPropagation.HANDLED;
+    }
+
     this.mouseX = x;
     this.mouseY = y;
 
@@ -122,6 +138,10 @@ public abstract class ControlHost implements Iterable<Control> {
   }
 
   protected InputPropagation mouseClick(final int x, final int y, final int button, final int mods) {
+    if(CONFIG.getConfig(CoreMod.DISABLE_MOUSE_INPUT_CONFIG.get()) && !Input.getController().getGuid().isEmpty()) {
+      return InputPropagation.HANDLED;
+    }
+
     final Control control = this.findControlAt(x, y);
 
     if(control != null && !control.isDisabled()) {
@@ -132,6 +152,10 @@ public abstract class ControlHost implements Iterable<Control> {
   }
 
   protected InputPropagation mouseScroll(final int deltaX, final int deltaY) {
+    if(CONFIG.getConfig(CoreMod.DISABLE_MOUSE_INPUT_CONFIG.get()) && !Input.getController().getGuid().isEmpty()) {
+      return InputPropagation.HANDLED;
+    }
+
     final Control control = this.findControlAt(this.mouseX, this.mouseY);
 
     if(control != null && !control.isDisabled()) {
@@ -142,6 +166,10 @@ public abstract class ControlHost implements Iterable<Control> {
   }
 
   protected InputPropagation mouseScrollHighRes(final double deltaX, final double deltaY) {
+    if(CONFIG.getConfig(CoreMod.DISABLE_MOUSE_INPUT_CONFIG.get()) && !Input.getController().getGuid().isEmpty()) {
+      return InputPropagation.HANDLED;
+    }
+
     final Control control = this.findControlAt(this.mouseX, this.mouseY);
 
     if(control != null && !control.isDisabled()) {

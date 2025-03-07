@@ -111,9 +111,12 @@ public final class Scus94491BpeSegment_8004 {
   public static EngineStateEnum engineStateOnceLoaded_8004dd24 = EngineStateEnum.PRELOAD_00;
   /** The previous state before the file finished loading */
   public static EngineStateEnum previousEngineState_8004dd28;
+  /** The last savable state we were in, used for generating crash recovery saves */
+  public static EngineStateEnum lastSavableEngineState;
 
   public static int width_8004dd34 = 320;
   public static int height_8004dd34 = 240;
+  public static EngineState.RenderMode renderMode = EngineState.RenderMode.LEGACY;
 
   public static int reinitOrderingTableBits_8004dd38 = 14;
 
@@ -272,7 +275,7 @@ public final class Scus94491BpeSegment_8004 {
               final int sequenceCount = sequenceList.sequenceCount_00;
 
               if(sequenceCount >= sequenceIndex) {
-                sssqish_800c4aa8 = sshd.getSubfile(4, (data, offset) -> new Sssqish(data, offset, sshd.getSubfileSize(4)));
+                sssqish_800c4aa8 = sshd.getSubfile(4, (name, data, offset) -> new Sssqish(name, data, offset, sshd.getSubfileSize(4)));
                 volumeRamp_800c4ab0 = sshd.getSubfile(1, VolumeRamp::new);
                 return sequenceList.sequences_02[sequenceIndex].reader();
               }
@@ -351,7 +354,7 @@ public final class Scus94491BpeSegment_8004 {
 
     final Sshd sshd = sequenceData.playableSound_020.sshdPtr_04;
     sshdPtr_800c4ac0 = sshd;
-    sssqChannelInfo_800C6680 = sshd.getSubfile(4, (data, offset) -> new Sssqish(data, offset, sshd.getSubfileSize(4))).entries_10[playingNote.sequenceChannel_04];
+    sssqChannelInfo_800C6680 = sshd.getSubfile(4, (name, data, offset) -> new Sssqish(name, data, offset, sshd.getSubfileSize(4))).entries_10[playingNote.sequenceChannel_04];
 
     //LAB_8004ae10
     playingNote.channelVolume_28 = sssqChannelInfo_800C6680.volume_0e;
@@ -572,7 +575,7 @@ public final class Scus94491BpeSegment_8004 {
       return -0x1L;
     }
 
-    final Sssqish sssq = playableSound.sshdPtr_04.getSubfile(4, (data, offset) -> new Sssqish(data, offset, playableSound.sshdPtr_04.getSubfileSize(4)));
+    final Sssqish sssq = playableSound.sshdPtr_04.getSubfile(4, (name, data, offset) -> new Sssqish(name, data, offset, playableSound.sshdPtr_04.getSubfileSize(4)));
     sssqReader_800c667c = null; //sssq.reader(); TODO?
     final int ret = sssq.volume_00;
     sssq.volume_00 = volume;
@@ -641,7 +644,13 @@ public final class Scus94491BpeSegment_8004 {
       soundEnv_800c6630.fadeOutVolL_30 = SPU.getMainVolumeLeft() >>> 8;
       soundEnv_800c6630.fadeOutVolR_32 = SPU.getMainVolumeRight() >>> 8;
 
-      AUDIO_THREAD.fadeOut(fadeTime);
+      // Retail bug: due to the way fade volume is lerped, fade out over 1
+      // tick doesn't fade out at all. This was breaking music after Lenus 2.
+      // See GH#1623
+      if(fadeTime > 1) {
+        AUDIO_THREAD.fadeOut(fadeTime);
+      }
+
       return 0;
     }
 
@@ -783,6 +792,10 @@ public final class Scus94491BpeSegment_8004 {
             final Voice voice = SPU.voices[voiceIndex];
             voice.adsr.lo = 0;
             voice.adsr.hi = 0;
+
+            // See stopSoundsAndSequences for a detailed explanation
+            voice.adsrVolume = 0;
+
             playingNote.used_00 = false;
           }
 
@@ -813,6 +826,20 @@ public final class Scus94491BpeSegment_8004 {
             final Voice voice = SPU.voices[voiceIndex];
             voice.adsr.lo = 0;
             voice.adsr.hi = 0;
+
+            // Since we run the SPU in lockstep now, the ADSR doesn't have time to tick and reduce the volume after
+            // the registers are cleared when changing engine states. The sequencer doesn't actually cull finished
+            // voices until their ADSR volume is < 0x10, so if this method is called when voices are all in use and
+            // then another sound is immediately played, it won't have any voices available. Even though all sound
+            // sequences are marked as stopped and the voices were reset.
+            //
+            // This was happening in the world map when piloting the Queen Fury. It plays far too many overlapping
+            // sounds for the SPU to handle (LOD sets the max to 8) so if a battle started, the transition sound
+            // would either be missing one or both channels (i.e. either the right channel would overwrite the left,
+            // or neither would play at all).
+            // See GH#1719
+            voice.adsrVolume = 0;
+
             playingNote.used_00 = false;
           }
 
