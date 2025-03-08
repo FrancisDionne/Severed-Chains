@@ -26,7 +26,6 @@ import static legend.game.SItem.characterCount_8011d7c4;
 import static legend.game.SItem.equipItem;
 import static legend.game.SItem.equipmentGlyphs_80114180;
 import static legend.game.SItem.loadCharacterStats;
-import static legend.game.SItem.loadItemsAndEquipmentForDisplay;
 import static legend.game.SItem.renderCharacterEquipment;
 import static legend.game.SItem.renderCharacterSlot;
 import static legend.game.SItem.renderCharacterStats;
@@ -44,7 +43,6 @@ import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.sortEquipmentInventory;
 import static legend.game.Scus94491BpeSegment_8002.takeEquipment;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
-import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
@@ -56,6 +54,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_FILTER;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class EquipmentScreen extends MenuScreen {
@@ -518,7 +517,7 @@ public class EquipmentScreen extends MenuScreen {
       return InputPropagation.HANDLED;
     }
 
-    if(action == INPUT_ACTION_MENU_.get()) {
+    if(action == INPUT_ACTION_MENU_FILTER.get()) {
       this.filterItems();
       return InputPropagation.HANDLED;
     }

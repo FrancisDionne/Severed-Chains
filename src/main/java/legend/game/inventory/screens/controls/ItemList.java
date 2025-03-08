@@ -3,8 +3,6 @@ package legend.game.inventory.screens.controls;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import legend.core.platform.input.InputAction;
 import legend.game.i18n.I18n;
-import legend.game.inventory.Equipment;
-import legend.game.inventory.Item;
 import legend.game.inventory.ItemIcon;
 import legend.game.inventory.screens.Control;
 import legend.game.inventory.screens.InputPropagation;
@@ -24,10 +22,6 @@ import static legend.game.SItem.allocateUiElement;
 import static legend.game.SItem.renderFraction;
 import static legend.game.Scus94491BpeSegment_8002.allocateManualRenderable;
 import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
-import static legend.game.Scus94491BpeSegment_8002.getInventoryEquipmentCount;
-import static legend.game.Scus94491BpeSegment_8002.getInventoryItemCount;
-import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryEquipments;
-import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.Scus94491BpeSegment_8002.uploadRenderable;
 
 public class ItemList<T> extends Control {
