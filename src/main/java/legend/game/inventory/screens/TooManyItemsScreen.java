@@ -188,7 +188,7 @@ public class TooManyItemsScreen extends MenuScreen {
       }
     }
 
-    if(this.menuState.ordinal() > MenuState._4.ordinal()) {
+    if(this.menuState.ordinal() > MenuState.RENDER_4.ordinal()) {
       FooterActionsHud.render();
     }
   }
@@ -777,7 +777,7 @@ public class TooManyItemsScreen extends MenuScreen {
   
   private void setMenuState(final MenuState state) {
     this.menuState = state;
-    if (state == MenuState._9) {
+    if (state == MenuState.INVENTORY_9) {
       FooterActionsHud.setMenuActions(FooterActions.SORT, null, null);
     } else {
       FooterActionsHud.setMenuActions(null, null, null);
