@@ -90,13 +90,13 @@ public abstract class MenuScreen extends ControlHost {
     this.render();
     this.renderControls(0, 0);
 
-    float offsetX = 0.0f;
-    for(int i = 0; i < this.hotkeys.size(); i++) {
-      final Hotkey hotkey = this.hotkeys.get(i);
-      final String string = I18n.translate("lod_core.ui.hotkey", hotkey.label, InputCodepoints.getActionName(hotkey.action.get()));
-      renderText(string, 8 + offsetX, 228, this.fontOptions);
-      offsetX += (textWidth(string) + 12.0f) * this.fontOptions.getSize();
-    }
+//    float offsetX = 0.0f;
+//    for(int i = 0; i < this.hotkeys.size(); i++) {
+//      final Hotkey hotkey = this.hotkeys.get(i);
+//      final String string = I18n.translate("lod_core.ui.hotkey", hotkey.label, InputCodepoints.getActionName(hotkey.action.get()));
+//      renderText(string, 8 + offsetX, 228, this.fontOptions);
+//      offsetX += (textWidth(string) + 12.0f) * this.fontOptions.getSize();
+//    }
   }
 
   @Override

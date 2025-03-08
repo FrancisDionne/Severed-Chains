@@ -79,6 +79,8 @@ public class ModsScreen extends VerticalLayoutScreen {
     }
 
     FooterActionsHud.setMenuActions(FooterActions.HELP, null, null);
+    this.addHotkey(I18n.translate("lod_core.ui.mods.help"), INPUT_ACTION_MENU_HELP, this::help);
+    this.addHotkey(I18n.translate("lod_core.ui.mods.back"), INPUT_ACTION_MENU_BACK, this::back);
   }
 
   private void help() {

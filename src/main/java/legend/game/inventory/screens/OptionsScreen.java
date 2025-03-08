@@ -96,6 +96,8 @@ public class OptionsScreen extends VerticalLayoutScreen {
       });
 
     FooterActionsHud.setMenuActions(FooterActions.HELP, null, null);
+    this.addHotkey(I18n.translate("lod_core.ui.options.help"), INPUT_ACTION_MENU_HELP, this::help);
+    this.addHotkey(I18n.translate("lod_core.ui.options.back"), INPUT_ACTION_MENU_BACK, this::back);
   }
 
   private Label createErrorLabel(final String log, final Throwable ex, final boolean setSize) {
