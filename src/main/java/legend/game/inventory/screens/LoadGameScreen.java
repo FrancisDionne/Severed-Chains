@@ -2,7 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
-import legend.game.input.InputAction;
+import legend.game.i18n.I18n;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.BigList;
 import legend.game.inventory.screens.controls.Glyph;
@@ -17,13 +17,14 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-import static legend.game.SItem.UI_TEXT;
 import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 
 public class LoadGameScreen extends MenuScreen {
   private static final Logger LOGGER = LogManager.getFormatterLogger(LoadGameScreen.class);
@@ -60,6 +61,9 @@ public class LoadGameScreen extends MenuScreen {
     for(final SavedGame save : campaign.loadAllSaves()) {
       this.saveList.addEntry(save);
     }
+
+    this.addHotkey(I18n.translate("lod_core.ui.load_game.delete"), INPUT_ACTION_MENU_DELETE, this::menuDelete);
+    this.addHotkey(I18n.translate("lod_core.ui.load_game.back"), INPUT_ACTION_MENU_BACK, this::menuEscape);
   }
 
   private void onSelection(final SavedGame save) {
@@ -115,24 +119,5 @@ public class LoadGameScreen extends MenuScreen {
   private void menuEscape() {
     playMenuSound(3);
     this.closed.run();
-  }
-
-  @Override
-  public InputPropagation pressedThisFrame(final InputAction inputAction) {
-    if(super.pressedThisFrame(inputAction) == InputPropagation.HANDLED) {
-      return InputPropagation.HANDLED;
-    }
-
-    if(inputAction == InputAction.BUTTON_WEST) {
-      this.menuDelete();
-      return InputPropagation.HANDLED;
-    }
-
-    if(inputAction == InputAction.BUTTON_EAST) {
-      this.menuEscape();
-      return InputPropagation.HANDLED;
-    }
-
-    return InputPropagation.PROPAGATE;
   }
 }

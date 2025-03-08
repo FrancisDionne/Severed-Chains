@@ -5,8 +5,9 @@ import legend.core.memory.Method;
 import legend.core.opengl.Texture;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
+import legend.core.platform.input.InputAction;
+import legend.core.platform.input.InputMod;
 import legend.game.i18n.I18n;
-import legend.game.input.InputAction;
 import legend.game.inventory.EquipItemResult;
 import legend.game.inventory.Equipment;
 import legend.game.types.EquipmentSlot;
@@ -15,6 +16,7 @@ import legend.game.types.MenuEntryStruct04;
 import legend.game.types.Renderable58;
 
 import java.util.List;
+import java.util.Set;
 
 import static legend.game.SItem.FUN_801034cc;
 import static legend.game.SItem.FUN_80104b60;
@@ -43,10 +45,18 @@ import static legend.game.Scus94491BpeSegment_8002.sortEquipmentInventory;
 import static legend.game.Scus94491BpeSegment_8002.takeEquipment;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_END;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_HOME;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_DOWN;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_UP;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HOME;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_DOWN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class EquipmentScreen extends MenuScreen {
   private int loadingStage;
@@ -220,7 +230,7 @@ public class EquipmentScreen extends MenuScreen {
   }
 
   @Override
-  protected InputPropagation mouseClick(final int x, final int y, final int button, final int mods) {
+  protected InputPropagation mouseClick(final int x, final int y, final int button, final Set<InputMod> mods) {
     if(super.mouseClick(x, y, button, mods) == InputPropagation.HANDLED) {
       return InputPropagation.HANDLED;
     }
@@ -313,22 +323,6 @@ public class EquipmentScreen extends MenuScreen {
     }
 
     this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
-  }
-
-  private void menuNavigateTop() {
-    if(this.selectedSlot != 0) {
-      playMenuSound(1);
-      this.selectedSlot = 0;
-      this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
-    }
-  }
-
-  private void menuNavigateBottom() {
-    if(this.selectedSlot != 3) {
-      playMenuSound(1);
-      this.selectedSlot = 3;
-      this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
-    }
   }
 
   private void menuNavigatePageUp() {
@@ -456,39 +450,8 @@ public class EquipmentScreen extends MenuScreen {
   }
 
   @Override
-  public InputPropagation keyPress(final int key, final int scancode, final int mods) {
-    if(super.keyPress(key, scancode, mods) == InputPropagation.HANDLED) {
-      return InputPropagation.HANDLED;
-    }
-
-    switch(key) {
-      case GLFW_KEY_HOME -> {
-        this.menuNavigateHome();
-        return InputPropagation.HANDLED;
-      }
-
-      case GLFW_KEY_END -> {
-        this.menuNavigateEnd();
-        return InputPropagation.HANDLED;
-      }
-
-      case GLFW_KEY_PAGE_UP -> {
-        this.menuNavigatePageUp();
-        return InputPropagation.HANDLED;
-      }
-
-      case GLFW_KEY_PAGE_DOWN -> {
-        this.menuNavigatePageDown();
-        return InputPropagation.HANDLED;
-      }
-    }
-
-    return InputPropagation.PROPAGATE;
-  }
-
-  @Override
-  public InputPropagation pressedThisFrame(final InputAction inputAction) {
-    if(super.pressedThisFrame(inputAction) == InputPropagation.HANDLED) {
+  public InputPropagation inputActionPressed(final InputAction action, final boolean repeat) {
+    if(super.inputActionPressed(action, repeat) == InputPropagation.HANDLED) {
       return InputPropagation.HANDLED;
     }
 
@@ -496,102 +459,85 @@ public class EquipmentScreen extends MenuScreen {
       return InputPropagation.PROPAGATE;
     }
 
-    switch(inputAction) {
-      case BUTTON_SHOULDER_LEFT_1 -> {
-        this.menuNavigateTop();
-        return InputPropagation.HANDLED;
-      }
+    if(action == INPUT_ACTION_MENU_HOME.get()) {
+      this.menuNavigateHome();
+      return InputPropagation.HANDLED;
+    }
 
-      case BUTTON_SHOULDER_LEFT_2 -> {
-        this.menuNavigateBottom();
-        return InputPropagation.HANDLED;
-      }
+    if(action == INPUT_ACTION_MENU_END.get()) {
+      this.menuNavigateEnd();
+      return InputPropagation.HANDLED;
+    }
 
-      case BUTTON_EAST -> {
-        this.menuEscape();
-        return InputPropagation.HANDLED;
-      }
+    if(action == INPUT_ACTION_MENU_PAGE_UP.get()) {
+      this.menuNavigatePageUp();
+      return InputPropagation.HANDLED;
+    }
 
-      case BUTTON_SOUTH -> {
-        this.menuSelect();
-        return InputPropagation.HANDLED;
-      }
+    if(action == INPUT_ACTION_MENU_PAGE_DOWN.get()) {
+      this.menuNavigatePageDown();
+      return InputPropagation.HANDLED;
+    }
 
-      case BUTTON_NORTH -> {
-        this.menuItemSort();
-        return InputPropagation.HANDLED;
-      }
+    if(action == INPUT_ACTION_MENU_UP.get()) {
+      this.menuNavigateUp();
+      this.allowWrapY = false;
+      return InputPropagation.HANDLED;
+    }
 
-      case BUTTON_WEST -> {
-        this.filterItems();
-        return InputPropagation.HANDLED;
-      }
+    if(action == INPUT_ACTION_MENU_DOWN.get()) {
+      this.menuNavigateDown();
+      this.allowWrapY = false;
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_LEFT.get()) {
+      this.menuNavigateLeft();
+      this.allowWrapX = false;
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_RIGHT.get()) {
+      this.menuNavigateRight();
+      this.allowWrapX = false;
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_BACK.get() && !repeat) {
+      this.menuEscape();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_CONFIRM.get() && !repeat) {
+      this.menuSelect();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_SORT.get()) {
+      this.menuItemSort();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_.get()) {
+      this.filterItems();
+      return InputPropagation.HANDLED;
     }
 
     return InputPropagation.PROPAGATE;
   }
 
   @Override
-  public InputPropagation pressedWithRepeatPulse(final InputAction inputAction) {
-    if(super.pressedWithRepeatPulse(inputAction) == InputPropagation.HANDLED) {
+  public InputPropagation inputActionReleased(final InputAction action) {
+    if(super.inputActionReleased(action) == InputPropagation.HANDLED) {
       return InputPropagation.HANDLED;
     }
 
-    if(this.loadingStage != 3) {
-      return InputPropagation.PROPAGATE;
-    }
-
-    switch(inputAction) {
-      case DPAD_UP, JOYSTICK_LEFT_BUTTON_UP -> {
-        this.menuNavigateUp();
-        this.allowWrapY = false;
-        return InputPropagation.HANDLED;
-      }
-
-      case DPAD_DOWN, JOYSTICK_LEFT_BUTTON_DOWN -> {
-        this.menuNavigateDown();
-        this.allowWrapY = false;
-        return InputPropagation.HANDLED;
-      }
-
-      case DPAD_LEFT, JOYSTICK_LEFT_BUTTON_LEFT -> {
-        this.menuNavigateLeft();
-        this.allowWrapX = false;
-        return InputPropagation.HANDLED;
-      }
-
-      case DPAD_RIGHT, JOYSTICK_LEFT_BUTTON_RIGHT -> {
-        this.menuNavigateRight();
-        this.allowWrapX = false;
-        return InputPropagation.HANDLED;
-      }
-
-      case BUTTON_SHOULDER_RIGHT_1 -> {
-        this.menuNavigatePageUp();
-        return InputPropagation.HANDLED;
-      }
-
-      case BUTTON_SHOULDER_RIGHT_2 -> {
-        this.menuNavigatePageDown();
-        return InputPropagation.HANDLED;
-      }
-    }
-
-    return InputPropagation.PROPAGATE;
-  }
-
-  @Override
-  public InputPropagation releasedThisFrame(final InputAction inputAction) {
-    if(super.releasedThisFrame(inputAction) == InputPropagation.HANDLED) {
-      return InputPropagation.HANDLED;
-    }
-
-    if(inputAction == InputAction.DPAD_UP || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_UP || inputAction == InputAction.DPAD_DOWN || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_DOWN) {
+    if(action == INPUT_ACTION_MENU_UP.get() || action == INPUT_ACTION_MENU_DOWN.get()) {
       this.allowWrapY = true;
       return InputPropagation.HANDLED;
     }
 
-    if(inputAction == InputAction.DPAD_LEFT || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_LEFT || inputAction == InputAction.DPAD_RIGHT || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_RIGHT) {
+    if(action == INPUT_ACTION_MENU_LEFT.get() || action == INPUT_ACTION_MENU_RIGHT.get()) {
       this.allowWrapX = true;
       return InputPropagation.HANDLED;
     }

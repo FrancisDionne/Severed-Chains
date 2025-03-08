@@ -2,7 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
-import legend.game.input.InputAction;
+import legend.game.i18n.I18n;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.BigList;
 import legend.game.inventory.screens.controls.Glyph;
@@ -28,6 +28,8 @@ import static legend.game.Scus94491BpeSegment_8005.collidedPrimitiveIndex_80052c
 import static legend.game.Scus94491BpeSegment_8005.submapCutForSave_800cb450;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 
 public class SaveGameScreen extends MenuScreen {
   private static final Logger LOGGER = LogManager.getFormatterLogger(SaveGameScreen.class);
@@ -67,6 +69,9 @@ public class SaveGameScreen extends MenuScreen {
     for(final SavedGame save : this.saves) {
       this.saveList.addEntry(save);
     }
+
+    this.addHotkey(I18n.translate("lod_core.ui.save_game.delete"), INPUT_ACTION_MENU_DELETE, this::menuDelete);
+    this.addHotkey(I18n.translate("lod_core.ui.save_game.back"), INPUT_ACTION_MENU_BACK, this::menuEscape);
   }
 
   @Override
@@ -152,24 +157,5 @@ public class SaveGameScreen extends MenuScreen {
   private void menuEscape() {
     playMenuSound(3);
     this.unload.run();
-  }
-
-  @Override
-  public InputPropagation pressedThisFrame(final InputAction inputAction) {
-    if(super.pressedThisFrame(inputAction) == InputPropagation.HANDLED) {
-      return InputPropagation.HANDLED;
-    }
-
-    if(inputAction == InputAction.BUTTON_WEST) {
-      this.menuDelete();
-      return InputPropagation.HANDLED;
-    }
-
-    if(inputAction == InputAction.BUTTON_EAST) {
-      this.menuEscape();
-      return InputPropagation.HANDLED;
-    }
-
-    return InputPropagation.PROPAGATE;
   }
 }

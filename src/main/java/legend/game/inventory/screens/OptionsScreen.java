@@ -3,8 +3,11 @@ package legend.game.inventory.screens;
 import legend.core.GameEngine;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
+import legend.core.platform.input.InputAction;
+import legend.core.platform.input.InputButton;
+import legend.core.platform.input.InputKey;
+import legend.core.platform.input.InputMod;
 import legend.game.i18n.I18n;
-import legend.game.input.InputAction;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Label;
 import legend.game.saves.ConfigCategory;
@@ -23,8 +26,9 @@ import java.util.Set;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HELP;
 
 public class OptionsScreen extends VerticalLayoutScreen {
   private static final Logger LOGGER = LogManager.getFormatterLogger(OptionsScreen.class);
@@ -61,11 +65,11 @@ public class OptionsScreen extends VerticalLayoutScreen {
         final String text = entry.getValue();
 
         if(validLocations.contains(configEntry.storageLocation) && configEntry.hasEditControl()) {
-          //noinspection unchecked
           Control editControl;
           boolean error = false;
 
           try {
+            //noinspection unchecked
             editControl = configEntry.makeEditControl(config.getConfig(configEntry), config);
           } catch(final Throwable ex) {
             editControl = this.createErrorLabel("Error creating control", ex, false);
@@ -119,39 +123,29 @@ public class OptionsScreen extends VerticalLayoutScreen {
     }
   }
 
+  private void back() {
+    playMenuSound(3);
+    this.unload.run();
+  }
+
+  private void help() {
+    final ConfigEntry<?> configEntry = this.helpEntries.get(this.getHighlightedRow());
+    if(configEntry != null) {
+      playMenuSound(2);
+      final Label helpLabel = this.helpLabels.get(this.getHighlightedRow());
+      this.getStack().pushScreen(new TooltipScreen(I18n.translate(configEntry.getHelpTranslationKey()), helpLabel.calculateTotalX() + helpLabel.getWidth() / 2, helpLabel.calculateTotalY() + helpLabel.getHeight() / 2));
+    }
+  }
+
   @Override
-  public InputPropagation pressedThisFrame(final InputAction inputAction) {
+  public InputPropagation inputActionPressed(final InputAction action, final boolean repeat) {
     try {
-      if(super.pressedThisFrame(inputAction) == InputPropagation.HANDLED) {
-        return InputPropagation.HANDLED;
-      }
-
-      if(inputAction == InputAction.BUTTON_EAST) {
-        playMenuSound(3);
-        this.unload.run();
-        return InputPropagation.HANDLED;
-      }
-
-      if(inputAction == InputAction.BUTTON_NORTH) {
-        final ConfigEntry<?> configEntry = this.helpEntries.get(this.getHighlightedRow());
-        if(configEntry != null) {
-          playMenuSound(2);
-          final Label helpLabel = this.helpLabels.get(this.getHighlightedRow());
-          this.getStack().pushScreen(new TooltipScreen(I18n.translate(configEntry.getHelpTranslationKey()), helpLabel.calculateTotalX() + helpLabel.getWidth() / 2, helpLabel.calculateTotalY() + helpLabel.getHeight() / 2));
-        }
-
-        return InputPropagation.HANDLED;
-      }
+      return super.inputActionPressed(action, repeat);
     } catch(final Throwable ex) {
       this.replaceControlWithErrorLabel("Error on pressedThisFrame", ex);
     }
 
     return InputPropagation.PROPAGATE;
-  }
-
-  @Override
-  protected void render() {
-    super.render();
   }
 
   @Override
@@ -184,21 +178,41 @@ public class OptionsScreen extends VerticalLayoutScreen {
   }
 
   @Override
-  protected InputPropagation pressedWithRepeatPulse(final InputAction inputAction) {
+  protected InputPropagation keyPress(final InputKey key, final InputKey scancode, final Set<InputMod> mods, final boolean repeat) {
     try {
-      return super.pressedWithRepeatPulse(inputAction);
+      return super.keyPress(key, scancode, mods, repeat);
     } catch(final Throwable ex) {
-      this.replaceControlWithErrorLabel("Error on pressedWithRepeatPulse", ex);
+      this.replaceControlWithErrorLabel("Error on keyPress", ex);
     }
     return InputPropagation.PROPAGATE;
   }
 
   @Override
-  protected InputPropagation keyPress(final int key, final int scancode, final int mods) {
+  protected InputPropagation keyRelease(final InputKey key, final InputKey scancode, final Set<InputMod> mods) {
     try {
-      return super.keyPress(key, scancode, mods);
+      return super.keyRelease(key, scancode, mods);
     } catch(final Throwable ex) {
-      this.replaceControlWithErrorLabel("Error on keyPress", ex);
+      this.replaceControlWithErrorLabel("Error on keyRelease", ex);
+    }
+    return InputPropagation.PROPAGATE;
+  }
+
+  @Override
+  protected InputPropagation buttonPress(final InputButton button, final boolean repeat) {
+    try {
+      return super.buttonPress(button, repeat);
+    } catch(final Throwable ex) {
+      this.replaceControlWithErrorLabel("Error on buttonPress", ex);
+    }
+    return InputPropagation.PROPAGATE;
+  }
+
+  @Override
+  protected InputPropagation buttonRelease(final InputButton button) {
+    try {
+      return super.buttonRelease(button);
+    } catch(final Throwable ex) {
+      this.replaceControlWithErrorLabel("Error on buttonRelease", ex);
     }
     return InputPropagation.PROPAGATE;
   }
@@ -214,11 +228,11 @@ public class OptionsScreen extends VerticalLayoutScreen {
   }
 
   @Override
-  protected InputPropagation releasedThisFrame(final InputAction inputAction) {
+  protected InputPropagation inputActionReleased(final InputAction action) {
     try {
-      return super.releasedThisFrame(inputAction);
+      return super.inputActionReleased(action);
     } catch(final Throwable ex) {
-      this.replaceControlWithErrorLabel("Error on releasedThisFrame", ex);
+      this.replaceControlWithErrorLabel("Error on inputActionReleased", ex);
     }
     return InputPropagation.PROPAGATE;
   }
