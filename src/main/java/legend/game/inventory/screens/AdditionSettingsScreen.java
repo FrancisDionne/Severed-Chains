@@ -2,7 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
 import legend.game.i18n.I18n;
-import legend.game.input.InputAction;
+import legend.core.platform.input.InputAction;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Label;
 import legend.game.modding.coremod.CoreMod;
@@ -20,6 +20,7 @@ import java.util.Set;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 
 public class AdditionSettingsScreen extends VerticalLayoutScreen {
   private final Runnable unload;
@@ -62,18 +63,8 @@ public class AdditionSettingsScreen extends VerticalLayoutScreen {
       });
   }
 
-  @Override
-  public InputPropagation pressedThisFrame(final InputAction inputAction) {
-    if(super.pressedThisFrame(inputAction) == InputPropagation.HANDLED) {
-      return InputPropagation.HANDLED;
-    }
-
-    if(inputAction == InputAction.BUTTON_EAST) {
-      playMenuSound(3);
-      this.unload.run();
-      return InputPropagation.HANDLED;
-    }
-
-    return InputPropagation.PROPAGATE;
+  private void back() {
+    playMenuSound(3);
+    this.unload.run();
   }
 }
