@@ -137,6 +137,7 @@ public class CoreMod {
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_BACK = INPUT_ACTION_REGISTRAR.register("menu_back", InputAction::fixed);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_DELETE = INPUT_ACTION_REGISTRAR.register("menu_delete", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_SORT = INPUT_ACTION_REGISTRAR.register("menu_sort", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_FILTER = INPUT_ACTION_REGISTRAR.register("menu_filter", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_HELP = INPUT_ACTION_REGISTRAR.register("menu_help", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_MODS = INPUT_ACTION_REGISTRAR.register("menu_mods", InputAction::editable);
 
@@ -223,6 +224,8 @@ public class CoreMod {
       .add(INPUT_ACTION_MENU_DELETE.get(), new ScancodeInputActivation(InputKey.Q))
       .add(INPUT_ACTION_MENU_SORT.get(), new ButtonInputActivation(InputButton.Y))
       .add(INPUT_ACTION_MENU_SORT.get(), new KeyInputActivation(InputKey.X))
+      .add(INPUT_ACTION_MENU_FILTER.get(), new ButtonInputActivation(InputButton.X))
+      .add(INPUT_ACTION_MENU_FILTER.get(), new ScancodeInputActivation(InputKey.Q))
       .add(INPUT_ACTION_MENU_HELP.get(), new ButtonInputActivation(InputButton.START))
       .add(INPUT_ACTION_MENU_HELP.get(), new KeyInputActivation(InputKey.H))
       .add(INPUT_ACTION_MENU_MODS.get(), new ButtonInputActivation(InputButton.Y))

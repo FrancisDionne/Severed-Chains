@@ -182,6 +182,7 @@ lod_core.input_actions.menu_confirm.name=Menu: confirm
 lod_core.input_actions.menu_back.name=Menu: back
 lod_core.input_actions.menu_delete.name=Menu: delete
 lod_core.input_actions.menu_sort.name=Menu: sort
+lod_core.input_actions.menu_filter.name=Menu: filter
 lod_core.input_actions.menu_help.name=Menu: help
 lod_core.input_actions.menu_mods.name=Menu: mods
 
