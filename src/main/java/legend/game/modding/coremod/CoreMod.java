@@ -1,10 +1,8 @@
 package legend.game.modding.coremod;
 
 import legend.core.GameEngine;
-import legend.game.combat.DragoonAdditionMode;
 import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
-import legend.game.combat.ui.ControllerStyle;
 import legend.game.input.InputAction;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionButtonStyleConfigEntry;
@@ -14,6 +12,7 @@ import legend.game.modding.coremod.config.DragoonAdditionGroupConfigEntry;
 import legend.game.modding.coremod.config.DragoonAdditionModeConfigEntry;
 import legend.game.modding.coremod.config.DragoonAdditionDifficultyConfigEntry;
 import legend.game.modding.coremod.config.GeneralAdditionGroupConfigEntry;
+import legend.game.inventory.IconSetConfigEntry;
 import legend.game.modding.coremod.config.AdditionModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionOverlayConfigEntry;
 import legend.game.modding.coremod.config.AdditionTimingModeConfigEntry;
@@ -29,25 +28,28 @@ import legend.game.modding.coremod.config.ControllerKeybindsConfigEntry;
 import legend.game.modding.coremod.config.AdditionSettingsConfigEntry;
 import legend.game.modding.coremod.config.ControllerStyleConfigEntry;
 import legend.game.modding.coremod.config.CreateCrashSaveConfigEntry;
+import legend.game.modding.coremod.config.DisableMouseInputConfigEntry;
 import legend.game.modding.coremod.config.EnabledModsConfigEntry;
 import legend.game.modding.coremod.config.EncounterRateConfigEntry;
 import legend.game.modding.coremod.config.FooterActionColorConfigEntry;
+import legend.game.modding.coremod.config.FmvVolumeConfigEntry;
 import legend.game.modding.coremod.config.FullscreenConfigEntry;
 import legend.game.modding.coremod.config.HighQualityProjectionConfigEntry;
 import legend.game.modding.coremod.config.IndicatorModeConfigEntry;
 import legend.game.modding.coremod.config.InventorySizeConfigEntry;
+import legend.game.modding.coremod.config.LegacyWidescreenModeConfig;
 import legend.game.modding.coremod.config.MashModeConfigEntry;
+import legend.game.modding.coremod.config.MasterVolumeConfigEntry;
 import legend.game.modding.coremod.config.MonitorConfigEntry;
 import legend.game.modding.coremod.config.MusicEffectsOverTimeGranularityConfigEntry;
 import legend.game.modding.coremod.config.MusicInterpolationPrecisionConfigEntry;
 import legend.game.modding.coremod.config.MusicPitchResolutionConfigEntry;
 import legend.game.modding.coremod.config.MusicSampleRateConfigEntry;
 import legend.game.modding.coremod.config.MusicVolumeConfigEntry;
-import legend.game.modding.coremod.config.DisableMouseInputConfigEntry;
 import legend.game.modding.coremod.config.ResolutionConfig;
 import legend.game.modding.coremod.config.SaveAnywhereConfig;
 import legend.game.modding.coremod.config.SecondaryCharacterXpMultiplierConfigEntry;
-import legend.game.modding.coremod.config.SubmapWidescreenModeConfig;
+import legend.game.modding.coremod.config.SfxVolumeConfigEntry;
 import legend.game.modding.coremod.config.TransformationModeConfigEntry;
 import legend.game.modding.coremod.config.UnlockPartyConfig;
 import legend.game.saves.BoolConfigEntry;
@@ -107,16 +109,20 @@ public class CoreMod {
   public static final RegistryDelegate<ControllerDeadzoneConfigEntry> CONTROLLER_DEADZONE_CONFIG = register("controller_deadzone", ControllerDeadzoneConfigEntry::new);
   public static final RegistryDelegate<BoolConfigEntry> RECEIVE_INPUT_ON_INACTIVE_WINDOW_CONFIG = register("receive_input_on_inactive_window", () -> new BoolConfigEntry(false, ConfigStorageLocation.GLOBAL, ConfigCategory.CONTROLS));
   public static final RegistryDelegate<BoolConfigEntry> DISABLE_MOUSE_INPUT_CONFIG = CONFIG_REGISTRAR.register("disable_mouse_input", DisableMouseInputConfigEntry::new);
-  public static final RegistryDelegate<BoolConfigEntry> RUMBLE_CONFIG = register("rumble", () -> new BoolConfigEntry(true, ConfigStorageLocation.GLOBAL, ConfigCategory.CONTROLS));
-  public static final RegistryDelegate<BoolConfigEntry> ALLOW_WIDESCREEN_CONFIG = register("allow_widescreen", AllowWidescreenConfigEntry::new);
-  public static final RegistryDelegate<SubmapWidescreenModeConfig> SUBMAP_WIDESCREEN_MODE_CONFIG = register("submap_widescreen_mode", SubmapWidescreenModeConfig::new);
-  public static final RegistryDelegate<BoolConfigEntry> HIGH_QUALITY_PROJECTION_CONFIG = register("high_quality_projection", HighQualityProjectionConfigEntry::new);
-  public static final RegistryDelegate<BoolConfigEntry> FULLSCREEN_CONFIG = register("fullscreen", FullscreenConfigEntry::new);
-  public static final RegistryDelegate<ResolutionConfig> RESOLUTION_CONFIG = register("resolution", ResolutionConfig::new);
+  public static final RegistryDelegate<BoolConfigEntry> RUMBLE_CONFIG = CONFIG_REGISTRAR.register("rumble", () -> new BoolConfigEntry(true, ConfigStorageLocation.GLOBAL, ConfigCategory.CONTROLS));
+  public static final RegistryDelegate<BoolConfigEntry> ALLOW_WIDESCREEN_CONFIG = CONFIG_REGISTRAR.register("allow_widescreen", AllowWidescreenConfigEntry::new);
+  public static final RegistryDelegate<LegacyWidescreenModeConfig> LEGACY_WIDESCREEN_MODE_CONFIG = CONFIG_REGISTRAR.register("submap_widescreen_mode", LegacyWidescreenModeConfig::new);
+  public static final RegistryDelegate<BoolConfigEntry> HIGH_QUALITY_PROJECTION_CONFIG = CONFIG_REGISTRAR.register("high_quality_projection", HighQualityProjectionConfigEntry::new);
+  public static final RegistryDelegate<BoolConfigEntry> FULLSCREEN_CONFIG = CONFIG_REGISTRAR.register("fullscreen", FullscreenConfigEntry::new);
+  public static final RegistryDelegate<ResolutionConfig> RESOLUTION_CONFIG = CONFIG_REGISTRAR.register("resolution", ResolutionConfig::new);
   public static final RegistryDelegate<MonitorConfigEntry> MONITOR_CONFIG = CONFIG_REGISTRAR.register("monitor", MonitorConfigEntry::new);
 
-  public static final RegistryDelegate<AudioDeviceConfig> AUDIO_DEVICE_CONFIG = register("audio_device", AudioDeviceConfig::new);
-  public static final RegistryDelegate<MusicVolumeConfigEntry> MUSIC_VOLUME_CONFIG = register("music_volume", MusicVolumeConfigEntry::new);  public static final RegistryDelegate<MusicInterpolationPrecisionConfigEntry> MUSIC_INTERPOLATION_PRECISION_CONFIG = CONFIG_REGISTRAR.register("music_interpolation_precision", MusicInterpolationPrecisionConfigEntry::new);
+  public static final RegistryDelegate<AudioDeviceConfig> AUDIO_DEVICE_CONFIG = CONFIG_REGISTRAR.register("audio_device", AudioDeviceConfig::new);
+  public static final RegistryDelegate<MasterVolumeConfigEntry> MASTER_VOLUME_CONFIG = CONFIG_REGISTRAR.register("master_volume", MasterVolumeConfigEntry::new);
+  public static final RegistryDelegate<MusicVolumeConfigEntry> MUSIC_VOLUME_CONFIG = CONFIG_REGISTRAR.register("music_volume", MusicVolumeConfigEntry::new);
+  public static final RegistryDelegate<SfxVolumeConfigEntry> SFX_VOLUME_CONFIG = CONFIG_REGISTRAR.register("sfx_volume", SfxVolumeConfigEntry::new);
+  public static final RegistryDelegate<FmvVolumeConfigEntry> FMV_VOLUME_CONFIG = CONFIG_REGISTRAR.register("fmv_volume", FmvVolumeConfigEntry::new);
+  public static final RegistryDelegate<MusicInterpolationPrecisionConfigEntry> MUSIC_INTERPOLATION_PRECISION_CONFIG = CONFIG_REGISTRAR.register("music_interpolation_precision", MusicInterpolationPrecisionConfigEntry::new);
   public static final RegistryDelegate<MusicPitchResolutionConfigEntry> MUSIC_PITCH_RESOLUTION_CONFIG = CONFIG_REGISTRAR.register("music_pitch_resolution", MusicPitchResolutionConfigEntry::new);
   public static final RegistryDelegate<MusicSampleRateConfigEntry> MUSIC_SAMPLE_RATE_CONFIG = CONFIG_REGISTRAR.register("music_sample_rate", MusicSampleRateConfigEntry::new);
   public static final RegistryDelegate<MusicEffectsOverTimeGranularityConfigEntry> MUSIC_EFFECTS_OVER_TIME_GRANULARITY_CONFIG = CONFIG_REGISTRAR.register("music_effects_over_time_granularity", MusicEffectsOverTimeGranularityConfigEntry::new);
@@ -196,6 +202,7 @@ public class CoreMod {
   public static final RegistryDelegate<ConfigEntry<Void>> DRAGOON_ADDITION_GROUP_CONFIG = register("dragoon_addition_group", DragoonAdditionGroupConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionModeConfigEntry> DRAGOON_ADDITION_MODE_CONFIG = register("dragoon_addition_mode", DragoonAdditionModeConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionDifficultyConfigEntry> DRAGOON_ADDITION_DIFFICULTY_CONFIG = register("dragoon_addition_difficulty", DragoonAdditionDifficultyConfigEntry::new);
+  public static final RegistryDelegate<IconSetConfigEntry> ICON_SET = CONFIG_REGISTRAR.register("icon_set", IconSetConfigEntry::new);
 
   public static final Formula<Integer, Integer> PHYSICAL_DAMAGE_FORMULA = Formula.make(PhysicalDamageFormula::calculatePhysicalDamage, builder -> builder
     .then(PhysicalDamageFormula::applyElementalInteractions)

@@ -28,7 +28,7 @@ import static legend.game.Scus94491BpeSegment_8002.EQUIPMENT_MAX_AMOUNT;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.getFirstIndexOfInventoryEntry;
 import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
-import static legend.game.Scus94491BpeSegment_8002.menuItemComparator;
+import static legend.game.Scus94491BpeSegment_8002.menuItemIconComparator;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.sortEquipmentInventory;
 import static legend.game.Scus94491BpeSegment_8002.sortItemInventory;
@@ -38,7 +38,7 @@ public class ItemListScreen extends MenuScreen {
   private final Runnable unload;
 
   private final ItemList<Item> itemList = new ItemList<>();
-  private final ItemList<Equipment> equipmentList = new ItemList<>();
+  private final ItemList<Equipment> equipmentList = new ItemList<>(i -> gameState_800babc8.equipment_1e8.size());
   private final Label description = new Label("");
 
   public ItemListScreen(final Runnable unload) {
@@ -63,6 +63,7 @@ public class ItemListScreen extends MenuScreen {
     });
     this.itemList.onPressedThisFrame(inputAction -> {
       if(inputAction == InputAction.DPAD_RIGHT || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_RIGHT) {
+        playMenuSound(1);
         this.setFocus(this.equipmentList);
         this.equipmentList.select(this.itemList.getSelectedIndex());
         return InputPropagation.HANDLED;
@@ -80,6 +81,7 @@ public class ItemListScreen extends MenuScreen {
     });
     this.equipmentList.onPressedThisFrame(inputAction -> {
       if(inputAction == InputAction.DPAD_LEFT || inputAction == InputAction.JOYSTICK_LEFT_BUTTON_LEFT) {
+        playMenuSound(1);
         this.setFocus(this.itemList);
         this.itemList.select(this.equipmentList.getSelectedIndex());
         return InputPropagation.HANDLED;
@@ -159,7 +161,7 @@ public class ItemListScreen extends MenuScreen {
       if(getInventoryEntryQuantity(entry) < 1) {
         list.remove(list.getSelectedItem());
       } else {
-        list.updateMaxLabel();
+        //list.updateMaxLabel();
       }
 
       list.refreshList();
@@ -184,8 +186,8 @@ public class ItemListScreen extends MenuScreen {
 
   private void menuSort() {
     playMenuSound(2);
-    this.itemList.sort(menuItemComparator());
-    this.equipmentList.sort(menuItemComparator());
+    this.itemList.sort(menuItemIconComparator());
+    this.equipmentList.sort(menuItemIconComparator());
     sortItemInventory();
     sortEquipmentInventory(0);
   }

@@ -36,8 +36,9 @@ import legend.game.types.TextboxState;
 import legend.game.types.TmdAnimationFile;
 import legend.game.types.Translucency;
 import legend.game.unpacker.FileData;
-import legend.game.unpacker.Unpacker;
+import legend.game.unpacker.Loader;
 import org.joml.Math;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -175,7 +176,7 @@ public class WMap extends EngineState {
     UNUSED_1(1),
     LOAD_MODEL_2(2),
     INIT_PLAYER_MODEL_3(3),
-    NOOP_4(4),
+    WAIT_FOR_MODEL_TO_LOAD_4(4),
     RENDER_5(5),
     NOOP_6(6),
     UNUSED_DEALLOC_7(7),
@@ -362,7 +363,7 @@ public class WMap extends EngineState {
 
   private WmapPromptPopup wmapLocationPromptPopup;
   private WmapPromptPopup coolonPromptPopup;
-  private final MV fastTravelTransforms = new MV();
+  private final Matrix4f fastTravelTransforms = new Matrix4f();
   /** Temporary solution until text refactoring */
   private final String[] startLabelNames = new String[8];
   private final float[] startLabelXs = new float[8];
@@ -454,7 +455,9 @@ public class WMap extends EngineState {
           renderText(this.coolonWarpDestLabelName, this.coolonWarpDestLabelX, this.coolonWarpDestLabelY, UI_WHITE_SHADOWED);
         }
 
-        this.handleMapTransitions();
+        if(this.modelAndAnimData_800c66a8.fastTravelTransitionMode_250 == FastTravelTransitionMode.NONE_0) {
+          this.handleMapTransitions();
+        }
       }
     }
   }
@@ -489,7 +492,7 @@ public class WMap extends EngineState {
   /** Checks for triangle press and transitions into the inv screen */
   @Method(0x800cc83cL)
   private void handleInventoryTransition() {
-    if(Unpacker.getLoadingFileCount() == 0) {
+    if(Loader.getLoadingFileCount() == 0) {
       if(this.tickMainMenuOpenTransition_800c6690 == 0) {
         final WMapCameraAndLights19c0 cameraAndLights = this.wmapCameraAndLights19c0_800c66b0;
 
@@ -828,12 +831,16 @@ public class WMap extends EngineState {
           TmdObjLoader.fromModel("WmapEntityModel (index " + i + ')', this.modelAndAnimData_800c66a8.models_0c[i]);
         }
 
-        this.playerState_800c669c = PlayerState.NOOP_4;
+        this.playerState_800c669c = PlayerState.WAIT_FOR_MODEL_TO_LOAD_4;
       }
 
-      case NOOP_4 -> {
+      case WAIT_FOR_MODEL_TO_LOAD_4 -> {
         if(loadWait-- > 0) break;
-        this.playerState_800c669c = PlayerState.RENDER_5;
+
+        //Prevents queen fury shadow renderer rendering before map model loads GH#2077
+        if((this.filesLoadedFlags_800c66b8.get() & 0x4) != 0x0) {
+          this.playerState_800c669c = PlayerState.RENDER_5;
+        }
       }
 
       case RENDER_5 -> this.renderPlayer();
@@ -2611,7 +2618,7 @@ public class WMap extends EngineState {
         }
 
         //LAB_800db698
-        this.lerp(modelAndAnimData.currPlayerPos_94, coolonWarpDest_800ef228[modelAndAnimData.coolonOriginIndex_221].destPosition_00, coolonWarpDest_800ef228[modelAndAnimData.coolonDestIndex_222].destPosition_00, modelAndAnimData.coolonTravelAnimationTick_218 / (36.0f / vsyncMode_8007a3b8));
+        coolonWarpDest_800ef228[modelAndAnimData.coolonOriginIndex_221].destPosition_00.lerp(coolonWarpDest_800ef228[modelAndAnimData.coolonDestIndex_222].destPosition_00, modelAndAnimData.coolonTravelAnimationTick_218 / (36.0f / vsyncMode_8007a3b8), modelAndAnimData.currPlayerPos_94);
 
         modelAndAnimData.models_0c[2].coord2_14.transforms.scale.x -= 0.041503906f / (3.0f / vsyncMode_8007a3b8); // ~1/24
 
@@ -2854,22 +2861,6 @@ public class WMap extends EngineState {
       }
     }
     //LAB_800dcc0c
-  }
-
-  @Method(0x800dcc20L)
-  private void lerp(final Vector3f out, final Vector3f a, final Vector3f b, final float ratio) {
-    if(ratio == 0.0f) {
-      out.set(a);
-    } else if(ratio == 1.0f) {
-      out.set(b);
-    } else {
-      //LAB_800dcca4
-      out.x = (b.x - a.x) * ratio + a.x;
-      out.y = (b.y - a.y) * ratio + a.y;
-      out.z = (b.z - a.z) * ratio + a.z;
-    }
-
-    //LAB_800dcddc
   }
 
   @Method(0x800dcde8L)
@@ -3221,14 +3212,7 @@ public class WMap extends EngineState {
     modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.coord.transfer.set(modelAndAnimData.coord2_34.coord.transfer);
 
     if(modelAndAnimData.fastTravelTransitionMode_250 == FastTravelTransitionMode.NONE_0) {
-      final float cwAngle = modelAndAnimData.playerRotation_a4.y - modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.transforms.rotate.y;
-      final float ccwAngle = modelAndAnimData.playerRotation_a4.y - (modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.transforms.rotate.y - MathHelper.TWO_PI);
-      final float finalAngle;
-      if(Math.abs(ccwAngle) < Math.abs(cwAngle)) {
-        finalAngle = ccwAngle;
-      } else {
-        finalAngle = cwAngle;
-      }
+      final float finalAngle = MathHelper.closestAngle(modelAndAnimData.playerRotation_a4.y, modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.transforms.rotate.y);
 
       //LAB_800e15e4
       modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.transforms.rotate.y += finalAngle / 2.0f / (3.0f / vsyncMode_8007a3b8);
@@ -3485,8 +3469,7 @@ public class WMap extends EngineState {
   /** Some kind of full-screen effect during the Wingly teleportation between Aglis and Zenebatos */
   @Method(0x800e3304L)
   private void renderFastTravelScreenDistortionEffect() {
-    this.fastTravelTransforms.transfer.set(0.0f, 0.0f, 20.0f);
-    this.fastTravelTransforms.scaling(320.0f, 240.0f, 1.0f);
+    this.fastTravelTransforms.scaling(320.0f * RENDERER.getRenderAspectRatio() / RENDERER.getNativeAspectRatio(), 240.0f, 1.0f);
 
     RENDERER.queueOrthoModel(RENDERER.renderBufferQuad, this.fastTravelTransforms, QueuedModelStandard.class)
       .texture(RENDERER.getLastFrame())
@@ -3496,7 +3479,7 @@ public class WMap extends EngineState {
   @Method(0x800e367cL)
   private void handleEncounters(final float encounterRateMultiplier) {
     if(
-      Unpacker.getLoadingFileCount() != 0 ||
+      Loader.getLoadingFileCount() != 0 ||
         this.worldMapState_800c6698 != WorldMapState.RENDER_5 ||
         this.playerState_800c669c != PlayerState.RENDER_5 ||
         this.modelAndAnimData_800c66a8.modelIndex_1e4 >= 2
@@ -3872,7 +3855,7 @@ public class WMap extends EngineState {
 
   @Method(0x800e5150L)
   private void handleMapTransitions() {
-    if(Unpacker.getLoadingFileCount() != 0 || this.tickMainMenuOpenTransition_800c6690 != 0) {
+    if(Loader.getLoadingFileCount() != 0 || this.tickMainMenuOpenTransition_800c6690 != 0) {
       return;
     }
 
@@ -4862,7 +4845,7 @@ public class WMap extends EngineState {
   @Method(0x800e9104L)
   private void processInput() {
     //LAB_800e912c
-    if(Unpacker.getLoadingFileCount() != 0 || this.modelAndAnimData_800c66a8.fadeAnimationType_05 != FadeAnimationType.NONE_0) {
+    if(Loader.getLoadingFileCount() != 0 || this.modelAndAnimData_800c66a8.fadeAnimationType_05 != FadeAnimationType.NONE_0) {
       return;
     }
 

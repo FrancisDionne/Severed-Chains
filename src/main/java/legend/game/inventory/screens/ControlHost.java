@@ -84,6 +84,14 @@ public abstract class ControlHost implements Iterable<Control> {
     return this.controls.iterator();
   }
 
+  protected List<Control> getControls() {
+    return this.controls;
+  }
+
+  protected Control getControl(final int index) {
+    return index > -1 && index < this.controls.size() ? this.controls.get(index) : null;
+  }
+
   protected Control findControlAt(final int x, final int y) {
     return this.findControlAt(x, y, false);
   }
@@ -144,6 +152,10 @@ public abstract class ControlHost implements Iterable<Control> {
   }
 
   protected InputPropagation mouseScroll(final int deltaX, final int deltaY) {
+    if(CONFIG.getConfig(CoreMod.DISABLE_MOUSE_INPUT_CONFIG.get()) && !Input.getController().getGuid().isEmpty()) {
+      return InputPropagation.HANDLED;
+    }
+
     final Control control = this.findControlAt(this.mouseX, this.mouseY);
 
     if(control != null && !control.isDisabled()) {
@@ -154,6 +166,10 @@ public abstract class ControlHost implements Iterable<Control> {
   }
 
   protected InputPropagation mouseScrollHighRes(final double deltaX, final double deltaY) {
+    if(CONFIG.getConfig(CoreMod.DISABLE_MOUSE_INPUT_CONFIG.get()) && !Input.getController().getGuid().isEmpty()) {
+      return InputPropagation.HANDLED;
+    }
+
     final Control control = this.findControlAt(this.mouseX, this.mouseY);
 
     if(control != null && !control.isDisabled()) {

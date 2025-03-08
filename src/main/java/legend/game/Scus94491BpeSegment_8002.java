@@ -68,7 +68,7 @@ import legend.game.types.Translucency;
 import legend.game.types.UiPart;
 import legend.game.types.UiType;
 import legend.game.unpacker.FileData;
-import legend.game.unpacker.Unpacker;
+import legend.game.unpacker.Loader;
 import legend.lodmod.LodMod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,6 +87,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -121,6 +122,7 @@ import static legend.game.Scus94491BpeSegment.unloadSoundFile;
 import static legend.game.Scus94491BpeSegment_8003.GsInitCoordinate2;
 import static legend.game.Scus94491BpeSegment_8004.currentEngineState_8004dd04;
 import static legend.game.Scus94491BpeSegment_8004.engineState_8004dd20;
+import static legend.game.Scus94491BpeSegment_8004.renderMode;
 import static legend.game.Scus94491BpeSegment_8004.stopMusicSequence;
 import static legend.game.Scus94491BpeSegment_8005.collidedPrimitiveIndex_80052c38;
 import static legend.game.Scus94491BpeSegment_8005.digits_80052b40;
@@ -277,7 +279,7 @@ public final class Scus94491BpeSegment_8002 {
     final AtomicInteger count = new AtomicInteger(0);
 
     for(int monsterSlot = 0; monsterSlot < 4; monsterSlot++) {
-      if(Unpacker.exists(path + '/' + monsterSlot)) {
+      if(Loader.exists(path + '/' + monsterSlot)) {
         count.incrementAndGet();
       }
     }
@@ -287,7 +289,7 @@ public final class Scus94491BpeSegment_8002 {
       file.id_02 = -1;
       file.used_00 = false;
 
-      if(Unpacker.exists(path + '/' + monsterSlot)) {
+      if(Loader.exists(path + '/' + monsterSlot)) {
         final int finalMonsterSlot = monsterSlot;
         loadDir(path + '/' + monsterSlot, files -> {
           final int offset = soundbankOffset.getAndUpdate(val -> val + MathHelper.roundUp(files.get(3).size(), 0x10));
@@ -791,6 +793,7 @@ public final class Scus94491BpeSegment_8002 {
 
     renderablePtr_800bdc5c = null;
     resizeDisplay(384, 240);
+    renderMode = EngineState.RenderMode.LEGACY;
     textZ_800bdf00 = 33;
 
     whichMenu_800bdc38 = destMenu;
@@ -803,13 +806,6 @@ public final class Scus94491BpeSegment_8002 {
   public static void initInventoryMenu() {
     initMenu(WhichMenu.RENDER_NEW_MENU, () -> new MainMenuScreen(() -> {
       menuStack.popScreen();
-
-      if(whichMenu_800bdc38 == WhichMenu.QUIT) {
-        deallocateRenderables(0xff);
-        startFadeEffect(2, 10);
-        textZ_800bdf00 = 13;
-      }
-
       whichMenu_800bdc38 = WhichMenu.UNLOAD;
     }));
   }
@@ -1095,6 +1091,7 @@ public final class Scus94491BpeSegment_8002 {
     if(gameState_800babc8.equipment_1e8.size() >= EQUIPMENT_MAX_AMOUNT) {
       return false;
     }
+
     final GiveEquipmentEvent event = EVENTS.postEvent(new GiveEquipmentEvent(equipment, Collections.unmodifiableList(gameState_800babc8.equipment_1e8), 255));
 
     if(event.isCanceled() || event.givenEquipment.isEmpty()) {
@@ -1205,13 +1202,13 @@ public final class Scus94491BpeSegment_8002 {
 
   @Method(0x80023a2cL)
   public static <T extends InventoryEntry> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items, final int count) {
-    display.sort(menuItemComparator());
+    display.sort(menuItemIconComparator());
     sortItems(items);
   }
 
   public static <T extends InventoryEntry> List<T> sortItems(final List<T> list) {
     final Comparator<T> comparator = Comparator
-      .comparingInt((T item) -> item.getIcon())
+      .comparingInt((T item) -> item.getIcon().resolve().icon)
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
     return list.stream().sorted(comparator).collect(Collectors.toList());
   }
@@ -1243,9 +1240,9 @@ public final class Scus94491BpeSegment_8002 {
     return list.stream().sorted(comparator).collect(Collectors.toList());
   }
 
-  public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemComparator() {
+  public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemIconComparator() {
     return Comparator
-      .comparingInt((MenuEntryStruct04<T> item) -> item.getIcon())
+      .comparingInt((MenuEntryStruct04<T> item) -> item.getIcon().resolve().icon)
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
   }
 
@@ -1444,7 +1441,7 @@ public final class Scus94491BpeSegment_8002 {
         final RenderableMetrics14[] metricses = entries[renderable.glyph_04].metrics_00();
 
         //LAB_80023e94
-        for(int metricsIndex = metricses.length - 1; metricsIndex >= 0; metricsIndex--) {
+        for(int metricsIndex = Math.min(metricses.length, renderable.metricsCount) - 1; metricsIndex >= 0; metricsIndex--) {
           final RenderableMetrics14 metrics = metricses[metricsIndex];
 
           final float x1;
@@ -3344,10 +3341,11 @@ public final class Scus94491BpeSegment_8002 {
           final int x = (int)(textboxText._18 + chr.x_00 * 9 - centreScreenX_1f8003dc - nudgeX);
           final int y;
 
+          // I adjusted the texture so that glyphs start 1 pixel lower to fix bleeding - subtract 1 here to compensate
           if((textboxText.flags_08 & TextboxText84.HAS_NAME) != 0 && i < textboxText.chars_1c) {
-            y = (int)(textboxText._1a + chr.y_02 * 12 - centreScreenY_1f8003de - scrollY);
+            y = (int)(textboxText._1a + chr.y_02 * 12 - centreScreenY_1f8003de - scrollY) - 1;
           } else {
-            y = (int)(textboxText._1a + chr.y_02 * 12 - centreScreenY_1f8003de - scrollY - textboxText.scrollAmount_2c);
+            y = (int)(textboxText._1a + chr.y_02 * 12 - centreScreenY_1f8003de - scrollY - textboxText.scrollAmount_2c) - 1;
           }
 
           //LAB_80028544
@@ -3360,7 +3358,7 @@ public final class Scus94491BpeSegment_8002 {
             .texture(RENDERER.textTexture)
             .vertices((LodString.fromLodChar(chr.char_06) - 33) * 4, 4)
             .monochrome(0.0f)
-            .scissor(GPU.getOffsetX() + x, GPU.getOffsetY() + y, 8, height);
+            .scissor(GPU.getOffsetX() + x, GPU.getOffsetY() + y + 2, 8, height);
 
           textboxText.transforms.transfer.x--;
           textboxText.transforms.transfer.y--;
@@ -3369,7 +3367,7 @@ public final class Scus94491BpeSegment_8002 {
             .texture(RENDERER.textTexture)
             .vertices((LodString.fromLodChar(chr.char_06) - 33) * 4, 4)
             .colour(chr.colour_04.r / 255.0f, chr.colour_04.g / 255.0f, chr.colour_04.b / 255.0f)
-            .scissor(GPU.getOffsetX() + x, GPU.getOffsetY() + y, 8, height);
+            .scissor(GPU.getOffsetX() + x, GPU.getOffsetY() + y + 1, 8, height);
         }
 
         nudgeX += getCharWidth(chr.char_06);
@@ -3480,6 +3478,11 @@ public final class Scus94491BpeSegment_8002 {
 
   @Method(0x80029300L)
   public static void renderText(final String text, final float originX, final float originY, final FontOptions options) {
+    renderText(text, originX, originY, options, null);
+  }
+
+  @Method(0x80029300L)
+  public static void renderText(final String text, final float originX, final float originY, final FontOptions options, @Nullable final Consumer<QueuedModelStandard> queueCallback) {
     final float height = 12.0f * options.getSize();
     final float trim = MathHelper.clamp(options.getTrim() * options.getSize(), -height, height);
 
@@ -3492,7 +3495,8 @@ public final class Scus94491BpeSegment_8002 {
         case RIGHT -> originX - lineWidth(text, 0) * options.getSize();
       };
 
-      float y = originY;
+      // I adjusted the texture so that glyphs start 1 pixel lower to fix bleeding - subtract 1 here to compensate
+      float y = originY - 1;
       float glyphNudge = 0.0f;
 
       for(int charIndex = 0; charIndex < text.length(); charIndex++) {
@@ -3532,10 +3536,14 @@ public final class Scus94491BpeSegment_8002 {
 
             if(trim != 0) {
               if(trim < 0) {
-                model.scissor(0, (int)y, displayWidth_1f8003e0, (int)(height + trim));
+                model.scissor(0, (int)y + 1, displayWidth_1f8003e0, (int)(height + trim));
               } else {
-                model.scissor(0, (int)(y - trim), displayWidth_1f8003e0, (int)height);
+                model.scissor(0, (int)(y + 1 - trim), displayWidth_1f8003e0, (int)height);
               }
+            }
+
+            if(queueCallback != null) {
+              queueCallback.accept(model);
             }
           }
         }
@@ -4171,7 +4179,7 @@ public final class Scus94491BpeSegment_8002 {
       LOGGER.info("Playing XA archive %d file %d", xaArchiveIndex, xaFileIndex);
 
       //LAB_8002c448
-      AUDIO_THREAD.loadXa(Unpacker.loadFile("XA/LODXA0%d.XA/%d.opus".formatted(xaArchiveIndex, xaFileIndex)));
+      AUDIO_THREAD.loadXa(Loader.loadFile("XA/LODXA0%d.XA/%d.opus".formatted(xaArchiveIndex, xaFileIndex)));
       _800bf0cf = 4;
     }
 

@@ -23,6 +23,7 @@ lod_core.ui.mods.wrong_version=Wrong version: %s
 lod_core.ui.mods.hotkeys=%s Help
 
 lod_core.ui.options.help_hotkey=%s Help
+lod_core.ui.options.error=Error
 
 lod_core.ui.links.hotkeys=%s Open Link %s View Link %s Back
 lod_core.ui.links.discord=Legend of Dragoon & Severed Chains Discord Community
@@ -66,7 +67,10 @@ lod_core.config.resolution._8K=8K
 lod_core.config.resolution.NATIVE=Native (window size)
 lod_core.config.monitor.label=Monitor
 lod_core.config.audio_device.label=Audio Device
-lod_core.config.music_volume.label=Music Volume
+lod_core.config.master_volume.label=Volume - All
+lod_core.config.music_volume.label=Volume - Music
+lod_core.config.sfx_volume.label=Volume - SFX
+lod_core.config.fmv_volume.label=Volume - FMV
 lod_core.config.music_interpolation_precision.label = Interpolation Precision
 lod_core.config.music_interpolation_precision.Quarter = Quarter
 lod_core.config.music_interpolation_precision.Half = Half
@@ -157,6 +161,10 @@ lod_core.config.footer_action_color.FOOTER_GREEN=Green
 lod_core.config.footer_action_color.FOOTER_LIME=Lime
 lod_core.config.footer_action_color.FOOTER_YELLOW=Yellow
 lod_core.config.footer_action_color.FOOTER_ORANGE=Orange
+lod_core.config.icon_set.label=Icon Set
+lod_core.config.icon_set.help=Enhanced changes some item and equipment icons to icons that were cut from the game
+lod_core.config.icon_set.ENHANCED=Enhanced
+lod_core.config.icon_set.RETAIL=Retail
 
 # Addition Settings
 lod_core.config.addition_settings.label=Additions

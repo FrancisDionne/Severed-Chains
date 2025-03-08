@@ -96,7 +96,7 @@ public class BattleHud {
     "Albert", "Meru", "Kongol", "Miranda", "DivinDGDart",
   };
   /** Poisoned, Dispirited, Weapon blocked, Stunned, Fearful, Confused, Bewitched, Petrified */
-  private static final String[] ailments_800fb3a0 = {
+  public static final String[] ailments_800fb3a0 = {
     "Poisoned", "Dispirited", "Weapon blocked", "Stunned", "Fearful",
     "Confused", "Bewitched", "Petrified",
   };
@@ -1122,9 +1122,10 @@ public class BattleHud {
             final float y;
             final float z;
             if(bent instanceof final MonsterBattleEntity monster) {
-              x = -monster.targetArrowPos_78.x * 100.0f;
+              // Dunno why these are backwards
+              x = -monster.targetArrowPos_78.z * 100.0f;
               y = -monster.targetArrowPos_78.y * 100.0f;
-              z = -monster.targetArrowPos_78.z * 100.0f;
+              z = -monster.targetArrowPos_78.x * 100.0f;
             } else {
               //LAB_800f3a3c
               x = 0;

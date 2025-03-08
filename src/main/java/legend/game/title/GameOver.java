@@ -13,7 +13,7 @@ import legend.game.input.Input;
 import legend.game.input.InputAction;
 import legend.game.types.McqHeader;
 import legend.game.unpacker.FileData;
-import legend.game.unpacker.Unpacker;
+import legend.game.unpacker.Loader;
 
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.RENDERER;
@@ -34,8 +34,8 @@ public class GameOver extends EngineState {
   private final MV transforms = new MV();
 
   @Override
-  public boolean allowsWidescreen() {
-    return false;
+  public RenderMode getRenderMode() {
+    return RenderMode.LEGACY;
   }
 
   @Method(0x800c7558L)
@@ -65,7 +65,7 @@ public class GameOver extends EngineState {
   public void tick() {
     switch(this.loadingStage) {
       case 0 -> {
-        if(Unpacker.getLoadingFileCount() == 0) {
+        if(Loader.getLoadingFileCount() == 0) {
           resetSubmapToNewGame();
           resizeDisplay(640, 240);
           this.loadingStage = 1;
