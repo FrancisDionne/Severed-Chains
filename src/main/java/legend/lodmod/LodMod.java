@@ -1,6 +1,16 @@
 package legend.lodmod;
 
 import legend.core.GameEngine;
+import legend.core.platform.input.AxisInputActivation;
+import legend.core.platform.input.ButtonInputActivation;
+import legend.core.platform.input.InputAction;
+import legend.core.platform.input.InputActionRegistryEvent;
+import legend.core.platform.input.InputAxis;
+import legend.core.platform.input.InputAxisDirection;
+import legend.core.platform.input.InputButton;
+import legend.core.platform.input.InputKey;
+import legend.core.platform.input.KeyInputActivation;
+import legend.core.platform.input.ScancodeInputActivation;
 import legend.game.characters.Element;
 import legend.game.characters.ElementRegistryEvent;
 import legend.game.characters.FractionalStat;
@@ -21,9 +31,13 @@ import legend.game.combat.bent.BattleEntityTypeRegistryEvent;
 import legend.game.combat.deff.RegisterDeffsEvent;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.EquipmentRegistryEvent;
+import legend.game.inventory.IconMapEvent;
+import legend.game.inventory.IconSet;
+import legend.game.inventory.ItemIcon;
 import legend.game.inventory.ItemRegistryEvent;
 import legend.game.inventory.ShopRegistryEvent;
 import legend.game.inventory.SpellRegistryEvent;
+import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.coremod.elements.DarkElement;
 import legend.game.modding.coremod.elements.DivineElement;
 import legend.game.modding.coremod.elements.EarthElement;
@@ -35,15 +49,12 @@ import legend.game.modding.coremod.elements.WaterElement;
 import legend.game.modding.coremod.elements.WindElement;
 import legend.game.modding.events.battle.RegisterBattleEntityStatsEvent;
 import legend.game.modding.events.gamestate.NewGameEvent;
+import legend.game.modding.events.input.RegisterDefaultInputBindingsEvent;
 import legend.game.modding.events.inventory.GatherAttackItemsEvent;
 import legend.game.modding.events.inventory.GatherRecoveryItemsEvent;
 import legend.game.types.EquipmentSlot;
 import legend.game.types.SpellStats0c;
-import legend.game.unpacker.Unpacker;
-import legend.lodmod.equipment.DestroyerMaceEquipment;
-import legend.lodmod.equipment.DetonateArrowEquipment;
-import legend.lodmod.equipment.UltimateWargodEquipment;
-import legend.lodmod.equipment.WargodCallingEquipment;
+import legend.game.unpacker.Loader;
 import org.legendofdragoon.modloader.Mod;
 import org.legendofdragoon.modloader.events.EventListener;
 import org.legendofdragoon.modloader.registries.Registrar;
@@ -52,7 +63,7 @@ import org.legendofdragoon.modloader.registries.RegistryId;
 
 import java.util.Map;
 
-import static legend.game.SItem.itemPrices_80114310;
+import static legend.core.GameEngine.CONFIG;
 import static legend.game.Scus94491BpeSegment_8005.spellCombatDescriptions_80052018;
 import static legend.game.Scus94491BpeSegment_8005.spells_80052734;
 import static legend.game.combat.Battle.spellStats_800fa0b8;
@@ -66,6 +77,37 @@ public class LodMod {
   public static RegistryId id(final String entryId) {
     return new RegistryId(MOD_ID, entryId);
   }
+
+  private static final Registrar<InputAction, InputActionRegistryEvent> INPUT_ACTION_REGISTRAR = new Registrar<>(GameEngine.REGISTRIES.inputActions, MOD_ID);
+
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_GENERAL_OPEN_INVENTORY = INPUT_ACTION_REGISTRAR.register("general_open_inventory", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_GENERAL_MOVE_UP = INPUT_ACTION_REGISTRAR.register("general_move_up", InputAction.make().visible().editable().useMovementDeadzone().build());
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_GENERAL_MOVE_DOWN = INPUT_ACTION_REGISTRAR.register("general_move_down", InputAction.make().visible().editable().useMovementDeadzone().build());
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_GENERAL_MOVE_LEFT = INPUT_ACTION_REGISTRAR.register("general_move_left", InputAction.make().visible().editable().useMovementDeadzone().build());
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_GENERAL_MOVE_RIGHT = INPUT_ACTION_REGISTRAR.register("general_move_right", InputAction.make().visible().editable().useMovementDeadzone().build());
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_GENERAL_RUN = INPUT_ACTION_REGISTRAR.register("general_run", InputAction::editable);
+
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_WMAP_ROTATE_RIGHT = INPUT_ACTION_REGISTRAR.register("wmap_rotate_right", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_WMAP_ROTATE_LEFT = INPUT_ACTION_REGISTRAR.register("wmap_rotate_left", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_WMAP_ZOOM_OUT = INPUT_ACTION_REGISTRAR.register("wmap_zoom_out", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_WMAP_ZOOM_IN = INPUT_ACTION_REGISTRAR.register("wmap_zoom_in", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_WMAP_COOLON = INPUT_ACTION_REGISTRAR.register("wmap_coolon", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_WMAP_QUEEN_FURY = INPUT_ACTION_REGISTRAR.register("wmap_queen_fury", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_WMAP_SERVICES = INPUT_ACTION_REGISTRAR.register("wmap_services", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_WMAP_DESTINATIONS = INPUT_ACTION_REGISTRAR.register("wmap_destinations", InputAction::editable);
+
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_SMAP_INTERACT = INPUT_ACTION_REGISTRAR.register("smap_interact", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_SMAP_TOGGLE_INDICATORS = INPUT_ACTION_REGISTRAR.register("smap_toggle_indicators", InputAction::editable);
+
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_ATTACK = INPUT_ACTION_REGISTRAR.register("bttl_attack", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_COUNTER = INPUT_ACTION_REGISTRAR.register("bttl_counter", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_ROTATE_CAMERA = INPUT_ACTION_REGISTRAR.register("bttl_rotate_camera", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_ADDITIONS = INPUT_ACTION_REGISTRAR.register("bttl_additions", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_TRANSFORM = INPUT_ACTION_REGISTRAR.register("bttl_transform", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_SPECIAL = INPUT_ACTION_REGISTRAR.register("bttl_special", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_ESCAPE = INPUT_ACTION_REGISTRAR.register("bttl_escape", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_GUARD = INPUT_ACTION_REGISTRAR.register("bttl_guard", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_ITEMS = INPUT_ACTION_REGISTRAR.register("bttl_items", InputAction::editable);
 
   private static final Registrar<StatType<?>, StatTypeRegistryEvent> STAT_TYPE_REGISTRAR = new Registrar<>(GameEngine.REGISTRIES.statTypes, MOD_ID);
   public static final RegistryDelegate<StatType<VitalsStat>> HP_STAT = STAT_TYPE_REGISTRAR.register("hp", () -> new StatType<>(VitalsStat::new));
@@ -148,25 +190,77 @@ public class LodMod {
   };
 
   @EventListener
+  public static void registerInputActions(final InputActionRegistryEvent event) {
+    INPUT_ACTION_REGISTRAR.registryEvent(event);
+  }
+
+  @EventListener
+  public static void registerDefaultInputBindings(final RegisterDefaultInputBindingsEvent event) {
+    event
+      .add(INPUT_ACTION_GENERAL_OPEN_INVENTORY.get(), new ScancodeInputActivation(InputKey.E))
+      .add(INPUT_ACTION_GENERAL_OPEN_INVENTORY.get(), new ButtonInputActivation(InputButton.Y))
+
+      .add(INPUT_ACTION_GENERAL_MOVE_UP.get(), new ButtonInputActivation(InputButton.DPAD_UP))
+      .add(INPUT_ACTION_GENERAL_MOVE_UP.get(), new AxisInputActivation(InputAxis.LEFT_Y, InputAxisDirection.NEGATIVE))
+      .add(INPUT_ACTION_GENERAL_MOVE_UP.get(), new ScancodeInputActivation(InputKey.UP))
+      .add(INPUT_ACTION_GENERAL_MOVE_UP.get(), new ScancodeInputActivation(InputKey.W))
+      .add(INPUT_ACTION_GENERAL_MOVE_DOWN.get(), new ButtonInputActivation(InputButton.DPAD_DOWN))
+      .add(INPUT_ACTION_GENERAL_MOVE_DOWN.get(), new AxisInputActivation(InputAxis.LEFT_Y, InputAxisDirection.POSITIVE))
+      .add(INPUT_ACTION_GENERAL_MOVE_DOWN.get(), new ScancodeInputActivation(InputKey.DOWN))
+      .add(INPUT_ACTION_GENERAL_MOVE_DOWN.get(), new ScancodeInputActivation(InputKey.S))
+      .add(INPUT_ACTION_GENERAL_MOVE_LEFT.get(), new ButtonInputActivation(InputButton.DPAD_LEFT))
+      .add(INPUT_ACTION_GENERAL_MOVE_LEFT.get(), new AxisInputActivation(InputAxis.LEFT_X, InputAxisDirection.NEGATIVE))
+      .add(INPUT_ACTION_GENERAL_MOVE_LEFT.get(), new ScancodeInputActivation(InputKey.LEFT))
+      .add(INPUT_ACTION_GENERAL_MOVE_LEFT.get(), new ScancodeInputActivation(InputKey.A))
+      .add(INPUT_ACTION_GENERAL_MOVE_RIGHT.get(), new ButtonInputActivation(InputButton.DPAD_RIGHT))
+      .add(INPUT_ACTION_GENERAL_MOVE_RIGHT.get(), new AxisInputActivation(InputAxis.LEFT_X, InputAxisDirection.POSITIVE))
+      .add(INPUT_ACTION_GENERAL_MOVE_RIGHT.get(), new ScancodeInputActivation(InputKey.RIGHT))
+      .add(INPUT_ACTION_GENERAL_MOVE_RIGHT.get(), new ScancodeInputActivation(InputKey.D))
+      .add(INPUT_ACTION_GENERAL_RUN.get(), new ScancodeInputActivation(InputKey.LEFT_SHIFT))
+      .add(INPUT_ACTION_GENERAL_RUN.get(), new ButtonInputActivation(InputButton.B))
+
+      .add(INPUT_ACTION_WMAP_ROTATE_LEFT.get(), new ScancodeInputActivation(InputKey.R))
+      .add(INPUT_ACTION_WMAP_ROTATE_LEFT.get(), new ButtonInputActivation(InputButton.LEFT_BUMPER))
+      .add(INPUT_ACTION_WMAP_ROTATE_RIGHT.get(), new ScancodeInputActivation(InputKey.T))
+      .add(INPUT_ACTION_WMAP_ROTATE_RIGHT.get(), new ButtonInputActivation(InputButton.RIGHT_BUMPER))
+      .add(INPUT_ACTION_WMAP_ZOOM_OUT.get(), new ScancodeInputActivation(InputKey.Z))
+      .add(INPUT_ACTION_WMAP_ZOOM_OUT.get(), new AxisInputActivation(InputAxis.LEFT_TRIGGER, InputAxisDirection.POSITIVE))
+      .add(INPUT_ACTION_WMAP_ZOOM_IN.get(), new ScancodeInputActivation(InputKey.X))
+      .add(INPUT_ACTION_WMAP_ZOOM_IN.get(), new AxisInputActivation(InputAxis.RIGHT_TRIGGER, InputAxisDirection.POSITIVE))
+      .add(INPUT_ACTION_WMAP_COOLON.get(), new ScancodeInputActivation(InputKey.Q))
+      .add(INPUT_ACTION_WMAP_COOLON.get(), new ButtonInputActivation(InputButton.X))
+      .add(INPUT_ACTION_WMAP_QUEEN_FURY.get(), new ScancodeInputActivation(InputKey.Q))
+      .add(INPUT_ACTION_WMAP_QUEEN_FURY.get(), new ButtonInputActivation(InputButton.X))
+      .add(INPUT_ACTION_WMAP_SERVICES.get(), new ScancodeInputActivation(InputKey.Q))
+      .add(INPUT_ACTION_WMAP_SERVICES.get(), new ButtonInputActivation(InputButton.X))
+      .add(INPUT_ACTION_WMAP_DESTINATIONS.get(), new KeyInputActivation(InputKey.L))
+      .add(INPUT_ACTION_WMAP_DESTINATIONS.get(), new ButtonInputActivation(InputButton.START))
+
+      .add(INPUT_ACTION_SMAP_INTERACT.get(), new ScancodeInputActivation(InputKey.SPACE))
+      .add(INPUT_ACTION_SMAP_INTERACT.get(), new ScancodeInputActivation(InputKey.RETURN))
+      .add(INPUT_ACTION_SMAP_INTERACT.get(), new ButtonInputActivation(InputButton.A))
+      .add(INPUT_ACTION_SMAP_TOGGLE_INDICATORS.get(), new ScancodeInputActivation(InputKey.Q))
+      .add(INPUT_ACTION_SMAP_TOGGLE_INDICATORS.get(), new ButtonInputActivation(InputButton.RIGHT_BUMPER))
+
+      .add(INPUT_ACTION_BTTL_ATTACK.get(), new ScancodeInputActivation(InputKey.SPACE))
+      .add(INPUT_ACTION_BTTL_ATTACK.get(), new ButtonInputActivation(InputButton.A))
+      .add(INPUT_ACTION_BTTL_COUNTER.get(), new ScancodeInputActivation(InputKey.LEFT_SHIFT))
+      .add(INPUT_ACTION_BTTL_COUNTER.get(), new ButtonInputActivation(InputButton.B))
+      .add(INPUT_ACTION_BTTL_ROTATE_CAMERA.get(), new ScancodeInputActivation(InputKey.Q))
+      .add(INPUT_ACTION_BTTL_ROTATE_CAMERA.get(), new ButtonInputActivation(InputButton.RIGHT_BUMPER))
+      .add(INPUT_ACTION_BTTL_ADDITIONS.get(), new ScancodeInputActivation(InputKey.E))
+      .add(INPUT_ACTION_BTTL_ADDITIONS.get(), new ButtonInputActivation(InputButton.Y))
+    ;
+  }
+
+  @EventListener
   public static void registerItems(final ItemRegistryEvent event) {
     LodItems.register(event);
   }
 
   @EventListener
   public static void registerEquipment(final EquipmentRegistryEvent event) {
-    for(int equipmentId = 0; equipmentId < 192; equipmentId++) {
-      final String name = EQUIPMENT_IDS[equipmentId];
-
-      if(!name.isEmpty()) {
-        event.register(id(name), switch(equipmentId) {
-          case 0x20 -> new DetonateArrowEquipment(itemPrices_80114310[equipmentId]);
-          case 0x2c -> new DestroyerMaceEquipment(itemPrices_80114310[equipmentId]);
-          case 0x9c -> new WargodCallingEquipment(itemPrices_80114310[equipmentId]);
-          case 0x9d -> new UltimateWargodEquipment(itemPrices_80114310[equipmentId]);
-          default -> Equipment.fromFile(itemPrices_80114310[equipmentId], Unpacker.loadFile("equipment/" + equipmentId + ".deqp"));
-        });
-      }
-    }
+    LodEquipment.register(event);
   }
 
   @EventListener
@@ -180,7 +274,7 @@ public class LodMod {
       if(spellStats_800fa0b8[spellId] == null) {
         final String name = spellId < 84 ? spells_80052734[spellId] : "Spell " + spellId;
         final String desc = spellId < 84 ? spellCombatDescriptions_80052018[spellId] : "";
-        spellStats_800fa0b8[spellId] = SpellStats0c.fromFile(name, desc, Unpacker.loadFile("spells/" + spellId + ".dspl"));
+        spellStats_800fa0b8[spellId] = SpellStats0c.fromFile(name, desc, Loader.loadFile("spells/" + spellId + ".dspl"));
       }
     }
   }
@@ -332,5 +426,46 @@ public class LodMod {
     miranda.put(EquipmentSlot.ACCESSORY, LodEquipment.BRACELET.get());
 
     event.gameState.gold_94 = 20;
+  }
+
+  @EventListener
+  public static void createIconMapping(final IconMapEvent event) {
+    if(CONFIG.getConfig(CoreMod.ICON_SET.get()) == IconSet.RETAIL) {
+      // Remap all the expanded icons to retail icons
+      event.addMapping(ItemIcon.AXE, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.HAMMER, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.SPEAR, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.BOW, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.MACE, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.KNUCKLE, ItemIcon.SWORD);
+      event.addMapping(ItemIcon.BOXING_GLOVE, ItemIcon.SWORD);
+
+      event.addMapping(ItemIcon.CLOTHES, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.ROBE, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.BREASTPLATE, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.RED_DRESS, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.LOINCLOTH, ItemIcon.ARMOR);
+      event.addMapping(ItemIcon.WARRIOR_DRESS, ItemIcon.ARMOR);
+
+      event.addMapping(ItemIcon.CROWN, ItemIcon.HELM);
+      event.addMapping(ItemIcon.HAIRBAND, ItemIcon.HELM);
+      event.addMapping(ItemIcon.BANDANA, ItemIcon.HELM);
+      event.addMapping(ItemIcon.HAT, ItemIcon.HELM);
+
+      event.addMapping(ItemIcon.SHOES, ItemIcon.BOOTS);
+      event.addMapping(ItemIcon.KNEEPIECE, ItemIcon.BOOTS);
+
+      event.addMapping(ItemIcon.BRACELET, ItemIcon.RING);
+      event.addMapping(ItemIcon.AMULET, ItemIcon.RING);
+      event.addMapping(ItemIcon.STONE, ItemIcon.RING);
+      event.addMapping(ItemIcon.JEWELLERY, ItemIcon.RING);
+      event.addMapping(ItemIcon.PIN, ItemIcon.RING);
+      event.addMapping(ItemIcon.BELL, ItemIcon.RING);
+      event.addMapping(ItemIcon.BAG, ItemIcon.RING);
+      event.addMapping(ItemIcon.CLOAK, ItemIcon.RING);
+      event.addMapping(ItemIcon.SCARF, ItemIcon.RING);
+      event.addMapping(ItemIcon.GLOVE, ItemIcon.RING);
+      event.addMapping(ItemIcon.HORN, ItemIcon.RING);
+    }
   }
 }

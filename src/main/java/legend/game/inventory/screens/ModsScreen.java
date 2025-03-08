@@ -3,12 +3,9 @@ package legend.game.inventory.screens;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
-import legend.game.input.InputAction;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Checkbox;
 import legend.game.inventory.screens.controls.Label;
-import legend.game.modding.coremod.CoreMod;
-import legend.lodmod.LodMod;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -20,8 +17,9 @@ import static legend.core.GameEngine.MODS;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HELP;
 
 public class ModsScreen extends VerticalLayoutScreen {
   private final Runnable unload;
@@ -83,38 +81,17 @@ public class ModsScreen extends VerticalLayoutScreen {
     FooterActionsHud.setMenuActions(FooterActions.HELP, null, null);
   }
 
-  private boolean isRequired(final String modId) {
-    return CoreMod.MOD_ID.equals(modId) || LodMod.MOD_ID.equals(modId);
+  private void help() {
+    final String text = this.helpText.get(this.getHighlightedRow());
+    if(text != null) {
+      playMenuSound(1);
+      final Label helpLabel = this.helpLabels.get(this.getHighlightedRow());
+      this.getStack().pushScreen(new TooltipScreen(text, helpLabel.calculateTotalX() + helpLabel.getWidth() / 2, helpLabel.calculateTotalY() + helpLabel.getHeight() / 2));
+    }
   }
 
-  @Override
-  public InputPropagation pressedThisFrame(final InputAction inputAction) {
-    if(super.pressedThisFrame(inputAction) == InputPropagation.HANDLED) {
-      return InputPropagation.HANDLED;
-    }
-
-    if(inputAction == InputAction.BUTTON_EAST) {
-      playMenuSound(3);
-      this.unload.run();
-      return InputPropagation.HANDLED;
-    }
-
-    if(inputAction == InputAction.BUTTON_NORTH) {
-      final String text = this.helpText.get(this.getHighlightedRow());
-      if(text != null) {
-        playMenuSound(1);
-        final Label helpLabel = this.helpLabels.get(this.getHighlightedRow());
-        this.getStack().pushScreen(new TooltipScreen(text, helpLabel.calculateTotalX() + helpLabel.getWidth() / 2, helpLabel.calculateTotalY() + helpLabel.getHeight() / 2));
-      }
-
-      return InputPropagation.HANDLED;
-    }
-
-    return InputPropagation.PROPAGATE;
-  }
-
-  @Override
-  protected void render() {
-    super.render();
+  private void back() {
+    playMenuSound(3);
+    this.unload.run();
   }
 }

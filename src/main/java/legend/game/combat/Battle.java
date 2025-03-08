@@ -18,6 +18,7 @@ import legend.core.memory.Method;
 import legend.core.memory.types.FloatRef;
 import legend.core.opengl.McqBuilder;
 import legend.core.opengl.TmdObjLoader;
+import legend.core.platform.input.InputAction;
 import legend.game.EngineState;
 import legend.game.EngineStateEnum;
 import legend.game.Scus94491BpeSegment;
@@ -128,6 +129,7 @@ import legend.game.types.SpellStats0c;
 import legend.game.types.TmdAnimationFile;
 import legend.game.types.Translucency;
 import legend.game.unpacker.FileData;
+import legend.game.unpacker.Loader;
 import legend.game.unpacker.Unpacker;
 import legend.lodmod.LodMod;
 import org.apache.logging.log4j.LogManager;
@@ -142,6 +144,8 @@ import org.legendofdragoon.modloader.registries.RegistryDelegate;
 import org.legendofdragoon.modloader.registries.RegistryId;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -151,6 +155,7 @@ import java.util.function.Function;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.GTE;
+import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.REGISTRIES;
 import static legend.core.GameEngine.RENDERER;
 import static legend.core.GameEngine.SCRIPTS;
@@ -160,7 +165,6 @@ import static legend.game.Scus94491BpeSegment.FUN_80013404;
 import static legend.game.Scus94491BpeSegment.battlePreloadedEntities_1f8003f4;
 import static legend.game.Scus94491BpeSegment.centreScreenY_1f8003de;
 import static legend.game.Scus94491BpeSegment.displayHeight_1f8003e4;
-import static legend.game.Scus94491BpeSegment.displayWidth_1f8003e0;
 import static legend.game.Scus94491BpeSegment.getCharacterName;
 import static legend.game.Scus94491BpeSegment.getLoadedDrgnFiles;
 import static legend.game.Scus94491BpeSegment.loadDeffSounds;
@@ -240,7 +244,6 @@ import static legend.game.Scus94491BpeSegment_800b.loadingMonsterModels;
 import static legend.game.Scus94491BpeSegment_800b.postBattleAction_800bc974;
 import static legend.game.Scus94491BpeSegment_800b.postCombatMainCallbackIndex_800bc91c;
 import static legend.game.Scus94491BpeSegment_800b.pregameLoadingStage_800bb10c;
-import static legend.game.Scus94491BpeSegment_800b.press_800bee94;
 import static legend.game.Scus94491BpeSegment_800b.queuedSounds_800bd110;
 import static legend.game.Scus94491BpeSegment_800b.scriptStatePtrArr_800bc1c0;
 import static legend.game.Scus94491BpeSegment_800b.soundFiles_800bcf80;
@@ -268,6 +271,10 @@ import static legend.game.combat.environment.Ambiance.stageAmbiance_801134fc;
 import static legend.game.combat.environment.BattleCamera.UPDATE_REFPOINT;
 import static legend.game.combat.environment.BattleCamera.UPDATE_VIEWPOINT;
 import static legend.game.combat.environment.StageData.getEncounterStageData;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
+import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_ATTACK;
+import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_COUNTER;
 
 public class Battle extends EngineState {
   private static final Logger LOGGER = LogManager.getFormatterLogger(Battle.class);
@@ -576,6 +583,68 @@ public class Battle extends EngineState {
   public static final int[] melbuStageIndices_800fb064 = {93, 94, 95, 25, 52, -1, -1, -1};
   public static final int[] modelVramSlotIndices_800fb06c = {0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 16, 17, 10, 11, 12, 13, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0};
 
+  private int inputPressed;
+  private int inputRepeat;
+  private int inputHeld;
+
+  @Override
+  public void inputActionPressed(final InputAction action, final boolean repeat) {
+    super.inputActionPressed(action, repeat);
+
+    if(action == INPUT_ACTION_BTTL_ATTACK.get()) {
+      if(!repeat) {
+        this.inputPressed |= 0x20;
+      }
+
+      this.inputRepeat |= 0x20;
+      this.inputHeld |= 0x20;
+    }
+
+    if(action == INPUT_ACTION_BTTL_COUNTER.get()) {
+      if(!repeat) {
+        this.inputPressed |= 0x40;
+      }
+
+      this.inputRepeat |= 0x40;
+      this.inputHeld |= 0x40;
+    }
+  }
+
+  @Override
+  public void inputActionReleased(final InputAction action) {
+    super.inputActionReleased(action);
+
+    if(action == INPUT_ACTION_BTTL_ATTACK.get()) {
+      this.inputHeld &= ~0x20;
+    }
+
+    if(action == INPUT_ACTION_BTTL_COUNTER.get()) {
+      this.inputHeld &= ~0x40;
+    }
+  }
+
+  @Override
+  public int getInputsPressed() {
+    return this.inputPressed;
+  }
+
+  @Override
+  public int getInputsRepeat() {
+    return this.inputRepeat;
+  }
+
+  @Override
+  public int getInputsHeld() {
+    return this.inputHeld;
+  }
+
+  @Override
+  public void postScriptTick(final boolean scriptsTicked) {
+    super.postScriptTick(scriptsTicked);
+    this.inputPressed = 0;
+    this.inputRepeat = 0;
+  }
+
   @Override
   public int tickMultiplier() {
     return 1;
@@ -584,6 +653,8 @@ public class Battle extends EngineState {
   @Override
   @Method(0x800186a0L)
   public void tick() {
+    super.tick();
+
     if(battleLoaded_800bc94c) {
       this.checkIfCharacterAndMonsterModelsAreLoadedAndCacheLivingBents();
       this.battleLoadingStage_8004f5d4[pregameLoadingStage_800bb10c].run();
@@ -1315,7 +1386,7 @@ public class Battle extends EngineState {
 
   @Method(0x800c7524L)
   public void initBattle() {
-    new Tim(Unpacker.loadFile("shadow.tim")).uploadToGpu();
+    new Tim(Loader.loadFile("shadow.tim")).uploadToGpu();
 
     this.FUN_800c8624();
 
@@ -1562,7 +1633,7 @@ public class Battle extends EngineState {
 
       final int enemyIndex = a0.charIndex_1a2 & 0x1ff;
 
-      if(Unpacker.exists("monsters/%d/textures/combat".formatted(enemyIndex))) {
+      if(Loader.exists("monsters/%d/textures/combat".formatted(enemyIndex))) {
         loadFile("monsters/%d/textures/combat".formatted(enemyIndex), files -> this.loadCombatantTim(a0, files));
       }
     }
@@ -1646,7 +1717,7 @@ public class Battle extends EngineState {
       return;
     }
 
-    if(Unpacker.getLoadingFileCount() == 0 && battleState_8006e398.hasBents() && !this.combatDisabled_800c66b9 && this.FUN_800c7da8()) {
+    if(Loader.getLoadingFileCount() == 0 && battleState_8006e398.hasBents() && !this.combatDisabled_800c66b9 && this.FUN_800c7da8()) {
       vsyncMode_8007a3b8 = 3;
       this.mcqColour_800fa6dc = 0x80;
       this.currentTurnBent_800c66c8.storage_44[7] &= 0xffff_efff;
@@ -1750,7 +1821,7 @@ public class Battle extends EngineState {
     //LAB_800c81c0
     this.currentPostCombatActionFrame_800c6690++;
 
-    if(this.currentPostCombatActionFrame_800c6690 >= postCombatActionTotalFrames_800fa6b8[postBattleAction] || (press_800bee94 & 0xff) != 0 && this.currentPostCombatActionFrame_800c6690 >= 25) {
+    if(this.currentPostCombatActionFrame_800c6690 >= postCombatActionTotalFrames_800fa6b8[postBattleAction] || (PLATFORM.isActionPressed(INPUT_ACTION_MENU_CONFIRM.get()) || PLATFORM.isActionPressed(INPUT_ACTION_MENU_BACK.get())) && this.currentPostCombatActionFrame_800c6690 >= 25) {
       //LAB_800c8214
       this.deallocateLightingControllerAndDeffManager();
 
@@ -2101,7 +2172,13 @@ public class Battle extends EngineState {
 
         if(charSlot < 0) {
           combatant.flags_19e = 0x1;
-          combatant.vramSlot_1a0 = this.findFreeMonsterTextureSlot(a0);
+          try {
+            if(a0 < 0 || (Loader.exists("monsters/%d/textures/combat".formatted(a0)) && Files.size(Loader.resolve("monsters/%d/textures/combat".formatted(a0))) > 0)) {
+              combatant.vramSlot_1a0 = this.findFreeMonsterTextureSlot(a0);
+            }
+          } catch(final IOException e) {
+            LOGGER.error("Failed to find texture file for monster %d", a0);
+          }
         } else {
           //LAB_800c8f90
           combatant.flags_19e = 0x5;
@@ -4164,10 +4241,11 @@ public class Battle extends EngineState {
   @Method(0x800cef00L)
   public FlowControl scriptRenderColouredQuad(final RunningScript<?> script) {
     // Make sure effect fills the whole screen
-    final float fullWidth = java.lang.Math.max(displayWidth_1f8003e0, RENDERER.window().getWidth() / (float)RENDERER.window().getHeight() * displayHeight_1f8003e4);
-    final float extraWidth = fullWidth - displayWidth_1f8003e0;
-    fullScreenEffect_800bb140.transforms.scaling(fullWidth, displayHeight_1f8003e4, 1.0f);
-    fullScreenEffect_800bb140.transforms.transfer.set(-extraWidth / 2, 0.0f, 120.0f);
+    final float fullWidth = java.lang.Math.max(RENDERER.getProjectionWidth(), (float)RENDERER.getRenderWidth() / RENDERER.getRenderHeight() * displayHeight_1f8003e4 * 1.1f);
+    fullScreenEffect_800bb140.transforms
+      .scaling(fullWidth, displayHeight_1f8003e4, 1.0f)
+      .translate(0.0f, 0.0f, 120.0f)
+    ;
 
     //LAB_800139c4
     RENDERER.queueOrthoModel(RENDERER.plainQuads.get(Translucency.of(script.params_20[3].get() + 1)), fullScreenEffect_800bb140.transforms, QueuedModelStandard.class)
@@ -5943,15 +6021,15 @@ public class Battle extends EngineState {
 
     for(int i = 0; i < dragoonDeffsWithExtraTims_800fb040.length; i++) {
       if(dragoonDeffsWithExtraTims_800fb040[i] == index) {
-        if(Unpacker.isDirectory("SECT/DRGN0.BIN/%d".formatted(4115 + i))) {
+        if(Loader.isDirectory("SECT/DRGN0.BIN/%d".formatted(4115 + i))) {
           loadDrgnDir(0, 4115 + i, this::uploadTims);
         }
       }
     }
 
     this.loadDeff(
-      Unpacker.resolve("SECT/DRGN0.BIN/" + (4139 + index * 2)),
-      Unpacker.resolve("SECT/DRGN0.BIN/" + (4140 + index * 2))
+      Loader.resolve("SECT/DRGN0.BIN/" + (4139 + index * 2)),
+      Loader.resolve("SECT/DRGN0.BIN/" + (4140 + index * 2))
     );
   }
 
@@ -5969,8 +6047,8 @@ public class Battle extends EngineState {
     this.allocateDeffEffectManager(parent, flags, bentIndex, _08, entrypoint, effect);
 
     this.loadDeff(
-      Unpacker.resolve("SECT/DRGN0.BIN/" + (4307 + s0)),
-      Unpacker.resolve("SECT/DRGN0.BIN/" + (4308 + s0))
+      Loader.resolve("SECT/DRGN0.BIN/" + (4307 + s0)),
+      Loader.resolve("SECT/DRGN0.BIN/" + (4308 + s0))
     );
   }
 
@@ -5986,8 +6064,8 @@ public class Battle extends EngineState {
 
     if(monsterIndex < 256) {
       this.loadDeff(
-        Unpacker.resolve("SECT/DRGN0.BIN/" + (4433 + monsterIndex * 2)),
-        Unpacker.resolve("SECT/DRGN0.BIN/" + (4434 + monsterIndex * 2))
+        Loader.resolve("SECT/DRGN0.BIN/" + (4433 + monsterIndex * 2)),
+        Loader.resolve("SECT/DRGN0.BIN/" + (4434 + monsterIndex * 2))
       );
     } else {
       final int a0_0 = monsterIndex >>> 4;
@@ -5999,8 +6077,8 @@ public class Battle extends EngineState {
       fileIndex = (fileIndex - 1) * 2;
 
       this.loadDeff(
-        Unpacker.resolve("SECT/DRGN0.BIN/" + (4945 + fileIndex)),
-        Unpacker.resolve("SECT/DRGN0.BIN/" + (4946 + fileIndex))
+        Loader.resolve("SECT/DRGN0.BIN/" + (4945 + fileIndex)),
+        Loader.resolve("SECT/DRGN0.BIN/" + (4946 + fileIndex))
       );
     }
   }
@@ -6016,15 +6094,15 @@ public class Battle extends EngineState {
 
     for(int i = 0; i < cutsceneDeffsWithExtraTims_800fb05c.length; i++) {
       if(cutsceneDeffsWithExtraTims_800fb05c[i] == cutsceneIndex) {
-        if(Unpacker.isDirectory("SECT/DRGN0.BIN/%d".formatted(5505 + i))) {
+        if(Loader.isDirectory("SECT/DRGN0.BIN/%d".formatted(5505 + i))) {
           loadDrgnDir(0, 5505 + i, this::uploadTims);
         }
       }
     }
 
     this.loadDeff(
-      Unpacker.resolve("SECT/DRGN0.BIN/" + (5511 + cutsceneIndex * 2)),
-      Unpacker.resolve("SECT/DRGN0.BIN/" + (5512 + cutsceneIndex * 2))
+      Loader.resolve("SECT/DRGN0.BIN/" + (5511 + cutsceneIndex * 2)),
+      Loader.resolve("SECT/DRGN0.BIN/" + (5512 + cutsceneIndex * 2))
     );
   }
 
@@ -6032,12 +6110,12 @@ public class Battle extends EngineState {
     this.loadedDeff_800c6938.script_14 = null;
     this.deffLoadingStage_800fafe8 = 1;
 
-    Unpacker.loadDirectory(tims, this::uploadTims);
-    Unpacker.loadDirectory(deff.resolve("0"), files -> {
+    Loader.loadDirectory(tims, this::uploadTims);
+    Loader.loadDirectory(deff.resolve("0"), files -> {
       this.loadDeffPackage(files, this.loadedDeff_800c6938.managerState_18);
 
       // We don't want the script to load before the DEFF package, so queueing this file inside of the DEFF package callback forces serialization
-      Unpacker.loadFile(deff.resolve("1"), file -> {
+      Loader.loadFile(deff.resolve("1"), file -> {
         LOGGER.info(DEFF, "Loading DEFF script");
         this.loadedDeff_800c6938.script_14 = new ScriptFile(deff.toString(), file.getBytes());
       });
@@ -8629,7 +8707,7 @@ public class Battle extends EngineState {
   private void loadStageDataAndControllerScripts() {
     this.currentStageData_800c6718 = getEncounterStageData(encounterId_800bb0f8);
 
-    this.playerBattleScript_800c66fc = new ScriptFile("player_combat_script", Unpacker.loadFile("player_combat_script").getBytes());
+    this.playerBattleScript_800c66fc = new ScriptFile("player_combat_script", Loader.loadFile("player_combat_script").getBytes());
 
     loadDrgnFile(1, "401", this::combatControllerScriptLoaded);
   }

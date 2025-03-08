@@ -17,10 +17,9 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.PolyBuilder;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.TmdObjLoader;
+import legend.core.platform.input.InputAction;
 import legend.game.EngineState;
 import legend.game.EngineStateEnum;
-import legend.game.input.Input;
-import legend.game.input.InputAction;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.HorizontalAlign;
@@ -36,8 +35,10 @@ import legend.game.types.TextboxState;
 import legend.game.types.TmdAnimationFile;
 import legend.game.types.Translucency;
 import legend.game.unpacker.FileData;
-import legend.game.unpacker.Unpacker;
+import legend.game.unpacker.Loader;
+import legend.lodmod.LodMod;
 import org.joml.Math;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -53,6 +54,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.GTE;
+import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
 import static legend.core.MathHelper.flEq;
 import static legend.game.Scus94491BpeSegment.getLoadedDrgnFiles;
@@ -99,7 +101,6 @@ import static legend.game.Scus94491BpeSegment_8005.submapCut_80052c30;
 import static legend.game.Scus94491BpeSegment_8005.submapScene_80052c34;
 import static legend.game.Scus94491BpeSegment_8007.clearRed_8007a3a8;
 import static legend.game.Scus94491BpeSegment_8007.vsyncMode_8007a3b8;
-import static legend.game.Scus94491BpeSegment_800b.analogMagnitude_800beeb4;
 import static legend.game.Scus94491BpeSegment_800b.battleStage_800bb0f4;
 import static legend.game.Scus94491BpeSegment_800b.clearBlue_800babc0;
 import static legend.game.Scus94491BpeSegment_800b.clearGreen_800bb104;
@@ -115,6 +116,13 @@ import static legend.game.Scus94491BpeSegment_800b.tickCount_800bb0fc;
 import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
 import static legend.game.Scus94491BpeSegment_800c.lightColourMatrix_800c3508;
 import static legend.game.Scus94491BpeSegment_800c.lightDirectionMatrix_800c34e8;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
+import static legend.game.modding.coremod.CoreMod.RUN_BY_DEFAULT;
 import static legend.game.wmap.MapState100.ForcedMovementMode;
 import static legend.game.wmap.MapState100.PathSegmentEndpointType;
 import static legend.game.wmap.MapState100.PathSegmentEntering;
@@ -149,6 +157,20 @@ import static legend.game.wmap.WmapStatics.teleportationLocations_800ef6c8;
 import static legend.game.wmap.WmapStatics.tmdUvAdjustmentMetrics_800eee48;
 import static legend.game.wmap.WmapStatics.waterClutYs_800ef348;
 import static legend.game.wmap.WmapStatics.wmapDestinationMarkers_800f5a6c;
+import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_MOVE_DOWN;
+import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_MOVE_LEFT;
+import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_MOVE_RIGHT;
+import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_MOVE_UP;
+import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_OPEN_INVENTORY;
+import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_RUN;
+import static legend.lodmod.LodMod.INPUT_ACTION_WMAP_COOLON;
+import static legend.lodmod.LodMod.INPUT_ACTION_WMAP_DESTINATIONS;
+import static legend.lodmod.LodMod.INPUT_ACTION_WMAP_QUEEN_FURY;
+import static legend.lodmod.LodMod.INPUT_ACTION_WMAP_ROTATE_LEFT;
+import static legend.lodmod.LodMod.INPUT_ACTION_WMAP_ROTATE_RIGHT;
+import static legend.lodmod.LodMod.INPUT_ACTION_WMAP_SERVICES;
+import static legend.lodmod.LodMod.INPUT_ACTION_WMAP_ZOOM_IN;
+import static legend.lodmod.LodMod.INPUT_ACTION_WMAP_ZOOM_OUT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class WMap extends EngineState {
@@ -175,7 +197,7 @@ public class WMap extends EngineState {
     UNUSED_1(1),
     LOAD_MODEL_2(2),
     INIT_PLAYER_MODEL_3(3),
-    NOOP_4(4),
+    WAIT_FOR_MODEL_TO_LOAD_4(4),
     RENDER_5(5),
     NOOP_6(6),
     UNUSED_DEALLOC_7(7),
@@ -362,7 +384,7 @@ public class WMap extends EngineState {
 
   private WmapPromptPopup wmapLocationPromptPopup;
   private WmapPromptPopup coolonPromptPopup;
-  private final MV fastTravelTransforms = new MV();
+  private final Matrix4f fastTravelTransforms = new Matrix4f();
   /** Temporary solution until text refactoring */
   private final String[] startLabelNames = new String[8];
   private final float[] startLabelXs = new float[8];
@@ -389,6 +411,47 @@ public class WMap extends EngineState {
   @Override
   public void restoreMusicAfterMenu() {
     unloadSoundFile(8);
+  }
+
+  @Override
+  public void inputActionPressed(final InputAction action, final boolean repeat) {
+    if(action == LodMod.INPUT_ACTION_GENERAL_OPEN_INVENTORY.get() && !repeat) {
+      if(Loader.getLoadingFileCount() == 0) {
+        if(this.wmapState_800bb10c == WmapState.PLAY_3) {
+          if(this.tickMainMenuOpenTransition_800c6690 == 0) {
+            final WMapCameraAndLights19c0 cameraAndLights = this.wmapCameraAndLights19c0_800c66b0;
+
+            if(cameraAndLights.cameraUpdateState_c5 == CameraUpdateState.AWAIT_INPUT_0) {
+              if(cameraAndLights.zoomStateIsLocal_c4) {
+                final WMapModelAndAnimData258 modelAndAnimData = this.modelAndAnimData_800c66a8;
+
+                if(modelAndAnimData.zoomState_1f8 == ZoomState.LOCAL_0) {
+                  if(modelAndAnimData.coolonWarpState_220 == CoolonWarpState.NONE_0) {
+                    if(
+                      this.worldMapState_800c6698.state >= WorldMapState.INIT_MAP_ANIM_3.state ||
+                        this.playerState_800c669c.state >= PlayerState.INIT_PLAYER_MODEL_3.state
+                    ) {
+                      //LAB_800cc900
+                      if(this.mapState_800c6798.pathSegmentEndpointTypeCrossed_fc != PathSegmentEndpointType.TERMINAL_1) {
+                        if(modelAndAnimData.fadeAnimationType_05 == FadeAnimationType.NONE_0) {
+                          if(this.mapState_800c6798.queenFuryForceMovementMode_d8 == ForcedMovementMode.NONE_0) {
+                            if(modelAndAnimData.fastTravelTransitionMode_250 == FastTravelTransitionMode.NONE_0) {
+                              startFadeEffect(1, 15);
+                              this.mapState_800c6798.disableInput_d0 = true;
+                              this.tickMainMenuOpenTransition_800c6690 = 1;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   @Method(0x800c925cL)
@@ -424,6 +487,8 @@ public class WMap extends EngineState {
   @Override
   @Method(0x800cc738L)
   public void tick() {
+    super.tick();
+
     this.wmapStates_800ef000[this.wmapState_800bb10c.state].run();
   }
 
@@ -454,7 +519,9 @@ public class WMap extends EngineState {
           renderText(this.coolonWarpDestLabelName, this.coolonWarpDestLabelX, this.coolonWarpDestLabelY, UI_WHITE_SHADOWED);
         }
 
-        this.handleMapTransitions();
+        if(this.modelAndAnimData_800c66a8.fastTravelTransitionMode_250 == FastTravelTransitionMode.NONE_0) {
+          this.handleMapTransitions();
+        }
       }
     }
   }
@@ -489,61 +556,27 @@ public class WMap extends EngineState {
   /** Checks for triangle press and transitions into the inv screen */
   @Method(0x800cc83cL)
   private void handleInventoryTransition() {
-    if(Unpacker.getLoadingFileCount() == 0) {
-      if(this.tickMainMenuOpenTransition_800c6690 == 0) {
-        final WMapCameraAndLights19c0 cameraAndLights = this.wmapCameraAndLights19c0_800c66b0;
+    if(Loader.getLoadingFileCount() != 0 || this.tickMainMenuOpenTransition_800c6690 == 0) {
+      return;
+    }
 
-        if(cameraAndLights.cameraUpdateState_c5 == CameraUpdateState.AWAIT_INPUT_0) {
-          if(cameraAndLights.zoomStateIsLocal_c4) {
-            final WMapModelAndAnimData258 modelAndAnimData = this.modelAndAnimData_800c66a8;
+    //LAB_800cc970
+    this.modelAndAnimData_800c66a8.mapTextureBrightness_20 -= 0.5f / (3.0f / vsyncMode_8007a3b8);
+    if(this.modelAndAnimData_800c66a8.mapTextureBrightness_20 < 0.0f) {
+      this.modelAndAnimData_800c66a8.mapTextureBrightness_20 = 0.0f;
+    }
 
-            if(modelAndAnimData.zoomState_1f8 == ZoomState.LOCAL_0) {
-              if(modelAndAnimData.coolonWarpState_220 == CoolonWarpState.NONE_0) {
-                if(
-                  this.worldMapState_800c6698.state >= WorldMapState.INIT_MAP_ANIM_3.state ||
-                    this.playerState_800c669c.state >= PlayerState.INIT_PLAYER_MODEL_3.state
-                ) {
-                  //LAB_800cc900
-                  if(Input.pressedThisFrame(InputAction.BUTTON_NORTH)) {
-                    if(this.mapState_800c6798.pathSegmentEndpointTypeCrossed_fc != PathSegmentEndpointType.TERMINAL_1) {
-                      if(modelAndAnimData.fadeAnimationType_05 == FadeAnimationType.NONE_0) {
-                        if(this.mapState_800c6798.queenFuryForceMovementMode_d8 == ForcedMovementMode.NONE_0) {
-                          if(modelAndAnimData.fastTravelTransitionMode_250 == FastTravelTransitionMode.NONE_0) {
-                            startFadeEffect(1, 15);
-                            this.mapState_800c6798.disableInput_d0 = true;
-                            this.tickMainMenuOpenTransition_800c6690 = 1;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+    //LAB_800cc998
+    this.tickMainMenuOpenTransition_800c6690++;
+    if(this.tickMainMenuOpenTransition_800c6690 >= 45.0f / vsyncMode_8007a3b8) {
+      this.wmapState_800bb10c = WmapState.TRANSITION_TO_SCREENS_4;
+      initInventoryMenu();
 
-        return;
-      }
+      this.modelAndAnimData_800c66a8.imageData_2c = new FileData(new byte[0x1_0000]);
+      this.modelAndAnimData_800c66a8.imageData_30 = new FileData(new byte[0x1_0000]);
 
-      //LAB_800cc970
-      this.modelAndAnimData_800c66a8.mapTextureBrightness_20 -= 0.5f / (3.0f / vsyncMode_8007a3b8);
-      if(this.modelAndAnimData_800c66a8.mapTextureBrightness_20 < 0.0f) {
-        this.modelAndAnimData_800c66a8.mapTextureBrightness_20 = 0.0f;
-      }
-
-      //LAB_800cc998
-      this.tickMainMenuOpenTransition_800c6690++;
-      if(this.tickMainMenuOpenTransition_800c6690 >= 45.0f / vsyncMode_8007a3b8) {
-        this.wmapState_800bb10c = WmapState.TRANSITION_TO_SCREENS_4;
-        initInventoryMenu();
-
-        this.modelAndAnimData_800c66a8.imageData_2c = new FileData(new byte[0x1_0000]);
-        this.modelAndAnimData_800c66a8.imageData_30 = new FileData(new byte[0x1_0000]);
-
-        GPU.downloadData15(this.storedEffectsRect_800c8700, this.modelAndAnimData_800c66a8.imageData_2c);
-        GPU.downloadData15(new Rect4i(320, 0, 64, 512), this.modelAndAnimData_800c66a8.imageData_30);
-      }
+      GPU.downloadData15(this.storedEffectsRect_800c8700, this.modelAndAnimData_800c66a8.imageData_2c);
+      GPU.downloadData15(new Rect4i(320, 0, 64, 512), this.modelAndAnimData_800c66a8.imageData_30);
     }
     //LAB_800cca5c
   }
@@ -828,12 +861,16 @@ public class WMap extends EngineState {
           TmdObjLoader.fromModel("WmapEntityModel (index " + i + ')', this.modelAndAnimData_800c66a8.models_0c[i]);
         }
 
-        this.playerState_800c669c = PlayerState.NOOP_4;
+        this.playerState_800c669c = PlayerState.WAIT_FOR_MODEL_TO_LOAD_4;
       }
 
-      case NOOP_4 -> {
+      case WAIT_FOR_MODEL_TO_LOAD_4 -> {
         if(loadWait-- > 0) break;
-        this.playerState_800c669c = PlayerState.RENDER_5;
+
+        //Prevents queen fury shadow renderer rendering before map model loads GH#2077
+        if((this.filesLoadedFlags_800c66b8.get() & 0x4) != 0x0) {
+          this.playerState_800c669c = PlayerState.RENDER_5;
+        }
       }
 
       case RENDER_5 -> this.renderPlayer();
@@ -1144,14 +1181,14 @@ public class WMap extends EngineState {
               if(this.mapState_800c6798.continent_00 != Continent.ENDINESS_7) {
                 if(!cameraAndLights.mapRotating_80) {
                   //LAB_800d30d8
-                  if(Input.pressedThisFrame(InputAction.BUTTON_SHOULDER_RIGHT_1)) { // R1
+                  if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_ROTATE_RIGHT.get())) {
                     cameraAndLights.mapRotationDirection = (int)MathHelper.floorMod((cameraAndLights.mapRotationDirection + 1), 8);
                     this.startMapRotation(1);
                     cameraAndLights.mapRotating_80 = true;
                   }
 
                   //LAB_800d310c
-                  if(Input.pressedThisFrame(InputAction.BUTTON_SHOULDER_LEFT_1)) { // L1
+                  if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_ROTATE_LEFT.get())) {
                     cameraAndLights.mapRotationDirection = (int)MathHelper.floorMod((cameraAndLights.mapRotationDirection - 1), 8);
                     this.startMapRotation(-1);
                     cameraAndLights.mapRotating_80 = true;
@@ -1224,7 +1261,7 @@ public class WMap extends EngineState {
             if(!cameraAndLights.mapRotating_80) {
               if(this.modelAndAnimData_800c66a8.fadeAnimationType_05 == FadeAnimationType.NONE_0) {
                 if(cameraAndLights.mapRotationState_110 == MapRotationState.MAIN_LOOP_0) {
-                  if(Input.pressedThisFrame(InputAction.BUTTON_SHOULDER_RIGHT_2)) { // R2
+                  if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_ZOOM_OUT.get())) {
                     if(this.modelAndAnimData_800c66a8.zoomState_1f8 == ZoomState.LOCAL_0) {
                       playSound(0, 4, (short)0, (short)0);
                       cameraAndLights.finalCameraY_9e = -9000;
@@ -1237,7 +1274,7 @@ public class WMap extends EngineState {
                   }
 
                   //LAB_800d37bc
-                  if(Input.pressedThisFrame(InputAction.BUTTON_SHOULDER_LEFT_2)) { // L2
+                  if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_ZOOM_IN.get())) {
                     if(this.modelAndAnimData_800c66a8.zoomState_1f8 == ZoomState.CONTINENT_1) {
                       //LAB_800d3814
                       setTextAndTextboxesToUninitialized(7, 0);
@@ -1358,7 +1395,7 @@ public class WMap extends EngineState {
       this.destinationLabelStage_800c86f0 = 0;
     } else if(zoomState == ZoomState.WORLD_3) {
       //LAB_800d4170
-      if(Input.pressedThisFrame(InputAction.BUTTON_SHOULDER_LEFT_2)) { // L2
+      if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_ZOOM_IN.get())) {
         setTextAndTextboxesToUninitialized(7, 0);
         this.shouldSetDestLabelMetrics = false;
         this.destLabelName = null;
@@ -1369,7 +1406,7 @@ public class WMap extends EngineState {
       //LAB_800d41b0
       setTextAndTextboxesToUninitialized(7, 0);
 
-      if(Input.pressedThisFrame(InputAction.BUTTON_SHOULDER_RIGHT_2)) { // R2
+      if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_ZOOM_OUT.get())) {
         this.destinationLabelStage_800c86f0 = 0;
       }
 
@@ -2139,7 +2176,7 @@ public class WMap extends EngineState {
     //LAB_800d955c
     switch(this.modelAndAnimData_800c66a8.zoomState_1f8) {
       case CONTINENT_1:
-        if(Input.pressedThisFrame(InputAction.BUTTON_SHOULDER_RIGHT_2)) { // Zoom out
+        if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_ZOOM_OUT.get())) {
           playSound(0, 4, (short)0, (short)0);
           this.shouldSetDestLabelMetrics = true;
 
@@ -2184,7 +2221,7 @@ public class WMap extends EngineState {
         break;
 
       case WORLD_3:
-        if(Input.pressedThisFrame(InputAction.BUTTON_SHOULDER_RIGHT_2)) { // Can't zoom out more
+        if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_ZOOM_OUT.get())) {
           playSound(0, 40, (short)0, (short)0);
         }
 
@@ -2196,7 +2233,7 @@ public class WMap extends EngineState {
         }
 
         //LAB_800d98a8
-        if(Input.pressedThisFrame(InputAction.BUTTON_SHOULDER_LEFT_2)) { // Zoom in
+        if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_ZOOM_IN.get())) {
           playSound(0, 4, (short)0, (short)0);
           this.initMapModelZoom(-1);
 
@@ -2216,7 +2253,7 @@ public class WMap extends EngineState {
           }
 
           //LAB_800d9a70
-          if(Input.getButtonState(InputAction.BUTTON_CENTER_2)) {
+          if(PLATFORM.isActionHeld(INPUT_ACTION_WMAP_DESTINATIONS.get())) {
             //LAB_800d9a8c
             for(int i = 0; i < 8; i++) {
               //LAB_800d9aa8
@@ -2356,7 +2393,7 @@ public class WMap extends EngineState {
     //LAB_800da4ec
     this.coolonQueenFuryOverlay.render(0);
 
-    if(Input.pressedThisFrame(InputAction.BUTTON_WEST)) { // Square
+    if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_COOLON.get())) {
       this.destinationLabelStage_800c86f0 = 0;
       modelAndAnimData.fastTravelTransitionMode_250 = FastTravelTransitionMode.OPEN_COOLON_MAP_2;
     }
@@ -2501,7 +2538,7 @@ public class WMap extends EngineState {
         break;
 
       case MAIN_LOOP_3:
-        if(Input.pressedThisFrame(InputAction.BUTTON_EAST) || Input.pressedThisFrame(InputAction.BUTTON_WEST)) {
+        if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_BACK.get()) || PLATFORM.isActionPressed(INPUT_ACTION_WMAP_COOLON.get())) {
           this.shouldSetCoolonWarpDestLabelMetrics = false;
           this.coolonWarpDestLabelName = null;
 
@@ -2532,7 +2569,7 @@ public class WMap extends EngineState {
         }
 
         //LAB_800db00c
-        if(Input.pressedThisFrame(InputAction.BUTTON_SOUTH)) {
+        if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_CONFIRM.get())) {
           playSound(0, 2, (short)0, (short)0);
           initTextbox(6, true, 240, 64, 9, 4);
           modelAndAnimData.coolonWarpState_220 = CoolonWarpState.INIT_PROMPT_4;
@@ -2570,21 +2607,20 @@ public class WMap extends EngineState {
 
         this.renderCoolonMapSymbols(false, true);
 
-        if(Input.pressedThisFrame(InputAction.BUTTON_EAST)) {
+        if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_BACK.get())) {
           playSound(0, 3, (short)0, (short)0);
           setTextAndTextboxesToUninitialized(6, 1);
           modelAndAnimData.coolonWarpState_220 = CoolonWarpState.MAIN_LOOP_3;
         }
 
         //LAB_800db39c
-        if(Input.pressedThisFrame(InputAction.DPAD_UP) || Input.pressedThisFrame(InputAction.JOYSTICK_LEFT_BUTTON_UP) ||
-          Input.pressedThisFrame(InputAction.DPAD_DOWN) || Input.pressedThisFrame(InputAction.JOYSTICK_LEFT_BUTTON_DOWN)) {
+        if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_UP.get()) || PLATFORM.isActionPressed(INPUT_ACTION_MENU_DOWN.get())) {
           playSound(0, 1, (short)0, (short)0);
           modelAndAnimData.coolonPromptIndex_223 ^= 1;
         }
 
         //LAB_800db3f8
-        if(Input.pressedThisFrame(InputAction.BUTTON_SOUTH)) {
+        if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_CONFIRM.get())) {
           if(modelAndAnimData.coolonPromptIndex_223 == 0) {
             playSound(0, 3, (short)0, (short)0);
             setTextAndTextboxesToUninitialized(6, 1);
@@ -2611,7 +2647,7 @@ public class WMap extends EngineState {
         }
 
         //LAB_800db698
-        this.lerp(modelAndAnimData.currPlayerPos_94, coolonWarpDest_800ef228[modelAndAnimData.coolonOriginIndex_221].destPosition_00, coolonWarpDest_800ef228[modelAndAnimData.coolonDestIndex_222].destPosition_00, modelAndAnimData.coolonTravelAnimationTick_218 / (36.0f / vsyncMode_8007a3b8));
+        coolonWarpDest_800ef228[modelAndAnimData.coolonOriginIndex_221].destPosition_00.lerp(coolonWarpDest_800ef228[modelAndAnimData.coolonDestIndex_222].destPosition_00, modelAndAnimData.coolonTravelAnimationTick_218 / (36.0f / vsyncMode_8007a3b8), modelAndAnimData.currPlayerPos_94);
 
         modelAndAnimData.models_0c[2].coord2_14.transforms.scale.x -= 0.041503906f / (3.0f / vsyncMode_8007a3b8); // ~1/24
 
@@ -2760,8 +2796,12 @@ public class WMap extends EngineState {
     modelAndAnimData.playerRotation_a4.y = MathHelper.floorMod(MathHelper.atan2(y, x) + MathHelper.PI / 2.0f, MathHelper.TWO_PI);
     modelAndAnimData.models_0c[2].coord2_14.transforms.rotate.y += (modelAndAnimData.playerRotation_a4.y - modelAndAnimData.models_0c[2].coord2_14.transforms.rotate.y) / 8 / (3.0f / vsyncMode_8007a3b8);
 
+    // How to handle repeats like this?
+    // Should we mark individual actions as repeatable?
+    // In the state have a flag that says if it was repeated or not?
+
     if(enableInput) {
-      if(Input.pressedWithRepeatPulse(InputAction.DPAD_RIGHT) || Input.pressedWithRepeatPulse(InputAction.JOYSTICK_LEFT_BUTTON_RIGHT) || Input.pressedWithRepeatPulse(InputAction.DPAD_DOWN) || Input.pressedWithRepeatPulse(InputAction.JOYSTICK_LEFT_BUTTON_DOWN)) {
+      if(PLATFORM.isActionRepeat(INPUT_ACTION_MENU_RIGHT.get()) || PLATFORM.isActionRepeat(INPUT_ACTION_MENU_DOWN.get())) {
         playSound(0, 1, (short)0, (short)0);
 
         if(modelAndAnimData.coolonDestIndex_222 > 0) {
@@ -2772,7 +2812,7 @@ public class WMap extends EngineState {
       }
 
       //LAB_800dc384
-      if(Input.pressedWithRepeatPulse(InputAction.DPAD_UP) || Input.pressedWithRepeatPulse(InputAction.JOYSTICK_LEFT_BUTTON_UP) || Input.pressedWithRepeatPulse(InputAction.DPAD_LEFT) || Input.pressedWithRepeatPulse(InputAction.JOYSTICK_LEFT_BUTTON_LEFT)) {
+      if(PLATFORM.isActionRepeat(INPUT_ACTION_MENU_LEFT.get()) || PLATFORM.isActionRepeat(INPUT_ACTION_MENU_UP.get())) {
         playSound(0, 1, (short)0, (short)0);
 
         modelAndAnimData.coolonDestIndex_222++;
@@ -2854,22 +2894,6 @@ public class WMap extends EngineState {
       }
     }
     //LAB_800dcc0c
-  }
-
-  @Method(0x800dcc20L)
-  private void lerp(final Vector3f out, final Vector3f a, final Vector3f b, final float ratio) {
-    if(ratio == 0.0f) {
-      out.set(a);
-    } else if(ratio == 1.0f) {
-      out.set(b);
-    } else {
-      //LAB_800dcca4
-      out.x = (b.x - a.x) * ratio + a.x;
-      out.y = (b.y - a.y) * ratio + a.y;
-      out.z = (b.z - a.z) * ratio + a.z;
-    }
-
-    //LAB_800dcddc
   }
 
   @Method(0x800dcde8L)
@@ -3172,14 +3196,17 @@ public class WMap extends EngineState {
 
     if(
       !flEq(modelAndAnimData.prevPlayerPos_84.x, modelAndAnimData.currPlayerPos_94.x) ||
-        !flEq(modelAndAnimData.prevPlayerPos_84.y, modelAndAnimData.currPlayerPos_94.y) ||
-        !flEq(modelAndAnimData.prevPlayerPos_84.z, modelAndAnimData.currPlayerPos_94.z)
+      !flEq(modelAndAnimData.prevPlayerPos_84.y, modelAndAnimData.currPlayerPos_94.y) ||
+      !flEq(modelAndAnimData.prevPlayerPos_84.z, modelAndAnimData.currPlayerPos_94.z)
     ) {
       final EncounterRateMode mode = CONFIG.getConfig(CoreMod.ENCOUNTER_RATE_CONFIG.get());
 
       //LAB_800e117c
       //LAB_800e11b0
-      if(Input.getButtonState(InputAction.BUTTON_EAST) || analogMagnitude_800beeb4 >= 0x7f) { // World Map Running
+      final boolean autoRun = CONFIG.getConfig(RUN_BY_DEFAULT.get());
+      final boolean runHeld = PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_RUN.get());
+      final float mag = this.getAnalogueMagnitude();
+      if(mag != 0.0f && autoRun != runHeld || mag >= 0.5f) { // World Map Running
         //LAB_800e11d0
         modelAndAnimData.currAnimIndex_b0 = 4;
         this.handleEncounters(mode.worldMapRunModifier);
@@ -3221,14 +3248,7 @@ public class WMap extends EngineState {
     modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.coord.transfer.set(modelAndAnimData.coord2_34.coord.transfer);
 
     if(modelAndAnimData.fastTravelTransitionMode_250 == FastTravelTransitionMode.NONE_0) {
-      final float cwAngle = modelAndAnimData.playerRotation_a4.y - modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.transforms.rotate.y;
-      final float ccwAngle = modelAndAnimData.playerRotation_a4.y - (modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.transforms.rotate.y - MathHelper.TWO_PI);
-      final float finalAngle;
-      if(Math.abs(ccwAngle) < Math.abs(cwAngle)) {
-        finalAngle = ccwAngle;
-      } else {
-        finalAngle = cwAngle;
-      }
+      final float finalAngle = MathHelper.closestAngle(modelAndAnimData.playerRotation_a4.y, modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.transforms.rotate.y);
 
       //LAB_800e15e4
       modelAndAnimData.models_0c[modelAndAnimData.modelIndex_1e4].coord2_14.transforms.rotate.y += finalAngle / 2.0f / (3.0f / vsyncMode_8007a3b8);
@@ -3485,8 +3505,7 @@ public class WMap extends EngineState {
   /** Some kind of full-screen effect during the Wingly teleportation between Aglis and Zenebatos */
   @Method(0x800e3304L)
   private void renderFastTravelScreenDistortionEffect() {
-    this.fastTravelTransforms.transfer.set(0.0f, 0.0f, 20.0f);
-    this.fastTravelTransforms.scaling(320.0f, 240.0f, 1.0f);
+    this.fastTravelTransforms.scaling(320.0f * RENDERER.getRenderAspectRatio() / RENDERER.getNativeAspectRatio(), 240.0f, 1.0f);
 
     RENDERER.queueOrthoModel(RENDERER.renderBufferQuad, this.fastTravelTransforms, QueuedModelStandard.class)
       .texture(RENDERER.getLastFrame())
@@ -3496,7 +3515,7 @@ public class WMap extends EngineState {
   @Method(0x800e367cL)
   private void handleEncounters(final float encounterRateMultiplier) {
     if(
-      Unpacker.getLoadingFileCount() != 0 ||
+      Loader.getLoadingFileCount() != 0 ||
         this.worldMapState_800c6698 != WorldMapState.RENDER_5 ||
         this.playerState_800c669c != PlayerState.RENDER_5 ||
         this.modelAndAnimData_800c66a8.modelIndex_1e4 >= 2
@@ -3872,7 +3891,7 @@ public class WMap extends EngineState {
 
   @Method(0x800e5150L)
   private void handleMapTransitions() {
-    if(Unpacker.getLoadingFileCount() != 0 || this.tickMainMenuOpenTransition_800c6690 != 0) {
+    if(Loader.getLoadingFileCount() != 0 || this.tickMainMenuOpenTransition_800c6690 != 0) {
       return;
     }
 
@@ -4035,7 +4054,7 @@ public class WMap extends EngineState {
       case MAIN_LOOP_3:
         this.wmapLocationPromptPopup.getShadow().currentBrightness_34 += 0.25f / (3.0f / vsyncMode_8007a3b8);
 
-        if(Input.pressedThisFrame(InputAction.DPAD_UP) || Input.pressedThisFrame(InputAction.JOYSTICK_LEFT_BUTTON_UP)) {
+        if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_UP.get())) {
           this.wmapLocationPromptPopup.decrMenuSelectorOptionIndex();
 
           //LAB_800e5950
@@ -4043,7 +4062,7 @@ public class WMap extends EngineState {
         }
 
         //LAB_800e5970
-        if(Input.pressedThisFrame(InputAction.DPAD_DOWN) || Input.pressedThisFrame(InputAction.JOYSTICK_LEFT_BUTTON_DOWN)) {
+        if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_DOWN.get())) {
           this.wmapLocationPromptPopup.incrMenuSelectorOptionIndex();
 
           //LAB_800e59c0
@@ -4084,12 +4103,12 @@ public class WMap extends EngineState {
           newBrightness
         );
 
-        if(Input.pressedThisFrame(InputAction.BUTTON_WEST) && this.mapState_800c6798.submapCutTo_c8 != 999) { // Square
+        if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_SERVICES.get()) && this.mapState_800c6798.submapCutTo_c8 != 999) {
           playSound(0, 2, (short)0, (short)0);
         }
 
         //LAB_800e60d0
-        if(Input.getButtonState(InputAction.BUTTON_WEST) && this.mapState_800c6798.submapCutTo_c8 != 999) { // Square
+        if(PLATFORM.isActionHeld(INPUT_ACTION_WMAP_SERVICES.get()) && this.mapState_800c6798.submapCutTo_c8 != 999) {
           newBrightness = currentBrightness - 0.5f / (3.0f / vsyncMode_8007a3b8);
 
           if(newBrightness < 0.5f) {
@@ -4115,7 +4134,7 @@ public class WMap extends EngineState {
         this.wmapLocationPromptPopup.render();
 
         //LAB_800e62d4
-        if(Input.pressedThisFrame(InputAction.BUTTON_SOUTH)) {
+        if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_CONFIRM.get())) {
           if(this.wmapLocationPromptPopup.getMenuSelectorOptionIndex() == 0) {
             setTextAndTextboxesToUninitialized(6, 1);
             setTextAndTextboxesToUninitialized(7, 0);
@@ -4160,7 +4179,7 @@ public class WMap extends EngineState {
           //LAB_800e651c
         } else {
           //LAB_800e6524
-          if(Input.pressedThisFrame(InputAction.BUTTON_EAST)) {
+          if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_BACK.get())) {
             playSound(0, 3, (short)0, (short)0);
 
             //LAB_800e6560
@@ -4293,7 +4312,7 @@ public class WMap extends EngineState {
       Arrays.fill(this.startLabelNames, null);
 
       //LAB_800e6b04
-      if(!Input.getButtonState(InputAction.BUTTON_CENTER_2)) {
+      if(!PLATFORM.isActionHeld(INPUT_ACTION_WMAP_DESTINATIONS.get())) {
         //LAB_800e6b20
         for(int i = 0; i < 7; i++) {
           //LAB_800e6b3c
@@ -4305,7 +4324,7 @@ public class WMap extends EngineState {
       }
 
       //LAB_800e6b74
-      if(Input.getButtonState(InputAction.BUTTON_NORTH)) {
+      if(PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_OPEN_INVENTORY.get())) {
         //LAB_800e6b90
         for(int i = 0; i < 7; i++) {
           //LAB_800e6bac
@@ -4317,7 +4336,7 @@ public class WMap extends EngineState {
       }
       //LAB_800e6afc
     } else {
-      if(Input.pressedThisFrame(InputAction.BUTTON_CENTER_2)) {
+      if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_DESTINATIONS.get())) {
         playSound(0, 2, (short)0, (short)0);
         this.startLocationLabelsActive_800c68a8 = true;
 
@@ -4837,7 +4856,7 @@ public class WMap extends EngineState {
                       //LAB_800e905c
                       if(this.tickMainMenuOpenTransition_800c6690 == 0) {
                         //LAB_800e9078
-                        if(Input.pressedThisFrame(InputAction.BUTTON_WEST)) { // Square
+                        if(PLATFORM.isActionPressed(INPUT_ACTION_WMAP_QUEEN_FURY.get())) {
                           if(this.mapState_800c6798.pathSegmentEndpointTypeCrossed_fc != PathSegmentEndpointType.TERMINAL_1) {
                             this.mapState_800c6798.submapCutTo_c8 = locations_800f0e34[93].submapCutTo_08;
                             this.mapState_800c6798.submapSceneTo_ca = locations_800f0e34[93].submapSceneTo_0a;
@@ -4862,7 +4881,7 @@ public class WMap extends EngineState {
   @Method(0x800e9104L)
   private void processInput() {
     //LAB_800e912c
-    if(Unpacker.getLoadingFileCount() != 0 || this.modelAndAnimData_800c66a8.fadeAnimationType_05 != FadeAnimationType.NONE_0) {
+    if(Loader.getLoadingFileCount() != 0 || this.modelAndAnimData_800c66a8.fadeAnimationType_05 != FadeAnimationType.NONE_0) {
       return;
     }
 
@@ -4892,21 +4911,21 @@ public class WMap extends EngineState {
     // Whichever mask gives a non-zero result determines whether the movement direction is positive or
     // negative. If both are zero or both are non-zero, Dart moves whichever way he is facing.
     if(
-      Input.getButtonState(InputAction.DPAD_UP) || Input.getButtonState(InputAction.JOYSTICK_LEFT_BUTTON_UP) ||
-      Input.getButtonState(InputAction.DPAD_RIGHT) || Input.getButtonState(InputAction.JOYSTICK_LEFT_BUTTON_RIGHT) ||
-      Input.getButtonState(InputAction.DPAD_DOWN) || Input.getButtonState(InputAction.JOYSTICK_LEFT_BUTTON_DOWN) ||
-      Input.getButtonState(InputAction.DPAD_LEFT) || Input.getButtonState(InputAction.JOYSTICK_LEFT_BUTTON_LEFT)
+      PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_MOVE_UP.get()) ||
+      PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_MOVE_DOWN.get()) ||
+      PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_MOVE_LEFT.get()) ||
+      PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_MOVE_RIGHT.get())
     ) {
       final int directionMaskIndex = MathHelper.radToPsxDeg(MathHelper.floorMod(this.wmapCameraAndLights19c0_800c66b0.currMapRotation_70.y - this.mapState_800c6798.previousPlayerRotation_c2 - 0.875f * MathHelper.PI, MathHelper.TWO_PI)) >> 9;
-      final boolean positiveDirection = Arrays.stream(positiveDirectionMovementMask_800f0204[directionMaskIndex]).anyMatch(Input::getButtonState);
-      final boolean negativeDirection = Arrays.stream(negativeDirectionMovementMask_800f0210[directionMaskIndex]).anyMatch(Input::getButtonState);
+      final boolean positiveDirection = Arrays.stream(positiveDirectionMovementMask_800f0204[directionMaskIndex]).anyMatch(action -> PLATFORM.isActionHeld((InputAction)action.get()));
+      final boolean negativeDirection = Arrays.stream(negativeDirectionMovementMask_800f0210[directionMaskIndex]).anyMatch(action -> PLATFORM.isActionHeld((InputAction)action.get()));
 
-      int movement;
+      float movement;
       if(positiveDirection && !negativeDirection) {
-        movement = 1;
+        movement = 1.0f;
         //LAB_800e92d0
       } else if(!positiveDirection && negativeDirection) {
-        movement = -1;
+        movement = -1.0f;
       } else {
         //LAB_800e9300
         movement = this.mapState_800c6798.facing_1c;
@@ -4914,16 +4933,22 @@ public class WMap extends EngineState {
 
       //LAB_800e9330
       //LAB_800e9364
-      if(Input.getButtonState(InputAction.BUTTON_EAST) || analogMagnitude_800beeb4 >= 0x7f) {
+      final boolean autoRun = CONFIG.getConfig(RUN_BY_DEFAULT.get());
+      final boolean runHeld = PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_RUN.get());
+      final float mag = this.getAnalogueMagnitude();
+
+      if(mag == 0.0f && autoRun != runHeld) {
         //LAB_800e9384
-        movement *= 2; // Running
+        movement *= 2.0f;
+      } else if(mag != 0.0f) {
+        movement *= mag * 2.0f;
       }
 
-      if(movement != 0) {
+      if(movement != 0.0f) {
         //LAB_800e9398
         this.mapState_800c6798.dotOffset_18 += movement / (3.0f / vsyncMode_8007a3b8);
 
-        if(movement < 0) {
+        if(movement < 0.0f) {
           this.mapState_800c6798.playerDestAngle_c0 = MathHelper.PI;
           this.mapState_800c6798.facing_1c = -1;
         } else {
@@ -5072,19 +5097,19 @@ public class WMap extends EngineState {
     int movementX = 0;
     int movementY = 0;
 
-    if(Input.getButtonState(InputAction.DPAD_UP) || Input.getButtonState(InputAction.JOYSTICK_LEFT_BUTTON_UP)) {
+    if(PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_MOVE_UP.get())) {
       movementY++;
     }
 
-    if(Input.getButtonState(InputAction.DPAD_LEFT) || Input.getButtonState(InputAction.JOYSTICK_LEFT_BUTTON_LEFT)) {
+    if(PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_MOVE_LEFT.get())) {
       movementX--;
     }
 
-    if(Input.getButtonState(InputAction.DPAD_DOWN) || Input.getButtonState(InputAction.JOYSTICK_LEFT_BUTTON_DOWN)) {
+    if(PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_MOVE_DOWN.get())) {
       movementY--;
     }
 
-    if(Input.getButtonState(InputAction.DPAD_RIGHT) || Input.getButtonState(InputAction.JOYSTICK_LEFT_BUTTON_RIGHT)) {
+    if(PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_MOVE_RIGHT.get())) {
       movementX++;
     }
 
@@ -5107,7 +5132,7 @@ public class WMap extends EngineState {
       final float playerAngleRelativeToPath = (this.wmapCameraAndLights19c0_800c66b0.currMapRotation_70.y - MathHelper.atan2(playerOffsetFromPathStart.x, playerOffsetFromPathStart.z) + MathHelper.PI) % MathHelper.TWO_PI;
 
       final int movementMaskIndex = (MathHelper.radToPsxDeg(playerAngleRelativeToPath) + 0x100 & 0xfff) >> 9;
-      if(Arrays.stream(positiveDirectionMovementMask_800f0204[movementMaskIndex]).anyMatch(Input::getButtonState)) {
+      if(Arrays.stream(positiveDirectionMovementMask_800f0204[movementMaskIndex]).anyMatch(action -> PLATFORM.isActionHeld((InputAction)action.get()))) {
         final float smallestMovementToPathAngle = currentMovementToPathAngle;
         final float pathAngleCwFromMovement = Math.abs(playerAngleRelativeToPath - angle);
         final float pathAngleCcwFromMovement = Math.abs(playerAngleRelativeToPath - angle - MathHelper.TWO_PI);

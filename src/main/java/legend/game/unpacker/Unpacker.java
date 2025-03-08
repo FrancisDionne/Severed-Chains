@@ -1,7 +1,5 @@
 package legend.game.unpacker;
 
-import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import legend.core.Config;
 import legend.core.DebugHelper;
 import legend.core.IoHelper;
@@ -9,11 +7,11 @@ import legend.core.MathHelper;
 import legend.core.Tuple;
 import legend.core.audio.xa.XaTranscoder;
 import legend.game.Scus94491BpeSegment;
+import legend.game.i18n.I18n;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -42,21 +40,21 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static legend.game.Scus94491BpeSegment.getCharacterName;
 
 public final class Unpacker {
-  private static final Pattern MRG_ENTRY = Pattern.compile("[=;]");
-  private static final Pattern DRGN_BIN = Pattern.compile("^DRGN(?:0|1|2[1234])?.BIN$");
-
   private Unpacker() { }
+
+  private static final Logger LOGGER = LogManager.getFormatterLogger(Unpacker.class);
 
   private static final String[] DISK_IDS = {"SCUS94491", "SCUS94584", "SCUS94585", "SCUS94586"};
   private static final List<String> OTHER_REGION_IDS = List.of("SCES03043", "SCES13043", "SCES23043", "SCES33043", "SCES03044", "SCES13044", "SCES23044", "SCES33044", "SCES03045", "SCES13045", "SCES23045", "SCES33045", "SCES03046", "SCES13046", "SCES23046", "SCES33046", "SCES03047", "SCES13047", "SCES23047", "SCES33047", "SCPS10119", "SCPS10120", "SCPS10121", "SCPS10122", "SCPS45461", "SCPS45462", "SCPS45463", "SCPS45464");
+  private static final String[] OTHER_REGION_NAMES = {"europe", "france", "germany", "italy", "spain", "japan", "asia"};
   private static final int PVD_SECTOR = 16;
 
   private static final Pattern ROOT_MRG = Pattern.compile("^SECT/DRGN0\\.BIN/\\d{4}/\\d+$");
+  private static final Pattern DRGN_BIN = Pattern.compile("^DRGN(?:0|1|2[1234])?.BIN$");
   private static final Pattern DRGN0_FILE = Pattern.compile("^SECT/DRGN0.BIN/\\d+/.*");
   private static final Pattern DRGN0_SUBFILE = Pattern.compile("^SECT/DRGN0.BIN/\\d+/\\d+");
   private static final Pattern ITEM_SCRIPT = Pattern.compile("^SECT/DRGN0.BIN/\\d+/1.*");
@@ -64,20 +62,9 @@ public final class Unpacker {
   /** Update this any time we make a breaking change */
   private static final int VERSION = 4;
 
-  static {
-    System.setProperty("log4j.skipJansi", "false");
-    System.setProperty("log4j2.configurationFile", "log4j2.xml");
-  }
-
-  private static final Logger LOGGER = LogManager.getFormatterLogger(Unpacker.class);
-
   public static Path ROOT = Path.of(".", "files");
 
   private static final FileData EMPTY_DIRECTORY_SENTINEL = new FileData(new byte[0]);
-
-  private static final int availableProcessors = Runtime.getRuntime().availableProcessors();
-  private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(availableProcessors);
-  private static final AtomicInteger loadingCount = new AtomicInteger();
 
   /**
    * Note: the transformation pipeline is recursive and after a transformation, the file will be placed back into the transformation queue
@@ -101,9 +88,9 @@ public final class Unpacker {
     transformers.put(Unpacker::drgn21_693_0_patcherDiscriminator, Unpacker::drgn21_693_0_patcher);
     transformers.put(Unpacker::drgn0_142_animPatcherDiscriminator, Unpacker::drgn0_142_animPatcher);
 
-    // Equipment, spells, XP, and TIMs from lod_engine
+    // Spells, XP, and TIMs from lod_engine
     transformers.put(Unpacker::lodEngineDiscriminator, Unpacker::lodEngineExtractor);
-    transformers.put(Unpacker::equipmentAndXpDiscriminator, Unpacker::equipmentAndXpExtractor);
+    transformers.put(Unpacker::xpDiscriminator, Unpacker::xpExtractor);
     transformers.put(Unpacker::spellsDiscriminator, Unpacker::spellsExtractor);
 
     // Savepoint etc. from SMAP
@@ -138,15 +125,12 @@ public final class Unpacker {
   static {
     // Convert submap PXLs into individual TIMs
     postTransformers.add(SubmapPxlTransformer::transform);
+
+    postTransformers.add(Unpacker::replaceBrokenClaireModel);
   }
 
   private static Consumer<String> statusListener = status -> { };
   private static boolean shouldStop;
-
-  public static void main(final String[] args) throws UnpackerException {
-    unpack();
-    EXECUTOR.shutdown();
-  }
 
   public static void stop() {
     shouldStop = true;
@@ -154,233 +138,6 @@ public final class Unpacker {
 
   public static void setStatusListener(final Consumer<String> listener) {
     statusListener = listener;
-  }
-
-  public static void shutdownLoader() {
-    EXECUTOR.shutdown();
-  }
-
-  public static FileData loadFile(final Path path) {
-    LOGGER.info("Loading file %s", path);
-
-    try {
-      return new FileData(Files.readAllBytes(path));
-    } catch(final IOException e) {
-      throw new RuntimeException("Failed to load file " + path, e);
-    }
-  }
-
-  public static Path resolve(final String name) {
-    return ROOT.resolve(fixPath(name));
-  }
-
-  public static FileData loadFile(final String name) {
-    return loadFile(ROOT.resolve(fixPath(name)));
-  }
-
-  public static void loadFile(final Path path, final Consumer<FileData> onCompletion) {
-    final int total = loadingCount.incrementAndGet();
-    final StackWalker.StackFrame frame = DebugHelper.getCallerFrame();
-    LOGGER.info("Queueing file %s (total queued: %d) from %s.%s(%s:%d)", path, total, frame.getClassName(), frame.getMethodName(), frame.getFileName(), frame.getLineNumber());
-
-    EXECUTOR.execute(() -> {
-      onCompletion.accept(loadFile(path));
-      final int remaining = loadingCount.decrementAndGet();
-      LOGGER.info("File %s loaded (remaining queued: %d)", path, remaining);
-    });
-  }
-
-  public static void loadFile(final String name, final Consumer<FileData> onCompletion) {
-    final int total = loadingCount.incrementAndGet();
-    LOGGER.info("Queueing file %s (total queued: %d)", name, total);
-    EXECUTOR.execute(() -> {
-      onCompletion.accept(loadFile(name));
-      final int remaining = loadingCount.decrementAndGet();
-      LOGGER.info("File %s loaded (remaining queued: %d)", name, remaining);
-    });
-  }
-
-  public static void loadFiles(final Consumer<List<FileData>> onCompletion, final String... files) {
-    final int total = loadingCount.updateAndGet(i -> i + files.length);
-    LOGGER.info("Queueing files %s (total queued: %d)", Arrays.toString(files), total);
-
-    EXECUTOR.execute(() -> {
-      final List<FileData> fileData = new ArrayList<>();
-      for(final String file : files) {
-        final FileData data = Unpacker.loadFile(file);
-        fileData.add(data);
-      }
-
-      onCompletion.accept(fileData);
-      final int remaining = loadingCount.updateAndGet(i -> i - files.length);
-      LOGGER.info("Files %s loaded (remaining queued: %d)", Arrays.toString(files), remaining);
-    });
-  }
-
-  public static void loadDirectory(final String name, final Consumer<List<FileData>> onCompletion) {
-    final int total = loadingCount.incrementAndGet();
-    LOGGER.info("Queueing directory %s (total queued: %d)", name, total);
-    EXECUTOR.execute(() -> {
-      onCompletion.accept(loadDirectory(name));
-      final int remaining = loadingCount.decrementAndGet();
-      LOGGER.info("Directory %s loaded (remaining queued: %d)", name, remaining);
-    });
-  }
-
-  public static void loadDirectory(final Path dir, final Consumer<List<FileData>> onCompletion) {
-    final int total = loadingCount.incrementAndGet();
-
-    final StackWalker.StackFrame frame = DebugHelper.getCallerFrame();
-    LOGGER.info("Queueing directory %s (total queued: %d) from %s.%s(%s:%d)", dir, total, frame.getClassName(), frame.getMethodName(), frame.getFileName(), frame.getLineNumber());
-
-    EXECUTOR.execute(() -> {
-      onCompletion.accept(loadDirectory(dir));
-      final int remaining = loadingCount.decrementAndGet();
-      LOGGER.info("Directory %s loaded (remaining queued: %d)", dir, remaining);
-    });
-  }
-
-  public static List<FileData> loadDirectory(final String name) {
-    return loadDirectory(ROOT.resolve(fixPath(name)));
-  }
-
-  public static List<FileData> loadDirectory(final Path dir) {
-    LOGGER.info("Loading directory %s", dir);
-
-    final Path mrg = dir.resolve("mrg");
-
-    if(Files.exists(mrg)) {
-      try(final BufferedReader reader = Files.newBufferedReader(mrg)) {
-        final Int2IntMap fileMap = new Int2IntArrayMap();
-        final Int2IntMap virtualSizeMap = new Int2IntArrayMap();
-
-        reader.lines().forEach(line -> {
-          final String[] parts = MRG_ENTRY.split(line);
-
-          if(parts.length != 3) {
-            throw new RuntimeException("Invalid MRG entry! " + line);
-          }
-
-          final int virtual = Integer.parseInt(parts[0]);
-
-          // Indicates no file
-          if(parts[1].isBlank()) {
-            fileMap.put(virtual, -1);
-            virtualSizeMap.put(virtual, 0);
-            return;
-          }
-
-          final int real = Integer.parseInt(parts[1]);
-          fileMap.put(virtual, real);
-          virtualSizeMap.put(virtual, Integer.parseInt(parts[2]));
-        });
-
-        final List<FileData> files = new ArrayList<>();
-
-        // Add real files
-        for(final var entry : fileMap.int2IntEntrySet()) {
-          final int virtual = entry.getIntKey();
-          final int real = entry.getIntValue();
-
-          // No file
-          if(real == -1) {
-            files.add(null);
-            continue;
-          }
-
-          try {
-            final Path file = dir.resolve(String.valueOf(real));
-            if(Files.isRegularFile(file)) {
-              if(virtual == real) {
-                files.add(new FileData(Files.readAllBytes(file)));
-              } else {
-                files.add(null);
-              }
-            } else if(Files.isDirectory(file)) {
-              files.add(new FileData(new byte[0]));
-            }
-          } catch(final IOException e) {
-            throw new RuntimeException("Failed to load directory " + dir, e);
-          }
-        }
-
-        // Add virtual files
-        for(final var entry : fileMap.int2IntEntrySet()) {
-          final int virtual = entry.getIntKey();
-          int real = entry.getIntValue();
-
-          if(virtual == real || real == -1) {
-            continue;
-          }
-
-          // Resolve to the realest file
-          while(fileMap.get(real) != real) {
-            real = fileMap.get(real);
-          }
-
-          final Path file = dir.resolve(String.valueOf(real));
-          if(Files.isRegularFile(file)) {
-            files.set(virtual, FileData.virtual(files.get(real), virtualSizeMap.get(virtual), real));
-          }
-        }
-
-        return files;
-      } catch(final IOException e) {
-        throw new RuntimeException("Failed to load directory " + dir, e);
-      }
-    } else {
-      try(final DirectoryStream<Path> ds = Files.newDirectoryStream(dir)) {
-        final List<FileData> files = new ArrayList<>();
-
-        StreamSupport.stream(ds.spliterator(), false)
-          .filter(Files::isRegularFile)
-          .sorted((path1, path2) -> {
-            final String filename1 = path1.getFileName().toString();
-            final String filename2 = path2.getFileName().toString();
-
-            try {
-              return Integer.compare(Integer.parseInt(filename1), Integer.parseInt(filename2));
-            } catch(final NumberFormatException ignored) { }
-
-            return String.CASE_INSENSITIVE_ORDER.compare(filename1, filename2);
-          })
-          .forEach(child -> {
-            try {
-              files.add(new FileData(Files.readAllBytes(child)));
-            } catch(final IOException e) {
-              throw new RuntimeException("Failed to load directory " + dir, e);
-            }
-          });
-
-        return files;
-      } catch(final IOException e) {
-        throw new RuntimeException("Failed to load directory " + dir, e);
-      }
-    }
-  }
-
-  public static int getLoadingFileCount() {
-    return loadingCount.get();
-  }
-
-  public static boolean exists(final String name) {
-    return Files.exists(ROOT.resolve(fixPath(name)));
-  }
-
-  public static boolean isDirectory(final String name) {
-    return Files.isDirectory(ROOT.resolve(fixPath(name)));
-  }
-
-  private static String fixPath(String name) {
-    if(name.contains(";")) {
-      name = name.substring(0, name.lastIndexOf(';'));
-    }
-
-    if(name.startsWith("\\")) {
-      name = name.substring(1);
-    }
-
-    return name.replace('\\', '/');
   }
 
   public static void unpack() throws UnpackerException {
@@ -391,22 +148,55 @@ public final class Unpacker {
       if(getUnpackVersion() != VERSION) {
         final long start = System.nanoTime();
 
-        statusListener.accept("Deleting old unpacked files...");
+        statusListener.accept(I18n.translate("unpacker.deleting_old"));
         LOGGER.info("Deleting old unpacked files...");
         deleteUnpack();
         LOGGER.info("Files deleted in %d seconds", (System.nanoTime() - start) / 1_000_000_000L);
       }
 
+      statusListener.accept(I18n.translate("unpacker.loading_disks"));
+
+      // Wait for disks
+      final IsoReader[] readers = new IsoReader[4];
+      final String[] errors = new String[4];
+
+      while(true) {
+        getIsoReaders(readers, errors);
+
+        int diskCount = 0;
+        for(int i = 0; i < readers.length; i++) {
+          if(readers[i] != null) {
+            diskCount++;
+          }
+        }
+
+        if(diskCount == readers.length) {
+          break;
+        }
+
+        String help = I18n.translate("unpacker.disk_help");
+
+        for(int i = 0; i < readers.length; i++) {
+          help += '\n' + I18n.translate("unpacker.disk_status", i + 1, errors[i]);
+        }
+
+        statusListener.accept(help);
+
+        if(shouldStop) {
+          throw new UnpackerStoppedRuntimeException("Game closed");
+        }
+
+        DebugHelper.sleep(1000);
+      }
+
       final long start = System.nanoTime();
-      final IsoReader[] readers = getIsoReaders();
+
       final DirectoryEntry[] roots = new DirectoryEntry[4];
       final DirectoryEntry root = loadRoot(readers[3], null);
 
       for(int i = 0; i < roots.length - 1; i++) {
         loadRoot(readers[i], root);
       }
-
-      statusListener.accept("Loading disk images...");
 
       final long fileTreeTime = System.nanoTime();
       LOGGER.info("Populating initial file tree...");
@@ -418,7 +208,7 @@ public final class Unpacker {
       LOGGER.info("Initial file tree populated in %fs", (System.nanoTime() - fileTreeTime) / 1_000_000_000.0f);
 
       if(!transformationQueue.isEmpty()) {
-        statusListener.accept("Transforming files...");
+        statusListener.accept(I18n.translate("unpacker.transforming_files", 0));
 
         final long leafTransformTime = System.nanoTime();
         LOGGER.info("Performing leaf transformations...");
@@ -431,7 +221,7 @@ public final class Unpacker {
         try(final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
           executor.execute(() -> {
             while(!transformations.isEmpty() && transformationThrowable.get() == null) {
-              statusListener.accept("Transforming %d files...".formatted(transformations.getRemaining()));
+              statusListener.accept(I18n.translate("unpacker.transforming_files", transformations.getRemaining()));
               DebugHelper.sleep(50);
             }
           });
@@ -467,7 +257,7 @@ public final class Unpacker {
 
         LOGGER.info("Leaf transformations completed in %fs", (System.nanoTime() - leafTransformTime) / 1_000_000_000.0f);
 
-        statusListener.accept("Transforming directories...");
+        statusListener.accept(I18n.translate("unpacker.transforming_directories"));
 
         final long branchTransformTime = System.nanoTime();
         LOGGER.info("Performing branch transformations...");
@@ -486,7 +276,7 @@ public final class Unpacker {
 
           executor.execute(() -> {
             while(remaining.get() > 0) {
-              statusListener.accept("Writing %d files...".formatted(remaining.get()));
+              statusListener.accept(I18n.translate("unpacker.writing_files", remaining.get()));
               DebugHelper.sleep(50);
             }
           });
@@ -510,7 +300,7 @@ public final class Unpacker {
       LOGGER.info("Files unpacked in %fs", (System.nanoTime() - start) / 1_000_000_000.0f);
     } catch(final OutOfMemoryError e) {
       LOGGER.info("Ran out of memory while unpacking, switching to low memory unpacker. Please restart the game.");
-      statusListener.accept("Ran out of memory while unpacking, switching to low memory unpacker. Please restart the game.");
+      statusListener.accept(I18n.translate("unpacker.low_memory"));
 
       Config.enableLowMemoryUnpacker();
       try {
@@ -568,43 +358,31 @@ public final class Unpacker {
     }
   }
 
-  private static IsoReader[] getIsoReaders() throws IOException {
-    final IsoReader[] readers = new IsoReader[4];
-    int diskCount = 0;
+  private static void getIsoReaders(final IsoReader[] readers, final String[] errors) throws IOException {
+    Arrays.fill(errors, I18n.translate("unpacker.disk_not_found"));
 
     try(final DirectoryStream<Path> children = Files.newDirectoryStream(Path.of("isos"))) {
       for(final Path child : children) {
-        final Tuple<IsoReader, Integer> tuple = getIsoReader(child);
+        final Tuple<IsoReader, Integer> tuple = getIsoReader(child, errors);
 
         if(tuple != null) {
           final int diskNum = tuple.b();
 
+          errors[diskNum] = I18n.translate("unpacker.disk_found");
+
           if(readers[diskNum] != null) {
-            LOGGER.warn("Found duplicate disk %d: %s", diskNum + 1, child);
+            tuple.a().close();
             continue;
           }
 
           LOGGER.info("Found disk %d: %s", diskNum + 1, child);
           readers[diskNum] = tuple.a();
-          diskCount++;
         }
       }
     }
-
-    if(diskCount < 4) {
-      for(int i = 0; i < readers.length; i++) {
-        if(readers[i] == null) {
-          LOGGER.error("Failed to find disk %d!", i + 1);
-        }
-      }
-
-      throw new UnpackerException("Failed to locate disk images");
-    }
-
-    return readers;
   }
 
-  private static Tuple<IsoReader, Integer> getIsoReader(final Path path) throws IOException {
+  private static Tuple<IsoReader, Integer> getIsoReader(final Path path, final String[] errors) throws IOException {
     final long fileSize = Files.size(path);
 
     if(fileSize < (PVD_SECTOR + 1) * IsoReader.SECTOR_SIZE) {
@@ -615,12 +393,21 @@ public final class Unpacker {
     final ByteBuffer sectorBuffer = ByteBuffer.wrap(sectorData);
     sectorBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
-    final IsoReader reader = new IsoReader(path);
+    final IsoReader reader;
+
+    try {
+      reader = new IsoReader(path);
+    } catch(final IOException e) {
+      // Failed to open file, probably mid-copy
+      return null;
+    }
+
     reader.seekSector(PVD_SECTOR);
     reader.advance(IsoReader.SYNC_PATTER_SIZE);
     reader.read(sectorData);
 
     if(sectorBuffer.get() != 1 || !"CD001".equals(IoHelper.readString(sectorBuffer, 5)) || sectorBuffer.get() != 0x1 || !"PLAYSTATION".equals(IoHelper.readString(sectorBuffer, 32).trim())) {
+      reader.close();
       return null;
     }
 
@@ -633,9 +420,11 @@ public final class Unpacker {
     }
 
     if(OTHER_REGION_IDS.contains(readId)) {
-      LOGGER.warn("Found disk %s from another region: %s", readId, path);
+      final int index = OTHER_REGION_IDS.indexOf(readId);
+      errors[index % 4] = I18n.translate("unpacker.disk_wrong_region", I18n.translate("unpacker.region." + OTHER_REGION_NAMES[index / 4]));
     }
 
+    reader.close();
     return null;
   }
 
@@ -835,7 +624,7 @@ public final class Unpacker {
 
   private static void drgn21_402_3_patcher(final PathNode node, final Transformations transformations, final Set<String> flags) {
     final byte[] newData = new byte[0x107c];
-    node.data.copyFrom(newData);
+    node.data.read(newData);
     newData[0x1078] = 0x49;
     transformations.replaceNode(node, new FileData(newData));
   }
@@ -853,7 +642,7 @@ public final class Unpacker {
 
   private static void drgn21_693_0_patcher(final PathNode node, final Transformations transformations, final Set<String> flags) {
     final byte[] newData = new byte[0x190];
-    node.data.copyFrom(newData);
+    node.data.read(newData);
     MathHelper.set(newData, 0x188, 4, 0xffffffffL);
     MathHelper.set(newData, 0x18c, 4, 0xffffffffL);
     transformations.replaceNode(node, new FileData(newData));
@@ -874,20 +663,20 @@ public final class Unpacker {
     final byte[] frame = {0x0e, (byte)0xe0, (byte)0xfe, (byte)0xde, (byte)0xff, (byte)0x9d, 0x1d, 0x00, 0x28, 0x03, (byte)0xcb, 0x00};
     // Note: we only create data for object 21, object 22 can be all 0's since it's not visible
 
-    node.data.copyFrom(0, newData, 0, 0x100);
+    node.data.read(0, newData, 0, 0x100);
     System.arraycopy(frame, 0, newData, 0x100, frame.length); // obj 21
-    node.data.copyFrom(0x100, newData, 0x118, 0xf0);
+    node.data.read(0x100, newData, 0x118, 0xf0);
     System.arraycopy(frame, 0, newData, 0x208, frame.length); // obj 21
     newData[0xc] = 22;
 
     transformations.replaceNode(node, new FileData(newData));
   }
 
-  private static boolean equipmentAndXpDiscriminator(final PathNode node, final Set<String> flags) {
+  private static boolean xpDiscriminator(final PathNode node, final Set<String> flags) {
     return "OVL/S_ITEM.OV_".equals(node.fullPath) && !flags.contains(node.fullPath);
   }
 
-  private static void equipmentAndXpExtractor(final PathNode node, final Transformations transformations, final Set<String> flags) {
+  private static void xpExtractor(final PathNode node, final Transformations transformations, final Set<String> flags) {
     flags.add(node.fullPath);
 
     transformations.addNode(node);
@@ -900,10 +689,6 @@ public final class Unpacker {
     transformations.addNode("characters/rose/xp", node.data.slice(0x1823c, 61 * 4));
     transformations.addNode("characters/shana/xp", node.data.slice(0x18330, 61 * 4));
     transformations.addNode("characters/miranda/xp", node.data.slice(0x18330, 61 * 4));
-
-    for(int i = 0; i < 192; i++) {
-      transformations.addNode("equipment/" + i + ".deqp", node.data.slice(0x16878 + i * 0x1c, 0x1c));
-    }
   }
 
   private static boolean spellsDiscriminator(final PathNode node, final Set<String> flags) {
@@ -979,13 +764,13 @@ public final class Unpacker {
     final int subfunc273params1a = 0xffff_f000;
     final int subfunc273params1b = 0xffff_fffa;
 
-    node.data.copyFrom(0, newData, 0, 0x47c0);
+    node.data.read(0, newData, 0, 0x47c0);
     MathHelper.set(newData, 0x47c0, 4, jump);
     System.arraycopy(address1, 0, newData, 0x47c4, address1.length);
-    node.data.copyFrom(0x47cd, newData, 0x47cd, 0x73f);
+    node.data.read(0x47cd, newData, 0x47cd, 0x73f);
     MathHelper.set(newData, 0x4f0c, 4, jump);
     System.arraycopy(address2, 0, newData, 0x4f10, address2.length);
-    node.data.copyFrom(0x4f15, newData, 0x4f15, 0x2307);
+    node.data.read(0x4f15, newData, 0x4f15, 0x2307);
     System.arraycopy(subfunc160a, 0, newData, 0x721c, subfunc160a.length);
     System.arraycopy(subfunc160params12a, 0, newData, 0x7224, subfunc160params12a.length);
     MathHelper.set(newData, 0x722c, 4, subfunc273);
@@ -1049,15 +834,22 @@ public final class Unpacker {
 
     final byte[] newData = new byte[data.size() + 0xc * keyframes * (expectedObjects - actualObjects)];
 
-    data.copyFrom(0, newData, 0, 0x10);
+    data.read(0, newData, 0, 0x10);
 
     for(int i = 0; i < keyframes; i++) {
       // This will fill the new objects with the first objects from the next keyframe to emulate retail behaviour. The last keyframe is an exception - it gets zero-filled.
-      data.copyFrom(0x10 + i * 0xc * actualObjects, newData, 0x10 + i * 0xc * expectedObjects, Math.min(0xc * expectedObjects, data.size() - (0x10 + i * 0xc * actualObjects)));
+      data.read(0x10 + i * 0xc * actualObjects, newData, 0x10 + i * 0xc * expectedObjects, Math.min(0xc * expectedObjects, data.size() - (0x10 + i * 0xc * actualObjects)));
     }
 
     newData[0xc] = (byte)expectedObjects;
     return newData;
+  }
+
+  /** Replaces the disk 2 Claire model (broken face UVs) with the good model from disk 3 */
+  private static void replaceBrokenClaireModel(final PathNode root, final Transformations transformations, final Set<String> flags) {
+    final PathNode bad = root.children.get("SECT").children.get("DRGN22.BIN").children.get("863").children.get("33");
+    final PathNode good = root.children.get("SECT").children.get("DRGN23.BIN").children.get("506").children.get("33");
+    transformations.replaceNode(bad, good.data);
   }
 
   /**

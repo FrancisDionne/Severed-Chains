@@ -3,16 +3,19 @@ package legend.lodmod.items;
 import legend.core.memory.Method;
 import legend.game.Scus94491BpeSegment_8002;
 import legend.game.combat.bent.BattleEntity27c;
+import legend.game.inventory.ItemIcon;
 import legend.game.inventory.UseItemResponse;
 import legend.lodmod.LodMod;
 
+import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
+import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 
 public class RecoverMpItem extends BattleItem {
   private final boolean targetAll;
   private final int percentage;
 
-  public RecoverMpItem(final int icon, final int price, final boolean targetAll, final int percentage) {
+  public RecoverMpItem(final ItemIcon icon, final int price, final boolean targetAll, final int percentage) {
     super(icon, price);
     this.targetAll = targetAll;
     this.percentage = percentage;
@@ -21,6 +24,19 @@ public class RecoverMpItem extends BattleItem {
   @Override
   public boolean canBeUsed(final UsageLocation location) {
     return true;
+  }
+
+  @Override
+  public boolean canBeUsedNow(final UsageLocation location) {
+    boolean canRecover = false;
+    for(int i = 0; i < characterIndices_800bdbb8.length; i++) {
+      if((gameState_800babc8.charData_32c[i].partyFlags_04 & 0x3) != 0 && stats_800be5f8[i].maxMp_6e > stats_800be5f8[i].mp_06) {
+        canRecover = true;
+        break;
+      }
+    }
+
+    return canRecover;
   }
 
   @Override

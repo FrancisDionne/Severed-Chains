@@ -1,7 +1,9 @@
 package legend.game.inventory.screens.controls;
 
 import legend.core.MathHelper;
-import legend.game.input.InputAction;
+import legend.core.platform.input.InputAction;
+import legend.core.platform.input.InputMod;
+import legend.game.inventory.ItemIcon;
 import legend.game.inventory.screens.Control;
 import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.InputPropagation;
@@ -11,20 +13,29 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
 import static legend.game.SItem.FUN_80104b60;
+import static legend.game.SItem.renderCharacterPortrait;
 import static legend.game.SItem.renderItemIcon;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_800b.textZ_800bdf00;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HOME;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_DOWN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class ListBox<T> extends Control {
   private final Function<T, String> entryToString;
   @Nullable
-  private final ToIntFunction<T> entryToIcon;
+  private final Function<T, ItemIcon> entryToIcon;
   @Nullable
   private final ToIntFunction<T> entryToRightIcon;
   @Nullable
@@ -37,12 +48,15 @@ public class ListBox<T> extends Control {
   private int scroll;
   private int slot;
 
+  /** Allows list wrapping, but only on new input */
+  private boolean allowWrapY = true;
+
   private final Glyph highlight;
 
   private final Glyph upArrow;
   private final Glyph downArrow;
 
-  public ListBox(final Function<T, String> entryToString, @Nullable final ToIntFunction<T> entryToIcon, @Nullable final ToIntFunction<T> entryToRightIcon, @Nullable final Predicate<T> isDisabled) {
+  public ListBox(final Function<T, String> entryToString, @Nullable final Function<T, ItemIcon> entryToIcon, @Nullable final ToIntFunction<T> entryToRightIcon, @Nullable final Predicate<T> isDisabled) {
     this.entryToString = entryToString;
     this.entryToIcon = entryToIcon;
     this.entryToRightIcon = entryToRightIcon;
@@ -230,7 +244,7 @@ public class ListBox<T> extends Control {
   }
 
   @Override
-  protected InputPropagation mouseClick(final int x, final int y, final int button, final int mods) {
+  protected InputPropagation mouseClick(final int x, final int y, final int button, final Set<InputMod> mods) {
     if(super.mouseClick(x, y, button, mods) == InputPropagation.HANDLED) {
       return InputPropagation.HANDLED;
     }
@@ -268,13 +282,131 @@ public class ListBox<T> extends Control {
     return InputPropagation.HANDLED;
   }
 
+  private void menuNavigateUp() {
+    if(this.slot > 0) {
+      playMenuSound(1);
+      this.select(this.slot - 1);
+    } else if(this.scroll > 0) {
+      playMenuSound(1);
+      this.scroll--;
+      this.updateEntries();
+      this.select(this.slot);
+    } else if(this.visibleEntries() > 1 && this.allowWrapY) {
+      playMenuSound(1);
+      this.scroll = this.getEntries().size() > 7 ? this.getEntries().size() - 7 : 0;
+      this.updateEntries();
+      this.select(this.getEntries().size() > 6 ? 6 : this.getEntries().size() - 1);
+    }
+  }
+
+  private void menuNavigateDown() {
+    if(this.slot < this.visibleEntries() - 1) {
+      playMenuSound(1);
+      this.select(this.slot + 1);
+    } else if(this.scroll < this.entries.size() - this.maxVisibleEntries) {
+      playMenuSound(1);
+      this.scroll++;
+      this.updateEntries();
+      this.select(this.slot);
+    } else if(this.visibleEntries() > 1 && this.allowWrapY) {
+      playMenuSound(1);
+      this.scroll = 0;
+      this.updateEntries();
+      this.select(0);
+    }
+  }
+
+  private void menuNavigatePageUp() {
+    if(this.scroll - this.maxVisibleEntries >= 0) {
+      playMenuSound(1);
+      this.scroll -= this.maxVisibleEntries;
+      this.updateEntries();
+      this.select(this.slot);
+    } else if(this.scroll != 0) {
+      playMenuSound(1);
+      this.scroll = 0;
+      this.updateEntries();
+      this.select(this.slot);
+    }
+  }
+
+  private void menuNavigatePageDown() {
+    if(this.scroll + this.maxVisibleEntries < this.entries.size() - this.maxVisibleEntries) {
+      playMenuSound(1);
+      this.scroll += this.maxVisibleEntries;
+      this.updateEntries();
+      this.select(this.slot);
+    } else if(this.entries.size() > this.maxVisibleEntries && this.scroll != this.entries.size() - this.maxVisibleEntries) {
+      playMenuSound(1);
+      this.scroll = this.entries.size() - this.maxVisibleEntries;
+      this.updateEntries();
+      this.select(this.slot);
+    }
+  }
+
+  private void menuNavigateHome() {
+    if(this.slot > 0 || this.scroll > 0) {
+      playMenuSound(1);
+      this.scroll = 0;
+      this.updateEntries();
+      this.select(0);
+    }
+  }
+
+  private void menuNavigateEnd() {
+    if(this.scroll + this.slot != this.entries.size() - 1) {
+      playMenuSound(1);
+      this.slot = Math.min(this.maxVisibleEntries - 1, this.entries.size() - 1);
+      this.scroll = this.entries.size() - 1 - this.slot;
+      this.updateEntries();
+      this.select(this.slot);
+    }
+  }
+
   @Override
-  protected InputPropagation pressedThisFrame(final InputAction inputAction) {
-    if(super.pressedThisFrame(inputAction) == InputPropagation.HANDLED) {
+  protected InputPropagation inputActionPressed(final InputAction action, final boolean repeat) {
+    if(super.inputActionPressed(action, repeat) == InputPropagation.HANDLED) {
       return InputPropagation.HANDLED;
     }
 
-    if(inputAction == InputAction.BUTTON_SOUTH) {
+    if(action == INPUT_ACTION_MENU_HOME.get()) {
+      this.menuNavigateHome();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_END.get()) {
+      this.menuNavigateEnd();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_PAGE_UP.get()) {
+      this.menuNavigatePageUp();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_PAGE_DOWN.get()) {
+      this.menuNavigatePageDown();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_UP.get()) {
+      this.menuNavigateUp();
+      this.allowWrapY = false;
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_DOWN.get()) {
+      this.menuNavigateDown();
+      this.allowWrapY = false;
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_CONFIRM.get() && !repeat) {
+      if(this.isEmpty()) {
+        playMenuSound(40);
+        return InputPropagation.HANDLED;
+      }
+
       if(this.isDisabled != null && this.isDisabled.test(this.getSelectedEntry())) {
         return InputPropagation.HANDLED;
       }
@@ -290,87 +422,14 @@ public class ListBox<T> extends Control {
   }
 
   @Override
-  protected InputPropagation pressedWithRepeatPulse(final InputAction inputAction) {
-    if(super.pressedWithRepeatPulse(inputAction) == InputPropagation.HANDLED) {
+  public InputPropagation inputActionReleased(final InputAction action) {
+    if(super.inputActionReleased(action) == InputPropagation.HANDLED) {
       return InputPropagation.HANDLED;
     }
 
-    switch(inputAction) {
-      case DPAD_UP, JOYSTICK_LEFT_BUTTON_UP -> {
-        if(this.slot > 0) {
-          playMenuSound(1);
-          this.select(this.slot - 1);
-          return InputPropagation.HANDLED;
-        } else if(this.scroll > 0) {
-          playMenuSound(1);
-          this.scroll--;
-          this.updateEntries();
-          this.select(this.slot);
-          return InputPropagation.HANDLED;
-        }
-      }
-
-      case DPAD_DOWN, JOYSTICK_LEFT_BUTTON_DOWN -> {
-        if(this.slot < this.visibleEntries() - 1) {
-          playMenuSound(1);
-          this.select(this.slot + 1);
-          return InputPropagation.HANDLED;
-        } else if(this.scroll < this.entries.size() - this.maxVisibleEntries) {
-          playMenuSound(1);
-          this.scroll++;
-          this.updateEntries();
-          this.select(this.slot);
-          return InputPropagation.HANDLED;
-        }
-      }
-
-      case BUTTON_SHOULDER_LEFT_1 -> {
-        if(this.slot > 0) {
-          playMenuSound(1);
-          this.select(0);
-          return InputPropagation.HANDLED;
-        }
-      }
-
-      case BUTTON_SHOULDER_LEFT_2 -> {
-        if(this.entries.size() > this.maxVisibleEntries - 1 && this.slot != this.maxVisibleEntries - 1) {
-          playMenuSound(1);
-          this.select(this.maxVisibleEntries - 1);
-          return InputPropagation.HANDLED;
-        }
-      }
-
-      case BUTTON_SHOULDER_RIGHT_1 -> {
-        if(this.scroll - this.maxVisibleEntries - 1 >= 0) {
-          playMenuSound(1);
-          this.scroll -= this.maxVisibleEntries - 1;
-          this.updateEntries();
-          this.select(this.slot);
-        } else {
-          if(this.scroll != 0) {
-            this.scroll = 0;
-            this.updateEntries();
-            this.select(this.slot);
-          }
-        }
-        return InputPropagation.HANDLED;
-      }
-
-      case BUTTON_SHOULDER_RIGHT_2 -> {
-        if(this.scroll + this.maxVisibleEntries - 1 < this.entries.size() - this.maxVisibleEntries) {
-          playMenuSound(1);
-          this.scroll += this.maxVisibleEntries - 1;
-          this.updateEntries();
-          this.select(this.slot);
-        } else {
-          if(this.entries.size() > this.maxVisibleEntries && this.scroll != this.entries.size() - this.maxVisibleEntries) {
-            this.scroll = this.entries.size() - this.maxVisibleEntries;
-            this.updateEntries();
-            this.select(this.slot);
-          }
-        }
-        return InputPropagation.HANDLED;
-      }
+    if(action == INPUT_ACTION_MENU_UP.get() || action == INPUT_ACTION_MENU_DOWN.get()) {
+      this.allowWrapY = true;
+      return InputPropagation.HANDLED;
     }
 
     return InputPropagation.PROPAGATE;
@@ -437,22 +496,16 @@ public class ListBox<T> extends Control {
       textZ_800bdf00 = oldZ;
 
       if(ListBox.this.entryToIcon != null) {
-        renderItemIcon(ListBox.this.entryToIcon.applyAsInt(this.data), x + 13, y + 1, 0x8);
+        renderItemIcon(ListBox.this.entryToIcon.apply(this.data), x + 13, y + 1, 0x8);
       }
 
       if(ListBox.this.entryToRightIcon != null) {
         final int icon = ListBox.this.entryToRightIcon.applyAsInt(this.data);
 
         if(icon != -1) {
-          renderItemIcon(48 | icon, x + this.getWidth() - 20, y + 1, 0x8).clut_30 = (500 + icon & 0x1ff) << 6 | 0x2b;
+          renderCharacterPortrait(icon, x + this.getWidth() - 20, y + 1, 0x8).clut_30 = (500 + icon & 0x1ff) << 6 | 0x2b;
         }
       }
-    }
-
-    /** Override here to allow access above */
-    @Override
-    protected boolean containsPoint(final int x, final int y) {
-      return super.containsPoint(x, y);
     }
   }
 }
