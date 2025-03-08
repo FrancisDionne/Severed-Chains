@@ -1,7 +1,7 @@
 package legend.game.combat.ui;
 
 import legend.core.opengl.Texture;
-import legend.game.input.InputAction;
+import legend.core.platform.input.InputAction;
 
 public class FooterAction {
   public FooterActions action;

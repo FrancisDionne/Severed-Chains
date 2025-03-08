@@ -684,7 +684,7 @@ public class TooManyItemsScreen extends MenuScreen {
   
   private void setMenuState(final MenuState state) {
     this.menuState = state;
-    if (state == MenuState._9) {
+    if (state == MenuState.INVENTORY_9) {
       FooterActionsHud.setMenuActions(FooterActions.SORT, null, null);
     } else {
       FooterActionsHud.setMenuActions(null, null, null);

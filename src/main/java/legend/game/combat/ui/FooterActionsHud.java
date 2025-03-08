@@ -5,7 +5,7 @@ import legend.core.gpu.Bpp;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
-import legend.game.input.InputAction;
+import legend.core.platform.input.InputAction;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.coremod.CoreMod;
 import org.joml.Matrix4f;
@@ -19,6 +19,10 @@ import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.UI_TEXT;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 
 public final class FooterActionsHud {
   private static final Matrix4f m = new Matrix4f();
@@ -56,30 +60,22 @@ public final class FooterActionsHud {
   private static Texture getTexture(final InputAction inputAction) {
     final ControllerStyle style = CONFIG.getConfig(CoreMod.CONTROLLER_STYLE_CONFIG.get());
     if (style == ControllerStyle.XBOX) {
-      return switch(inputAction) {
-        case InputAction.BUTTON_SOUTH -> textures[10];
-        case InputAction.BUTTON_WEST -> textures[12];
-        case InputAction.BUTTON_NORTH -> textures[13];
-        case InputAction.BUTTON_EAST -> textures[11];
-        default -> null;
-      };
+      if (inputAction == INPUT_ACTION_MENU_CONFIRM.get()) return textures[10];
+      if (inputAction == INPUT_ACTION_MENU_DELETE.get()) return textures[12];
+      if (inputAction == INPUT_ACTION_MENU_SORT.get()) return textures[13];
+      if (inputAction == INPUT_ACTION_MENU_BACK.get()) return textures[11];
     }
     if (style == ControllerStyle.NINTENDO) {
-      return switch(inputAction) {
-        case InputAction.BUTTON_SOUTH -> textures[14];
-        case InputAction.BUTTON_WEST -> textures[16];
-        case InputAction.BUTTON_NORTH -> textures[17];
-        case InputAction.BUTTON_EAST -> textures[15];
-        default -> null;
-      };
+      if (inputAction == INPUT_ACTION_MENU_CONFIRM.get()) return textures[14];
+      if (inputAction == INPUT_ACTION_MENU_DELETE.get()) return textures[16];
+      if (inputAction == INPUT_ACTION_MENU_SORT.get()) return textures[17];
+      if (inputAction == INPUT_ACTION_MENU_BACK.get()) return textures[15];
     }
-    return switch(inputAction) {
-      case InputAction.BUTTON_SOUTH -> textures[0];
-      case InputAction.BUTTON_WEST -> textures[1];
-      case InputAction.BUTTON_NORTH -> textures[2];
-      case InputAction.BUTTON_EAST -> textures[3];
-      default -> null;
-    };
+      if (inputAction == INPUT_ACTION_MENU_CONFIRM.get()) return textures[0];
+      if (inputAction == INPUT_ACTION_MENU_DELETE.get()) return textures[1];
+      if (inputAction == INPUT_ACTION_MENU_SORT.get()) return textures[2];
+      if (inputAction == INPUT_ACTION_MENU_BACK.get()) return textures[3];
+      return null;
   }
 
   private static String getText(final FooterActions footerAction) {
@@ -192,10 +188,10 @@ public final class FooterActionsHud {
       return null;
     }
     final InputAction input = switch(action) {
-      case FooterActions.BACK -> InputAction.BUTTON_EAST;
-      case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD -> InputAction.BUTTON_WEST;
-      case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS -> InputAction.BUTTON_NORTH;
-      case FooterActions.SELECT -> InputAction.BUTTON_SOUTH;
+      case FooterActions.BACK -> INPUT_ACTION_MENU_BACK.get();
+      case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD -> INPUT_ACTION_MENU_DELETE.get();
+      case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS -> INPUT_ACTION_MENU_SORT.get();
+      case FooterActions.SELECT -> INPUT_ACTION_MENU_CONFIRM.get();
     };
     return new FooterAction(action, input);
   }

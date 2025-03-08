@@ -4,6 +4,7 @@ import legend.core.MathHelper;
 import legend.core.memory.Method;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.core.platform.input.InputMod;
+import legend.core.platform.input.InputAction;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.Renderable58;
