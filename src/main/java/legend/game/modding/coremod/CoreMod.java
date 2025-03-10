@@ -146,7 +146,6 @@ public class CoreMod {
 
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_GROUP_CONFIG = register("addition_group", AdditionGroupConfigEntry::new);
   public static final RegistryDelegate<AdditionModeConfigEntry> ADDITION_MODE_CONFIG = register("addition_mode", AdditionModeConfigEntry::new);
-  public static final RegistryDelegate<BoolConfigEntry> AUTO_DRAGOON_ADDITION_CONFIG = CONFIG_REGISTRAR.register("auto_dragoon_addition", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY));
   public static final RegistryDelegate<AdditionDifficultyConfigEntry> ADDITION_DIFFICULTY_CONFIG = register("addition_difficulty", AdditionDifficultyConfigEntry::new);
   public static final RegistryDelegate<AdditionTimingModeConfigEntry> ADDITION_TIMING_MODE_CONFIG = register("addition_timing_mode", AdditionTimingModeConfigEntry::new);
   public static final RegistryDelegate<AdditionTimingOffsetConfigEntry> ADDITION_TIMING_OFFSET_CONFIG = register("addition_timing_offset", AdditionTimingOffsetConfigEntry::new);
@@ -156,10 +155,9 @@ public class CoreMod {
   public static final RegistryDelegate<ConfigEntry<Void>> DRAGOON_ADDITION_GROUP_CONFIG = register("dragoon_addition_group", DragoonAdditionGroupConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionModeConfigEntry> DRAGOON_ADDITION_MODE_CONFIG = register("dragoon_addition_mode", DragoonAdditionModeConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionDifficultyConfigEntry> DRAGOON_ADDITION_DIFFICULTY_CONFIG = register("dragoon_addition_difficulty", DragoonAdditionDifficultyConfigEntry::new);
+
   public static final RegistryDelegate<IconSetConfigEntry> ICON_SET = CONFIG_REGISTRAR.register("icon_set", IconSetConfigEntry::new);
-
   public static final RegistryDelegate<RunByDefaultConfig> RUN_BY_DEFAULT = CONFIG_REGISTRAR.register("run_by_default", RunByDefaultConfig::new);
-
   private static final Registrar<InputAction, InputActionRegistryEvent> INPUT_ACTION_REGISTRAR = new Registrar<>(GameEngine.REGISTRIES.inputActions, MOD_ID);
 
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_UP = INPUT_ACTION_REGISTRAR.register("menu_up", InputAction::fixed);
