@@ -29,6 +29,8 @@ import legend.game.modding.events.input.InputPressedEvent;
 import legend.game.modding.events.input.InputReleasedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.joml.Math;
 import org.lwjgl.sdl.SDL_Event;
 import org.lwjgl.sdl.SDL_GamepadAxisEvent;
@@ -55,6 +57,7 @@ import static legend.game.modding.coremod.CoreMod.MENU_INNER_DEADZONE_CONFIG;
 import static legend.game.modding.coremod.CoreMod.MENU_OUTER_DEADZONE_CONFIG;
 import static legend.game.modding.coremod.CoreMod.MOVEMENT_INNER_DEADZONE_CONFIG;
 import static legend.game.modding.coremod.CoreMod.MOVEMENT_OUTER_DEADZONE_CONFIG;
+import static legend.game.modding.coremod.CoreMod.RECEIVE_INPUT_ON_INACTIVE_WINDOW_CONFIG;
 import static org.lwjgl.sdl.SDLError.SDL_GetError;
 import static org.lwjgl.sdl.SDLEvents.SDL_EVENT_GAMEPAD_ADDED;
 import static org.lwjgl.sdl.SDLEvents.SDL_EVENT_GAMEPAD_AXIS_MOTION;
@@ -100,6 +103,7 @@ import static org.lwjgl.sdl.SDLGamepad.SDL_GetGamepadStringForAxis;
 import static org.lwjgl.sdl.SDLGamepad.SDL_GetGamepadStringForButton;
 import static org.lwjgl.sdl.SDLGamepad.SDL_GetGamepads;
 import static org.lwjgl.sdl.SDLGamepad.SDL_OpenGamepad;
+import static org.lwjgl.sdl.SDLHints.SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS;
 import static org.lwjgl.sdl.SDLHints.SDL_HINT_WINDOWS_RAW_KEYBOARD;
 import static org.lwjgl.sdl.SDLHints.SDL_SetHint;
 import static org.lwjgl.sdl.SDLInit.SDL_INIT_GAMEPAD;
@@ -332,9 +336,11 @@ import static org.lwjgl.sdl.SDLVideo.SDL_GetDisplays;
 
 public class SdlPlatformManager extends PlatformManager {
   private static final Logger LOGGER = LogManager.getFormatterLogger(SdlPlatformManager.class);
+  private static final Marker INPUT_MARKER = MarkerManager.getMarker("INPUT");
+  private static final Marker ACTIONS_MARKER = MarkerManager.getMarker("ACTIONS");
 
   private final Long2ObjectMap<SdlWindow> windows = new Long2ObjectOpenHashMap<>();
-  private SdlWindow focus;
+  private SdlWindow lastActiveWindow;
   private SDL_Event event;
 
   private final Map<InputAction, InputActionState> actionStates = new HashMap<>();
@@ -355,11 +361,14 @@ public class SdlPlatformManager extends PlatformManager {
 
   @Override
   public void init() {
+    SDL_SetHint(SDL_HINT_WINDOWS_RAW_KEYBOARD, "1");
+    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+//    SDL_SetHint("SDL_GAMECONTROLLER_ALLOW_STEAM_VIRTUAL_GAMEPAD", "1");
+
     if(!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
+      this.logLastError();
       throw new IllegalStateException("Unable to initialize SDL3");
     }
-
-    SDL_SetHint(SDL_HINT_WINDOWS_RAW_KEYBOARD, "1");
 
     this.event = SDL_Event.malloc();
 
@@ -412,6 +421,8 @@ public class SdlPlatformManager extends PlatformManager {
   }
 
   public List<SdlGamepadDevice> loadGamepads() {
+    LOGGER.info("Loading gamepads...");
+
     final IntBuffer ids = SDL_GetGamepads();
 
     if(ids == null) {
@@ -424,7 +435,9 @@ public class SdlPlatformManager extends PlatformManager {
     for(int i = 0; i < ids.limit(); i++) {
       try {
         final int id = ids.get(i);
-        gamepads.add(new SdlGamepadDevice(id, SDL_OpenGamepad(id)));
+        final SdlGamepadDevice gamepad = new SdlGamepadDevice(id, SDL_OpenGamepad(id));
+        gamepads.add(gamepad);
+        LOGGER.info("Found gamepad %s", gamepad.name);
       } catch(final FailedToLoadDeviceException e) {
         this.logLastError();
       }
@@ -469,14 +482,13 @@ public class SdlPlatformManager extends PlatformManager {
         case SDL_EVENT_WINDOW_CLOSE_REQUESTED -> this.getWindow(this.event).close();
         case SDL_EVENT_WINDOW_FOCUS_GAINED -> {
           final SdlWindow window = this.getWindow(this.event);
-          this.focus = window;
+          this.lastActiveWindow = window;
           window.hasFocus = true;
           window.events().onFocus(true);
         }
 
         case SDL_EVENT_WINDOW_FOCUS_LOST -> {
           final SdlWindow window = this.getWindow(this.event);
-          this.focus = null;
           window.hasFocus = false;
           window.events().onFocus(false);
         }
@@ -490,6 +502,14 @@ public class SdlPlatformManager extends PlatformManager {
         case SDL_EVENT_KEY_DOWN, SDL_EVENT_KEY_UP -> {
           final SDL_KeyboardEvent key = this.event.key();
 
+          if(LOGGER.isInfoEnabled(INPUT_MARKER)) {
+            if(key.down()) {
+              LOGGER.info(INPUT_MARKER, "Key down %s mods %#x repeat %b", SDL_GetKeyName(key.key()), key.mod(), key.repeat());
+            } else {
+              LOGGER.info(INPUT_MARKER, "Key up %s mods %#x repeat %b", SDL_GetKeyName(key.key()), key.mod(), key.repeat());
+            }
+          }
+
           final IgnoreSteamInputMode ignoreSteamInputMode = CONFIG.getConfig(IGNORE_STEAM_INPUT_MODE_CONFIG.get());
 
 /*TODO          if(ignoreSteamInputMode == IgnoreSteamInputMode.VIRTUAL_KEYBOARD_ID) {
@@ -500,6 +520,10 @@ public class SdlPlatformManager extends PlatformManager {
             // Ignore keys if gamepad buttons are held. Workaround for Steam Input.
             if(this.buttonsHeld != 0 || !this.axesHeld.isEmpty()) {
               if(this.event.type() == SDL_EVENT_KEY_DOWN) {
+                if(LOGGER.isInfoEnabled(ACTIONS_MARKER)) {
+                  LOGGER.info(ACTIONS_MARKER, "Ignoring key %s", SDL_GetKeyName(key.key()));
+                }
+
                 this.ignoredKeys.add(key.scancode());
               }
 
@@ -507,6 +531,10 @@ public class SdlPlatformManager extends PlatformManager {
             }
 
             if(this.event.type() == SDL_EVENT_KEY_UP && this.ignoredKeys.contains(key.scancode())) {
+              if(LOGGER.isInfoEnabled(ACTIONS_MARKER)) {
+                LOGGER.info(ACTIONS_MARKER, "Removing ignored key %s", SDL_GetKeyName(key.key()));
+              }
+
               this.ignoredKeys.remove(key.scancode());
               break;
             }
@@ -521,10 +549,20 @@ public class SdlPlatformManager extends PlatformManager {
           this.setWindowInputClass(window, InputClass.KEYBOARD);
           this.decodeMods(key, window.mods);
 
+          final InputKey inputKey = this.getInputFromKeycode(key.key());
+
           if(key.down()) {
-            window.events().onKeyPress(this.getInputFromKeycode(key.key()), this.getInputKeyFromScanCode(key.scancode()), window.mods, key.repeat());
+            if(LOGGER.isInfoEnabled(ACTIONS_MARKER)) {
+              LOGGER.info(ACTIONS_MARKER, "Triggering press key %s -> %s", SDL_GetKeyName(key.key()), inputKey);
+            }
+
+            window.events().onKeyPress(inputKey, this.getInputKeyFromScanCode(key.scancode()), window.mods, key.repeat());
           } else {
-            window.events().onKeyRelease(this.getInputFromKeycode(key.key()), this.getInputKeyFromScanCode(key.scancode()), window.mods);
+            if(LOGGER.isInfoEnabled(ACTIONS_MARKER)) {
+              LOGGER.info(ACTIONS_MARKER, "Triggering release key %s -> %s", SDL_GetKeyName(key.key()), inputKey);
+            }
+
+            window.events().onKeyRelease(inputKey, this.getInputKeyFromScanCode(key.scancode()), window.mods);
           }
 
           final List<InputBinding<KeyInputActivation>> keycodeBindings = InputBindings.getBindings(KeyInputActivation.class);
@@ -535,11 +573,19 @@ public class SdlPlatformManager extends PlatformManager {
             if(this.getKeyCode(binding.activation.key) == key.key()) {
               if(key.down()) {
                 if((binding.activation.mods.isEmpty() || window.mods.containsAll(binding.activation.mods)) && !key.repeat()) {
+                  if(LOGGER.isInfoEnabled(ACTIONS_MARKER)) {
+                    LOGGER.info(ACTIONS_MARKER, "Triggering press input key %s -> %s -> %s", SDL_GetKeyName(key.key()), inputKey, binding.action);
+                  }
+
                   window.events().onInputActionPressed(binding.action, false);
                   this.getInputActionState(binding.action).press();
                   EVENTS.postEvent(new InputPressedEvent(binding.action, false));
                 }
               } else {
+                if(LOGGER.isInfoEnabled(ACTIONS_MARKER)) {
+                  LOGGER.info(ACTIONS_MARKER, "Triggering release input key %s -> %s -> %s", SDL_GetKeyName(key.key()), inputKey, binding.action);
+                }
+
                 window.events().onInputActionReleased(binding.action);
                 this.getInputActionState(binding.action).release();
                 EVENTS.postEvent(new InputReleasedEvent(binding.action));
@@ -555,11 +601,19 @@ public class SdlPlatformManager extends PlatformManager {
             if(this.getScanCode(binding.activation.key) == key.scancode()) {
               if(key.down()) {
                 if((binding.activation.mods.isEmpty() || window.mods.containsAll(binding.activation.mods)) && !key.repeat()) {
+                  if(LOGGER.isInfoEnabled(ACTIONS_MARKER)) {
+                    LOGGER.info(ACTIONS_MARKER, "Triggering press input action scancode %s -> %s", SDL_GetScancodeName(key.scancode()), binding.action);
+                  }
+
                   window.events().onInputActionPressed(binding.action, false);
                   this.getInputActionState(binding.action).press();
                   EVENTS.postEvent(new InputPressedEvent(binding.action, false));
                 }
               } else {
+                if(LOGGER.isInfoEnabled(ACTIONS_MARKER)) {
+                  LOGGER.info(ACTIONS_MARKER, "Triggering release input action scancode %s -> %s", SDL_GetScancodeName(key.scancode()), binding.action);
+                }
+
                 window.events().onInputActionReleased(binding.action);
                 this.getInputActionState(binding.action).release();
                 EVENTS.postEvent(new InputReleasedEvent(binding.action));
@@ -580,6 +634,8 @@ public class SdlPlatformManager extends PlatformManager {
           this.setWindowInputClass(window, InputClass.KEYBOARD);
           final String string = text.textString();
 
+          LOGGER.info(INPUT_MARKER, "Text %s", string);
+
           for(int i = 0; i < string.length(); i++) {
             window.events().onChar(string.charAt(i));
           }
@@ -588,29 +644,38 @@ public class SdlPlatformManager extends PlatformManager {
         case SDL_EVENT_MOUSE_MOTION -> {
           final SDL_MouseMotionEvent mouse = this.event.motion();
           final SdlWindow window = this.getWindow(this.event);
-          this.setWindowInputClass(window, InputClass.KEYBOARD);
 
-          final boolean relative = mouse.which() != 0;
-          window.events().onMouseMove(relative ? mouse.xrel() : mouse.x(), relative ? mouse.yrel() : mouse.y());
+          if(window != null) {
+            this.setWindowInputClass(window, InputClass.KEYBOARD);
+
+            final boolean relative = mouse.which() != 0;
+            window.events().onMouseMove(relative ? mouse.xrel() : mouse.x(), relative ? mouse.yrel() : mouse.y());
+          }
         }
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN, SDL_EVENT_MOUSE_BUTTON_UP -> {
           final SDL_MouseButtonEvent mouse = this.event.button();
           final SdlWindow window = this.getWindow(this.event);
-          this.setWindowInputClass(window, InputClass.KEYBOARD);
 
-          if(mouse.down()) {
-            this.getWindow(this.event).events().onMousePress(mouse.button(), window.mods);
-          } else {
-            this.getWindow(this.event).events().onMouseRelease(mouse.button(), window.mods);
+          if(window != null) {
+            this.setWindowInputClass(window, InputClass.KEYBOARD);
+
+            if(mouse.down()) {
+              this.getWindow(this.event).events().onMousePress(mouse.button(), window.mods);
+            } else {
+              this.getWindow(this.event).events().onMouseRelease(mouse.button(), window.mods);
+            }
           }
         }
 
         case SDL_EVENT_MOUSE_WHEEL -> {
           final SDL_MouseWheelEvent wheel = this.event.wheel();
           final SdlWindow window = this.getWindow(this.event);
-          this.setWindowInputClass(window, InputClass.KEYBOARD);
-          window.events().onMouseScroll(wheel.x(), wheel.y());
+
+          if(window != null) {
+            this.setWindowInputClass(window, InputClass.KEYBOARD);
+            window.events().onMouseScroll(wheel.x(), wheel.y());
+          }
         }
 
         case SDL_EVENT_GAMEPAD_ADDED -> {
@@ -650,14 +715,18 @@ public class SdlPlatformManager extends PlatformManager {
         case SDL_EVENT_GAMEPAD_AXIS_MOTION -> {
           final SDL_GamepadAxisEvent axis = this.event.gaxis();
 
-          if(this.focus != null) {
+          if(LOGGER.isInfoEnabled(INPUT_MARKER) && axis.value() > 1000) {
+            LOGGER.info(INPUT_MARKER, "Axis gamepad %d axis %d value %d", axis.which(), axis.axis(), axis.value());
+          }
+
+          if(this.lastActiveWindow != null && (this.lastActiveWindow.hasFocus || CONFIG.getConfig(RECEIVE_INPUT_ON_INACTIVE_WINDOW_CONFIG.get()))) {
             final float menuInnerDeadzone = CONFIG.getConfig(MENU_INNER_DEADZONE_CONFIG.get());
             final float menuOuterDeadzone = CONFIG.getConfig(MENU_OUTER_DEADZONE_CONFIG.get());
             final float movementInnerDeadzone = CONFIG.getConfig(MOVEMENT_INNER_DEADZONE_CONFIG.get());
             final float movementOuterDeadzone = CONFIG.getConfig(MOVEMENT_OUTER_DEADZONE_CONFIG.get());
 
             if(Math.abs(axis.value()) >= Math.min(menuInnerDeadzone, movementInnerDeadzone) * 0x7fff) {
-              this.setWindowInputClass(this.focus, InputClass.GAMEPAD);
+              this.setWindowInputClass(this.lastActiveWindow, InputClass.GAMEPAD);
               this.lastGamepad = this.gamepads.get(axis.which());
               this.axesHeld.add(axis.axis());
             } else {
@@ -688,22 +757,22 @@ public class SdlPlatformManager extends PlatformManager {
 
                   if(value >= 0.0f) {
                     if(!state.isHeld()) {
-                      LOGGER.info("Action %s pressed due to axis %f", binding.action, Math.abs(axis.value()) / (float)0x7fff);
-                      this.focus.events().onInputActionPressed(binding.action, false);
+                      LOGGER.info(ACTIONS_MARKER, "Triggering press input action axis gamepad %d axis %d value %d -> %s", axis.which(), axis.axis(), axis.value(), binding.action);
+                      this.lastActiveWindow.events().onInputActionPressed(binding.action, false);
                       state.press();
                       EVENTS.postEvent(new InputPressedEvent(binding.action, false));
                     }
 
                     state.axis(value * Math.signum(axis.value()));
                   } else if(state.isHeld() && state.getAxis() != 0.0f) {
-                    LOGGER.info("Action %s released due to axis", binding.action);
-                    this.focus.events().onInputActionReleased(binding.action);
+                    LOGGER.info(ACTIONS_MARKER, "Triggering release A input action axis gamepad %d axis %d value %d -> %s", axis.which(), axis.axis(), axis.value(), binding.action);
+                    this.lastActiveWindow.events().onInputActionReleased(binding.action);
                     state.release();
                     EVENTS.postEvent(new InputReleasedEvent(binding.action));
                   }
                 } else if(state.isHeld() && state.getAxis() != 0.0f) {
-                  LOGGER.info("Action %s released due to axis", binding.action);
-                  this.focus.events().onInputActionReleased(binding.action);
+                  LOGGER.info(ACTIONS_MARKER, "Triggering release B input action axis gamepad %d axis %d value %d -> %s", axis.which(), axis.axis(), axis.value(), binding.action);
+                  this.lastActiveWindow.events().onInputActionReleased(binding.action);
                   state.release();
                   EVENTS.postEvent(new InputReleasedEvent(binding.action));
                 }
@@ -717,10 +786,12 @@ public class SdlPlatformManager extends PlatformManager {
 
           final SDL_GamepadButtonEvent button = this.event.gbutton();
 
-          if(this.focus != null) {
-            this.setWindowInputClass(this.focus, InputClass.GAMEPAD);
+          LOGGER.info(INPUT_MARKER, "Button down gamepad %d button %d", button.which(), button.button());
+
+          if(this.lastActiveWindow != null && (this.lastActiveWindow.hasFocus || CONFIG.getConfig(RECEIVE_INPUT_ON_INACTIVE_WINDOW_CONFIG.get()))) {
+            this.setWindowInputClass(this.lastActiveWindow, InputClass.GAMEPAD);
             this.lastGamepad = this.gamepads.get(button.which());
-            this.focus.events().onButtonPress(this.getInputFromButton(button.button()), false);
+            this.lastActiveWindow.events().onButtonPress(this.getInputFromButton(button.button()), false);
 
             final List<InputBinding<ButtonInputActivation>> bindings = InputBindings.getBindings(ButtonInputActivation.class);
 
@@ -728,7 +799,8 @@ public class SdlPlatformManager extends PlatformManager {
               final InputBinding<ButtonInputActivation> binding = bindings.get(i);
 
               if(this.getButtonCode(binding.activation.button) == button.button()) {
-                this.focus.events().onInputActionPressed(binding.action, false);
+                LOGGER.info(ACTIONS_MARKER, "Triggering press input action button gamepad %d button %d -> %s", button.which(), button.button(), binding.action);
+                this.lastActiveWindow.events().onInputActionPressed(binding.action, false);
                 this.getInputActionState(binding.action).press();
                 EVENTS.postEvent(new InputPressedEvent(binding.action, false));
               }
@@ -741,10 +813,12 @@ public class SdlPlatformManager extends PlatformManager {
 
           final SDL_GamepadButtonEvent button = this.event.gbutton();
 
-          if(this.focus != null) {
-            this.setWindowInputClass(this.focus, InputClass.GAMEPAD);
+          LOGGER.info(INPUT_MARKER, "Button up gamepad %d button %d", button.which(), button.button());
+
+          if(this.lastActiveWindow != null && (this.lastActiveWindow.hasFocus || CONFIG.getConfig(RECEIVE_INPUT_ON_INACTIVE_WINDOW_CONFIG.get()))) {
+            this.setWindowInputClass(this.lastActiveWindow, InputClass.GAMEPAD);
             this.lastGamepad = this.gamepads.get(button.which());
-            this.focus.events().onButtonRelease(this.getInputFromButton(button.button()));
+            this.lastActiveWindow.events().onButtonRelease(this.getInputFromButton(button.button()));
 
             final List<InputBinding<ButtonInputActivation>> bindings = InputBindings.getBindings(ButtonInputActivation.class);
 
@@ -752,7 +826,8 @@ public class SdlPlatformManager extends PlatformManager {
               final InputBinding<ButtonInputActivation> binding = bindings.get(i);
 
               if(this.getButtonCode(binding.activation.button) == button.button()) {
-                this.focus.events().onInputActionReleased(binding.action);
+                LOGGER.info(ACTIONS_MARKER, "Triggering release input action button gamepad %d button %d -> %s", button.which(), button.button(), binding.action);
+                this.lastActiveWindow.events().onInputActionReleased(binding.action);
                 this.getInputActionState(binding.action).release();
                 EVENTS.postEvent(new InputReleasedEvent(binding.action));
               }
@@ -762,14 +837,28 @@ public class SdlPlatformManager extends PlatformManager {
       }
     }
 
-    if(this.focus != null) {
-      for(final var entry : this.actionStates.entrySet()) {
-        final InputAction action = entry.getKey();
-        final InputActionState state = entry.getValue();
+    if(this.lastActiveWindow != null) {
+      if(this.lastActiveWindow.hasFocus || CONFIG.getConfig(RECEIVE_INPUT_ON_INACTIVE_WINDOW_CONFIG.get())) {
+        for(final var entry : this.actionStates.entrySet()) {
+          final InputAction action = entry.getKey();
+          final InputActionState state = entry.getValue();
 
-        if(state.repeat()) {
-          this.focus.events().onInputActionPressed(action, true);
-          EVENTS.postEvent(new InputPressedEvent(action, true));
+          if(state.repeat()) {
+            LOGGER.info(ACTIONS_MARKER, "Triggering repeat input action %s", action);
+            this.lastActiveWindow.events().onInputActionPressed(action, true);
+            EVENTS.postEvent(new InputPressedEvent(action, true));
+          }
+        }
+      } else {
+        for(final var entry : this.actionStates.entrySet()) {
+          final InputAction action = entry.getKey();
+          final InputActionState state = entry.getValue();
+
+          if(state.isHeld()) {
+            LOGGER.info(ACTIONS_MARKER, "Triggering release input action %s", action);
+            state.release();
+            EVENTS.postEvent(new InputReleasedEvent(action));
+          }
         }
       }
     }
@@ -896,7 +985,9 @@ public class SdlPlatformManager extends PlatformManager {
 
   @Override
   public void openUrl(final String url) {
-    SDL_OpenURL(url);
+    if(!SDL_OpenURL(url)) {
+      this.logLastError();
+    }
   }
 
   private void decodeMods(final SDL_KeyboardEvent key, final Set<InputMod> mods) {

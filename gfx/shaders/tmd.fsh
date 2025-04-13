@@ -1,21 +1,23 @@
 #version 330 core
 
-smooth in vec2 vertUv;
-flat in vec2 vertTpage;
-flat in vec2 vertClut;
-flat in int vertBpp;
-smooth in vec4 vertColour;
-flat in int vertFlags;
+in GS_OUT {
+  smooth vec2 vertUv;
+  flat vec2 vertTpage;
+  flat vec2 vertClut;
+  flat int vertBpp;
+  smooth vec4 vertColour;
+  flat int vertFlags;
 
-flat in int translucency;
+  flat int translucency;
 
-flat in float widthMultiplier;
-flat in int widthMask;
-flat in int indexShift;
-flat in int indexMask;
+  flat float widthMultiplier;
+  flat int widthMask;
+  flat int indexShift;
+  flat int indexMask;
 
-smooth in float depth;
-smooth in float depthOffset;
+  smooth float depth;
+  smooth float depthOffset;
+};
 
 layout(std140) uniform projectionInfo {
   float znear;
@@ -78,7 +80,7 @@ void main() {
       discard;
     }
 
-    outColour *= texColour;
+    outColour = clamp(outColour * texColour, 0.0, 1.0);
   } else {
     // Untextured translucent primitives don't have a translucency bit so we always discard during the appropriate discard modes
     if(discardTranslucency == 1 && translucent || discardTranslucency == 2 && !translucent) {
@@ -88,8 +90,7 @@ void main() {
 
   outColour.rgb *= recolour;
 
-  // The or condition is to disable translucency if a texture's pixel has alpha disabled
-  if(translucencyMode == 1 && (!textured || outColour.a != 0)) { // (B+F)/2 translucency
+  if(translucent && translucencyMode == 1) { // (B+F)/2 translucency
     outColour.a = 0.5;
   } else {
     outColour.a = 1.0;

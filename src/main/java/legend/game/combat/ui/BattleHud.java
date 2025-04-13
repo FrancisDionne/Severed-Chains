@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import legend.core.Config;
 import legend.core.MathHelper;
 import legend.core.QueuedModelStandard;
+import legend.core.Transformations;
 import legend.core.gpu.Bpp;
 import legend.core.gte.MV;
 import legend.core.memory.Method;
@@ -52,6 +53,8 @@ import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.scriptStatePtrArr_800bc1c0;
 import static legend.game.Scus94491BpeSegment_800b.tickCount_800bb0fc;
 import static legend.game.combat.Battle.melbuStageToMonsterNameIndices_800c6f30;
+import static legend.game.combat.bent.BattleEntity27c.FLAG_CANT_TARGET;
+import static legend.game.combat.bent.BattleEntity27c.FLAG_MONSTER;
 import static legend.game.combat.ui.BattleMenuStruct58.battleMenuIconMetrics_800fb674;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
@@ -261,7 +264,7 @@ public class BattleHud {
         }
 
         //LAB_800eccac
-        if((targetBent.storage_44[7] & 0x4000) == 0) {
+        if((targetBent.storage_44[7] & FLAG_CANT_TARGET) == 0) {
           this.drawTargetArrow(colour, target);
         }
 
@@ -300,7 +303,8 @@ public class BattleHud {
     }
 
     //LAB_800ecdac
-    final Vector2f screenCoords = bent.transformRelative(x, y, z);
+    final Vector2f screenCoords = new Vector2f();
+    Transformations.toScreenspace(new Vector3f(x, y, z), bent.model_148.coord2_14, screenCoords);
 
     //LAB_800ece9c
     this.battleMenu_800c6c34.transforms.identity();
@@ -504,7 +508,7 @@ public class BattleHud {
           final PlayerBattleEntity player = state.innerStruct_00;
           final int brightnessIndex0;
           final int brightnessIndex1;
-          if((this.battle.currentTurnBent_800c66c8.storage_44[7] & 0x4) != 0x1 && this.battle.currentTurnBent_800c66c8 == state) {
+          if((this.battle.currentTurnBent_800c66c8.storage_44[7] & FLAG_MONSTER) != 0x1 && this.battle.currentTurnBent_800c66c8 == state) {
             brightnessIndex0 = 2;
             brightnessIndex1 = 2;
           } else {
@@ -1146,7 +1150,8 @@ public class BattleHud {
             }
 
             //LAB_800f3a44
-            final Vector2f screenCoords = bent.transformRelative(x, y, z);
+            final Vector2f screenCoords = new Vector2f();
+            Transformations.toScreenspace(new Vector3f(x, y, z), bent.model_148.coord2_14, screenCoords);
             num.x_1c = this.clampX(screenCoords.x + centreScreenX_1f8003dc);
             num.y_20 = this.clampY(screenCoords.y + centreScreenY_1f8003de);
           }
@@ -1343,7 +1348,8 @@ public class BattleHud {
     }
 
     //LAB_800f4320
-    final Vector2f screenCoords = bent.transformRelative(x, y, z);
+    final Vector2f screenCoords = new Vector2f();
+    Transformations.toScreenspace(new Vector3f(x, y, z), bent.model_148.coord2_14, screenCoords);
 
     //LAB_800f4394
     this.FUN_800f89f4(bentIndex, 0, 2, damage, this.clampX(screenCoords.x + centreScreenX_1f8003dc), this.clampY(screenCoords.y + centreScreenY_1f8003de), 60 / vsyncMode_8007a3b8 / 4, s4);
@@ -1877,7 +1883,7 @@ public class BattleHud {
   public void buildBattleMenuBackground(final QuadBuilder builder, final BattleMenuBackgroundUvMetrics04 menuBackgroundMetrics, final int x, final int y, final int w, final int h, final int baseClutOffset, final int uvShiftType) {
     builder
       .add()
-      .monochrome(0.5f);
+      .monochrome(1.0f);
 
     this.setGpuPacketParams(builder, x, y, 0, 0, w, h, false);
 
@@ -1966,7 +1972,7 @@ public class BattleHud {
     for(targetIndex = 0; targetIndex < count; targetIndex++) {
       target = this.battle.targetBents_800c71f0[targetType][this.battleMenu_800c6c34.targetedSlot_800c697c];
 
-      if(target != null && (target.storage_44[7] & 0x4000) == 0) {
+      if(target != null && (target.storage_44[7] & FLAG_CANT_TARGET) == 0) {
         break;
       }
 
@@ -2070,7 +2076,7 @@ public class BattleHud {
   public void buildBattleMenuElement(final QuadBuilder builder, final int x, final int y, final int u, final int v, final int w, final int h, final int clut) {
     builder
       .add()
-      .monochrome(0.5f);
+      .monochrome(1.0f);
 
     this.setGpuPacketParams(builder, x, y, u, v, w, h, true);
     this.setGpuPacketClutAndTpageAndQueue(builder, clut, null);

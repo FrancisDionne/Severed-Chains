@@ -94,6 +94,7 @@ import static legend.game.Scus94491BpeSegment_800c.lightDirectionMatrix_800c34e8
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
+import static legend.game.modding.coremod.CoreMod.REDUCE_MOTION_FLASHING_CONFIG;
 
 public class Ttle extends EngineState {
   private static final Logger LOGGER = LogManager.getFormatterLogger(Ttle.class);
@@ -669,8 +670,8 @@ public class Ttle extends EngineState {
       final float scaleY;
 
       if(CONFIG.getConfig(CoreMod.LEGACY_WIDESCREEN_MODE_CONFIG.get()) == SubmapWidescreenMode.EXPANDED) {
-        scaleX = w / RENDERER.getProjectionWidth();
-        scaleY = h / RENDERER.getProjectionHeight();
+        scaleX = w / RENDERER.getNativeWidth();
+        scaleY = h / RENDERER.getNativeHeight();
         left = (window.getWidth() - w) / 2;
         top = (window.getHeight() - h) / 2;
       } else {
@@ -678,8 +679,8 @@ public class Ttle extends EngineState {
         scaleY = 1.0f;
         left = 0.0f;
         top = 0.0f;
-        x = x / window.getWidth() * RENDERER.getProjectionWidth();
-        y = y / window.getHeight() * RENDERER.getProjectionHeight();
+        x = x / window.getWidth() * RENDERER.getNativeWidth();
+        y = y / window.getHeight() * RENDERER.getNativeHeight();
       }
 
       if(this.menuLoadingStage == 3) {
@@ -691,7 +692,7 @@ public class Ttle extends EngineState {
 
             final int menuWidth = (int)(155 * scaleX);
             final int menuHeight = (int)(16 * scaleY);
-            final int menuX = (int)(left + (RENDERER.getProjectionWidth() * scaleX - menuWidth) / 2.0f);
+            final int menuX = (int)(left + (RENDERER.getNativeWidth() * scaleX - menuWidth) / 2.0f);
             final int menuY = (int)(top + (134.0f + i * 16.0f) * scaleY);
 
             if(MathHelper.inBox((int)x, (int)y, menuX, menuY, menuWidth, menuHeight)) {
@@ -745,8 +746,8 @@ public class Ttle extends EngineState {
         final float scaleY;
 
         if(CONFIG.getConfig(CoreMod.LEGACY_WIDESCREEN_MODE_CONFIG.get()) == SubmapWidescreenMode.EXPANDED) {
-          scaleX = w / RENDERER.getProjectionWidth();
-          scaleY = h / RENDERER.getProjectionHeight();
+          scaleX = w / RENDERER.getNativeWidth();
+          scaleY = h / RENDERER.getNativeHeight();
           left = (window.getWidth() - w) / 2;
           top = (window.getHeight() - h) / 2;
         } else {
@@ -754,8 +755,8 @@ public class Ttle extends EngineState {
           scaleY = 1.0f;
           left = 0.0f;
           top = 0.0f;
-          x = x / window.getWidth() * RENDERER.getProjectionWidth();
-          y = y / window.getHeight() * RENDERER.getProjectionHeight();
+          x = x / window.getWidth() * RENDERER.getNativeWidth();
+          y = y / window.getHeight() * RENDERER.getNativeHeight();
         }
 
         if(this.menuState_800c672c < 3) {
@@ -766,7 +767,7 @@ public class Ttle extends EngineState {
 
             final int menuWidth = (int)(155 * scaleX);
             final int menuHeight = (int)(16 * scaleY);
-            final int menuX = (int)(left + (RENDERER.getProjectionWidth() * scaleX - menuWidth) / 2.0f);
+            final int menuX = (int)(left + (RENDERER.getNativeWidth() * scaleX - menuWidth) / 2.0f);
             final int menuY = (int)(top + (134.0f + i * 16.0f) * scaleY);
 
             if(MathHelper.inBox((int)x, (int)y, menuX, menuY, menuWidth, menuHeight)) {
@@ -1216,6 +1217,10 @@ public class Ttle extends EngineState {
 
   @Method(0x800cb974L)
   private void renderLogoFlash() {
+    if(CONFIG.getConfig(REDUCE_MOTION_FLASHING_CONFIG.get())) {
+      this.logoFlashStage = 2;
+    }
+
     if(this.logoFlashStage == 2) {
       return;
     }

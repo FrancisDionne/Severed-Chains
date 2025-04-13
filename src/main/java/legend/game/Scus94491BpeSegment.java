@@ -26,7 +26,6 @@ import legend.game.combat.environment.StageData2c;
 import legend.game.debugger.CombatDebuggerController;
 import legend.game.debugger.Debugger;
 import legend.game.inventory.WhichMenu;
-import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.RenderEvent;
 import legend.game.modding.events.battle.BattleMusicEvent;
 import legend.game.modding.events.characters.DivineDragoonEvent;
@@ -168,6 +167,9 @@ import static legend.game.Scus94491BpeSegment_800b.victoryMusic;
 import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
 import static legend.game.Scus94491BpeSegment_800c.sequenceData_800c4ac8;
 import static legend.game.combat.environment.StageData.getEncounterStageData;
+import static legend.game.modding.coremod.CoreMod.ALLOW_WIDESCREEN_CONFIG;
+import static legend.game.modding.coremod.CoreMod.BATTLE_TRANSITION_MODE_CONFIG;
+import static legend.game.modding.coremod.CoreMod.REDUCE_MOTION_FLASHING_CONFIG;
 
 public final class Scus94491BpeSegment {
   private Scus94491BpeSegment() { }
@@ -734,7 +736,7 @@ public final class Scus94491BpeSegment {
     // This causes the bright flash of light from the lightning, etc.
     if(fullScreenEffect_800bb140.red0_20 != 0 || fullScreenEffect_800bb140.green0_1c != 0 || fullScreenEffect_800bb140.blue0_14 != 0) {
       // Make sure effect fills the whole screen
-      final float fullWidth = Math.max(RENDERER.getProjectionWidth(), (float)RENDERER.getRenderWidth() / RENDERER.getRenderHeight() * displayHeight_1f8003e4 * 1.1f);
+      final float fullWidth = Math.max(RENDERER.getNativeWidth(), (float)RENDERER.getRenderWidth() / RENDERER.getRenderHeight() * displayHeight_1f8003e4 * 1.1f);
       fullScreenEffect_800bb140.transforms
         .scaling(fullWidth, displayHeight_1f8003e4, 1.0f)
         .translate(0.0f, 0.0f, 156.0f)
@@ -750,7 +752,7 @@ public final class Scus94491BpeSegment {
     // This causes the screen darkening from the lightning, etc.
     if(fullScreenEffect_800bb140.red1_18 != 0 || fullScreenEffect_800bb140.green1_10 != 0 || fullScreenEffect_800bb140.blue1_0c != 0) {
       // Make sure effect fills the whole screen
-      final float fullWidth = Math.max(RENDERER.getProjectionWidth(), (float)RENDERER.getRenderWidth() / RENDERER.getRenderHeight() * displayHeight_1f8003e4 * 1.1f);
+      final float fullWidth = Math.max(RENDERER.getNativeWidth(), (float)RENDERER.getRenderWidth() / RENDERER.getRenderHeight() * displayHeight_1f8003e4 * 1.1f);
       fullScreenEffect_800bb140.transforms
         .scaling(fullWidth, displayHeight_1f8003e4, 1.0f)
         .translate(0.0f, 0.0f, 156.0f)
@@ -767,7 +769,7 @@ public final class Scus94491BpeSegment {
   @Method(0x80013c3cL)
   public static void drawFullScreenRect(final int colour, final Translucency transMode) {
     // Make sure effect fills the whole screen
-    final float fullWidth = Math.max(RENDERER.getProjectionWidth(), (float)RENDERER.getRenderWidth() / RENDERER.getRenderHeight() * displayHeight_1f8003e4 * 1.1f);
+    final float fullWidth = Math.max(RENDERER.getNativeWidth(), (float)RENDERER.getRenderWidth() / RENDERER.getRenderHeight() * displayHeight_1f8003e4 * 1.1f);
     fullScreenEffect_800bb140.transforms
       .scaling(fullWidth, displayHeight_1f8003e4, 1.0f)
       .translate(0.0f, 0.0f, 120.0f)
@@ -1238,17 +1240,20 @@ public final class Scus94491BpeSegment {
             if(overlay.widthScale_04 != 0) {
               overlay.widthScale_04 -= 0x492;
               overlay.heightScale_06 -= 0x492;
-            } else {
+            } else if(!CONFIG.getConfig(REDUCE_MOTION_FLASHING_CONFIG.get())) {
               //LAB_80019084
               overlay.clutAndTranslucency_0c &= 0x8fff;
             }
 
             //LAB_80019094
             if(overlay._09 == 0) {
-              overlay.clutAndTranslucency_0c &= 0x7fff;
               overlay.negaticks_08 = 0;
-              overlay.clutAndTranslucency_0c &= 0xf0ff;
-              overlay.clutAndTranslucency_0c |= ((overlay.clutAndTranslucency_0c >>> 8 & 0xf) + 1 & 0xf) << 8;
+
+              if(!CONFIG.getConfig(REDUCE_MOTION_FLASHING_CONFIG.get())) {
+                overlay.clutAndTranslucency_0c &= 0x7fff;
+                overlay.clutAndTranslucency_0c &= 0xf0ff;
+                overlay.clutAndTranslucency_0c |= ((overlay.clutAndTranslucency_0c >>> 8 & 0xf) + 1 & 0xf) << 8;
+              }
             }
           } else if(v1 == 1) {
             //LAB_800190d4
@@ -1256,8 +1261,11 @@ public final class Scus94491BpeSegment {
 
             if(overlay.negaticks_08 == 10) {
               overlay._09 = (byte)(simpleRand() % 10 + 2);
-              overlay.clutAndTranslucency_0c &= 0xf0ff;
-              overlay.clutAndTranslucency_0c |= ((overlay.clutAndTranslucency_0c >>> 8 & 0xf) + 1 & 0xf) << 8;
+
+              if(!CONFIG.getConfig(REDUCE_MOTION_FLASHING_CONFIG.get())) {
+                overlay.clutAndTranslucency_0c &= 0xf0ff;
+                overlay.clutAndTranslucency_0c |= ((overlay.clutAndTranslucency_0c >>> 8 & 0xf) + 1 & 0xf) << 8;
+              }
             }
             //LAB_80019028
           } else if(v1 == 2) {
@@ -1267,8 +1275,11 @@ public final class Scus94491BpeSegment {
             if(overlay._09 == 0) {
               //LAB_80019180
               overlay._09 = 8;
-              overlay.clutAndTranslucency_0c &= 0xf0ff;
-              overlay.clutAndTranslucency_0c |= ((overlay.clutAndTranslucency_0c >>> 8 & 0xf) + 1 & 0xf) << 8;
+
+              if(!CONFIG.getConfig(REDUCE_MOTION_FLASHING_CONFIG.get())) {
+                overlay.clutAndTranslucency_0c &= 0xf0ff;
+                overlay.clutAndTranslucency_0c |= ((overlay.clutAndTranslucency_0c >>> 8 & 0xf) + 1 & 0xf) << 8;
+              }
             }
           } else if(v1 == 3) {
             //LAB_800191b8
@@ -1862,7 +1873,7 @@ public final class Scus94491BpeSegment {
       tickBattleDissolveDarkening();
     }
 
-    final BattleTransitionMode mode = CONFIG.getConfig(CoreMod.BATTLE_TRANSITION_MODE_CONFIG.get());
+    final BattleTransitionMode mode = CONFIG.getConfig(BATTLE_TRANSITION_MODE_CONFIG.get());
     final int speedDivisor = mode == BattleTransitionMode.NORMAL ? 1 : 2;
 
     //LAB_8001b480
@@ -1911,19 +1922,19 @@ public final class Scus94491BpeSegment {
 
     battleDissolveTicks += vsyncMode_8007a3b8;
 
-    if((battleDissolveTicks & 0x1) == 0 || CONFIG.getConfig(CoreMod.BATTLE_TRANSITION_MODE_CONFIG.get()) == BattleTransitionMode.FAST) {
+    if(!CONFIG.getConfig(REDUCE_MOTION_FLASHING_CONFIG.get()) && ((battleDissolveTicks & 0x1) == 0 || CONFIG.getConfig(BATTLE_TRANSITION_MODE_CONFIG.get()) == BattleTransitionMode.FAST)) {
       final float squish;
       final float width;
       final float offset;
 
       // Make sure effect fills the whole screen
-      if(RENDERER.getRenderMode() == EngineState.RenderMode.PERSPECTIVE && !CONFIG.getConfig(CoreMod.ALLOW_WIDESCREEN_CONFIG.get())) {
+      if(RENDERER.getRenderMode() == EngineState.RenderMode.PERSPECTIVE && !CONFIG.getConfig(ALLOW_WIDESCREEN_CONFIG.get())) {
         squish = 1.0f;
         width = dissolveDisplayWidth;
         offset = 0.0f;
       } else {
         squish = dissolveDisplayWidth / 320.0f;
-        width = RENDERER.getLastFrame().width / ((float)RENDERER.getLastFrame().height / RENDERER.getProjectionHeight());
+        width = RENDERER.getLastFrame().width / ((float)RENDERER.getLastFrame().height / RENDERER.getNativeHeight());
         offset = width - 320.0f;
       }
 
@@ -1993,13 +2004,13 @@ public final class Scus94491BpeSegment {
     final float offset;
 
     // Make sure effect fills the whole screen
-    if(RENDERER.getRenderMode() == EngineState.RenderMode.PERSPECTIVE && !CONFIG.getConfig(CoreMod.ALLOW_WIDESCREEN_CONFIG.get())) {
+    if(RENDERER.getRenderMode() == EngineState.RenderMode.PERSPECTIVE && !CONFIG.getConfig(ALLOW_WIDESCREEN_CONFIG.get())) {
       squish = 1.0f;
       width = dissolveDisplayWidth;
       offset = 0.0f;
     } else {
       squish = dissolveDisplayWidth / 320.0f;
-      width = RENDERER.getLastFrame().width / ((float)RENDERER.getLastFrame().height / RENDERER.getProjectionHeight());
+      width = RENDERER.getLastFrame().width / ((float)RENDERER.getLastFrame().height / RENDERER.getNativeHeight());
       offset = width - 320.0f;
     }
 
@@ -2026,7 +2037,7 @@ public final class Scus94491BpeSegment {
     clearGreen_800bb104 = 0;
     clearBlue_800babc0 = 0;
     _8004f6e4 = 1;
-    dissolveDisplayWidth = RENDERER.getProjectionWidth();
+    dissolveDisplayWidth = RENDERER.getNativeWidth();
 
     if(dissolveSquare != null) {
       dissolveSquare.delete();
@@ -2082,15 +2093,6 @@ public final class Scus94491BpeSegment {
     //LAB_8001cc50
     sound.playableSound_10 = loadSshdAndSoundbank(sound.name, files.get(3), new Sshd(sound.name, files.get(2)), charSlotSpuOffsets_80050190[charSlot]);
     sound.used_00 = true;
-
-    if(charSlot == 0 || charSlot == 1) {
-      //LAB_8001cc30
-      FUN_8001e8cc();
-    } else {
-      //LAB_8001cc38
-      //LAB_8001cc40
-      FUN_8001e8d4();
-    }
   }
 
   @Method(0x8001cce8L)
@@ -2399,6 +2401,8 @@ public final class Scus94491BpeSegment {
     //LAB_8001df9c
     loadedDrgnFiles_800bcf78.updateAndGet(val -> val | 0x8);
 
+    final AtomicInteger remaining = new AtomicInteger(3);
+
     // Player combat sounds for current party composition (example file: 764)
     for(int charSlot = 0; charSlot < 3; charSlot++) {
       final int charIndex = gameState_800babc8.charIds_88[charSlot];
@@ -2406,7 +2410,18 @@ public final class Scus94491BpeSegment {
       if(charIndex != -1) {
         final String name = getCharacterName(charIndex).toLowerCase();
         final int finalCharSlot = charSlot;
-        loadDir("characters/%s/sounds/combat".formatted(name), files -> charSoundEffectsLoaded(files, finalCharSlot));
+        loadDir("characters/%s/sounds/combat".formatted(name), files -> {
+          charSoundEffectsLoaded(files, finalCharSlot);
+          if(remaining.decrementAndGet() == 0) {
+            //LAB_8001cc38
+            //LAB_8001cc40
+            FUN_8001e8d4();
+          }
+        });
+      } else {
+        if(remaining.decrementAndGet() == 0) {
+          FUN_8001e8d4();
+        }
       }
     }
 
@@ -2578,10 +2593,6 @@ public final class Scus94491BpeSegment {
     throw new RuntimeException("Not implemented");
   }
 
-  @Method(0x8001e8ccL)
-  public static void FUN_8001e8cc() {
-    // empty
-  }
 
   @Method(0x8001e8d4L)
   public static void FUN_8001e8d4() {

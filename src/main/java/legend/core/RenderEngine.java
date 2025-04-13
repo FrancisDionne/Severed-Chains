@@ -174,7 +174,7 @@ public class RenderEngine {
   );
 
   public static final ShaderType<ShaderOptionsTmd> TMD_SHADER = new ShaderType<>(
-    options -> loadShader("tmd", "tmd", options),
+    options -> loadShader("tmd", "tmd", "tmd", options),
     shader -> {
       shader.use();
       shader.new UniformInt("tex24").set(0);
@@ -195,7 +195,7 @@ public class RenderEngine {
   );
 
   public static final ShaderType<ShaderOptionsBattleTmd> BATTLE_TMD_SHADER = new ShaderType<>(
-    options -> loadShader("battle_tmd", "battle_tmd", options),
+    options -> loadShader("battle_tmd", "tmd", "battle_tmd", options),
     shader -> {
       shader.use();
       shader.new UniformInt("tex24").set(0);
@@ -339,12 +339,12 @@ public class RenderEngine {
     this.updateResolution();
   }
 
-  public int getProjectionWidth() {
-    return this.mainBatch.getProjectionWidth();
+  public int getNativeWidth() {
+    return this.mainBatch.getNativeWidth();
   }
 
-  public int getProjectionHeight() {
-    return this.mainBatch.getProjectionHeight();
+  public int getNativeHeight() {
+    return this.mainBatch.getNativeHeight();
   }
 
   public int getRenderWidth() {
@@ -365,6 +365,10 @@ public class RenderEngine {
 
   public void updateProjections() {
     this.mainBatch.updateProjections();
+  }
+
+  public Matrix4f getPerspectiveProjection() {
+    return this.mainBatch.perspectiveProjection;
   }
 
   public WindowEvents events() {
@@ -418,6 +422,14 @@ public class RenderEngine {
   public static <Options extends ShaderOptions<Options>> Shader<Options> loadShader(final String vsh, final String fsh, final Function<Shader<Options>, Supplier<Options>> options) {
     try {
       return new Shader<>(Paths.get("gfx/shaders/" + vsh + ".vsh"), Paths.get("gfx/shaders/" + fsh + ".fsh"), options);
+    } catch(final IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static <Options extends ShaderOptions<Options>> Shader<Options> loadShader(final String vsh, final String gsh, final String fsh, final Function<Shader<Options>, Supplier<Options>> options) {
+    try {
+      return new Shader<>(Paths.get("gfx/shaders/" + vsh + ".vsh"), Paths.get("gfx/shaders/" + gsh + ".gsh"), Paths.get("gfx/shaders/" + fsh + ".fsh"), options);
     } catch(final IOException e) {
       throw new RuntimeException(e);
     }
@@ -712,7 +724,7 @@ public class RenderEngine {
           avg += this.fps[i];
         }
 
-        RENDERER.window().setTitle("Severed Chains %s - FPS: %.2f/%d scale: %.2f res: %dx%d".formatted(Version.FULL_VERSION, avg / fpsLimit, fpsLimit, RENDERER.getRenderHeight() / 240.0f, this.getProjectionWidth(), this.getProjectionHeight()));
+        RENDERER.window().setTitle("Severed Chains %s - FPS: %.2f/%d scale: %.2f res: %dx%d".formatted(Version.FULL_VERSION, avg / fpsLimit, fpsLimit, RENDERER.getRenderHeight() / 240.0f, this.getNativeWidth(), this.getNativeHeight()));
       }
 
       if(this.reloadShaders) {
@@ -801,8 +813,8 @@ public class RenderEngine {
           entry.render(null, layer);
         }
 
-        // First pass of translucency rendering - renders opaque pixels with translucency bit not set for translucent primitives
-        if(entry.hasTranslucency(layer)) {
+        // First pass of translucency rendering - renders opaque pixels with translucency bit not set for translucent primitives (only applies to emulated VRAM)
+        if(!entry.texturesUsed && entry.hasTranslucency(layer)) {
           for(int translucencyIndex = 0; translucencyIndex < Translucency.FOR_RENDERING.length; translucencyIndex++) {
             final Translucency translucency = Translucency.FOR_RENDERING[translucencyIndex];
 
@@ -845,7 +857,7 @@ public class RenderEngine {
       final QueuedModel<?, ?> entry = pool.get(i);
 
       if(entry.hasTranslucency()) {
-        entry.useShader(modelIndex, 2);
+        entry.useShader(modelIndex, entry.texturesUsed ? 0 : 2); // Don't discard if we aren't using the emulated VRAM texture
         this.state.enableDepthTest(entry.translucentDepthComparator);
 
         this.state.scissor(entry);
@@ -948,11 +960,12 @@ public class RenderEngine {
     this.projectionBuffer.put(0, 0.0f);
 
     // zfar
+    this.projectionBuffer.put(1, GTE.getProjectionPlaneDistance());
+
+    // zdiff
     if(highQualityProjection) {
-      this.projectionBuffer.put(1, 1000000.0f);
       this.projectionBuffer.put(2, 1.0f / 1000000.0f);
     } else {
-      this.projectionBuffer.put(1, GTE.getProjectionPlaneDistance());
       this.projectionBuffer.put(2, 1.0f / GTE.getProjectionPlaneDistance());
     }
 
@@ -1067,10 +1080,10 @@ public class RenderEngine {
 
     final Resolution res = CONFIG.getConfig(CoreMod.RESOLUTION_CONFIG.get());
     if(res == Resolution.NATIVE) {
-      this.renderWidth = (int)(width * (this.mainBatch.projectionWidth / 320.0f));
+      this.renderWidth = (int)(width * (this.mainBatch.nativeWidth / 320.0f));
       this.renderHeight = height;
     } else {
-      this.renderWidth = (int)((float)res.verticalResolution / height * width * (this.mainBatch.projectionWidth / 320.0f));
+      this.renderWidth = (int)((float)res.verticalResolution / height * width * (this.mainBatch.nativeWidth / 320.0f));
       this.renderHeight = res.verticalResolution;
     }
 

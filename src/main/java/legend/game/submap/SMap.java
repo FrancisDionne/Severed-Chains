@@ -36,6 +36,7 @@ import legend.game.scripting.ScriptDescription;
 import legend.game.scripting.ScriptParam;
 import legend.game.scripting.ScriptState;
 import legend.game.scripting.ScriptStorageParam;
+import legend.game.scripting.ScriptedObject;
 import legend.game.tim.Tim;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.AnimatedSprite08;
@@ -45,6 +46,7 @@ import legend.game.types.AnmSpriteMetrics14;
 import legend.game.types.BackgroundType;
 import legend.game.types.CContainer;
 import legend.game.types.CharacterData2c;
+import legend.game.types.GameState52c;
 import legend.game.types.GsF_LIGHT;
 import legend.game.types.LodString;
 import legend.game.types.Model124;
@@ -156,6 +158,7 @@ import static legend.game.Scus94491BpeSegment_800c.lightColourMatrix_800c3508;
 import static legend.game.Scus94491BpeSegment_800c.lightDirectionMatrix_800c34e8;
 import static legend.game.Scus94491BpeSegment_800c.worldToScreenMatrix_800c3548;
 import static legend.game.combat.environment.StageData.stageData_80109a98;
+import static legend.game.modding.coremod.CoreMod.REDUCE_MOTION_FLASHING_CONFIG;
 import static legend.game.modding.coremod.CoreMod.RUN_BY_DEFAULT;
 import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_MOVE_DOWN;
 import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_MOVE_LEFT;
@@ -164,6 +167,7 @@ import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_MOVE_UP;
 import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_OPEN_INVENTORY;
 import static legend.lodmod.LodMod.INPUT_ACTION_GENERAL_RUN;
 import static legend.lodmod.LodMod.INPUT_ACTION_SMAP_INTERACT;
+import static legend.lodmod.LodMod.INPUT_ACTION_SMAP_SNOWFIELD_WARP;
 import static legend.lodmod.LodMod.INPUT_ACTION_SMAP_TOGGLE_INDICATORS;
 import static org.lwjgl.opengl.GL11C.GL_LESS;
 import static org.lwjgl.opengl.GL11C.GL_LINES;
@@ -182,7 +186,7 @@ public class SMap extends EngineState {
 
   public int sobjCount_800c6730;
 
-  public ScriptState<Void> submapControllerState_800c6740;
+  public ScriptState<ScriptedObject> submapControllerState_800c6740;
 
   private final Model124 playerModel_800c6748 = new Model124("Player");
 
@@ -383,6 +387,19 @@ public class SMap extends EngineState {
   }
 
   @Override
+  public void loadGameFromMenu(final GameState52c gameState) {
+    this.smapLoadingStage_800cb430 = SubmapState.RENDER_SUBMAP_12;
+    this.transitioning_800f7e4c = false;
+
+    if(gameState.isOnWorldMap_4e4) {
+      this.mapTransition(0, submapScene_80052c34);
+    } else {
+      this.mapTransition(submapCut_80052c30, submapScene_80052c34);
+      this.restoreMusicAfterMenu();
+    }
+  }
+
+  @Override
   public void inputActionPressed(final InputAction action, final boolean repeat) {
     super.inputActionPressed(action, repeat);
 
@@ -439,6 +456,15 @@ public class SMap extends EngineState {
       this.inputRepeat |= 0x20;
       this.inputHeld |= 0x20;
     }
+
+    if(action == INPUT_ACTION_SMAP_SNOWFIELD_WARP.get()) {
+      if(!repeat) {
+        this.inputPressed |= 0x800;
+      }
+
+      this.inputRepeat |= 0x800;
+      this.inputHeld |= 0x800;
+    }
   }
 
   @Override
@@ -467,6 +493,10 @@ public class SMap extends EngineState {
 
     if(action == INPUT_ACTION_SMAP_INTERACT.get()) {
       this.inputHeld &= ~0x20;
+    }
+
+    if(action == INPUT_ACTION_SMAP_SNOWFIELD_WARP.get()) {
+      this.inputHeld &= ~0x800;
     }
   }
 
@@ -1012,7 +1042,8 @@ public class SMap extends EngineState {
   private void renderSmapShadow(final Model124 model) {
     GsInitCoordinate2(model.coord2_14, shadowModel_800bda10.coord2_14);
 
-    shadowModel_800bda10.zOffset_a0 = model.zOffset_a0 + 16;
+    // This is +16 in retail, but this value isn't used - the z offset is inherited from the model render method that calls this
+    shadowModel_800bda10.zOffset_a0 = model.zOffset_a0;
     shadowModel_800bda10.coord2_14.transforms.scale.set(model.shadowSize_10c).div(64.0f);
 
     shadowModel_800bda10.coord2_14.coord.scaling(shadowModel_800bda10.coord2_14.transforms.scale);
@@ -1160,7 +1191,7 @@ public class SMap extends EngineState {
       GTE.setTransforms(worldToScreenMatrix_800c3548);
       this.transformToWorldspace(worldspaceDeltaMovement, deltaMovement);
 
-      final int collidedPrimitiveIndex = this.collisionGeometry_800cbe08.checkCollision(player.sobjIndex_12e != 0, playerModel.coord2_14.coord.transfer, worldspaceDeltaMovement);
+      final int collidedPrimitiveIndex = this.collisionGeometry_800cbe08.checkCollision(player.sobjIndex_12e != 0, playerModel.coord2_14.coord.transfer, worldspaceDeltaMovement, true);
       if(collidedPrimitiveIndex >= 0) {
         if(this.isWalkable(collidedPrimitiveIndex)) {
           player.finishInterpolatedMovement();
@@ -1381,7 +1412,7 @@ public class SMap extends EngineState {
       GTE.setTransforms(worldToScreenMatrix_800c3548);
       this.transformToWorldspace(movement, deltaMovement);
 
-      this.collisionGeometry_800cbe08.checkCollision(sobj.sobjIndex_12e != 0, model.coord2_14.coord.transfer, movement);
+      this.collisionGeometry_800cbe08.checkCollision(sobj.sobjIndex_12e != 0, model.coord2_14.coord.transfer, movement, true);
 
       //LAB_800def08
       angle = MathHelper.positiveAtan2(movement.z, movement.x);
@@ -2958,7 +2989,7 @@ public class SMap extends EngineState {
         this.firstMovement = true;
 
         //LAB_800e1914
-        final ScriptState<Void> submapController = SCRIPTS.allocateScriptState(0, "Submap controller", null);
+        final ScriptState<ScriptedObject> submapController = SCRIPTS.allocateScriptState(0, "Submap controller", null);
         this.submapControllerState_800c6740 = submapController;
         submapController.loadScriptFile(this.submap.script);
 
@@ -3085,7 +3116,7 @@ public class SMap extends EngineState {
       }
 
       //LAB_800e2140
-      final int collidedPrimitiveIndex = this.collisionGeometry_800cbe08.checkCollision(sobj.sobjIndex_12e != 0, model.coord2_14.coord.transfer, movement);
+      final int collidedPrimitiveIndex = this.collisionGeometry_800cbe08.checkCollision(sobj.sobjIndex_12e != 0, model.coord2_14.coord.transfer, movement, false);
       if(collidedPrimitiveIndex >= 0 && this.isWalkable(collidedPrimitiveIndex)) {
         model.coord2_14.coord.transfer.x += movement.x / (2.0f / vsyncMode_8007a3b8);
         model.coord2_14.coord.transfer.y = movement.y;
@@ -3583,20 +3614,20 @@ public class SMap extends EngineState {
 
         this.submap.applyCollisionDebugColour(i, model);
 
-        if(this.sobjs_800c6880[0].innerStruct_00.collidedPrimitiveIndex_16c != -1) {
-          final CollisionPrimitiveInfo0c collidedPrimitive = this.collisionGeometry_800cbe08.primitiveInfo_14[this.sobjs_800c6880[0].innerStruct_00.collidedPrimitiveIndex_16c];
-
-          RENDERER.queueModel(this.collisionGeometry_800cbe08.debugLines, QueuedModelStandard.class)
-            .colour(1.0f, 0.0f, 0.0f)
-            .screenspaceOffset(GPU.getOffsetX() + GTE.getScreenOffsetX() - 184, GPU.getOffsetY() + GTE.getScreenOffsetY() - 120)
-            .vertices(collidedPrimitive.vertexInfoOffset_02 * 2, collidedPrimitive.vertexCount_00 * 2)
-            .depthOffset(-1.0f);
-        }
-
 //        this.collisionGeometry_800cbe08.getMiddleOfCollisionPrimitive(i, middle);
 //        this.transformVertex(transformed, middle);
 //        final LodString text = new LodString(Integer.toString(i));
 //        renderText(text, transformed.x + centreScreenX_1f8003dc - textWidth(text) / 2.0f, transformed.y + centreScreenY_1f8003de - 6, TextColour.LIME, 0);
+      }
+
+      if(this.sobjs_800c6880[0].innerStruct_00.collidedPrimitiveIndex_16c != -1) {
+        final CollisionPrimitiveInfo0c collidedPrimitive = this.collisionGeometry_800cbe08.primitiveInfo_14[this.sobjs_800c6880[0].innerStruct_00.collidedPrimitiveIndex_16c];
+
+        RENDERER.queueModel(this.collisionGeometry_800cbe08.debugLines, QueuedModelStandard.class)
+          .colour(1.0f, 0.0f, 0.0f)
+          .screenspaceOffset(GPU.getOffsetX() + GTE.getScreenOffsetX() - 184, GPU.getOffsetY() + GTE.getScreenOffsetY() - 120)
+          .vertices(collidedPrimitive.vertexInfoOffset_02 * 2, collidedPrimitive.vertexCount_00 * 2)
+          .depthOffset(-1.0f);
       }
     } else if(this.collisionGeometry_800cbe08.debugObj != null) {
       this.collisionGeometry_800cbe08.debugObj.delete();
@@ -3844,7 +3875,7 @@ public class SMap extends EngineState {
         this.executeSubmapMediaLoadingStage(this.currentSubmapScene_800caaf8);
 
         // Wait for media to finish loading
-        if(this.mediaLoadingStage_800c68e4 != SubmapMediaState.DONE) {
+        if(this.mediaLoadingStage_800c68e4 != SubmapMediaState.DONE || !SCRIPTS.willTick()) {
           return;
         }
 
@@ -5240,7 +5271,7 @@ public class SMap extends EngineState {
       final AnmSpriteGroup[] spriteGroups = anm.spriteGroups;
 
       //LAB_800f365c
-      if((s1._00 & 0x1) == 0) {
+      if((s1._00 & 0x1) == 0 && !CONFIG.getConfig(REDUCE_MOTION_FLASHING_CONFIG.get())) {
         if(((this.smapTicks_800c6ae0 % (3 - vsyncMode_8007a3b8) == 0))) {
           s1.time_08--;
         }

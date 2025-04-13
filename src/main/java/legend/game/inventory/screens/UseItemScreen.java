@@ -45,6 +45,7 @@ import static legend.game.Scus94491BpeSegment_800b.saveListUpArrow_800bdb94;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 import static legend.game.Scus94491BpeSegment_800b.uiFile_800bdc3c;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BOTTOM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
@@ -53,6 +54,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_TOP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class UseItemScreen extends MenuScreen {
@@ -458,6 +460,22 @@ public class UseItemScreen extends MenuScreen {
     this.itemHighlight.y_44 = this.getItemSlotY(this.selectedSlot);
   }
 
+  private void menuStage2NavigateTop() {
+    if(this.selectedSlot != 0) {
+      playMenuSound(1);
+      this.selectedSlot = 0;
+      this.itemHighlight.y_44 = this.getItemSlotY(this.selectedSlot);
+    }
+  }
+
+  private void menuStage2NavigateBottom() {
+    if(this.selectedSlot != 4) {
+      playMenuSound(1);
+      this.selectedSlot = 4;
+      this.itemHighlight.y_44 = this.getItemSlotY(this.selectedSlot);
+    }
+  }
+
   private void menuStage2NavigatePageUp() {
     if(this.slotScroll - 4 >= 0) {
       this.scroll(this.slotScroll - 4);
@@ -482,7 +500,7 @@ public class UseItemScreen extends MenuScreen {
   }
 
   private void menuStage2NavigateEnd() {
-    if(this.slotScroll + this.selectedSlot != this.itemCount - 1) {
+    if(this.itemCount > 0 && this.slotScroll + this.selectedSlot != this.itemCount - 1) {
       this.selectedSlot = Math.min(4, this.itemCount - 1);
       this.scroll(this.itemCount - 1 - this.selectedSlot);
     }
@@ -587,7 +605,7 @@ public class UseItemScreen extends MenuScreen {
       }
 
       this.getItemResponseText(this.useItemResponse);
-      menuStack.pushScreen(new MessageBoxScreen(this.useItemResponse.string_08, 0, result -> {}));
+      this.deferAction(() -> menuStack.pushScreen(new MessageBoxScreen(this.useItemResponse.string_08, 0, result -> {})));
       this.loadingStage = 1;
     }
   }
@@ -616,6 +634,16 @@ public class UseItemScreen extends MenuScreen {
 
       if(action == INPUT_ACTION_MENU_PAGE_DOWN.get()) {
         this.menuStage2NavigatePageDown();
+        return InputPropagation.HANDLED;
+      }
+
+      if(action == INPUT_ACTION_MENU_TOP.get()) {
+        this.menuStage2NavigateTop();
+        return InputPropagation.HANDLED;
+      }
+
+      if(action == INPUT_ACTION_MENU_BOTTOM.get()) {
+        this.menuStage2NavigateBottom();
         return InputPropagation.HANDLED;
       }
 

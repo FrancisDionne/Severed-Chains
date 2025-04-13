@@ -31,6 +31,7 @@ import legend.game.modding.coremod.config.AdditionTimingOffsetConfigEntry;
 import legend.game.modding.coremod.config.PreferredBattleCameraAngleConfigEntry;
 import legend.game.modding.coremod.config.AllowWidescreenConfigEntry;
 import legend.game.modding.coremod.config.AudioDeviceConfig;
+import legend.game.modding.coremod.config.AutoTextDelayConfigEntry;
 import legend.game.modding.coremod.config.BattleTransitionModeConfigEntry;
 import legend.game.modding.coremod.config.DeadzoneConfigEntry;
 import legend.game.modding.coremod.config.ControllerKeybindsConfigEntry;
@@ -56,6 +57,7 @@ import legend.game.modding.coremod.config.MusicInterpolationPrecisionConfigEntry
 import legend.game.modding.coremod.config.MusicPitchResolutionConfigEntry;
 import legend.game.modding.coremod.config.MusicSampleRateConfigEntry;
 import legend.game.modding.coremod.config.MusicVolumeConfigEntry;
+import legend.game.modding.coremod.config.ReduceMotionFlashingConfigEntry;
 import legend.game.modding.coremod.config.ResolutionConfig;
 import legend.game.modding.coremod.config.RumbleIntensityConfigEntry;
 import legend.game.modding.coremod.config.RunByDefaultConfig;
@@ -105,6 +107,7 @@ public class CoreMod {
   public static final RegistryDelegate<BoolConfigEntry> FULLSCREEN_CONFIG = CONFIG_REGISTRAR.register("fullscreen", FullscreenConfigEntry::new);
   public static final RegistryDelegate<ResolutionConfig> RESOLUTION_CONFIG = CONFIG_REGISTRAR.register("resolution", ResolutionConfig::new);
   public static final RegistryDelegate<MonitorConfigEntry> MONITOR_CONFIG = CONFIG_REGISTRAR.register("monitor", MonitorConfigEntry::new);
+  public static final RegistryDelegate<ReduceMotionFlashingConfigEntry> REDUCE_MOTION_FLASHING_CONFIG = CONFIG_REGISTRAR.register("reduce_motion_flashing", ReduceMotionFlashingConfigEntry::new);
 
   public static final RegistryDelegate<AudioDeviceConfig> AUDIO_DEVICE_CONFIG = CONFIG_REGISTRAR.register("audio_device", AudioDeviceConfig::new);
   public static final RegistryDelegate<MasterVolumeConfigEntry> MASTER_VOLUME_CONFIG = CONFIG_REGISTRAR.register("master_volume", MasterVolumeConfigEntry::new);
@@ -124,10 +127,6 @@ public class CoreMod {
 
   // Per-campaign config
   public static final RegistryDelegate<CampaignNameConfigEntry> CAMPAIGN_NAME = CONFIG_REGISTRAR.register("campaign_name", CampaignNameConfigEntry::new);
-  public static final RegistryDelegate<EnabledModsConfigEntry> ENABLED_MODS_CONFIG = register("enabled_mods", EnabledModsConfigEntry::new);
-  public static final RegistryDelegate<IndicatorModeConfigEntry> INDICATOR_MODE_CONFIG = register("indicator_mode", IndicatorModeConfigEntry::new);
-  public static final RegistryDelegate<InventorySizeConfigEntry> INVENTORY_SIZE_CONFIG = register("inventory_size", InventorySizeConfigEntry::new);
-  public static final RegistryDelegate<EncounterRateConfigEntry> ENCOUNTER_RATE_CONFIG = register("encounter_rate", EncounterRateConfigEntry::new);
   public static final RegistryDelegate<TransformationModeConfigEntry> TRANSFORMATION_MODE_CONFIG = register("transformation_mode", TransformationModeConfigEntry::new);
   public static final RegistryDelegate<BoolConfigEntry> QUICK_TEXT_CONFIG = register("quick_text", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY));
   public static final RegistryDelegate<BoolConfigEntry> AUTO_TEXT_CONFIG = register("auto_text", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY));
@@ -138,7 +137,6 @@ public class CoreMod {
   public static final RegistryDelegate<SecondaryCharacterXpMultiplierConfigEntry> SECONDARY_CHARACTER_XP_MULTIPLIER_CONFIG = register("secondary_character_xp_multiplier", SecondaryCharacterXpMultiplierConfigEntry::new);
   public static final RegistryDelegate<BattleTransitionModeConfigEntry> BATTLE_TRANSITION_MODE_CONFIG = register("battle_transition_mode", BattleTransitionModeConfigEntry::new);
   public static final RegistryDelegate<PreferredBattleCameraAngleConfigEntry> PREFERRED_BATTLE_CAMERA_ANGLE = register("preferred_battle_camera_angle", PreferredBattleCameraAngleConfigEntry::new);
-  public static final RegistryDelegate<BoolConfigEntry> UNLOCK_PARTY_CONFIG = register("unlock_party", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY));
   public static final RegistryDelegate<FooterActionColorConfigEntry> FOOTER_ACTION_COLOR_CONFIG = CONFIG_REGISTRAR.register("footer_action_color", FooterActionColorConfigEntry::new);
   
   public static final RegistryDelegate<ConfigEntry<Void>> GENERAL_ADDITION_GROUP_CONFIG = register("general_addition_group", GeneralAdditionGroupConfigEntry::new);
@@ -156,6 +154,13 @@ public class CoreMod {
   public static final RegistryDelegate<DragoonAdditionModeConfigEntry> DRAGOON_ADDITION_MODE_CONFIG = register("dragoon_addition_mode", DragoonAdditionModeConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionDifficultyConfigEntry> DRAGOON_ADDITION_DIFFICULTY_CONFIG = register("dragoon_addition_difficulty", DragoonAdditionDifficultyConfigEntry::new);
 
+  public static final RegistryDelegate<EnabledModsConfigEntry> ENABLED_MODS_CONFIG = CONFIG_REGISTRAR.register("enabled_mods", EnabledModsConfigEntry::new);
+  public static final RegistryDelegate<IndicatorModeConfigEntry> INDICATOR_MODE_CONFIG = CONFIG_REGISTRAR.register("indicator_mode", IndicatorModeConfigEntry::new);
+  public static final RegistryDelegate<InventorySizeConfigEntry> INVENTORY_SIZE_CONFIG = CONFIG_REGISTRAR.register("inventory_size", InventorySizeConfigEntry::new);
+  public static final RegistryDelegate<EncounterRateConfigEntry> ENCOUNTER_RATE_CONFIG = CONFIG_REGISTRAR.register("encounter_rate", EncounterRateConfigEntry::new);
+  public static final RegistryDelegate<AutoTextDelayConfigEntry> AUTO_TEXT_DELAY_CONFIG = CONFIG_REGISTRAR.register("auto_text_delay", AutoTextDelayConfigEntry::new);
+  public static final RegistryDelegate<UnlockPartyConfig> UNLOCK_PARTY_CONFIG = CONFIG_REGISTRAR.register("unlock_party", UnlockPartyConfig::new);
+
   public static final RegistryDelegate<IconSetConfigEntry> ICON_SET = CONFIG_REGISTRAR.register("icon_set", IconSetConfigEntry::new);
   public static final RegistryDelegate<RunByDefaultConfig> RUN_BY_DEFAULT = CONFIG_REGISTRAR.register("run_by_default", RunByDefaultConfig::new);
   private static final Registrar<InputAction, InputActionRegistryEvent> INPUT_ACTION_REGISTRAR = new Registrar<>(GameEngine.REGISTRIES.inputActions, MOD_ID);
@@ -166,6 +171,8 @@ public class CoreMod {
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_RIGHT = INPUT_ACTION_REGISTRAR.register("menu_right", InputAction::fixed);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_HOME = INPUT_ACTION_REGISTRAR.register("menu_home", InputAction::fixed);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_END = INPUT_ACTION_REGISTRAR.register("menu_end", InputAction::fixed);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_TOP = INPUT_ACTION_REGISTRAR.register("menu_top", InputAction::fixed);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_BOTTOM = INPUT_ACTION_REGISTRAR.register("menu_bottom", InputAction::fixed);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_PAGE_UP = INPUT_ACTION_REGISTRAR.register("menu_page_up", InputAction::fixed);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_PAGE_DOWN = INPUT_ACTION_REGISTRAR.register("menu_page_down", InputAction::fixed);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_CONFIRM = INPUT_ACTION_REGISTRAR.register("menu_confirm", InputAction::fixed);
@@ -175,6 +182,7 @@ public class CoreMod {
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_FILTER = INPUT_ACTION_REGISTRAR.register("menu_filter", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_HELP = INPUT_ACTION_REGISTRAR.register("menu_help", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_MODS = INPUT_ACTION_REGISTRAR.register("menu_mods", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_TEXTBOX_CONFIRM = INPUT_ACTION_REGISTRAR.register("menu_textbox_confirm", InputAction::fixed);
 
   public static final RegistryDelegate<InputAction> INPUT_ACTION_FMV_SKIP = INPUT_ACTION_REGISTRAR.register("fmv_skip", InputAction::fixed);
 
@@ -274,6 +282,8 @@ public class CoreMod {
       .add(INPUT_ACTION_MENU_HELP.get(), new KeyInputActivation(InputKey.H))
       .add(INPUT_ACTION_MENU_MODS.get(), new ButtonInputActivation(InputButton.Y))
       .add(INPUT_ACTION_MENU_MODS.get(), new KeyInputActivation(InputKey.M))
+      .add(INPUT_ACTION_MENU_TEXTBOX_CONFIRM.get(), new ButtonInputActivation(InputButton.A))
+      .add(INPUT_ACTION_MENU_TEXTBOX_CONFIRM.get(), new KeyInputActivation(InputKey.RETURN))
 
       .add(INPUT_ACTION_FMV_SKIP.get(), new KeyInputActivation(InputKey.RETURN))
       .add(INPUT_ACTION_FMV_SKIP.get(), new ButtonInputActivation(InputButton.Y))

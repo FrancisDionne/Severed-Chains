@@ -28,6 +28,7 @@ import legend.game.modding.coremod.CoreMod;
 import legend.game.submap.EncounterRateMode;
 import legend.game.tim.Tim;
 import legend.game.types.CContainer;
+import legend.game.types.GameState52c;
 import legend.game.types.GsF_LIGHT;
 import legend.game.types.McqHeader;
 import legend.game.types.Model124;
@@ -411,6 +412,11 @@ public class WMap extends EngineState {
   @Override
   public void restoreMusicAfterMenu() {
     unloadSoundFile(8);
+  }
+
+  @Override
+  public void loadGameFromMenu(final GameState52c gameState) {
+    this.wmapState_800bb10c = gameState.isOnWorldMap_4e4 ? WmapState.INIT_0 : WmapState.TRANSITION_TO_SUBMAP_7;
   }
 
   @Override
@@ -3206,14 +3212,24 @@ public class WMap extends EngineState {
       final boolean autoRun = CONFIG.getConfig(RUN_BY_DEFAULT.get());
       final boolean runHeld = PLATFORM.isActionHeld(INPUT_ACTION_GENERAL_RUN.get());
       final float mag = this.getAnalogueMagnitude();
-      if(mag != 0.0f && autoRun != runHeld || mag >= 0.5f) { // World Map Running
+      if(mag == 0.0f && autoRun != runHeld || mag >= 0.75f) { // World Map Running
         //LAB_800e11d0
         modelAndAnimData.currAnimIndex_b0 = 4;
-        this.handleEncounters(mode.worldMapRunModifier);
+
+        if(mag != 0.0f) {
+          this.handleEncounters(mode.worldMapRunModifier * mag);
+        } else {
+          this.handleEncounters(mode.worldMapRunModifier);
+        }
       } else {
         //LAB_800e11f4
         modelAndAnimData.currAnimIndex_b0 = 3;
-        this.handleEncounters(mode.worldMapWalkModifier);
+
+        if(mag != 0.0f) {
+          this.handleEncounters(mode.worldMapRunModifier * mag);
+        } else {
+          this.handleEncounters(mode.worldMapWalkModifier);
+        }
       }
 
       //LAB_800e1210
@@ -4082,10 +4098,10 @@ public class WMap extends EngineState {
             locations_800f0e34[this.mapState_800c6798.locationIndex_10].thumbnailShouldUseFullBrightness_10
         ) {
           //LAB_800e5e98
-          newBrightness = currentBrightness * 0.5f;
+          newBrightness = currentBrightness;
         } else {
           //LAB_800e5e18
-          newBrightness = currentBrightness * 0.1875f;
+          newBrightness = currentBrightness * 0.375f;
         }
 
         //LAB_800e5f04

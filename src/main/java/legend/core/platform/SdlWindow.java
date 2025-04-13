@@ -52,6 +52,7 @@ import static org.lwjgl.sdl.SDLVideo.SDL_GetDisplayBounds;
 import static org.lwjgl.sdl.SDLVideo.SDL_GetDisplays;
 import static org.lwjgl.sdl.SDLVideo.SDL_GetPrimaryDisplay;
 import static org.lwjgl.sdl.SDLVideo.SDL_GetWindowSize;
+import static org.lwjgl.sdl.SDLVideo.SDL_RestoreWindow;
 import static org.lwjgl.sdl.SDLVideo.SDL_SetWindowBordered;
 import static org.lwjgl.sdl.SDLVideo.SDL_SetWindowIcon;
 import static org.lwjgl.sdl.SDLVideo.SDL_SetWindowMinimumSize;
@@ -202,17 +203,18 @@ public class SdlWindow extends Window {
   public void makeFullscreen() {
     this.monitor = this.getMonitorFromConfig();
     this.vidMode = SDL_GetDesktopDisplayMode(this.monitor);
+    this.err(SDL_RestoreWindow(this.window), "RestoreWindow");
+    this.err(SDL_SetWindowBordered(this.window, false), "SetWindowBordered");
     this.moveToMonitor();
-    SDL_SetWindowBordered(this.window, false);
 
     // Overscan by 1 pixel to stop Windows from putting it into exclusive fullscreen
-    SDL_SetWindowSize(this.window, this.vidMode.w(), this.vidMode.h() + 1);
+    this.err(SDL_SetWindowSize(this.window, this.vidMode.w(), this.vidMode.h() + 1), "SetWindowSize");
   }
 
   @Override
   public void makeWindowed() {
-    SDL_SetWindowBordered(this.window, true);
-    SDL_SetWindowSize(this.window, Config.windowWidth(), Config.windowHeight());
+    this.err(SDL_SetWindowBordered(this.window, true), "SetWindowBordered");
+    this.err(SDL_SetWindowSize(this.window, Config.windowWidth(), Config.windowHeight()), "SetWindowSize");
     this.centerWindow();
   }
 
@@ -223,22 +225,28 @@ public class SdlWindow extends Window {
       final IntBuffer pHeight = stack.mallocInt(1);
       final SDL_Rect displayRect = SDL_Rect.malloc(stack);
 
-      SDL_GetWindowSize(this.window, pWidth, pHeight);
-      SDL_GetDisplayBounds(this.monitor, displayRect);
+      this.err(SDL_GetWindowSize(this.window, pWidth, pHeight), "GetWindowSize");
+      this.err(SDL_GetDisplayBounds(this.monitor, displayRect), "GetDisplayBounds");
 
-      SDL_SetWindowPosition(
+      this.err(SDL_SetWindowPosition(
         this.window,
         displayRect.x() + (displayRect.w() - pWidth.get(0)) / 2,
         displayRect.y() + (displayRect.h() - pHeight.get(0)) / 2
-      );
+      ), "SetWindowPosition");
     }
   }
 
   private void moveToMonitor() {
     try(final MemoryStack stack = stackPush()) {
       final SDL_Rect displayRect = SDL_Rect.malloc(stack);
-      SDL_GetDisplayBounds(this.monitor, displayRect);
-      SDL_SetWindowPosition(this.window, displayRect.x(), displayRect.y());
+      this.err(SDL_GetDisplayBounds(this.monitor, displayRect), "GetDisplayBounds");
+      this.err(SDL_SetWindowPosition(this.window, displayRect.x(), displayRect.y()), "SetWindowPosition");
+    }
+  }
+
+  private void err(final boolean status, final String action) {
+    if(!status) {
+      LOGGER.error("SDL error (%s): %s", action, SDL_GetError());
     }
   }
 

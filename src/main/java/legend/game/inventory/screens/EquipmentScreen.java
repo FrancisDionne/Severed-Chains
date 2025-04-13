@@ -18,6 +18,7 @@ import legend.game.types.Renderable58;
 import java.util.List;
 import java.util.Set;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.game.SItem.FUN_801034cc;
 import static legend.game.SItem.FUN_80104b60;
 import static legend.game.SItem.allocateUiElement;
@@ -44,6 +45,7 @@ import static legend.game.Scus94491BpeSegment_8002.sortEquipmentInventory;
 import static legend.game.Scus94491BpeSegment_8002.takeEquipment;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BOTTOM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
@@ -55,7 +57,9 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_FILTER;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_TOP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
+import static legend.game.modding.coremod.CoreMod.REDUCE_MOTION_FLASHING_CONFIG;
 
 public class EquipmentScreen extends MenuScreen {
   private int loadingStage;
@@ -69,8 +73,8 @@ public class EquipmentScreen extends MenuScreen {
   private int sort;
   private int filter;
   private Renderable58 itemHighlight;
-  private Renderable58 _800bdb9c;
-  private Renderable58 _800bdba0;
+  private Renderable58 upArrow_800bdb9c;
+  private Renderable58 downArrow_800bdba0;
 
   /** Allows list wrapping, but only on new input */
   private boolean allowWrapX = true;
@@ -181,11 +185,17 @@ public class EquipmentScreen extends MenuScreen {
 
     if(allocate) {
       allocateUiElement(90, 0x5a, 194, 96);
-      this._800bdb9c = allocateUiElement(61, 0x44, 358, this.menuHighlightPositionY(0));
-      this._800bdba0 = allocateUiElement(53, 0x3c, 358, this.menuHighlightPositionY(3));
+
+      if(!CONFIG.getConfig(REDUCE_MOTION_FLASHING_CONFIG.get())) {
+        this.upArrow_800bdb9c = allocateUiElement(61, 68, 358, this.menuHighlightPositionY(0));
+        this.downArrow_800bdba0 = allocateUiElement(53, 60, 358, this.menuHighlightPositionY(3));
+      } else {
+        this.upArrow_800bdb9c = allocateUiElement(67, 67, 358, this.menuHighlightPositionY(0));
+        this.downArrow_800bdba0 = allocateUiElement(59, 59, 358, this.menuHighlightPositionY(3));
+      }
     }
 
-    renderMenuItems(194, 92, this.menuItems, slotScroll, 4, this._800bdb9c, this._800bdba0, true);
+    renderMenuItems(194, 92, this.menuItems, slotScroll, 4, this.upArrow_800bdb9c, this.downArrow_800bdba0, true);
 
     final String text = slotIndex + slotScroll < this.menuItems.size() ? I18n.translate(this.menuItems.get(slotIndex + slotScroll).item_00.getDescriptionTranslationKey()) : "";
     renderString(194, 178, text, allocate);
@@ -324,6 +334,22 @@ public class EquipmentScreen extends MenuScreen {
     this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
   }
 
+  private void menuNavigateTop() {
+    if(this.selectedSlot != 0) {
+      playMenuSound(1);
+      this.selectedSlot = 0;
+      this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
+    }
+  }
+
+  private void menuNavigateBottom() {
+    if(this.selectedSlot != 3) {
+      playMenuSound(1);
+      this.selectedSlot = 3;
+      this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
+    }
+  }
+
   private void menuNavigatePageUp() {
     if(this.slotScroll - 3 >= 0) {
       this.scroll(this.slotScroll - 3);
@@ -348,7 +374,7 @@ public class EquipmentScreen extends MenuScreen {
   }
 
   private void menuNavigateEnd() {
-    if(this.slotScroll + this.selectedSlot != this.equipmentCount - 1) {
+    if(this.equipmentCount > 0 && this.slotScroll + this.selectedSlot != this.equipmentCount - 1) {
       this.selectedSlot = Math.min(3, this.equipmentCount - 1);
       this.scroll(this.equipmentCount - 1 - this.selectedSlot);
     }
@@ -475,6 +501,16 @@ public class EquipmentScreen extends MenuScreen {
 
     if(action == INPUT_ACTION_MENU_PAGE_DOWN.get()) {
       this.menuNavigatePageDown();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_TOP.get()) {
+      this.menuNavigateTop();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_BOTTOM.get()) {
+      this.menuNavigateBottom();
       return InputPropagation.HANDLED;
     }
 
