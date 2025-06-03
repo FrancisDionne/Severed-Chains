@@ -1262,7 +1262,7 @@ public class ShopScreen extends MenuScreen {
       }
     }
   }
-
+  
   private void menuSell10NavigatePageUp() {
     if(this.invScroll_8011e0e4 - 6 >= 0) {
       playMenuSound(1);
