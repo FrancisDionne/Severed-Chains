@@ -374,7 +374,7 @@ public class CombatDebuggerController {
       hp.setCurrent(9999);
       hp.setMaxRaw(9999);
 
-      if (bent instanceof final PlayerBattleEntity player){
+      if (bent instanceof final PlayerBattleEntity player) {
         bent.attack_34 = 0;
         bent.magicAttack_36 = 0;
         bent.attackHit_3c = 9999;

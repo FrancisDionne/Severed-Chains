@@ -438,7 +438,7 @@ public class ShopScreen extends MenuScreen {
       downArrow.setVisible(firstItem + 6 <= items.size() - 1);
     } else {
       int i;
-      if (!items.isEmpty()){
+      if (!items.isEmpty()) {
         for(i = 0; firstItem + i < items.size() && i < 6; i++) {
           final Equipment equipment = (Equipment)items.get(firstItem + i);
           final int quantity = getInventoryEntryQuantity(equipment);
@@ -725,7 +725,7 @@ public class ShopScreen extends MenuScreen {
                 final boolean wasStack = result.quantity >= quantity;
                 boolean taken = false;
 
-                for (int j = 0; j < result.quantity; j++){
+                for (int j = 0; j < result.quantity; j++) {
                   final int index = getFirstIndexOfInventoryEntry(isItem ? (Item)entry : (Equipment)entry);
                   if(isItem) {
                     taken = takeItem(index) || taken;
@@ -1162,7 +1162,7 @@ public class ShopScreen extends MenuScreen {
       menuStack.pushScreen(new MessageBoxQuantityScreen("Sell " + itemText + " x[#]?", 1, quantity, 2, result -> {
         if(Objects.requireNonNull(result.messageBoxResult) == MessageBoxResult.YES) {
           boolean taken = false;
-          for (int i = 0; i < result.quantity; i++){
+          for (int i = 0; i < result.quantity; i++) {
             final int index = getFirstIndexOfInventoryEntry(isItem ? (Item)entry : (Equipment)entry);
             if(isItem) {
               taken = takeItem(index) || taken;

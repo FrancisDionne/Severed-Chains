@@ -6,6 +6,7 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
 import legend.core.platform.input.InputAction;
+import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.coremod.CoreMod;
 import org.joml.Matrix4f;
@@ -16,7 +17,6 @@ import java.util.Arrays;
 
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.RENDERER;
-import static legend.game.SItem.UI_TEXT;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
@@ -35,6 +35,7 @@ public final class FooterActionsHud {
 
   private static final FooterAction[] actions = new FooterAction[5];
   private static int style = 0; //0 = Menu, 1 = Battle
+  private static FontOptions font;
 
   public static Texture[] textures = {
     Texture.png(Path.of("gfx", "ui", "Small_Button_Playstation_Cross.png")),      //0
@@ -113,9 +114,6 @@ public final class FooterActionsHud {
     };
   }
 
-  private FooterActionsHud() {
-  }
-
   public static void render() {
     final TextColour color = getColor();
 
@@ -125,6 +123,10 @@ public final class FooterActionsHud {
       final int y;
       String text;
       int textWidth;
+
+      if (font == null || color.r / 255.0f != font.getRed() || color.g / 255.0f != font.getGreen() || color.b / 255.0f != font.getBlue()) {
+        font = new FontOptions().colour(color).shadowColour(color == TextColour.FOOTER_BROWN ? TextColour.MIDDLE_BROWN : TextColour.DARK_GREY);
+      }
 
       if(style == 1) { // Battle
         x = 250;
@@ -145,7 +147,7 @@ public final class FooterActionsHud {
             textWidth = textWidth(text);
             x -= textWidth;
 
-            renderText(text, x, y + 1, UI_TEXT);
+            renderText(text, x, y + 1, font);
 
             x -= 11;
 
@@ -162,7 +164,7 @@ public final class FooterActionsHud {
             textWidth = textWidth(text);
             x -= textWidth;
 
-            renderText(text, x, y + 1, UI_TEXT);
+            renderText(text, x, y + 1, font);
 
             x -= 2;
           }
@@ -171,7 +173,7 @@ public final class FooterActionsHud {
           textWidth = textWidth(text);
           x -= textWidth;
 
-          renderText(text, x, y, UI_TEXT);
+          renderText(text, x, y, font);
 
           x -= 14;
 
