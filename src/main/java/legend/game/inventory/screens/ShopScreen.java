@@ -76,6 +76,7 @@ import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.takeEquipment;
 import static legend.game.Scus94491BpeSegment_8002.takeItem;
+import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.Scus94491BpeSegment_8002.unloadRenderable;
 import static legend.game.Scus94491BpeSegment_8007.shopId_8007a3b4;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
@@ -176,7 +177,7 @@ public class ShopScreen extends MenuScreen {
       case INIT_2 -> {
         deallocateRenderables(0xff);
         renderGlyphs(glyphs_80114510, 0, 0);
-        this.selectedMenuOptionRenderablePtr_800bdbe0 = allocateUiElement(0x7a, 0x7a, 49, this.getShopMenuYOffset(this.menuIndex_8011e0dc));
+        this.selectedMenuOptionRenderablePtr_800bdbe0 = allocateUiElement(0x7a, 0x7a, 52, this.getShopMenuYOffset(this.menuIndex_8011e0dc));
         FUN_80104b60(this.selectedMenuOptionRenderablePtr_800bdbe0);
 
         for(int charSlot = 0; charSlot < characterCount_8011d7c4; charSlot++) {
@@ -424,9 +425,11 @@ public class ShopScreen extends MenuScreen {
         for(i = 0; firstItem + i < items.size() && i < 6; i++) {
           final Item item = (Item)items.get(firstItem + i);
           final int quantity = getInventoryEntryQuantity(item);
+          final String quantityText = '(' + Integer.toString(quantity) + ')';
+          final int w = textWidth(quantityText);
+          renderText(I18n.translate(item), 168, this.menuEntryY(i) + 2, UI_TEXT);
+          renderText(quantityText, 168 + 120 + (19 - w), this.menuEntryY(i) + 2, UI_TEXT);
           renderItemIcon(item.getIcon(), 151, this.menuEntryY(i), 0x8);
-          renderText(I18n.translate(item) + (quantity > 1 ? " (" + quantity + ')' : ""), 168, this.menuEntryY(i) + 2, UI_TEXT);
-
           final ShopSellPriceEvent event = EVENTS.postEvent(new ShopSellPriceEvent(shopId_8007a3b4, item, item.getPrice()));
           this.FUN_801069d0(324, this.menuEntryY(i) + 4, event.price);
         }
@@ -439,8 +442,11 @@ public class ShopScreen extends MenuScreen {
         for(i = 0; firstItem + i < items.size() && i < 6; i++) {
           final Equipment equipment = (Equipment)items.get(firstItem + i);
           final int quantity = getInventoryEntryQuantity(equipment);
+          final String quantityText = '(' + Integer.toString(quantity) + ')';
+          final int w = textWidth(quantityText);
+          renderText(I18n.translate(equipment), 168, this.menuEntryY(i) + 2, equipment.canBeDiscarded() ? UI_TEXT : UI_TEXT_DISABLED);
+          renderText(quantityText, 168 + 120 + (19 - w), this.menuEntryY(i) + 2, equipment.canBeDiscarded() ? UI_TEXT : UI_TEXT_DISABLED);
           renderItemIcon(equipment.icon_0e, 151, this.menuEntryY(i), 0x8);
-          renderText(I18n.translate(equipment) + (quantity > 1 ? " (" + quantity + ')' : ""), 168, this.menuEntryY(i) + 2, equipment.canBeDiscarded() ? UI_TEXT : UI_TEXT_DISABLED);
 
           if(equipment.canBeDiscarded()) {
             final ShopSellPriceEvent event = EVENTS.postEvent(new ShopSellPriceEvent(shopId_8007a3b4, equipment, equipment.getPrice()));
@@ -761,7 +767,7 @@ public class ShopScreen extends MenuScreen {
           return;
         }
 
-        this.selectedMenuOptionRenderablePtr_800bdbe4 = allocateUiElement(0x7b, 0x7b, 170, this.menuEntryY(this.invIndex_8011e0e0));
+        this.selectedMenuOptionRenderablePtr_800bdbe4 = allocateUiElement(0x7b, 0x7b, 175, this.menuEntryY(this.invIndex_8011e0e0));
         FUN_80104b60(this.selectedMenuOptionRenderablePtr_800bdbe4);
 
         if(this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).item instanceof final Equipment equipment) {
@@ -774,7 +780,7 @@ public class ShopScreen extends MenuScreen {
       }
 
       case 1 -> // Sell
-        menuStack.pushScreen(new MessageBoxScreen("What do you want to sell?", "Armed", "Items", 2, result -> {
+        menuStack.pushScreen(new MessageBoxScreen("What do you want to sell?", "Equip", "Items", 2, result -> {
           switch(result.messageBoxResult) {
             case YES -> {
               this.invIndex_8011e0e0 = 0;
@@ -783,7 +789,7 @@ public class ShopScreen extends MenuScreen {
 
               if(!gameState_800babc8.equipment_1e8.isEmpty()) {
                 this.menuState = MenuState.SELL_10;
-                this.selectedMenuOptionRenderablePtr_800bdbe4 = allocateUiElement(0x7b, 0x7b, 170, this.menuEntryY(0));
+                this.selectedMenuOptionRenderablePtr_800bdbe4 = allocateUiElement(0x7b, 0x7b, 175, this.menuEntryY(0));
                 this.renderable_8011e0f0 = allocateUiElement(0x3d, 0x44, 358, this.menuEntryY(0));
                 this.renderable_8011e0f4 = allocateUiElement(0x35, 0x3c, 358, this.menuEntryY(5));
                 FUN_80104b60(this.selectedMenuOptionRenderablePtr_800bdbe4);
@@ -802,7 +808,7 @@ public class ShopScreen extends MenuScreen {
                 this.menuState = MenuState.SELL_10;
                 this.renderable_8011e0f0 = allocateUiElement(0x3d, 0x44, 358, this.menuEntryY(0));
                 this.renderable_8011e0f4 = allocateUiElement(0x35, 0x3c, 358, this.menuEntryY(5));
-                this.selectedMenuOptionRenderablePtr_800bdbe4 = allocateUiElement(0x7b, 0x7b, 170, this.menuEntryY(0));
+                this.selectedMenuOptionRenderablePtr_800bdbe4 = allocateUiElement(0x7b, 0x7b, 175, this.menuEntryY(0));
                 FUN_80104b60(this.selectedMenuOptionRenderablePtr_800bdbe4);
               } else {
                 menuStack.pushScreen(new MessageBoxScreen("You have no items\nto sell", 0, result1 -> {

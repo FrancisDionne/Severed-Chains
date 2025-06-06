@@ -124,7 +124,7 @@ public class TooManyItemsScreen extends MenuScreen {
 
       case RENDER_6 -> {
         this.dropIndex = 0;
-        final Renderable58 renderable2 = allocateUiElement(124, 124, 42, this.FUN_8010f178(0));
+        final Renderable58 renderable2 = allocateUiElement(124, 124, 44, this.FUN_8010f178(0));
         this.renderable_8011e200 = renderable2;
         FUN_80104b60(renderable2);
         deallocateRenderables(0);
@@ -209,7 +209,7 @@ public class TooManyItemsScreen extends MenuScreen {
       saveListDownArrow_800bdb98 = allocateUiElement(53, 60, 358, this.FUN_8010f178(6));
     }
 
-    renderMenuItems(16, 33, this.droppedItems, 0, Math.min(5, this.droppedItems.size()), saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, false);
+    renderMenuItems(16, 33, this.droppedItems, 0, Math.min(5, this.droppedItems.size()), saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, false, false);
 
     if((a4 & 0x1) != 0 && !allocate) {
       renderString(16, 140, I18n.translate(inv.getDescriptionTranslationKey()), false);
@@ -221,7 +221,7 @@ public class TooManyItemsScreen extends MenuScreen {
       renderText(Used_item_8011c32c, 210, 22, UI_TEXT);
 
       if((a4 & 0x1) != 0) {
-        renderMenuItems(194, 33, this.items, slotScroll, 7, saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, true);
+        renderMenuItems(194, 33, this.items, slotScroll, 7, saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, true, false);
       }
 
       if((a4 & 0x2) != 0) {
@@ -238,7 +238,7 @@ public class TooManyItemsScreen extends MenuScreen {
       renderText(Armed_item_8011c314, 210, 22, UI_TEXT);
 
       if((a4 & 0x1) != 0) {
-        renderMenuItems(194, 33, this.equipment, slotScroll, 7, saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, true);
+        renderMenuItems(194, 33, this.equipment, slotScroll, 7, saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, true, false);
       }
 
       if((a4 & 0x2) != 0) {
@@ -534,7 +534,7 @@ public class TooManyItemsScreen extends MenuScreen {
   }
 
   private void selectMenuState8() {
-    final Renderable58 renderable3 = allocateUiElement(118, 118, 220, this.FUN_8010f178(0));
+    final Renderable58 renderable3 = allocateUiElement(118, 118, 222, this.FUN_8010f178(0));
     this.renderable_8011e204 = renderable3;
     FUN_80104b60(renderable3);
     playMenuSound(2);

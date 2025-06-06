@@ -18,6 +18,7 @@ import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.inventory.screens.MenuStack;
 import legend.game.inventory.screens.TextColour;
+import legend.game.inventory.screens.controls.ListBox;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.characters.AdditionHitMultiplierEvent;
 import legend.game.modding.events.characters.AdditionUnlockEvent;
@@ -1662,18 +1663,22 @@ public final class SItem {
   }
 
   @Method(0x80109410L)
-  public static void renderMenuItems(final int x, final int y, final MenuEntries<?> menuItems, final int slotScroll, final int itemCount, @Nullable final Renderable58 upArrow, @Nullable final Renderable58 downArrow, final boolean displayQuantity) {
+  public static void renderMenuItems(final int x, final int y, final MenuEntries<?> menuItems, final int slotScroll, final int itemCount, @Nullable final Renderable58 upArrow, @Nullable final Renderable58 downArrow, final boolean displayQuantity, final boolean shortenText) {
     int s3 = slotScroll;
 
     //LAB_8010947c
     int i;
     for(i = 0; i < itemCount && s3 < menuItems.size(); i++) {
       final MenuEntryStruct04<?> menuItem = menuItems.get(s3);
-      String text = I18n.translate(menuItem.getNameTranslationKey());
+      final String text = I18n.translate(menuItem.getNameTranslationKey());
 
       if(menuItem.item_00 instanceof final RegistryEntry entry) {
         final int quantity = displayQuantity ? getInventoryEntryQuantity(entry) : 0;
-        text = text + (quantity > 1 ? " (" + quantity + ')' : "");
+        if (quantity > 0) {
+          final String quantityText = '(' + Integer.toString(quantity) + ')';
+          final int w = textWidth(quantityText);
+          renderText(quantityText, x + 135 + (shortenText ? -3 : 0) + (19 - w), y + FUN_800fc814(i) + 2, (menuItem.flags_02 & 0x6000) == 0 ? UI_TEXT : UI_TEXT_DISABLED);
+        }
       }
 
       //LAB_801094ac

@@ -110,7 +110,7 @@ public class UseItemScreen extends MenuScreen {
       case 1 -> {
         deallocateRenderables(0xff);
         renderGlyphs(useItemGlyphs_801141fc, 0, 0);
-        this.itemHighlight = allocateUiElement(0x77, 0x77, 42, this.getItemSlotY(this.selectedSlot));
+        this.itemHighlight = allocateUiElement(0x77, 0x77, 45, this.getItemSlotY(this.selectedSlot));
         FUN_80104b60(this.itemHighlight);
         this.itemCount = this.getUsableItemsInMenu();
         if(this.slotScroll > this.itemCount - 5) {
@@ -177,7 +177,7 @@ public class UseItemScreen extends MenuScreen {
     }
 
     //LAB_80102ee8
-    renderMenuItems(16, 10, this.menuItems, slotScroll, 5, saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, true);
+    renderMenuItems(18, 10, this.menuItems, slotScroll, 5, saveListUpArrow_800bdb94, saveListDownArrow_800bdb98, true, true);
 
     if(selectedSlot + slotScroll < this.menuItems.size()) {
       renderString(194, 16, I18n.translate(this.menuItems.get(selectedSlot + slotScroll).item_00.getDescriptionTranslationKey()), allocate);

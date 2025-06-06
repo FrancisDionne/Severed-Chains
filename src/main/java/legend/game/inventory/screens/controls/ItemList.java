@@ -38,14 +38,13 @@ public class ItemList<T> extends Control {
   public ItemList(@Nullable final Int2IntFunction itemCount) {
     this(
       entry -> {
-        String text = I18n.translate(entry.getNameTranslationKey());
+        return I18n.translate(entry.getNameTranslationKey());
+      },
+      entry -> {
         if(entry.item_00 instanceof final RegistryEntry e) {
-          final int quantity = getInventoryEntryQuantity(e);
-          if(quantity > 1) {
-            text += " (" + quantity + ')';
-          }
+          return Integer.toString(getInventoryEntryQuantity(e));
         }
-        return text;
+        return "";
       },
       MenuEntryStruct04::getIcon,
       menuItem -> (menuItem.flags_02 & 0x1000) != 0 ? menuItem.flags_02 & 0xf : -1,
@@ -54,10 +53,10 @@ public class ItemList<T> extends Control {
     );
   }
 
-  public ItemList(final Function<MenuEntryStruct04<T>, String> getItemName, @Nullable final Function<MenuEntryStruct04<T>, ItemIcon> getItemIcon, @Nullable final ToIntFunction<MenuEntryStruct04<T>> getFaceIcon, @Nullable final Predicate<MenuEntryStruct04<T>> isDisabled, @Nullable final Int2IntFunction itemCount) {
+  public ItemList(final Function<MenuEntryStruct04<T>, String> getItemName, @Nullable final Function<MenuEntryStruct04<T>, String> getItemQuantity, @Nullable final Function<MenuEntryStruct04<T>, ItemIcon> getItemIcon, @Nullable final ToIntFunction<MenuEntryStruct04<T>> getFaceIcon, @Nullable final Predicate<MenuEntryStruct04<T>> isDisabled, @Nullable final Int2IntFunction itemCount) {
     this.setSize(173, 147);
 
-    this.items = new ListBox<>(getItemName, getItemIcon, getFaceIcon, isDisabled);
+    this.items = new ListBox<>(getItemName, getItemQuantity, getItemIcon, getFaceIcon, isDisabled);
     this.items.setPos(0, 26);
     this.items.setSize(173, 119);
     this.addControl(this.items);

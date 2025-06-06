@@ -23,6 +23,7 @@ import static legend.game.SItem.renderCharacterPortrait;
 import static legend.game.SItem.renderItemIcon;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
+import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.Scus94491BpeSegment_800b.textZ_800bdf00;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BOTTOM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
@@ -36,6 +37,8 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class ListBox<T> extends Control {
   private final Function<T, String> entryToString;
+  @Nullable
+  private final Function<T, String> entryToQuantity;
   @Nullable
   private final Function<T, ItemIcon> entryToIcon;
   @Nullable
@@ -58,8 +61,9 @@ public class ListBox<T> extends Control {
   private final Glyph upArrow;
   private final Glyph downArrow;
 
-  public ListBox(final Function<T, String> entryToString, @Nullable final Function<T, ItemIcon> entryToIcon, @Nullable final ToIntFunction<T> entryToRightIcon, @Nullable final Predicate<T> isDisabled) {
+  public ListBox(final Function<T, String> entryToString, @Nullable final Function<T, String> entryToQuantity, @Nullable final Function<T, ItemIcon> entryToIcon, @Nullable final ToIntFunction<T> entryToRightIcon, @Nullable final Predicate<T> isDisabled) {
     this.entryToString = entryToString;
+    this.entryToQuantity = entryToQuantity;
     this.entryToIcon = entryToIcon;
     this.entryToRightIcon = entryToRightIcon;
     this.isDisabled = isDisabled;
@@ -521,6 +525,12 @@ public class ListBox<T> extends Control {
       textZ_800bdf00 = this.getZ() - 1;
       renderText(this.string, x + 28, y + 3, this.fontOptions);
       textZ_800bdf00 = oldZ;
+
+      if(ListBox.this.entryToQuantity != null) {
+        final String quantityText = '(' + ListBox.this.entryToQuantity.apply(this.data) + ')';
+        final int w = textWidth(quantityText);
+        renderText(quantityText, x + 140 + (19 - w), y + 3, this.fontOptions);
+      }
 
       if(ListBox.this.entryToIcon != null) {
         renderItemIcon(ListBox.this.entryToIcon.apply(this.data), x + 13, y + 1, 0x8);

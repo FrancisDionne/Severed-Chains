@@ -614,7 +614,7 @@ public class DabasScreen extends MenuScreen {
     renderText(Take_8011d058, 94, this.getDabasMenuY(0) + 2, selectedSlot == 0 ? UI_TEXT_SELECTED_CENTERED : !this.hasItems && this.gold == 0 ? UI_TEXT_DISABLED_CENTERED : UI_TEXT_CENTERED);
     renderText(Discard_8011d05c, 94, this.getDabasMenuY(1) + 2, selectedSlot == 1 ? UI_TEXT_SELECTED_CENTERED : !this.hasItems ? UI_TEXT_DISABLED_CENTERED : UI_TEXT_CENTERED);
     renderText(NextDig_8011d064, 94, this.getDabasMenuY(2) + 2, selectedSlot == 2 ? UI_TEXT_SELECTED_CENTERED : !this.newDigEnabled ? UI_TEXT_DISABLED_CENTERED : UI_TEXT_CENTERED);
-    renderMenuItems(194, 37, this.menuItems, 0, 6, null, null, false);
+    renderMenuItems(194, 37, this.menuItems, 0, 6, null, null, false, false);
     renderEightDigitNumber(100, 147, this.gold, 0x2);
 
     if(this.specialItem != null) {

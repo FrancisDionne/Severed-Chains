@@ -195,7 +195,7 @@ public class EquipmentScreen extends MenuScreen {
       }
     }
 
-    renderMenuItems(194, 92, this.menuItems, slotScroll, 4, this.upArrow_800bdb9c, this.downArrow_800bdba0, true);
+    renderMenuItems(194, 92, this.menuItems, slotScroll, 4, this.upArrow_800bdb9c, this.downArrow_800bdba0, true, false);
 
     final String text = slotIndex + slotScroll < this.menuItems.size() ? I18n.translate(this.menuItems.get(slotIndex + slotScroll).item_00.getDescriptionTranslationKey()) : "";
     renderString(194, 178, text, allocate);
