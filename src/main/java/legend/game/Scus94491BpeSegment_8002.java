@@ -1061,9 +1061,27 @@ public final class Scus94491BpeSegment_8002 {
     return true;
   }
 
+  public static boolean isItemInventoryFull()
+  {
+    return getInventoryItemCount() >= CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get());
+  }
+
+  public static boolean isEquipmentInventoryFull()
+  {
+    return getInventoryEquipmentCount() >= EQUIPMENT_MAX_AMOUNT;
+  }
+
+  public static int getRemainingInventoryItemSpace() {
+    return Math.max(0, CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get()) - getInventoryItemCount());
+  }
+
+  public static int getRemainingInventoryEquipmentSpace() {
+    return Math.max(0, EQUIPMENT_MAX_AMOUNT - getInventoryEquipmentCount());
+  }
+
   @Method(0x80023484L)
   public static boolean giveItem(final Item item) {
-    if(getInventoryItemCount() >= CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get())) {
+    if(isItemInventoryFull()) {
       return false;
     }
 
@@ -1093,7 +1111,7 @@ public final class Scus94491BpeSegment_8002 {
 
   @Method(0x80023484L)
   public static boolean giveEquipment(final Equipment equipment) {
-    if(gameState_800babc8.equipment_1e8.size() >= EQUIPMENT_MAX_AMOUNT) {
+    if(isEquipmentInventoryFull()) {
       return false;
     }
 

@@ -134,7 +134,7 @@ public class CampaignSelectionScreen extends MenuScreen {
       loadGameScreen.run();
     } else {
       menuStack.pushScreen(new MessageBoxScreen(I18n.translate("lod_core.ui.campaign_selection.missing_mods_confirm"), 2, result -> {
-        if(result == MessageBoxResult.YES) {
+        if(result.messageBoxResult == MessageBoxResult.YES) {
           loadGameScreen.run();
         }
       }));
@@ -167,7 +167,7 @@ public class CampaignSelectionScreen extends MenuScreen {
     menuStack.pushScreen(new ModsScreen(modIds, () -> {
       if(!originalMods.equals(modIds)) {
         menuStack.pushScreen(new MessageBoxScreen(I18n.translate("lod_core.ui.campaign_selection.change_mods_confirm"), 2, result -> {
-          if(result == MessageBoxResult.YES) {
+          if(result.messageBoxResult == MessageBoxResult.YES) {
             campaign.config.setConfig(CoreMod.ENABLED_MODS_CONFIG.get(), modIds.toArray(String[]::new));
             ConfigStorage.saveConfig(campaign.config, ConfigStorageLocation.CAMPAIGN, campaign.path.resolve("campaign_config.dcnf"));
             startFadeEffect(2, 10);
@@ -186,7 +186,7 @@ public class CampaignSelectionScreen extends MenuScreen {
 
     if(this.campaignList.getSelected() != null) {
       menuStack.pushScreen(new MessageBoxScreen(I18n.translate("lod_core.ui.campaign_selection.delete_campaign_confirm"), 2, result -> {
-        if(result == MessageBoxResult.YES) {
+        if(result.messageBoxResult == MessageBoxResult.YES) {
           try {
             this.campaignList.getSelected().delete();
             this.campaignList.removeEntry(this.campaignList.getSelected());

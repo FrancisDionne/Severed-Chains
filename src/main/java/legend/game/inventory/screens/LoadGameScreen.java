@@ -69,7 +69,7 @@ public class LoadGameScreen extends MenuScreen {
   private void onSelection(final SavedGame save) {
     if(save.isValid()) {
       playMenuSound(2);
-      menuStack.pushScreen(new MessageBoxScreen("Load this save?", 2, result -> this.onMessageboxResult(result, save)));
+      menuStack.pushScreen(new MessageBoxScreen("Load this save?", 2, result -> this.onMessageboxResult(result.messageBoxResult, save)));
     } else {
       playMenuSound(4);
       menuStack.pushScreen(new MessageBoxScreen("This save cannot be loaded", 0, result -> { }));
@@ -103,7 +103,7 @@ public class LoadGameScreen extends MenuScreen {
 
     if(this.saveList.getSelected() != null) {
       menuStack.pushScreen(new MessageBoxScreen("Are you sure you want to\ndelete this save?", 2, result -> {
-        if(result == MessageBoxResult.YES) {
+        if(result.messageBoxResult == MessageBoxResult.YES) {
           try {
             this.campaign.deleteSave(this.saveList.getSelected().fileName);
             this.saveList.removeEntry(this.saveList.getSelected());

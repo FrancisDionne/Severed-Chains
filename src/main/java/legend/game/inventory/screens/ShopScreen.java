@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
+import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
@@ -66,6 +67,7 @@ import static legend.game.Scus94491BpeSegment_8002.getFirstIndexOfInventoryEntry
 import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
 import static legend.game.Scus94491BpeSegment_8002.getInventoryEquipmentCount;
 import static legend.game.Scus94491BpeSegment_8002.getInventoryItemCount;
+import static legend.game.Scus94491BpeSegment_8002.getRemainingInventoryItemSpace;
 import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryEquipments;
 import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryItems;
 import static legend.game.Scus94491BpeSegment_8002.giveEquipment;
@@ -85,6 +87,7 @@ import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BOTTOM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HOME;
@@ -617,15 +620,22 @@ public class ShopScreen extends MenuScreen {
             menuStack.pushScreen(new MessageBoxScreen(Not_enough_money_8011c468, 0, result -> { }));
           } else {
             if(inv.item instanceof final Item item) {
-              menuStack.pushScreen(new MessageBoxScreen("Buy item?", 2, result -> {
-                if(result == MessageBoxResult.YES) {
-                  if(giveItem(item)) {
-                    gameState_800babc8.gold_94 -= inv.price;
-                  } else {
-                    menuStack.pushScreen(new MessageBoxScreen("Cannot carry any more", 0, onResult -> { }));
+              final String itemText = I18n.translate(item.getNameTranslationKey());
+              int quantity = getRemainingInventoryItemSpace();
+              quantity = Math.min(quantity, gameState_800babc8.gold_94 / inv.price);
+              if (quantity > 0) {
+                menuStack.pushScreen(new MessageBoxQuantityScreen("Buy " + itemText + " x[#]?", 1, quantity, 2, result -> {
+                  if(result.messageBoxResult == MessageBoxResult.YES) {
+                    for (int j = 0; j < result.quantity; j++) {
+                      if(giveItem(item)) {
+                        gameState_800babc8.gold_94 -= inv.price;
+                      }
+                    }
                   }
-                }
-              }));
+                }));
+              } else {
+                menuStack.pushScreen(new MessageBoxScreen("Cannot carry any more", 0, onResult -> { }));
+              }
             } else {
               this.charHighlight = allocateUiElement(0x83, 0x83, this.FUN_8010a818(this.equipCharIndex), 174);
               FUN_80104b60(this.charHighlight);
@@ -643,17 +653,19 @@ public class ShopScreen extends MenuScreen {
           this.equipCharIndex = i;
           this.charHighlight.x_40 = this.FUN_8010a818(this.equipCharIndex);
 
-          menuStack.pushScreen(new MessageBoxScreen("Buy item?", 2, result -> {
-            if(result == MessageBoxResult.YES) {
-              if(canEquip((Equipment)this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).item, characterIndices_800bdbb8[this.equipCharIndex])) {
-                menuStack.pushScreen(new MessageBoxScreen("Equip item?", 2, result1 -> {
-                  if(result1 == MessageBoxResult.YES) {
-                    final EquipItemResult equipResult = equipItem((Equipment)this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).item, characterIndices_800bdbb8[this.equipCharIndex]);
+          final Equipment equipment = (Equipment)this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).item;
+          final String itemText = I18n.translate(equipment.getNameTranslationKey());
+          menuStack.pushScreen(new MessageBoxScreen("Buy " + itemText + '?', 2, result -> {
+            if(result.messageBoxResult == MessageBoxResult.YES) {
+              if(canEquip(equipment, characterIndices_800bdbb8[this.equipCharIndex])) {
+                menuStack.pushScreen(new MessageBoxScreen("Equip " + itemText + '?', 2, result1 -> {
+                  if(result1.messageBoxResult == MessageBoxResult.YES) {
+                    final EquipItemResult equipResult = equipItem(equipment, characterIndices_800bdbb8[this.equipCharIndex]);
 
                     if(equipResult.previousEquipment != null) {
                       if(equipResult.success) {
                         if(giveEquipment(equipResult.previousEquipment)) {
-                          gameState_800babc8.gold_94 -= this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).price;
+                          gameState_800babc8.gold_94 -= equipment.price;
                         } else {
                           equipItem(equipResult.previousEquipment, characterIndices_800bdbb8[this.equipCharIndex]);
                           menuStack.pushScreen(new MessageBoxScreen("Cannot carry any more", 0, onResult -> {}));
@@ -684,7 +696,8 @@ public class ShopScreen extends MenuScreen {
         }
       }
     } else if(this.menuState == MenuState.SELL_10) {
-      final List<?> list = this.sellType != 0 ? getUniqueInventoryItems() : getUniqueInventoryEquipments();
+      final boolean isItem = this.sellType != 0;
+      final List<?> list = isItem ? getUniqueInventoryItems() : getUniqueInventoryEquipments();
 
       for(int i = 0; i < Math.min(list.size(), 6); i++) {
         if(MathHelper.inBox(this.mouseX, this.mouseY, 138, this.menuEntryY(i), 220, 17)) {
@@ -692,30 +705,30 @@ public class ShopScreen extends MenuScreen {
           this.selectedMenuOptionRenderablePtr_800bdbe4.y_44 = this.menuEntryY(i);
 
           final int slot = this.invScroll_8011e0e4 + this.invIndex_8011e0e0;
-          if((this.sellType != 0 && slot >= list.size()) || (this.sellType == 0 && (slot >= list.size() || !((Equipment)list.get(slot)).canBeDiscarded()))) {
+          if((isItem && slot >= list.size()) || (this.sellType == 0 && (slot >= list.size() || !((Equipment)list.get(slot)).canBeDiscarded()))) {
             playMenuSound(40);
           } else {
             playMenuSound(2);
 
-            menuStack.pushScreen(new MessageBoxScreen("Sell item?", 2, result -> {
-              if(Objects.requireNonNull(result) == MessageBoxResult.YES) {
-                final InventoryEntry entry;
-                final boolean success;
-                final boolean wasStack;
-                final int index;
-                if(this.sellType != 0) {
-                  index = getFirstIndexOfInventoryEntry((Item)list.get(slot));
-                  entry = gameState_800babc8.items_2e9.get(index);
-                  success = takeItem(index);
-                  wasStack = getFirstIndexOfInventoryEntry((Item)entry) > -1;
-                } else {
-                  index = getFirstIndexOfInventoryEntry((Equipment)list.get(slot));
-                  entry = gameState_800babc8.equipment_1e8.get(index);
-                  success = takeEquipment(index);
-                  wasStack = getFirstIndexOfInventoryEntry((Equipment)entry) > -1;
+            final InventoryEntry entry = (InventoryEntry)list.get(slot);
+            final int quantity = getInventoryEntryQuantity(isItem ? (Item)entry : (Equipment)entry);
+            final String itemText = I18n.translate(entry.getNameTranslationKey());
+
+            menuStack.pushScreen(new MessageBoxQuantityScreen("Sell " + itemText + " x[#]?", 1, quantity, 2, result -> {
+              if(Objects.requireNonNull(result.messageBoxResult) == MessageBoxResult.YES) {
+                final boolean wasStack = result.quantity >= quantity;
+                boolean taken = false;
+
+                for (int j = 0; j < result.quantity; j++){
+                  final int index = getFirstIndexOfInventoryEntry(isItem ? (Item)entry : (Equipment)entry);
+                  if(isItem) {
+                    taken = takeItem(index) || taken;
+                  } else {
+                    taken = takeEquipment(index) || taken;
+                  }
                 }
 
-                if(success) {
+                if(taken) {
                   final ShopSellPriceEvent event = EVENTS.postEvent(new ShopSellPriceEvent(shopId_8007a3b4, entry, entry.getPrice()));
                   addGold(event.price);
 
@@ -762,7 +775,7 @@ public class ShopScreen extends MenuScreen {
 
       case 1 -> // Sell
         menuStack.pushScreen(new MessageBoxScreen("What do you want to sell?", "Armed", "Items", 2, result -> {
-          switch(result) {
+          switch(result.messageBoxResult) {
             case YES -> {
               this.invIndex_8011e0e0 = 0;
               this.invScroll_8011e0e4 = 0;
@@ -889,15 +902,22 @@ public class ShopScreen extends MenuScreen {
     } else if(gameState_800babc8.gold_94 < inv.price) {
       this.deferAction(() -> menuStack.pushScreen(new MessageBoxScreen(Not_enough_money_8011c468, 0, result -> { })));
     } else if(inv.item instanceof final Item item) {
-      menuStack.pushScreen(new MessageBoxScreen("Buy item?", 2, result -> {
-        if(result == MessageBoxResult.YES) {
-          if(giveItem(item)) {
-            gameState_800babc8.gold_94 -= inv.price;
-          } else {
-            this.deferAction(() -> menuStack.pushScreen(new MessageBoxScreen("Cannot carry any more", 0, onResult -> { })));
+      final String itemText = I18n.translate(item.getNameTranslationKey());
+      int quantity = getRemainingInventoryItemSpace();
+      quantity = Math.min(quantity, gameState_800babc8.gold_94 / inv.price);
+      if (quantity > 0) {
+        menuStack.pushScreen(new MessageBoxQuantityScreen("Buy " + itemText + " x[#]?", 1, quantity, 2, result -> {
+          if(result.messageBoxResult == MessageBoxResult.YES) {
+            for (int i = 0; i < result.quantity; i++) {
+              if(giveItem(item)) {
+                gameState_800babc8.gold_94 -= inv.price;
+              }
+            }
           }
-        }
-      }));
+        }));
+      } else {
+        menuStack.pushScreen(new MessageBoxScreen("Cannot carry any more", 0, onResult -> { }));
+      }
     } else {
       this.charHighlight = allocateUiElement(0x83, 0x83, this.FUN_8010a818(this.equipCharIndex), 174);
       FUN_80104b60(this.charHighlight);
@@ -1042,17 +1062,19 @@ public class ShopScreen extends MenuScreen {
   private void menuSelectChar5Select() {
     playMenuSound(2);
 
-    menuStack.pushScreen(new MessageBoxScreen("Buy item?", 2, result -> {
-      if(result == MessageBoxResult.YES) {
-        if(canEquip((Equipment)this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).item, characterIndices_800bdbb8[this.equipCharIndex])) {
-          menuStack.pushScreen(new MessageBoxScreen("Equip item?", 2, result1 -> {
-            if(result1 == MessageBoxResult.YES) {
-              final EquipItemResult equipResult = equipItem((Equipment)this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).item, characterIndices_800bdbb8[this.equipCharIndex]);
+    final Equipment equipment = (Equipment)this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).item;
+    final String itemText = I18n.translate(equipment.getNameTranslationKey());
+    menuStack.pushScreen(new MessageBoxScreen("Buy " + itemText + '?', 2, result -> {
+      if(result.messageBoxResult == MessageBoxResult.YES) {
+        if(canEquip(equipment, characterIndices_800bdbb8[this.equipCharIndex])) {
+          menuStack.pushScreen(new MessageBoxScreen("Equip " + itemText + '?', 2, result1 -> {
+            if(result1.messageBoxResult == MessageBoxResult.YES) {
+              final EquipItemResult equipResult = equipItem(equipment, characterIndices_800bdbb8[this.equipCharIndex]);
 
               if(equipResult.previousEquipment != null) {
                 if(equipResult.success) {
                   if(giveEquipment(equipResult.previousEquipment)) {
-                    gameState_800babc8.gold_94 -= this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).price;
+                    gameState_800babc8.gold_94 -= equipment.price;
                   } else {
                     equipItem(equipResult.previousEquipment, characterIndices_800bdbb8[this.equipCharIndex]);
                     this.deferAction(() -> menuStack.pushScreen(new MessageBoxScreen("Cannot carry any more", 0, onResult -> {})));
@@ -1118,37 +1140,38 @@ public class ShopScreen extends MenuScreen {
     this.menuState = MenuState.INIT_2;
   }
 
-  private void menuSell10Select() {
-    final List<?> list = this.sellType != 0 ? getUniqueInventoryItems() : getUniqueInventoryEquipments();
+  private void menuSell10Select(final boolean sellStack) {
+    final boolean isItem = this.sellType != 0;
+    final List<?> list = isItem ? getUniqueInventoryItems() : getUniqueInventoryEquipments();
     final int slot = this.invScroll_8011e0e4 + this.invIndex_8011e0e0;
-    if(list.isEmpty() || (this.sellType != 0 && slot >= list.size()) || (this.sellType == 0 && (slot >= list.size() || !((Equipment)list.get(slot)).canBeDiscarded()))) {
+    if(list.isEmpty() || (isItem && slot >= list.size()) || (this.sellType == 0 && (slot >= list.size() || !((Equipment)list.get(slot)).canBeDiscarded()))) {
       playMenuSound(40);
     } else {
       playMenuSound(2);
 
-      menuStack.pushScreen(new MessageBoxScreen("Sell item?", 2, result -> {
-        if(Objects.requireNonNull(result) == MessageBoxResult.YES) {
-          final InventoryEntry entry;
-          final boolean taken;
-          final int count;
-          if(this.sellType != 0) {
-            entry = (Item)list.get(slot);
-            final int index = getFirstIndexOfInventoryEntry((Item)entry);
-            taken = takeItem(index);
-            count = getUniqueInventoryItems().size();
-          } else {
-            entry = (Equipment)list.get(slot);
-            final int index = getFirstIndexOfInventoryEntry((Equipment)entry);
-            taken = takeEquipment(index);
-            count = getUniqueInventoryEquipments().size();
+      final InventoryEntry entry = (InventoryEntry)list.get(slot);
+      final int quantity = getInventoryEntryQuantity(isItem ? (Item)entry : (Equipment)entry);
+      final String itemText = I18n.translate(entry.getNameTranslationKey());
+
+      menuStack.pushScreen(new MessageBoxQuantityScreen("Sell " + itemText + " x[#]?", 1, quantity, 2, result -> {
+        if(Objects.requireNonNull(result.messageBoxResult) == MessageBoxResult.YES) {
+          boolean taken = false;
+          for (int i = 0; i < result.quantity; i++){
+            final int index = getFirstIndexOfInventoryEntry(isItem ? (Item)entry : (Equipment)entry);
+            if(isItem) {
+              taken = takeItem(index) || taken;
+            } else {
+              taken = takeEquipment(index) || taken;
+            }
           }
 
           if(taken) {
             final ShopSellPriceEvent event = EVENTS.postEvent(new ShopSellPriceEvent(shopId_8007a3b4, entry, entry.getPrice()));
             addGold(event.price);
 
+            final int count = isItem ? getUniqueInventoryItems().size() : getUniqueInventoryEquipments().size();
             if(count == 0) {
-              if(this.sellType != 0) {
+              if(isItem) {
                 menuStack.pushScreen(new MessageBoxScreen("You have no more\nitems to sell", 0, result1 -> {}));
               } else {
                 menuStack.pushScreen(new MessageBoxScreen("You have no more\nequipment to sell", 0, result1 -> {}));
@@ -1489,7 +1512,12 @@ public class ShopScreen extends MenuScreen {
         }
 
         if(action == INPUT_ACTION_MENU_CONFIRM.get() && !repeat) {
-          this.menuSell10Select();
+          this.menuSell10Select(false);
+          return InputPropagation.HANDLED;
+        }
+
+        if(action == INPUT_ACTION_MENU_DELETE.get() && !repeat) {
+          this.menuSell10Select(true);
           return InputPropagation.HANDLED;
         }
       }

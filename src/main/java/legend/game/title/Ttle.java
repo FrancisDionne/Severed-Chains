@@ -460,7 +460,7 @@ public class Ttle extends EngineState {
 
         menuStack.pushScreen(new MessageBoxScreen("Delete the memory card file?", 2, result1 -> {
           try {
-            SAVES.splitMemcards(name, result1 == MessageBoxResult.YES);
+            SAVES.splitMemcards(name, result1.messageBoxResult == MessageBoxResult.YES);
           } catch(final IOException | InvalidSaveException | SaveFailedException e) {
             LOGGER.error("Failed to convert memcard", e);
           }

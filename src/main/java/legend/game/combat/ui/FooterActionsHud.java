@@ -199,7 +199,7 @@ public final class FooterActionsHud {
     return new FooterAction(action, input);
   }
 
-  public static void setFootActions(final int style, @Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
+  public static void setFooterActions(final int style, @Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
     FooterActionsHud.style = style;
     if(!compareFooterActions(action1, action2, action3, action4, action5)) {
       actions[0] = newFooterAction(action1);
@@ -212,13 +212,13 @@ public final class FooterActionsHud {
 
   public static void renderActions(final int style, @Nullable final FooterActions action1, @Nullable final FooterActions action2, @Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
     if(!compareFooterActions(action1, action2, action3, action4, action5)) {
-      setFootActions(style, action1, action2, action3, action4, action5);
+      setFooterActions(style, action1, action2, action3, action4, action5);
     }
     render();
   }
 
   public static void setMenuActions(@Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
-    setFootActions(0, FooterActions.SELECT, FooterActions.BACK, action3, action4, action5);
+    setFooterActions(0, FooterActions.SELECT, FooterActions.BACK, action3, action4, action5);
   }
 
   public static void renderMenuActions(@Nullable final FooterActions action3, @Nullable final FooterActions action4, @Nullable final FooterActions action5) {
@@ -230,7 +230,7 @@ public final class FooterActionsHud {
   }
 
   public static void setBattleActions(@Nullable final FooterActions action4, @Nullable final FooterActions action5) {
-    setFootActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, action4, action5);
+    setFooterActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, action4, action5);
   }
 
   public static void renderBattleActions(@Nullable final FooterActions action4, @Nullable final FooterActions action5) {

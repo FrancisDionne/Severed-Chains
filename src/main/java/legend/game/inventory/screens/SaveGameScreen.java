@@ -91,7 +91,7 @@ public class SaveGameScreen extends MenuScreen {
     if(save == null) {
       menuStack.pushScreen(new InputBoxScreen("Save name:", SAVES.generateSaveName(this.saves, gameState_800babc8), this::onNewSaveResult));
     } else {
-      menuStack.pushScreen(new MessageBoxScreen(Overwrite_save_8011c9e8, 2, result -> this.onOverwriteResult(result, save)));
+      menuStack.pushScreen(new MessageBoxScreen(Overwrite_save_8011c9e8, 2, result -> this.onOverwriteResult(result.messageBoxResult, save)));
     }
   }
 
@@ -140,7 +140,7 @@ public class SaveGameScreen extends MenuScreen {
 
     if(this.saveList.getSelected() != null) {
       menuStack.pushScreen(new MessageBoxScreen("Are you sure you want to\ndelete this save?", 2, result -> {
-        if(result == MessageBoxResult.YES) {
+        if(result.messageBoxResult == MessageBoxResult.YES) {
           try {
             this.saveList.getSelected().state.campaign.deleteSave(this.saveList.getSelected().fileName);
             this.saves.removeIf(save -> save.fileName.equals(this.saveList.getSelected().fileName));

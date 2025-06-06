@@ -364,7 +364,7 @@ public class DabasScreen extends MenuScreen {
           playMenuSound(2);
 
           menuStack.pushScreen(new MessageBoxScreen("Take items from Dabas?", 2, result -> {
-            if(result == MessageBoxResult.YES) {
+            if(result.messageBoxResult == MessageBoxResult.YES) {
               this.takeItems();
             }
           }));
@@ -378,7 +378,7 @@ public class DabasScreen extends MenuScreen {
           playMenuSound(2);
 
           menuStack.pushScreen(new MessageBoxScreen("Discard items?", 2, result -> {
-            if(result == MessageBoxResult.YES) {
+            if(result.messageBoxResult == MessageBoxResult.YES) {
               this.discardItems();
             }
           }));
@@ -392,7 +392,7 @@ public class DabasScreen extends MenuScreen {
           playMenuSound(2);
 
           menuStack.pushScreen(new MessageBoxScreen("Begin new expedition?", 2, result -> {
-            if(result == MessageBoxResult.YES) {
+            if(result.messageBoxResult == MessageBoxResult.YES) {
               this.newDig();
             }
           }));

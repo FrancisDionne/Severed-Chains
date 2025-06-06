@@ -147,26 +147,33 @@ public class ItemListScreen extends MenuScreen {
     FooterActionsHud.renderMenuActions(FooterActions.DISCARD, FooterActions.SORT, null);
   }
 
-  private <T> void showDiscardMenu(final ItemList<T> list, final List<T> inv) {
+  private <T> void showDiscardMenu(final ItemList<T> list, final List<T> inv, final boolean isItem) {
     if(((list.getSelectedItem().flags_02 & 0x2000) != 0)) {
       playMenuSound(40);
     } else {
       playMenuSound(2);
-      menuStack.pushScreen(new MessageBoxScreen("Discard?", 2, result -> this.discard(result, list, inv)));
+
+      final InventoryEntry entry = (InventoryEntry)list.getSelectedItem().item_00;
+      final int quantity = getInventoryEntryQuantity(isItem ? (Item)entry : (Equipment)entry);
+      final String itemText = I18n.translate(entry.getNameTranslationKey());
+
+      menuStack.pushScreen(new MessageBoxQuantityScreen("Discard " + itemText + " x[#]?", 1, quantity, 2, result -> {
+        this.discard(result, list, inv);
+      }));
     }
   }
 
-  private <T> void discard(final MessageBoxResult result, final ItemList<T> list, final List<T> inv) {
-    if(result == MessageBoxResult.YES) {
+  private <T> void discard(final MessageBoxResults result, final ItemList<T> list, final List<T> inv) {
+    if(result.messageBoxResult == MessageBoxResult.YES) {
       final RegistryEntry entry = (RegistryEntry)list.getSelectedItem().item_00;
-      final int index = getFirstIndexOfInventoryEntry(entry);
 
-      inv.remove(index);
+      for (int i = 0; i < result.quantity; i++) {
+        final int index = getFirstIndexOfInventoryEntry(entry);
+        inv.remove(index);
+      }
 
       if(getInventoryEntryQuantity(entry) < 1) {
         list.remove(list.getSelectedItem());
-      } else {
-        //list.updateMaxLabel();
       }
 
       list.refreshList();
@@ -182,10 +189,10 @@ public class ItemListScreen extends MenuScreen {
   private void menuDiscard() {
     if(this.itemList.isHighlightShown()) {
       if(!this.itemList.isEmpty()) {
-        this.showDiscardMenu(this.itemList, gameState_800babc8.items_2e9);
+        this.showDiscardMenu(this.itemList, gameState_800babc8.items_2e9, true);
       }
     } else if(!this.equipmentList.isEmpty()) {
-      this.showDiscardMenu(this.equipmentList, gameState_800babc8.equipment_1e8);
+      this.showDiscardMenu(this.equipmentList, gameState_800babc8.equipment_1e8, false);
     }
   }
 

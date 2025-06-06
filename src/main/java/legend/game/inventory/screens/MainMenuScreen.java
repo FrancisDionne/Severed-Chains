@@ -107,7 +107,7 @@ public class MainMenuScreen extends MenuScreen {
     this.addButton("Diiig", this::showDabasScreen);
     this.addButton("", () -> { }).hide();
     this.addButton("Quit", () -> menuStack.pushScreen(new MessageBoxScreen("Quit to main menu?", 2, result -> {
-      if(result == MessageBoxResult.YES) {
+      if(result.messageBoxResult == MessageBoxResult.YES) {
         this.menuEscape();
         whichMenu_800bdc38 = WhichMenu.QUIT;
       }
