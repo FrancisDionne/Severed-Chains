@@ -157,7 +157,7 @@ public class ItemListScreen extends MenuScreen {
       final int quantity = getInventoryEntryQuantity(isItem ? (Item)entry : (Equipment)entry);
       final String itemText = I18n.translate(entry.getNameTranslationKey());
 
-      menuStack.pushScreen(new MessageBoxQuantityScreen("Discard " + itemText + " x[#]?", 1, quantity, 2, result -> {
+      menuStack.pushScreen(new MessageBoxQuantityScreen("Discard " + itemText + " \u011d[#]?", 1, quantity, 2, result -> {
         this.discard(result, list, inv);
       }));
     }

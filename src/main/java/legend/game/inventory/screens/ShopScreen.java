@@ -630,7 +630,7 @@ public class ShopScreen extends MenuScreen {
               int quantity = getRemainingInventoryItemSpace();
               quantity = Math.min(quantity, gameState_800babc8.gold_94 / inv.price);
               if (quantity > 0) {
-                menuStack.pushScreen(new MessageBoxQuantityScreen("Buy " + itemText + " x[#]?", 1, quantity, 2, result -> {
+                menuStack.pushScreen(new MessageBoxQuantityScreen("Buy " + itemText + " \u011d[#]?", 1, quantity, 2, result -> {
                   if(result.messageBoxResult == MessageBoxResult.YES) {
                     for (int j = 0; j < result.quantity; j++) {
                       if(giveItem(item)) {
@@ -720,7 +720,7 @@ public class ShopScreen extends MenuScreen {
             final int quantity = getInventoryEntryQuantity(isItem ? (Item)entry : (Equipment)entry);
             final String itemText = I18n.translate(entry.getNameTranslationKey());
 
-            menuStack.pushScreen(new MessageBoxQuantityScreen("Sell " + itemText + " x[#]?", 1, quantity, 2, result -> {
+            menuStack.pushScreen(new MessageBoxQuantityScreen("Sell " + itemText + " \u011d[#]?", 1, quantity, 2, result -> {
               if(Objects.requireNonNull(result.messageBoxResult) == MessageBoxResult.YES) {
                 final boolean wasStack = result.quantity >= quantity;
                 boolean taken = false;
@@ -912,7 +912,7 @@ public class ShopScreen extends MenuScreen {
       int quantity = getRemainingInventoryItemSpace();
       quantity = Math.min(quantity, gameState_800babc8.gold_94 / inv.price);
       if (quantity > 0) {
-        menuStack.pushScreen(new MessageBoxQuantityScreen("Buy " + itemText + " x[#]?", 1, quantity, 2, result -> {
+        menuStack.pushScreen(new MessageBoxQuantityScreen("Buy " + itemText + " \u011d[#]?", 1, quantity, 2, result -> {
           if(result.messageBoxResult == MessageBoxResult.YES) {
             for (int i = 0; i < result.quantity; i++) {
               if(giveItem(item)) {
@@ -1159,7 +1159,7 @@ public class ShopScreen extends MenuScreen {
       final int quantity = getInventoryEntryQuantity(isItem ? (Item)entry : (Equipment)entry);
       final String itemText = I18n.translate(entry.getNameTranslationKey());
 
-      menuStack.pushScreen(new MessageBoxQuantityScreen("Sell " + itemText + " x[#]?", 1, quantity, 2, result -> {
+      menuStack.pushScreen(new MessageBoxQuantityScreen("Sell " + itemText + " \u011d[#]?", 1, quantity, 2, result -> {
         if(Objects.requireNonNull(result.messageBoxResult) == MessageBoxResult.YES) {
           boolean taken = false;
           for (int i = 0; i < result.quantity; i++) {
