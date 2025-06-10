@@ -37,13 +37,13 @@ public class MessageBoxQuantityScreen extends MessageBoxScreen {
   }
 
   private void menuNavigateLeft() {
-    playMenuSound(2);
+    playMenuSound(1);
     this.currentQuantity = this.currentQuantity - 1 < this.minQuantity ? this.maxQuantity : this.currentQuantity - 1;
     this.setQuantityText();
   }
 
   private void menuNavigateRight() {
-    playMenuSound(2);
+    playMenuSound(1);
     this.currentQuantity = this.currentQuantity + 1 > this.maxQuantity ? this.minQuantity : this.currentQuantity + 1;
     this.setQuantityText();
   }
