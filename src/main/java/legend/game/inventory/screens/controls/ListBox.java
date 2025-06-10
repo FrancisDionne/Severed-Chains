@@ -527,9 +527,12 @@ public class ListBox<T> extends Control {
       textZ_800bdf00 = oldZ;
 
       if(ListBox.this.entryToQuantity != null) {
-        final String quantityText = '(' + ListBox.this.entryToQuantity.apply(this.data) + ')';
-        final int w = textWidth(quantityText);
-        renderText(quantityText, x + 140 + (19 - w), y + 3, this.fontOptions);
+        final String quantity = ListBox.this.entryToQuantity.apply(this.data);
+        if (!quantity.equals("0")) {
+          final String quantityText = '(' + quantity + ')';
+          final int w = textWidth(quantityText);
+          renderText(quantityText, x + 140 + (19 - w), y + 3, this.fontOptions);
+        }
       }
 
       if(ListBox.this.entryToIcon != null) {

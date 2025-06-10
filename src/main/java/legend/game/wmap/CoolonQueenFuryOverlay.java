@@ -4,7 +4,14 @@ import legend.core.QueuedModelStandard;
 import legend.core.gpu.Bpp;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
+import legend.core.opengl.Texture;
+import legend.game.combat.AdditionButtonStyle;
+import legend.game.combat.ui.ControllerStyle;
+import legend.game.combat.ui.FooterActionsHud;
+import legend.game.modding.coremod.CoreMod;
+import org.joml.Matrix4f;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Scus94491BpeSegment_8007.vsyncMode_8007a3b8;
@@ -21,24 +28,38 @@ public class CoolonQueenFuryOverlay {
   private final Obj[] buttonSprites = new Obj[3];
   private final Obj[] coolonSprites = new Obj[4];
   private final Obj[] queenFurySprites = new Obj[5];
+  private final Matrix4f buttonMatrix = new Matrix4f();
+
+  private ControllerStyle currentStyle;
 
   public CoolonQueenFuryOverlay() {
-    this.buildButton();
+    this.buildButton(CONFIG.getConfig(CoreMod.CONTROLLER_STYLE_CONFIG.get()));
     this.buildCoolonIcon();
     this.buildQueenFuryIcon();
   }
 
-  private void buildButton() {
+  private void buildButton(final ControllerStyle style) {
+    this.currentStyle = style;
     for(int i = 0; i < 3; i++) {
-      this.buttonSprites[i] = new QuadBuilder("CoolonQfButton")
-        .bpp(Bpp.BITS_4)
-        .clut(640, 508)
-        .vramPos(640, 256)
-        .monochrome(1.0f)
-        .pos(GPU.getOffsetX() + 86.0f, GPU.getOffsetY() + 88.0f, 52.0f)
-        .size(16.0f, 16.0f)
-        .uv(64 + i * 16, 168)
-        .build();
+      if (style != ControllerStyle.PLAYSTATION) {
+        this.buttonSprites[i] = new QuadBuilder("CoolonQfButton")
+          .pos(GPU.getOffsetX() + 86.0f, GPU.getOffsetY() + 88.0f, 52.0f)
+          .size(16.0f, 16.0f)
+          .uv(64 + i * 16, 168)
+          .uvSize(1.0f, 1.0f)
+          .bpp(Bpp.BITS_24)
+          .build();
+      } else {
+        this.buttonSprites[i] = new QuadBuilder("CoolonQfButton")
+          .bpp(Bpp.BITS_4)
+          .clut(640, 508)
+          .vramPos(640, 256)
+          .monochrome(1.0f)
+          .pos(GPU.getOffsetX() + 86.0f, GPU.getOffsetY() + 88.0f, 52.0f)
+          .size(16.0f, 16.0f)
+          .uv(64 + i * 16, 168)
+          .build();
+      }
     }
   }
 
@@ -74,7 +95,25 @@ public class CoolonQueenFuryOverlay {
   public void render(final int mode) {
     final int buttonState = buttonStates[(int)(tickCount_800bb0fc / 2 / (3.0f / vsyncMode_8007a3b8) % 7)];
     final Obj button = this.buttonSprites[buttonState];
-    RENDERER.queueOrthoModel(button, QueuedModelStandard.class);
+    final ControllerStyle style = CONFIG.getConfig(CoreMod.CONTROLLER_STYLE_CONFIG.get());
+
+    if (this.currentStyle != style) {
+      this.buildButton(style);
+    }
+
+    if (style != ControllerStyle.PLAYSTATION) {
+      Texture texture = null;
+      if (style == ControllerStyle.XBOX) texture = FooterActionsHud.textures[12];
+      else if (style == ControllerStyle.NINTENDO) texture = FooterActionsHud.textures[16];
+      for (int i = 0; i <= buttonState; i++) {
+        this.buttonMatrix.translation((int)RENDERER.getWidescreenOrthoOffsetX(), i - buttonState, 52f + i);
+        RENDERER
+          .queueOrthoModel(button, this.buttonMatrix, QueuedModelStandard.class)
+          .texture(texture);
+      }
+    } else {
+      RENDERER.queueOrthoModel(button, QueuedModelStandard.class);
+    }
 
     final int iconState;
     final Obj icon;
