@@ -5,13 +5,11 @@ import legend.core.gpu.Bpp;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
-import legend.game.combat.AdditionButtonStyle;
 import legend.game.combat.ui.ControllerStyle;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.modding.coremod.CoreMod;
 import org.joml.Matrix4f;
 
-import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Scus94491BpeSegment_8007.vsyncMode_8007a3b8;
@@ -33,7 +31,7 @@ public class CoolonQueenFuryOverlay {
   private ControllerStyle currentStyle;
 
   public CoolonQueenFuryOverlay() {
-    this.buildButton(CONFIG.getConfig(CoreMod.CONTROLLER_STYLE_CONFIG.get()));
+    this.buildButton(CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle());
     this.buildCoolonIcon();
     this.buildQueenFuryIcon();
   }
@@ -95,7 +93,7 @@ public class CoolonQueenFuryOverlay {
   public void render(final int mode) {
     final int buttonState = buttonStates[(int)(tickCount_800bb0fc / 2 / (3.0f / vsyncMode_8007a3b8) % 7)];
     final Obj button = this.buttonSprites[buttonState];
-    final ControllerStyle style = CONFIG.getConfig(CoreMod.CONTROLLER_STYLE_CONFIG.get());
+    final ControllerStyle style = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
 
     if (this.currentStyle != style) {
       this.buildButton(style);

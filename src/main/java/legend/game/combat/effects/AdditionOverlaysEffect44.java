@@ -9,12 +9,12 @@ import legend.core.memory.Method;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.game.combat.AdditionButtonMode;
-import legend.game.combat.AdditionButtonStyle;
 import legend.game.combat.SEffe;
 import legend.core.platform.input.InputAction;
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.types.AdditionHitProperties10;
 import legend.game.combat.ui.AdditionOverlayMode;
+import legend.game.combat.ui.ControllerStyle;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.scripting.ScriptState;
 import legend.game.types.Translucency;
@@ -249,20 +249,20 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
   @Method(0x80106050L)
   private void renderAdditionButton(final int frames, final boolean isCounter) {
     final int offset = isCounter ? 1 : 0;
-    final AdditionButtonStyle style = CONFIG.getConfig(CoreMod.ADDITION_BUTTON_STYLE_CONFIG.get());
+    final ControllerStyle style = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
     if(Math.abs(frames) >= 2) {  // Button up position
       renderButtonPressHudElement1(0x24, 119, 43, Translucency.B_PLUS_F, 0x80);
-      if (style == AdditionButtonStyle.PLAYSTATION) {
+      if (style == ControllerStyle.PLAYSTATION) {
         renderButtonPressHudElement1(additionButtonRenderCallbackIndices_800fb7bc[offset], 115, 48, Translucency.B_PLUS_F, 0x80);
-      } else if (style == AdditionButtonStyle.XBOX) {
+      } else if (style == ControllerStyle.XBOX) {
         renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.xboxBFrames[0] : AdditionButtonFeedbackText.xboxAFrames[0], 0);
       }
     } else {  // Button down position
       //LAB_80106114
       renderButtonPressHudElement1(0x24, 119, 51, Translucency.B_PLUS_F, 0x80);
-      if (style == AdditionButtonStyle.PLAYSTATION) {
+      if (style == ControllerStyle.PLAYSTATION) {
         renderButtonPressHudElement1(additionButtonRenderCallbackIndices_800fb7bc[offset + 2], 115, 48, Translucency.B_PLUS_F, 0x80);
-      } else if (style == AdditionButtonStyle.XBOX) {
+      } else if (style == ControllerStyle.XBOX) {
         renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.xboxBFrames[2] : AdditionButtonFeedbackText.xboxAFrames[2], 0);
       }
       renderButtonPressHudElement1(0x25, 115, 50, Translucency.B_PLUS_F, 0x80);

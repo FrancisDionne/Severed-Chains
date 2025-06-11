@@ -78,6 +78,7 @@ import legend.game.combat.types.DragoonAdditionScriptData1c;
 import legend.game.combat.types.PerfectDragoonAdditionEffect30;
 import legend.game.combat.types.PerfectDragoonAdditionEffectGlyph06;
 import legend.game.combat.types.VertexDifferenceAnimation18;
+import legend.game.combat.ui.ControllerStyle;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.scripting.FlowControl;
 import legend.game.scripting.RunningScript;
@@ -1288,10 +1289,10 @@ public final class SEffe {
 
     //LAB_80107b10
     // Button
-    final AdditionButtonStyle style = CONFIG.getConfig(CoreMod.ADDITION_BUTTON_STYLE_CONFIG.get());
-    if (style == AdditionButtonStyle.PLAYSTATION) {
+    final ControllerStyle style = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
+    if (style == ControllerStyle.PLAYSTATION) {
       renderButtonPressHudElement1(buttonHudMetricsIndex, x0 + 12, y0 + 66, Translucency.B_PLUS_F, 128);
-    } else if (style == AdditionButtonStyle.XBOX) {
+    } else if (style == ControllerStyle.XBOX) {
       renderButtonPressHudElement1(AdditionButtonFeedbackText.xboxAFrames[buttonHudMetricsIndex == 35 ? 2 : 0], 1);
     }
 

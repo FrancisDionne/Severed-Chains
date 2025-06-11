@@ -15,14 +15,12 @@ import legend.core.platform.input.ScancodeInputActivation;
 import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
-import legend.game.modding.coremod.config.AdditionButtonStyleConfigEntry;
 import legend.game.modding.coremod.config.AdditionDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionGroupConfigEntry;
 import legend.game.modding.coremod.config.DragoonAdditionGroupConfigEntry;
 import legend.game.modding.coremod.config.DragoonAdditionModeConfigEntry;
 import legend.game.modding.coremod.config.DragoonAdditionDifficultyConfigEntry;
 import legend.game.modding.coremod.config.GeneralAdditionGroupConfigEntry;
-import legend.game.combat.ui.ControllerStyle;
 import legend.game.inventory.IconSetConfigEntry;
 import legend.game.modding.coremod.config.AdditionModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionOverlayConfigEntry;
@@ -140,7 +138,6 @@ public class CoreMod {
   public static final RegistryDelegate<FooterActionColorConfigEntry> FOOTER_ACTION_COLOR_CONFIG = CONFIG_REGISTRAR.register("footer_action_color", FooterActionColorConfigEntry::new);
   
   public static final RegistryDelegate<ConfigEntry<Void>> GENERAL_ADDITION_GROUP_CONFIG = register("general_addition_group", GeneralAdditionGroupConfigEntry::new);
-  public static final RegistryDelegate<AdditionButtonStyleConfigEntry> ADDITION_BUTTON_STYLE_CONFIG = register("addition_button_style", AdditionButtonStyleConfigEntry::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_GROUP_CONFIG = register("addition_group", AdditionGroupConfigEntry::new);
   public static final RegistryDelegate<AdditionModeConfigEntry> ADDITION_MODE_CONFIG = register("addition_mode", AdditionModeConfigEntry::new);

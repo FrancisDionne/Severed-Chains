@@ -6,6 +6,7 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
 import legend.core.platform.input.InputAction;
+import legend.core.platform.input.InputGamepadType;
 import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.coremod.CoreMod;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import static legend.core.GameEngine.CONFIG;
+import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
@@ -62,7 +64,7 @@ public final class FooterActionsHud {
   };
 
   private static Texture getTexture(final InputAction inputAction) {
-    final ControllerStyle style = CONFIG.getConfig(CoreMod.CONTROLLER_STYLE_CONFIG.get());
+    final ControllerStyle style = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
     if (style == ControllerStyle.XBOX) {
       if (inputAction == INPUT_ACTION_MENU_CONFIRM.get()) return textures[10];
       if (inputAction == INPUT_ACTION_MENU_DELETE.get()) return textures[12];
