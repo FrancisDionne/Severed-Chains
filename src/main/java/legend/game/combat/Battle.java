@@ -92,6 +92,7 @@ import legend.game.combat.types.MonsterStats1c;
 import legend.game.combat.types.StageDeffThing08;
 import legend.game.combat.ui.BattleHud;
 import legend.game.combat.ui.BattleMenuStruct58;
+import legend.game.combat.ui.ControllerStyle;
 import legend.game.combat.ui.UiBox;
 import legend.game.debugger.CombatDebuggerController;
 import legend.game.fmv.Fmv;
@@ -4761,12 +4762,13 @@ public class Battle extends EngineState {
   @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "brightness", description = "The brightness")
   @Method(0x800d46d4L)
   public FlowControl scriptRenderButtonPressHudElement(final RunningScript<?> script) { // Magic Item Mash
-    final AdditionButtonStyle style = CONFIG.getConfig(CoreMod.ADDITION_BUTTON_STYLE_CONFIG.get());
+    final ControllerStyle style = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
     final int type = script.params_20[0].get();
     final boolean isButtonType = type == 33 || type == 35; // 33 = Button Up, 35 = Button Down
     if (!isButtonType || style == AdditionButtonStyle.PLAYSTATION) {
+    if (!isButtonType || style == ControllerStyle.PLAYSTATION) {
       renderButtonPressHudElement1(type, script.params_20[1].get(), script.params_20[2].get(), Translucency.of(script.params_20[3].get()), script.params_20[4].get());
-    } else if (style == AdditionButtonStyle.XBOX) {
+    } else if (style == ControllerStyle.XBOX) {
       renderButtonPressHudElement1(AdditionButtonFeedbackText.xboxAFrames[type == 35 ? 2 : 0], 2);
     }
     return FlowControl.CONTINUE;
