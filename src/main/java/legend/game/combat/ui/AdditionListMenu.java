@@ -122,8 +122,11 @@ public class AdditionListMenu extends ListMenu {
   private void prepareAdditionList(final int charId) {
     //LAB_800f83dc
     this.additions.clear();
+    this.additions.addAll(getAdditions(charId));
+  }
 
-    //LAB_800f8420
+  public static List<String> getAdditions(final int charId){
+    final ArrayList<String> additions = new ArrayList<>();
     for(int additionSlot = 0; additionSlot < additionCounts_8004f5c0[charId]; additionSlot++) {
       final int additionOffset = additionOffsets_8004f5ac[charId];
 
@@ -131,16 +134,17 @@ public class AdditionListMenu extends ListMenu {
 
       if(level == -1 && (gameState_800babc8.charData_32c[charId].partyFlags_04 & 0x40) != 0) {
         final String additionName = AdditionConfigs.additionNames_800fa8d4[additionOffset + additionSlot];
-        this.additions.add(additionName);
+        additions.add(additionName);
       } else if(level > 0 && level <= gameState_800babc8.charData_32c[charId].level_12) {
         final String additionName = AdditionConfigs.additionNames_800fa8d4[additionOffset + additionSlot];
-        this.additions.add(additionName);
+        additions.add(additionName);
 
         if(gameState_800babc8.charData_32c[charId].additionLevels_1a[additionSlot] == 0) {
           gameState_800babc8.charData_32c[charId].additionLevels_1a[additionSlot] = 1;
         }
       }
     }
+    return additions;
   }
 
   @Override

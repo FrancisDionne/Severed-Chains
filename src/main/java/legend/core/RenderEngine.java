@@ -85,6 +85,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_FREECAM_UP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_GENERAL_SLOW_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_GENERAL_SPEED_UP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_GENERAL_TOGGLE_FULLSCREEN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
 import static org.lwjgl.opengl.GL11C.GL_BLEND;
 import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
@@ -1245,6 +1246,8 @@ public class RenderEngine {
       Config.setGameSpeedMultiplier(Math.min(Config.getGameSpeedMultiplier() + 1, 16));
     } else if(action == INPUT_ACTION_GENERAL_SLOW_DOWN.get()) {
       Config.setGameSpeedMultiplier(Math.max(Config.getGameSpeedMultiplier() - 1, 1));
+    } else if(action == INPUT_ACTION_MENU_END.get() && CONFIG.getConfig(CoreMod.SPEED_TOGGLE_CONFIG.get())) {
+      Config.setGameSpeedMultiplier(16, false);
     } else if(action == INPUT_ACTION_DEBUG_PAUSE.get()) {
       this.togglePause = !this.togglePause;
     } else if(action == INPUT_ACTION_DEBUG_FRAME_ADVANCE.get()) {
@@ -1283,6 +1286,8 @@ public class RenderEngine {
 
     if(action == INPUT_ACTION_DEBUG_FRAME_ADVANCE_HOLD.get()) {
       this.frameAdvance = false;
+    } else if(action == INPUT_ACTION_MENU_END.get() && CONFIG.getConfig(CoreMod.SPEED_TOGGLE_CONFIG.get())) {
+      Config.resumeGameSpeedMultiplier();
     }
   }
 }

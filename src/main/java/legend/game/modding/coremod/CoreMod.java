@@ -17,6 +17,7 @@ import legend.game.combat.formula.PhysicalDamageFormula;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionGroupConfigEntry;
+import legend.game.modding.coremod.config.AdditionRandomModeConfig;
 import legend.game.modding.coremod.config.DragoonAdditionGroupConfigEntry;
 import legend.game.modding.coremod.config.DragoonAdditionModeConfigEntry;
 import legend.game.modding.coremod.config.DragoonAdditionDifficultyConfigEntry;
@@ -59,9 +60,9 @@ import legend.game.modding.coremod.config.ReduceMotionFlashingConfigEntry;
 import legend.game.modding.coremod.config.ResolutionConfig;
 import legend.game.modding.coremod.config.RumbleIntensityConfigEntry;
 import legend.game.modding.coremod.config.RunByDefaultConfig;
-import legend.game.modding.coremod.config.SaveAnywhereConfig;
 import legend.game.modding.coremod.config.SecondaryCharacterXpMultiplierConfigEntry;
 import legend.game.modding.coremod.config.SfxVolumeConfigEntry;
+import legend.game.modding.coremod.config.TurboToggleConfig;
 import legend.game.modding.coremod.config.TransformationModeConfigEntry;
 import legend.game.modding.coremod.config.UnlockPartyConfig;
 import legend.game.modding.events.input.RegisterDefaultInputBindingsEvent;
@@ -136,7 +137,8 @@ public class CoreMod {
   public static final RegistryDelegate<BattleTransitionModeConfigEntry> BATTLE_TRANSITION_MODE_CONFIG = register("battle_transition_mode", BattleTransitionModeConfigEntry::new);
   public static final RegistryDelegate<PreferredBattleCameraAngleConfigEntry> PREFERRED_BATTLE_CAMERA_ANGLE = register("preferred_battle_camera_angle", PreferredBattleCameraAngleConfigEntry::new);
   public static final RegistryDelegate<FooterActionColorConfigEntry> FOOTER_ACTION_COLOR_CONFIG = CONFIG_REGISTRAR.register("footer_action_color", FooterActionColorConfigEntry::new);
-  
+  public static final RegistryDelegate<TurboToggleConfig> SPEED_TOGGLE_CONFIG = CONFIG_REGISTRAR.register("turbo_toggle", TurboToggleConfig::new);
+
   public static final RegistryDelegate<ConfigEntry<Void>> GENERAL_ADDITION_GROUP_CONFIG = register("general_addition_group", GeneralAdditionGroupConfigEntry::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_GROUP_CONFIG = register("addition_group", AdditionGroupConfigEntry::new);
@@ -146,6 +148,7 @@ public class CoreMod {
   public static final RegistryDelegate<AdditionTimingOffsetConfigEntry> ADDITION_TIMING_OFFSET_CONFIG = register("addition_timing_offset", AdditionTimingOffsetConfigEntry::new);
   public static final RegistryDelegate<AdditionOverlayConfigEntry> ADDITION_OVERLAY_CONFIG = register("addition_overlay_mode", AdditionOverlayConfigEntry::new);
   public static final RegistryDelegate<AdditionButtonModeConfigEntry> ADDITION_BUTTON_MODE_CONFIG = register("addition_button_mode", AdditionButtonModeConfigEntry::new);
+  public static final RegistryDelegate<AdditionRandomModeConfig> ADDITION_RANDOM_MODE_CONFIG = CONFIG_REGISTRAR.register("addition_random_mode", AdditionRandomModeConfig::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> DRAGOON_ADDITION_GROUP_CONFIG = register("dragoon_addition_group", DragoonAdditionGroupConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionModeConfigEntry> DRAGOON_ADDITION_MODE_CONFIG = register("dragoon_addition_mode", DragoonAdditionModeConfigEntry::new);

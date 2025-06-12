@@ -191,6 +191,8 @@ lod_core.config.footer_action_color.FOOTER_GREEN=Green
 lod_core.config.footer_action_color.FOOTER_LIME=Lime
 lod_core.config.footer_action_color.FOOTER_YELLOW=Yellow
 lod_core.config.footer_action_color.FOOTER_ORANGE=Orange
+lod_core.config.turbo_toggle.label=Enable Turbo Toggle
+lod_core.config.turbo_toggle.help=Holding the 'Menu: end' keybind (R2 on controllers by default) will increase the game's speed when enabled
 lod_core.config.icon_set.label=Icon Set
 lod_core.config.icon_set.help=Enhanced changes some item and equipment icons to icons that were cut from the game
 lod_core.config.icon_set.ENHANCED=Enhanced
@@ -226,6 +228,8 @@ lod_core.config.addition_difficulty.label=[Additions] Difficulty
 lod_core.config.addition_difficulty.EASY=Easier
 lod_core.config.addition_difficulty.NORMAL=Normal
 lod_core.config.addition_difficulty.HARD=Harder
+lod_core.config.addition_random_mode.label=[Additions] Frenzy Mode
+lod_core.config.addition_random_mode.help=A random unlocked addition is chosen each time you attack
 
 lod_core.config.dragoon_addition_group.label=[--- Dragoon Additions ---]
 lod_core.config.dragoon_addition_mode.label=[Dragoon Additions] Input

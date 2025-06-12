@@ -81,6 +81,7 @@ public final class Config {
 
   private static int gameSpeedMultiplier = 1;
   private static int loadedGameSpeedMultiplier = 1;
+  private static int storedGameSpeedMultiplier = 1;
 
   public static boolean lowMemoryUnpacker() {
     return readBool("low_memory_unpacker", false);
@@ -135,8 +136,19 @@ public final class Config {
   }
 
   public static void setGameSpeedMultiplier(final int multiplier) {
+    setGameSpeedMultiplier(multiplier, true);
+  }
+
+  public static void setGameSpeedMultiplier(final int multiplier, final boolean setProperty) {
     gameSpeedMultiplier = multiplier;
-    properties.setProperty("game_speed_multiplier", String.valueOf(multiplier));
+    if(setProperty) {
+      storedGameSpeedMultiplier = multiplier;
+      properties.setProperty("game_speed_multiplier", String.valueOf(multiplier));
+    }
+  }
+
+  public static void resumeGameSpeedMultiplier() {
+    gameSpeedMultiplier = storedGameSpeedMultiplier;
   }
 
   public static int getLoadedGameSpeedMultiplier() {
