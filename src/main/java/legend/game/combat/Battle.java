@@ -8247,18 +8247,10 @@ public class Battle extends EngineState {
       return FlowControl.PAUSE_AND_REWIND;
     }
 
-    if(CONFIG.getConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get()) && this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 instanceof final PlayerBattleEntity player) {
-      final ActiveStatsa0 stats = stats_800be5f8[player.charId_272];
-      final CharacterData2c charData = gameState_800babc8.charData_32c[player.charId_272];
-      final List<String> additions = AdditionListMenu.getAdditions(player.charId_272);
-      final int additionIndex = new Random().nextInt(additions.size());
-      player.combatant_144.mrg_04 = null;
-      charData.selectedAddition_19 = additionOffsets_8004f5ac[player.charId_272] + additionIndex;
-      loadCharacterStats();
-      player.additionSpMultiplier_11a = stats.additionSpMultiplier_9e;
-      player.additionDamageMultiplier_11c = stats.additionDamageMultiplier_9f;
-      loadAdditions();
-      this.hud.battle.loadAttackAnimations(player.combatant_144);
+    //Addition Frenzy Mode - Changes addition to a random one every time the player attacks
+    if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 instanceof final PlayerBattleEntity player && !player.isDragoon() && CONFIG.getConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get())) {
+      final int additionIndex = new Random().nextInt(AdditionListMenu.getAdditions(player.charId_272).size());
+      AdditionListMenu.setAddition(player, additionIndex, this.hud);
     }
 
     if(ret == 1) { // Pressed X

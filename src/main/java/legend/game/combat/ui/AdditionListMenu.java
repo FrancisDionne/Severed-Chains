@@ -1,6 +1,7 @@
 package legend.game.combat.ui;
 
 import legend.core.Config;
+import legend.core.Random;
 import legend.game.combat.AdditionConfigs;
 import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.inventory.screens.FontOptions;
@@ -91,15 +92,7 @@ public class AdditionListMenu extends ListMenu {
 
   @Override
   protected void onUse(final int index) {
-    final ActiveStatsa0 stats = stats_800be5f8[this.player_08.charId_272];
-    final CharacterData2c charData = gameState_800babc8.charData_32c[this.player_08.charId_272];
-    this.player_08.combatant_144.mrg_04 = null;
-    charData.selectedAddition_19 = additionOffsets_8004f5ac[this.player_08.charId_272] + index;
-    loadCharacterStats();
-    this.player_08.additionSpMultiplier_11a = stats.additionSpMultiplier_9e;
-    this.player_08.additionDamageMultiplier_11c = stats.additionDamageMultiplier_9f;
-    loadAdditions();
-    this.hud.battle.loadAttackAnimations(this.player_08.combatant_144);
+    setAddition(this.player_08, index, this.hud);
     this.flags_02 &= ~0x8;
     this.menuState_00 = 8;
   }
@@ -145,6 +138,18 @@ public class AdditionListMenu extends ListMenu {
       }
     }
     return additions;
+  }
+
+  public static void setAddition(final PlayerBattleEntity player, final int index, final BattleHud hud) {
+    final ActiveStatsa0 stats = stats_800be5f8[player.charId_272];
+    final CharacterData2c charData = gameState_800babc8.charData_32c[player.charId_272];
+    player.combatant_144.mrg_04 = null;
+    charData.selectedAddition_19 = additionOffsets_8004f5ac[player.charId_272] + index;
+    loadCharacterStats();
+    player.additionSpMultiplier_11a = stats.additionSpMultiplier_9e;
+    player.additionDamageMultiplier_11c = stats.additionDamageMultiplier_9f;
+    loadAdditions();
+    hud.battle.loadAttackAnimations(player.combatant_144);
   }
 
   @Override
