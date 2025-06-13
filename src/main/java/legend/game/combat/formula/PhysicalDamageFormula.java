@@ -2,6 +2,8 @@ package legend.game.combat.formula;
 
 import legend.game.characters.Element;
 import legend.game.combat.Battle;
+import legend.game.combat.bent.PlayerBattleEntity;
+import legend.game.combat.effects.AdditionOverlaysEffect44;
 import legend.game.combat.types.AttackType;
 
 import static legend.game.Scus94491BpeSegment_8004.currentEngineState_8004dd04;
@@ -29,6 +31,14 @@ public final class PhysicalDamageFormula {
 
   public static int applyPower(final State<Integer> state) {
     return adjustDamageForPower(state.value(), state.bents.get(Side.ATTACKER).powerAttack_b4, state.bents.get(Side.DEFENDER).powerDefence_b8);
+  }
+
+  public static int applyFlawlessAdditionModifier(final State<Integer> state) {
+    int damage = state.value();
+    if(state.bents.get(Side.ATTACKER) instanceof final PlayerBattleEntity player && !player.isDragoon() && AdditionOverlaysEffect44.additionResults != null && AdditionOverlaysEffect44.additionResults.flawless) {
+      damage += Math.round(Math.max(1, damage * (0.05f + (AdditionOverlaysEffect44.additionResults.hits * 0.0215f)))); //5% + 2.15% per addition hit (potential max at 20% with best additions)
+    }
+    return damage;
   }
 
   public static int applyDragoonSpace(final State<Integer> state) {

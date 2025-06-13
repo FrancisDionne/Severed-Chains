@@ -230,6 +230,8 @@ lod_core.config.addition_difficulty.NORMAL=Normal
 lod_core.config.addition_difficulty.HARD=Harder
 lod_core.config.addition_random_mode.label=[Additions] Frenzy Mode
 lod_core.config.addition_random_mode.help=A random unlocked addition is chosen each time you attack
+lod_core.config.addition_gameplay_enhance.label=[Additions] Gameplay Enhancements
+lod_core.config.addition_gameplay_enhance.help=Completing additions flawlessly will reward you with more damage and faster mastery\n(Suggested to pair this option with Button Behavior: Feedback)
 
 lod_core.config.dragoon_addition_group.label=[--- Dragoon Additions ---]
 lod_core.config.dragoon_addition_mode.label=[Dragoon Additions] Input

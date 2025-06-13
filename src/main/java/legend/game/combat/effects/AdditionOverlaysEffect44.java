@@ -8,9 +8,9 @@ import legend.core.gte.MV;
 import legend.core.memory.Method;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
+import legend.core.platform.input.InputAction;
 import legend.game.combat.AdditionButtonMode;
 import legend.game.combat.SEffe;
-import legend.core.platform.input.InputAction;
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.types.AdditionHitProperties10;
 import legend.game.combat.ui.AdditionOverlayMode;
@@ -20,6 +20,7 @@ import legend.game.scripting.ScriptState;
 import legend.game.types.Translucency;
 import org.joml.Math;
 import org.joml.Vector3f;
+
 import java.util.Arrays;
 
 import static legend.core.GameEngine.CONFIG;
@@ -69,6 +70,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
   // Not needed anymore, just reference hit overlay array at index lastCompletedHit_39
   // public final Pointer<AdditionOverlaysHit20> lastCompletedHitOverlay_3c;
   public AdditionOverlaysHit20[] hitOverlays_40;
+  public static AdditionResults additionResults;
 
   public Obj reticleBorderShadow;
   public final MV transforms = new MV();
@@ -111,6 +113,8 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
     Arrays.setAll(hitArray, AdditionOverlaysHit20::new);
     this.hitOverlays_40 = hitArray;
     int cumulativeOverlayDisplayDelay = 0;
+    additionResults = new AdditionResults();
+    additionResults.additionHits = hitCount;
 
     //LAB_801063f0
     for(hitNum = 0; hitNum < this.count_30; hitNum++) {
@@ -621,6 +625,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
                   } else if(this.currentFrame_34 >= hitOverlay.frameSuccessLowerBound_10 && this.currentFrame_34 <= hitOverlay.frameSuccessUpperBound_12) { // Good Input
                     additionHitCompletionState_8011a014[hitNum] = 1;
                     hitOverlay.hitSuccessful_01 = true;
+                    additionResults.hits++;
 
                     int perfectLowerBound = hitOverlay.frameSuccessLowerBound_10;
                     int perfectUpperBound = hitOverlay.frameSuccessLowerBound_10;
@@ -651,6 +656,8 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
                     this.currentInputStatus = this.currentFrame_34 < hitOverlay.frameSuccessLowerBound_10 ? AdditionButtonFeedback.EARLY : AdditionButtonFeedback.LATE;
                     this.flawlessAddition = false;
                   }
+
+                  additionResults.flawless = CONFIG.getConfig(CoreMod.ADDITION_GAMEPLAY_ENHANCE_CONFIG.get()) && this.flawlessAddition;
 
                   if (SEffe.additionButtonFeedbackText != null) {
                     if (hitNum == hitArray.length - 1 && this.flawlessAddition) {

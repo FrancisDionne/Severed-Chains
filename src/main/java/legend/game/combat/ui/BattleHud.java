@@ -17,6 +17,7 @@ import legend.game.combat.Battle;
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.bent.MonsterBattleEntity;
 import legend.game.combat.bent.PlayerBattleEntity;
+import legend.game.combat.effects.AdditionOverlaysEffect44;
 import legend.game.combat.environment.BattleMenuBackgroundDisplayMetrics0c;
 import legend.game.combat.environment.BattleMenuBackgroundUvMetrics04;
 import legend.game.combat.environment.CombatPortraitBorderMetrics0c;
@@ -951,14 +952,14 @@ public class BattleHud {
       final FloatingNumberC4 num = this.floatingNumbers_800c6b5c[i];
 
       if(num.state_00 == 0) {
-        this.addFloatingNumber(i, 0, 0, number, x, y, 60 / vsyncMode_8007a3b8 * 5, 0);
+        this.addFloatingNumber(i, 0, 0, number, x, y, 60 / vsyncMode_8007a3b8 * 5, 0, false);
         break;
       }
     }
   }
 
   @Method(0x800f3354L)
-  public void addFloatingNumber(final int numIndex, final int onHitTextType, final int onHitClutCol, final int number, final float x, final float y, int ticks, int colour) {
+  public void addFloatingNumber(final int numIndex, final int onHitTextType, final int onHitClutCol, final int number, final float x, final float y, int ticks, int colour, final boolean critical) {
     if(this.miss == null) {
       for(int i = 0; i < 10; i++) {
         final QuadBuilder builder1 = new QuadBuilder("Type 1 Floating Digit " + i)
@@ -1013,6 +1014,10 @@ public class BattleHud {
     num.shade_0c = 0x80;
     num._18 = -1;
     num.ticksRemaining_14 = -1;
+    num.critical = critical;
+    num.currentColour.set(num.colour);
+    num.pulseColour.set(num.colour.x * 0.6f, num.colour.y * 0.6f, num.colour.z * 0.6f);
+    num.scale = critical ? 1.3f : 1f;
 
     //LAB_800f3528
     for(int i = 0; i < num.digits_24.length; i++) {
@@ -1113,6 +1118,8 @@ public class BattleHud {
         displayPosX += 8;
       }
 
+      displayPosX = Math.round(displayPosX * num.scale);
+
       //LAB_800f3898
       digit.digit_0c = damageDigits[digitIdx];
 
@@ -1128,6 +1135,19 @@ public class BattleHud {
   public void tickFloatingNumbers() {
     //LAB_800f3978
     for(final FloatingNumberC4 num : this.floatingNumbers_800c6b5c) {
+
+      if(num.critical && num.state_00 < 97) {
+        num.criticalTicks++;
+        if (num.criticalTicks > 1) num.criticalTicks = 0;
+        if(num.criticalTicks > 0) {
+          num.currentColour.set(num.pulseColour);
+        } else {
+          num.currentColour.set(num.colour);
+        }
+      } else {
+        num.currentColour.set(num.colour);
+      }
+
       if((num.flags_02 & 0x8000) != 0) {
         if(num.state_00 != 0) {
           if(num.bentIndex_04 != -1) {
@@ -1277,16 +1297,17 @@ public class BattleHud {
 
             if((digit.flags_00 & 0x8000) != 0) {
               //LAB_800f3ec0
-                num.transforms.transfer.set(digit.x_0e + num.x_1c, digit.y_10 + num.y_20, 28.0f);
-                final QueuedModelStandard model = RENDERER.queueOrthoModel(digit.obj, num.transforms, QueuedModelStandard.class)
-                  .colour(num.colour);
+              num.transforms.transfer.set(digit.x_0e + num.x_1c, digit.y_10 + num.y_20, 28.0f);
+              num.transforms.scaling(num.scale);
+              final QueuedModelStandard model = RENDERER.queueOrthoModel(digit.obj, num.transforms, QueuedModelStandard.class)
+                .colour(num.currentColour);
 
-                if(num.translucent_08) {
-                  model
-                    .translucency(Translucency.HALF_B_PLUS_HALF_F)
-                    .alpha(num.shade_0c / 128.0f);
-                }
-                //LAB_800f4110
+              if(num.translucent_08) {
+                model
+                  .translucency(Translucency.HALF_B_PLUS_HALF_F)
+                  .alpha(num.shade_0c / 128.0f);
+              }
+              //LAB_800f4110
             }
           }
         }
@@ -1328,13 +1349,14 @@ public class BattleHud {
   }
 
   @Method(0x800f4268L)
-  public void addFloatingNumberForBent(final int bentIndex, final int damage, final int s4) {
+  public void addFloatingNumberForBent(@Nullable final BattleEntity27c attacker, final int bentIndex, final int damage, int colour) {
     final ScriptState<?> state = scriptStatePtrArr_800bc1c0[bentIndex];
     final BattleEntity27c bent = (BattleEntity27c)state.innerStruct_00;
 
     final float x;
     final float y;
     final float z;
+    boolean critical = false;
     if(bent instanceof final MonsterBattleEntity monster) {
       // ZYX is the correct order
       x = -monster.targetArrowPos_78.z * 100.0f;
@@ -1347,12 +1369,16 @@ public class BattleHud {
       z = 0;
     }
 
+    if(attacker instanceof final PlayerBattleEntity player && !player.isDragoon() && AdditionOverlaysEffect44.additionResults != null && AdditionOverlaysEffect44.additionResults.flawless) {
+      critical = true;
+    }
+
     //LAB_800f4320
     final Vector2f screenCoords = new Vector2f();
     Transformations.toScreenspace(new Vector3f(x, y, z), bent.model_148.coord2_14, screenCoords);
 
     //LAB_800f4394
-    this.FUN_800f89f4(bentIndex, 0, 2, damage, this.clampX(screenCoords.x + centreScreenX_1f8003dc), this.clampY(screenCoords.y + centreScreenY_1f8003de), 60 / vsyncMode_8007a3b8 / 4, s4);
+    this.FUN_800f89f4(bentIndex, 0, 2, damage, this.clampX(screenCoords.x + centreScreenX_1f8003dc), this.clampY(screenCoords.y + centreScreenY_1f8003de), 60 / vsyncMode_8007a3b8 / 4, colour, critical);
   }
 
   private void onListClose() {
@@ -2049,13 +2075,13 @@ public class BattleHud {
   }
 
   @Method(0x800f89f4L)
-  public boolean FUN_800f89f4(final int bentIndex, final int a1, final int a2, final int rawDamage, final float x, final float y, final int a6, final int a7) {
+  public boolean FUN_800f89f4(final int bentIndex, final int a1, final int a2, final int rawDamage, final float x, final float y, final int a6, final int a7, final boolean critical) {
     //LAB_800f8a30
     for(int i = 0; i < this.floatingNumbers_800c6b5c.length; i++) {
       final FloatingNumberC4 num = this.floatingNumbers_800c6b5c[i];
 
       if(num.state_00 == 0) {
-        this.addFloatingNumber(i, a1, a2, rawDamage, x, y, a6, a7);
+        this.addFloatingNumber(i, a1, a2, rawDamage, x, y, a6, a7, critical);
         num.bentIndex_04 = bentIndex;
         return true;
       }
@@ -2068,8 +2094,8 @@ public class BattleHud {
   }
 
   @Method(0x800f8aa4L)
-  public void renderDamage(final int bentIndex, final int damage) {
-    this.addFloatingNumberForBent(bentIndex, damage, 8);
+  public void renderDamage(@Nullable final BattleEntity27c attacker, final int bentIndex, final int damage) {
+    this.addFloatingNumberForBent(attacker, bentIndex, damage, 8);
   }
 
   @Method(0x800f8cd8L)

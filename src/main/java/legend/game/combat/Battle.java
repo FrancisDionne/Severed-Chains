@@ -42,6 +42,7 @@ import legend.game.combat.deff.LoadedDeff24;
 import legend.game.combat.effects.AdditionButtonFeedbackText;
 import legend.game.combat.effects.AdditionCharEffectData0c;
 import legend.game.combat.effects.AdditionNameTextEffect1c;
+import legend.game.combat.effects.AdditionOverlaysEffect44;
 import legend.game.combat.effects.AdditionSparksEffect08;
 import legend.game.combat.effects.AdditionStarburstEffect10;
 import legend.game.combat.effects.Attachment18;
@@ -1756,6 +1757,7 @@ public class Battle extends EngineState {
       vsyncMode_8007a3b8 = 3;
       this.mcqColour_800fa6dc = 0x80;
       this.currentTurnBent_800c66c8.storage_44[7] &= ~FLAG_1000;
+      AdditionOverlaysEffect44.additionResults = null;
 
       if(battleState_8006e398.hasAlivePlayers()) {
         //LAB_800c7c98
@@ -3562,7 +3564,7 @@ public class Battle extends EngineState {
   @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "damage", description = "The amount of damage done")
   @Method(0x800ccb3cL)
   public FlowControl scriptRenderDamage(final RunningScript<?> script) {
-    this.hud.renderDamage(script.params_20[0].get(), script.params_20[1].get());
+    this.hud.renderDamage(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[0].get(), script.params_20[1].get());
     return FlowControl.CONTINUE;
   }
 
@@ -3571,7 +3573,7 @@ public class Battle extends EngineState {
   @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "value", description = "The number to show")
   @Method(0x800ccb70L)
   public FlowControl scriptAddFloatingNumberForBent(final RunningScript<?> script) {
-    this.hud.addFloatingNumberForBent(script.params_20[0].get(), script.params_20[1].get(), 13);
+    this.hud.addFloatingNumberForBent(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[0].get(), script.params_20[1].get(), 13);
     return FlowControl.CONTINUE;
   }
 
@@ -3826,8 +3828,10 @@ public class Battle extends EngineState {
         return FlowControl.CONTINUE;
       }
 
+      final int xp = AdditionOverlaysEffect44.additionResults.flawless ? 2 : 1;
+
       //LAB_800cd208
-      final int additionXp = Math.min(99, charData.additionXp_22[additionIndex] + 1);
+      final int additionXp = Math.min(99, charData.additionXp_22[additionIndex] + xp);
 
       //LAB_800cd240
       //LAB_800cd288
@@ -4631,8 +4635,8 @@ public class Battle extends EngineState {
       final int addition = gameState_800babc8.charData_32c[script.params_20[0].get()].selectedAddition_19;
       final ScriptState<AdditionNameTextEffect1c> state = SCRIPTS.allocateScriptState("AdditionNameTextEffect1c", additionStruct);
       state.loadScriptFile(doNothingScript_8004f650);
-      state.setTicker((s, effect) -> additionStruct.tickAdditionNameEffect(s, this._800faa9d));
-      final String additionName = AdditionConfigs.additionNames_800fa8d4[addition];
+      state.setTicker((s, effect) -> additionStruct.tickAdditionNameEffect(s, this._800faa9d, 0));
+      final String additionName = AdditionNameTextEffect1c.getAdditionName(addition);
 
       //LAB_800d3e5c
       //LAB_800d3e7c
@@ -4736,7 +4740,7 @@ public class Battle extends EngineState {
       final AdditionNameTextEffect1c s0 = new AdditionNameTextEffect1c();
       final ScriptState<AdditionNameTextEffect1c> state = SCRIPTS.allocateScriptState("AdditionScriptData1c", s0);
       state.loadScriptFile(doNothingScript_8004f650);
-      state.setTicker((s, effect) -> s0.tickAdditionNameEffect(s, this._800faa9d));
+      state.setTicker((s, effect) -> s0.tickAdditionNameEffect(s, this._800faa9d, 1));
       s0.ptr_18 = new AdditionCharEffectData0c[] {new AdditionCharEffectData0c()};
       s0.positionMovement_0c = 40;
       s0.renderer_14 = s0::renderAdditionSpGain;
@@ -8559,7 +8563,7 @@ public class Battle extends EngineState {
   @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "colourIndex", description = "Which colour to use (indices are unknown)")
   @Method(0x800f984cL)
   public FlowControl scriptRenderRecover(final RunningScript<?> script) {
-    this.hud.addFloatingNumberForBent(script.params_20[0].get(), script.params_20[1].get(), script.params_20[2].get());
+    this.hud.addFloatingNumberForBent(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[0].get(), script.params_20[1].get(), script.params_20[2].get());
     return FlowControl.CONTINUE;
   }
 

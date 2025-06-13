@@ -6,7 +6,6 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
 import legend.core.platform.input.InputAction;
-import legend.core.platform.input.InputGamepadType;
 import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.coremod.CoreMod;
@@ -17,7 +16,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import static legend.core.GameEngine.CONFIG;
-import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;

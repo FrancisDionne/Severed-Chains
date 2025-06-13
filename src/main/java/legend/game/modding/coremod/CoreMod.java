@@ -16,6 +16,7 @@ import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionDifficultyConfigEntry;
+import legend.game.modding.coremod.config.AdditionGameplayEnhanceConfig;
 import legend.game.modding.coremod.config.AdditionGroupConfigEntry;
 import legend.game.modding.coremod.config.AdditionRandomModeConfig;
 import legend.game.modding.coremod.config.DragoonAdditionGroupConfigEntry;
@@ -149,6 +150,7 @@ public class CoreMod {
   public static final RegistryDelegate<AdditionOverlayConfigEntry> ADDITION_OVERLAY_CONFIG = register("addition_overlay_mode", AdditionOverlayConfigEntry::new);
   public static final RegistryDelegate<AdditionButtonModeConfigEntry> ADDITION_BUTTON_MODE_CONFIG = register("addition_button_mode", AdditionButtonModeConfigEntry::new);
   public static final RegistryDelegate<AdditionRandomModeConfig> ADDITION_RANDOM_MODE_CONFIG = CONFIG_REGISTRAR.register("addition_random_mode", AdditionRandomModeConfig::new);
+  public static final RegistryDelegate<AdditionGameplayEnhanceConfig> ADDITION_GAMEPLAY_ENHANCE_CONFIG = CONFIG_REGISTRAR.register("addition_gameplay_enhance", AdditionGameplayEnhanceConfig::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> DRAGOON_ADDITION_GROUP_CONFIG = register("dragoon_addition_group", DragoonAdditionGroupConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionModeConfigEntry> DRAGOON_ADDITION_MODE_CONFIG = register("dragoon_addition_mode", DragoonAdditionModeConfigEntry::new);
@@ -208,6 +210,7 @@ public class CoreMod {
   public static final Formula<Integer, Integer> PHYSICAL_DAMAGE_FORMULA = Formula.make(PhysicalDamageFormula::calculatePhysicalDamage, builder -> builder
     .then(PhysicalDamageFormula::applyElementalInteractions)
     .then(PhysicalDamageFormula::applyPower)
+    .then(PhysicalDamageFormula::applyFlawlessAdditionModifier)
     .then(PhysicalDamageFormula::applyDragoonSpace)
     .then(PhysicalDamageFormula.minimum(0))
     .then(PhysicalDamageFormula::applyDamageMultipliers)

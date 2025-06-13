@@ -12,7 +12,10 @@ public class FloatingNumberC4 {
   public int bentIndex_04;
   public boolean translucent_08;
   public int shade_0c;
+  public final Vector3f currentColour = new Vector3f();
   public final Vector3f colour = new Vector3f();
+  public final Vector3f pulseColour = new Vector3f();
+  public float scale;
 
   public int _10;
   public int ticksRemaining_14;
@@ -20,6 +23,8 @@ public class FloatingNumberC4 {
   public float x_1c;
   public float y_20;
   public final FloatingNumberDigit20[] digits_24 = new FloatingNumberDigit20[10];
+  public boolean critical;
+  public int criticalTicks;
 
   public final MV transforms = new MV();
 

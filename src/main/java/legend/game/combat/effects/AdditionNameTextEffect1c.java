@@ -26,6 +26,7 @@ public class AdditionNameTextEffect1c implements ScriptedObject {
   public int totalSp_10;
   public TriConsumer<AdditionCharEffectData0c, Integer, Integer> renderer_14;
   public AdditionCharEffectData0c[] ptr_18;
+  private int flawlessTicks;
 
   @Override
   public Vector3f getPosition() {
@@ -39,16 +40,25 @@ public class AdditionNameTextEffect1c implements ScriptedObject {
     ScriptedObject.renderScriptDebugText(state, viewspace.x + GPU.getOffsetX() - 9.0f, viewspace.y + GPU.getOffsetY() - 9.0f);
   }
 
+  public static String getAdditionName(final int additionId) {
+    String additionName = AdditionConfigs.additionNames_800fa8d4[additionId];
+    if(AdditionOverlaysEffect44.additionResults != null && AdditionOverlaysEffect44.additionResults.flawless) {
+      additionName += '+';
+    }
+    return additionName;
+  }
+
   @Method(0x800d37dcL)
   private void renderAdditionNameChar(final int x, final int y, final int additionId, final int charOffset, final int brightness) {
     int charIndex = 0;
+    final String additionName = getAdditionName(additionId);
 
     //LAB_800d3838
     int chr;
     while(true) {
       chr = asciiTable_800fa788[charIndex];
 
-      if(AdditionConfigs.additionNames_800fa8d4[additionId].charAt(charOffset) == chr) {
+      if(additionName.charAt(charOffset) == chr) {
         break;
       } else if(chr == 0) {
         //LAB_800d3860
@@ -59,8 +69,18 @@ public class AdditionNameTextEffect1c implements ScriptedObject {
       charIndex++;
     }
 
-    //LAB_800d3864
-    battleUiParts.queueLetter(charIndex, x, y, 0xa, Translucency.B_PLUS_F, brightness, 1.0f, 1.0f);
+    if(AdditionOverlaysEffect44.additionResults != null && AdditionOverlaysEffect44.additionResults.flawless) {
+      if(charIndex == 91 && charOffset == additionName.length() - 1) {
+        battleUiParts.queueBigNumber(10, x, y - 3, 0x22, Translucency.B_PLUS_F, brightness, 1.3f, 1.3f);
+        battleUiParts.queueBigNumber(10, x, y - 3, 0x9, Translucency.B_MINUS_F, brightness, 1.3f, 1.3f);
+      } else {
+        battleUiParts.queueLetter(charIndex, x, y, 0x22, Translucency.B_PLUS_F, brightness, 1f, 1f);
+        battleUiParts.queueLetter(charIndex, x, y, 0x9, Translucency.B_MINUS_F, brightness, 1f, 1f);
+      }
+    } else {
+      //LAB_800d3864
+      battleUiParts.queueLetter(charIndex, x, y,  0xa, Translucency.B_PLUS_F, brightness, 1f, 1f);
+    }
   }
 
   @Method(0x800d3a20L)
@@ -101,8 +121,13 @@ public class AdditionNameTextEffect1c implements ScriptedObject {
   }
 
   @Method(0x800d3bb8L)
-  public void tickAdditionNameEffect(final ScriptState<AdditionNameTextEffect1c> state, final int unknown) {
+  public void tickAdditionNameEffect(final ScriptState<AdditionNameTextEffect1c> state, final int unknown, final int type) {
     this.ticks_04++;
+
+    if(type == 0) {
+      this.flawlessTicks++;
+      if(this.flawlessTicks > 3) this.flawlessTicks = 0;
+    }
 
     if(unknown == 0) {
       state.deallocateWithChildren();
@@ -126,9 +151,14 @@ public class AdditionNameTextEffect1c implements ScriptedObject {
           }
         }
 
+        int brightness = 0x80;
+        if(type == 0 && this.ptr_18[charIdx].scrolling_00 == 0 && AdditionOverlaysEffect44.additionResults != null && AdditionOverlaysEffect44.additionResults.flawless) {
+          brightness = this.flawlessTicks > 1 ? 0x70 : 0x80;
+        }
+
         //LAB_800d3c84
         //LAB_800d3c88
-        this.renderer_14.accept(charStruct, 0x80, charIdx);
+        this.renderer_14.accept(charStruct, brightness, charIdx);
         int currPosition = charStruct.position_04;
         int u = charStruct.dupes_02 * 0x10;
 
