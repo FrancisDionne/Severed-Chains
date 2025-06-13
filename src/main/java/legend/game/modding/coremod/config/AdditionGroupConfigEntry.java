@@ -6,6 +6,6 @@ import legend.game.saves.ConfigStorageLocation;
 
 public class AdditionGroupConfigEntry extends ConfigEntry<Void> {
   public AdditionGroupConfigEntry() {
-    super(null, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS, o -> new byte[0], bytes -> null);
+    super(null, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS, o -> new byte[0], bytes -> null, 0, true);
   }
 }

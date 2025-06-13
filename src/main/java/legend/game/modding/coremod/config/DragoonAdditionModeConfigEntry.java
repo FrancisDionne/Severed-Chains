@@ -8,6 +8,6 @@ import legend.game.saves.EnumConfigEntry;
 
 public class DragoonAdditionModeConfigEntry extends EnumConfigEntry<DragoonAdditionMode> {
   public DragoonAdditionModeConfigEntry() {
-    super(DragoonAdditionMode.class, DragoonAdditionMode.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS);
+    super(DragoonAdditionMode.class, DragoonAdditionMode.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS, 50);
   }
 }

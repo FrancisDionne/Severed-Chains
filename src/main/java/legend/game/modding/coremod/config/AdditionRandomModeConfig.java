@@ -6,7 +6,7 @@ import legend.game.saves.ConfigStorageLocation;
 
 public class AdditionRandomModeConfig extends BoolConfigEntry {
   public AdditionRandomModeConfig() {
-    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS);
+    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS, 8);
   }
 
   @Override

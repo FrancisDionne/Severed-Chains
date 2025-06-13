@@ -9,12 +9,17 @@ public class EnumConfigEntry<T extends Enum<T>> extends ConfigEntry<T> {
   private final Class<T> cls;
 
   public EnumConfigEntry(final Class<T> cls, final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category) {
+    this(cls, defaultValue, storageLocation, category, 0);
+  }
+
+  public EnumConfigEntry(final Class<T> cls, final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final double order) {
     super(
       defaultValue,
       storageLocation,
       category,
       IoHelper::enumToBytes,
-      bytes -> IoHelper.enumFromBytes(cls, bytes, defaultValue)
+      bytes -> IoHelper.enumFromBytes(cls, bytes, defaultValue),
+      order
     );
 
     this.cls = cls;

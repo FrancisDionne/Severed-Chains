@@ -6,12 +6,17 @@ import legend.game.inventory.screens.HorizontalAlign;
 /** Convenience class for simple enum-backed configs */
 public class BoolConfigEntry extends ConfigEntry<Boolean> {
   public BoolConfigEntry(final boolean defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category) {
+    this(defaultValue, storageLocation, category, 0);
+  }
+
+  public BoolConfigEntry(final boolean defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final double order) {
     super(
       defaultValue,
       storageLocation,
       category,
       BoolConfigEntry::serialize,
-      bytes -> deserialize(bytes, defaultValue)
+      bytes -> deserialize(bytes, defaultValue),
+      order
     );
 
     this.setEditControl((current, gameState) -> {

@@ -12,15 +12,27 @@ public class ConfigEntry<T> extends RegistryEntry {
   public final ConfigCategory category;
   public final Function<T, byte[]> serializer;
   public final Function<byte[], T> deserializer;
+  public final double order;
+  public final boolean header;
 
   private BiFunction<T, ConfigCollection, Control> editControl;
 
   public ConfigEntry(final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Function<T, byte[]> serializer, final Function<byte[], T> deserializer) {
+    this(defaultValue, storageLocation, category, serializer, deserializer, 0);
+  }
+
+  public ConfigEntry(final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Function<T, byte[]> serializer, final Function<byte[], T> deserializer, final double order) {
+    this(defaultValue, storageLocation, category, serializer, deserializer, order, false);
+  }
+
+  public ConfigEntry(final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Function<T, byte[]> serializer, final Function<byte[], T> deserializer, final double order, final boolean header) {
     this.defaultValue = defaultValue;
     this.storageLocation = storageLocation;
     this.category = category;
     this.serializer = serializer;
     this.deserializer = deserializer;
+    this.order = order;
+    this.header = header;
   }
 
   protected void setEditControl(final BiFunction<T, ConfigCollection, Control> editControl) {

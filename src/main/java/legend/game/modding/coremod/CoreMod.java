@@ -14,36 +14,35 @@ import legend.core.platform.input.KeyInputActivation;
 import legend.core.platform.input.ScancodeInputActivation;
 import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
+import legend.game.inventory.IconSetConfigEntry;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionGameplayEnhanceConfig;
 import legend.game.modding.coremod.config.AdditionGroupConfigEntry;
-import legend.game.modding.coremod.config.AdditionRandomModeConfig;
-import legend.game.modding.coremod.config.DragoonAdditionGroupConfigEntry;
-import legend.game.modding.coremod.config.DragoonAdditionModeConfigEntry;
-import legend.game.modding.coremod.config.DragoonAdditionDifficultyConfigEntry;
-import legend.game.modding.coremod.config.GeneralAdditionGroupConfigEntry;
-import legend.game.inventory.IconSetConfigEntry;
 import legend.game.modding.coremod.config.AdditionModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionOverlayConfigEntry;
+import legend.game.modding.coremod.config.AdditionRandomModeConfig;
+import legend.game.modding.coremod.config.AdditionSettingsConfigEntry;
 import legend.game.modding.coremod.config.AdditionTimingModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionTimingOffsetConfigEntry;
-import legend.game.modding.coremod.config.PreferredBattleCameraAngleConfigEntry;
 import legend.game.modding.coremod.config.AllowWidescreenConfigEntry;
 import legend.game.modding.coremod.config.AudioDeviceConfig;
 import legend.game.modding.coremod.config.AutoTextDelayConfigEntry;
 import legend.game.modding.coremod.config.BattleTransitionModeConfigEntry;
-import legend.game.modding.coremod.config.DeadzoneConfigEntry;
 import legend.game.modding.coremod.config.ControllerKeybindsConfigEntry;
-import legend.game.modding.coremod.config.AdditionSettingsConfigEntry;
 import legend.game.modding.coremod.config.ControllerStyleConfigEntry;
 import legend.game.modding.coremod.config.CreateCrashSaveConfigEntry;
+import legend.game.modding.coremod.config.DeadzoneConfigEntry;
 import legend.game.modding.coremod.config.DisableMouseInputConfigEntry;
+import legend.game.modding.coremod.config.DragoonAdditionDifficultyConfigEntry;
+import legend.game.modding.coremod.config.DragoonAdditionGroupConfigEntry;
+import legend.game.modding.coremod.config.DragoonAdditionModeConfigEntry;
 import legend.game.modding.coremod.config.EnabledModsConfigEntry;
 import legend.game.modding.coremod.config.EncounterRateConfigEntry;
-import legend.game.modding.coremod.config.FooterActionColorConfigEntry;
 import legend.game.modding.coremod.config.FmvVolumeConfigEntry;
+import legend.game.modding.coremod.config.FooterActionColorConfigEntry;
 import legend.game.modding.coremod.config.FullscreenConfigEntry;
+import legend.game.modding.coremod.config.GeneralAdditionGroupConfigEntry;
 import legend.game.modding.coremod.config.HighQualityProjectionConfigEntry;
 import legend.game.modding.coremod.config.IgnoreSteamInputModeConfigEntry;
 import legend.game.modding.coremod.config.IndicatorModeConfigEntry;
@@ -57,14 +56,15 @@ import legend.game.modding.coremod.config.MusicInterpolationPrecisionConfigEntry
 import legend.game.modding.coremod.config.MusicPitchResolutionConfigEntry;
 import legend.game.modding.coremod.config.MusicSampleRateConfigEntry;
 import legend.game.modding.coremod.config.MusicVolumeConfigEntry;
+import legend.game.modding.coremod.config.PreferredBattleCameraAngleConfigEntry;
 import legend.game.modding.coremod.config.ReduceMotionFlashingConfigEntry;
 import legend.game.modding.coremod.config.ResolutionConfig;
 import legend.game.modding.coremod.config.RumbleIntensityConfigEntry;
 import legend.game.modding.coremod.config.RunByDefaultConfig;
 import legend.game.modding.coremod.config.SecondaryCharacterXpMultiplierConfigEntry;
 import legend.game.modding.coremod.config.SfxVolumeConfigEntry;
-import legend.game.modding.coremod.config.TurboToggleConfig;
 import legend.game.modding.coremod.config.TransformationModeConfigEntry;
+import legend.game.modding.coremod.config.TurboToggleConfig;
 import legend.game.modding.coremod.config.UnlockPartyConfig;
 import legend.game.modding.events.input.RegisterDefaultInputBindingsEvent;
 import legend.game.saves.BoolConfigEntry;
@@ -144,10 +144,10 @@ public class CoreMod {
 
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_GROUP_CONFIG = register("addition_group", AdditionGroupConfigEntry::new);
   public static final RegistryDelegate<AdditionModeConfigEntry> ADDITION_MODE_CONFIG = register("addition_mode", AdditionModeConfigEntry::new);
+  public static final RegistryDelegate<AdditionOverlayConfigEntry> ADDITION_OVERLAY_CONFIG = register("addition_overlay_mode", AdditionOverlayConfigEntry::new);
   public static final RegistryDelegate<AdditionDifficultyConfigEntry> ADDITION_DIFFICULTY_CONFIG = register("addition_difficulty", AdditionDifficultyConfigEntry::new);
   public static final RegistryDelegate<AdditionTimingModeConfigEntry> ADDITION_TIMING_MODE_CONFIG = register("addition_timing_mode", AdditionTimingModeConfigEntry::new);
   public static final RegistryDelegate<AdditionTimingOffsetConfigEntry> ADDITION_TIMING_OFFSET_CONFIG = register("addition_timing_offset", AdditionTimingOffsetConfigEntry::new);
-  public static final RegistryDelegate<AdditionOverlayConfigEntry> ADDITION_OVERLAY_CONFIG = register("addition_overlay_mode", AdditionOverlayConfigEntry::new);
   public static final RegistryDelegate<AdditionButtonModeConfigEntry> ADDITION_BUTTON_MODE_CONFIG = register("addition_button_mode", AdditionButtonModeConfigEntry::new);
   public static final RegistryDelegate<AdditionRandomModeConfig> ADDITION_RANDOM_MODE_CONFIG = CONFIG_REGISTRAR.register("addition_random_mode", AdditionRandomModeConfig::new);
   public static final RegistryDelegate<AdditionGameplayEnhanceConfig> ADDITION_GAMEPLAY_ENHANCE_CONFIG = CONFIG_REGISTRAR.register("addition_gameplay_enhance", AdditionGameplayEnhanceConfig::new);
@@ -281,7 +281,7 @@ public class CoreMod {
       .add(INPUT_ACTION_MENU_SORT.get(), new KeyInputActivation(InputKey.X))
       .add(INPUT_ACTION_MENU_FILTER.get(), new ButtonInputActivation(InputButton.X))
       .add(INPUT_ACTION_MENU_FILTER.get(), new ScancodeInputActivation(InputKey.Q))
-      .add(INPUT_ACTION_MENU_HELP.get(), new ButtonInputActivation(InputButton.START))
+      .add(INPUT_ACTION_MENU_HELP.get(), new ButtonInputActivation(InputButton.Y))
       .add(INPUT_ACTION_MENU_HELP.get(), new KeyInputActivation(InputKey.H))
       .add(INPUT_ACTION_MENU_MODS.get(), new ButtonInputActivation(InputButton.Y))
       .add(INPUT_ACTION_MENU_MODS.get(), new KeyInputActivation(InputKey.M))

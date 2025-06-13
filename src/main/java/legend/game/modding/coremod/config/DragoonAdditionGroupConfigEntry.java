@@ -6,6 +6,6 @@ import legend.game.saves.ConfigStorageLocation;
 
 public class DragoonAdditionGroupConfigEntry extends ConfigEntry<Void> {
   public DragoonAdditionGroupConfigEntry() {
-    super(null, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS, o -> new byte[0], bytes -> null);
+    super(null, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS, o -> new byte[0], bytes -> null, 8.5, true);
   }
 }
