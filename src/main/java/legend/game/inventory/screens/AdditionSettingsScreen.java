@@ -76,6 +76,8 @@ public class AdditionSettingsScreen extends VerticalLayoutScreen {
 
           if(error) {
             label.getFontOptions().colour(0.30f, 0.0f, 0.0f).shadowColour(TextColour.LIGHT_BROWN);
+          } else if (configEntry.header) {
+            label.getFontOptions().colour(TextColour.DARKER_GREY).shadowColour(TextColour.MIDDLE_BROWN);
           }
 
           if(configEntry.hasHelp()) {

@@ -14,6 +14,7 @@ public enum TextColour {
   GREY(0x78, 0x78, 0x78),
   PURPLE(0x60, 0x00, 0xf8),
   DARK_GREY(54, 54, 54),
+  DARKER_GREY(40, 40, 40),
 
   FOOTER_BROWN(88, 64, 48),
   FOOTER_WHITE(246, 246, 246),
