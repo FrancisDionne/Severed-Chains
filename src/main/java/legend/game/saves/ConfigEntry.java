@@ -1,5 +1,6 @@
 package legend.game.saves;
 
+import legend.game.i18n.I18n;
 import legend.game.inventory.screens.Control;
 import org.legendofdragoon.modloader.registries.RegistryEntry;
 
@@ -56,7 +57,9 @@ public class ConfigEntry<T> extends RegistryEntry {
   }
 
   public boolean hasHelp() {
-    return false;
+    final String key = this.getHelpTranslationKey();
+    final String text = I18n.translate(key);
+    return text != null && !text.isEmpty() && !key.equals(text);
   }
 
   public void onChange(final ConfigCollection configCollection, final T oldValue, final T newValue) {
