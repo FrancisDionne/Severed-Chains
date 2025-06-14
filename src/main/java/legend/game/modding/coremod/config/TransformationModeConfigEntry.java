@@ -7,6 +7,6 @@ import legend.game.saves.EnumConfigEntry;
 
 public class TransformationModeConfigEntry extends EnumConfigEntry<TransformationMode> {
   public TransformationModeConfigEntry() {
-    super(TransformationMode.class, TransformationMode.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY);
+    super(TransformationMode.class, TransformationMode.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001);
   }
 }

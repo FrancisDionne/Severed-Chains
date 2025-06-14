@@ -6,7 +6,7 @@ import legend.game.saves.ConfigStorageLocation;
 
 public class TurboToggleConfig extends BoolConfigEntry {
   public TurboToggleConfig() {
-    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY);
+    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 9001);
   }
 
   @Override

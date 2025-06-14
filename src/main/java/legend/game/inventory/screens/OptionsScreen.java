@@ -65,7 +65,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
         final ConfigEntry configEntry = entry.getKey();
         final String text = entry.getValue().label;
 
-        if(validLocations.contains(configEntry.storageLocation) && configEntry.hasEditControl()) {
+        if(validLocations.contains(configEntry.storageLocation) && (configEntry.hasEditControl() || configEntry.header)) {
           Control editControl = null;
           boolean error = false;
 

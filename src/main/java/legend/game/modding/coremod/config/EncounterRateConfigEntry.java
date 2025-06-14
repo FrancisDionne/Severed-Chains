@@ -7,7 +7,7 @@ import legend.game.submap.EncounterRateMode;
 
 public class EncounterRateConfigEntry extends EnumConfigEntry<EncounterRateMode> {
   public EncounterRateConfigEntry() {
-    super(EncounterRateMode.class, EncounterRateMode.AVERAGE, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY);
+    super(EncounterRateMode.class, EncounterRateMode.AVERAGE, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001);
   }
 
   @Override

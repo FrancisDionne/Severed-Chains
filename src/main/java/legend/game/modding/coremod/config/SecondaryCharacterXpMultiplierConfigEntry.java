@@ -8,7 +8,7 @@ import legend.game.saves.ConfigStorageLocation;
 
 public class SecondaryCharacterXpMultiplierConfigEntry extends ConfigEntry<Float> {
   public SecondaryCharacterXpMultiplierConfigEntry() {
-    super(0.5f, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, SecondaryCharacterXpMultiplierConfigEntry::serializer, SecondaryCharacterXpMultiplierConfigEntry::deserializer);
+    super(0.5f, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, SecondaryCharacterXpMultiplierConfigEntry::serializer, SecondaryCharacterXpMultiplierConfigEntry::deserializer, 3001);
 
     this.setEditControl((number, gameState) -> {
       final NumberSpinner<Float> spinner = NumberSpinner.percentSpinner(number, 0.01f, 0.05f, 0.0f, 1.0f);

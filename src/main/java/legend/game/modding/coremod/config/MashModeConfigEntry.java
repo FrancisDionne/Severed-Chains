@@ -11,7 +11,7 @@ import static legend.core.GameEngine.CONFIG;
 
 public class MashModeConfigEntry extends EnumConfigEntry<MashMode> implements ScriptReadable {
   public MashModeConfigEntry() {
-    super(MashMode.class, MashMode.MASH, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY);
+    super(MashMode.class, MashMode.MASH, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001);
   }
 
   @Override

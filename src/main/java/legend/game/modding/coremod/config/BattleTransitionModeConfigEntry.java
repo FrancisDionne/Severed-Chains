@@ -7,6 +7,6 @@ import legend.game.saves.EnumConfigEntry;
 
 public class BattleTransitionModeConfigEntry extends EnumConfigEntry<BattleTransitionMode> {
   public BattleTransitionModeConfigEntry() {
-    super(BattleTransitionMode.class, BattleTransitionMode.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY);
+    super(BattleTransitionMode.class, BattleTransitionMode.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001);
   }
 }

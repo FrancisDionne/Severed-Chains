@@ -6,7 +6,7 @@ import legend.game.saves.ConfigStorageLocation;
 
 public class CreateCrashSaveConfigEntry extends BoolConfigEntry {
   public CreateCrashSaveConfigEntry() {
-    super(true, ConfigStorageLocation.GLOBAL, ConfigCategory.GAMEPLAY);
+    super(true, ConfigStorageLocation.GLOBAL, ConfigCategory.GAMEPLAY, 9002);
   }
 
   @Override

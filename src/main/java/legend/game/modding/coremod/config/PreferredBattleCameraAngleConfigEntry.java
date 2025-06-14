@@ -7,6 +7,6 @@ import legend.game.saves.EnumConfigEntry;
 
 public class PreferredBattleCameraAngleConfigEntry extends EnumConfigEntry<PreferredBattleCameraAngle> {
   public PreferredBattleCameraAngleConfigEntry() {
-    super(PreferredBattleCameraAngle.class, PreferredBattleCameraAngle.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY);
+    super(PreferredBattleCameraAngle.class, PreferredBattleCameraAngle.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001);
   }
 }

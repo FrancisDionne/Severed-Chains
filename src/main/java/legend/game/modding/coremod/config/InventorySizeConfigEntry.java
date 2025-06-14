@@ -13,7 +13,7 @@ import static legend.core.GameEngine.CONFIG;
 
 public class InventorySizeConfigEntry extends ConfigEntry<Integer> implements ScriptReadable {
   public InventorySizeConfigEntry() {
-    super(32, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, InventorySizeConfigEntry::serializer, InventorySizeConfigEntry::deserializer);
+    super(32, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, InventorySizeConfigEntry::serializer, InventorySizeConfigEntry::deserializer, 5001);
 
     this.setEditControl((number, gameState) -> {
       final NumberSpinner<Integer> spinner = NumberSpinner.intSpinner(number, 1, 9999);

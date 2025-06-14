@@ -1246,7 +1246,7 @@ public class RenderEngine {
       Config.setGameSpeedMultiplier(Math.min(Config.getGameSpeedMultiplier() + 1, 16));
     } else if(action == INPUT_ACTION_GENERAL_SLOW_DOWN.get()) {
       Config.setGameSpeedMultiplier(Math.max(Config.getGameSpeedMultiplier() - 1, 1));
-    } else if(action == INPUT_ACTION_MENU_END.get() && CONFIG.getConfig(CoreMod.SPEED_TOGGLE_CONFIG.get())) {
+    } else if(action == INPUT_ACTION_MENU_END.get() && CONFIG.getConfig(CoreMod.TURBO_TOGGLE_CONFIG.get())) {
       Config.setGameSpeedMultiplier(16, false);
     } else if(action == INPUT_ACTION_DEBUG_PAUSE.get()) {
       this.togglePause = !this.togglePause;
@@ -1286,7 +1286,7 @@ public class RenderEngine {
 
     if(action == INPUT_ACTION_DEBUG_FRAME_ADVANCE_HOLD.get()) {
       this.frameAdvance = false;
-    } else if(action == INPUT_ACTION_MENU_END.get() && CONFIG.getConfig(CoreMod.SPEED_TOGGLE_CONFIG.get())) {
+    } else if(action == INPUT_ACTION_MENU_END.get() && CONFIG.getConfig(CoreMod.TURBO_TOGGLE_CONFIG.get())) {
       Config.resumeGameSpeedMultiplier();
     }
   }

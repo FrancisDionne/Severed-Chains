@@ -7,6 +7,6 @@ import legend.game.saves.EnumConfigEntry;
 
 public class FooterActionColorConfigEntry extends EnumConfigEntry<FooterActionColor> {
   public FooterActionColorConfigEntry() {
-    super(FooterActionColor.class, FooterActionColor.FOOTER_BROWN, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY);
+    super(FooterActionColor.class, FooterActionColor.FOOTER_BROWN, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 5001);
   }
 }
