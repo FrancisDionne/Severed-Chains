@@ -11,14 +11,12 @@ import legend.game.i18n.I18n;
 import legend.game.inventory.Addition04;
 import legend.game.inventory.EquipItemResult;
 import legend.game.inventory.Equipment;
-import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
 import legend.game.inventory.ItemIcon;
 import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.inventory.screens.MenuStack;
 import legend.game.inventory.screens.TextColour;
-import legend.game.inventory.screens.controls.ListBox;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.characters.AdditionHitMultiplierEvent;
 import legend.game.modding.events.characters.AdditionUnlockEvent;
@@ -1760,10 +1758,9 @@ public final class SItem {
         messageBox.result = MessageBoxResult.AWAITING_INPUT;
 
       case 2:
-        if(messageBox.backgroundRenderable_08.animationLoopsCompletedCount_0c != 0) {
+        if(messageBox.backgroundRenderable_08.animationLoopsCompletedCount_0c != 0 || messageBox.backgroundRenderable_08.flags_00 == Renderable58.FLAG_NO_ANIMATION) {
           messageBox.state_0c = 3;
         }
-
         break;
 
       case 3:
@@ -1798,7 +1795,7 @@ public final class SItem {
           break;
         }
 
-        if(messageBox.type_15 == 2) {
+        if(messageBox.type_15 == 2 || messageBox.type_15 == 1) {
           //LAB_8010ef10
           if(messageBox.highlightRenderable_04 == null) {
             renderable = allocateUiElement(125, 125, messageBox.x_1c + 45, messageBox.menuIndex_18 * 12 + y + 5);
@@ -1812,7 +1809,7 @@ public final class SItem {
           textZ_800bdf00 = 30;
 
           renderText(messageBox.yes, messageBox.x_1c + 60, y + 7, messageBox.menuIndex_18 == 0 ? UI_TEXT_SELECTED_CENTERED : UI_TEXT_CENTERED);
-          renderText(messageBox.no, messageBox.x_1c + 60, y + 21, messageBox.menuIndex_18 == 0 ? UI_TEXT_CENTERED : UI_TEXT_SELECTED_CENTERED);
+          if (messageBox.type_15 == 2) renderText(messageBox.no, messageBox.x_1c + 60, y + 21, messageBox.menuIndex_18 == 0 ? UI_TEXT_CENTERED : UI_TEXT_SELECTED_CENTERED);
 
           textZ_800bdf00 = 33;
         }
@@ -1851,7 +1848,7 @@ public final class SItem {
     return MessageBoxResult.AWAITING_INPUT;
   }
 
-  public static void setMessageBoxOptions(final MessageBox20 messageBox, final String yes, final String no) {
+  public static void setMessageBoxOptions(final MessageBox20 messageBox, final String yes, @Nullable final String no) {
     messageBox.yes = yes;
     messageBox.no = no;
   }
