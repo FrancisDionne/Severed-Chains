@@ -2,10 +2,9 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
-import legend.game.combat.ui.FooterActions;
-import legend.game.combat.ui.FooterActionsHud;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.EquipItemResult;
 import legend.game.inventory.Equipment;
@@ -736,7 +735,7 @@ public class ShopScreen extends MenuScreen {
 
                 if(taken) {
                   final ShopSellPriceEvent event = EVENTS.postEvent(new ShopSellPriceEvent(shopId_8007a3b4, entry, entry.getPrice()));
-                  addGold(event.price);
+                  addGold(event.price * result.quantity);
 
                   if(this.invScroll_8011e0e4 > 0 && this.invScroll_8011e0e4 + 6 > list.size() - 1 && !wasStack) {
                     this.invScroll_8011e0e4--;
@@ -1173,7 +1172,7 @@ public class ShopScreen extends MenuScreen {
 
           if(taken) {
             final ShopSellPriceEvent event = EVENTS.postEvent(new ShopSellPriceEvent(shopId_8007a3b4, entry, entry.getPrice()));
-            addGold(event.price);
+            addGold(event.price * result.quantity);
 
             final int count = isItem ? getUniqueInventoryItems().size() : getUniqueInventoryEquipments().size();
             if(count == 0) {
