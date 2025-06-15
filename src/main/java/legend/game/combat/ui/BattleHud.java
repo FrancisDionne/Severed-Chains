@@ -179,6 +179,7 @@ public class BattleHud {
   private final BattleDisplayStats144[] displayStats_800c6c2c = new BattleDisplayStats144[3];
   private final int[] cameraPositionIndicesIndices_800c6c30 = new int[4];
   private final BattleHudCharacterDisplay3c[] activePartyBattleHudCharacterDisplays_800c6c40 = new BattleHudCharacterDisplay3c[3];
+  private final TurnOrderHud turnOrderHud = new TurnOrderHud(this);
 
   public final Battle battle;
 
@@ -445,6 +446,8 @@ public class BattleHud {
           if(charDisplay._14[2] < 6) {
             charDisplay._14[2]++;
           }
+
+          this.turnOrderHud.render();
         }
         //LAB_800efc9c
       }
@@ -2034,7 +2037,7 @@ public class BattleHud {
   }
 
   @Method(0x800f8568L)
-  private String getTargetEnemyName(final BattleEntity27c target, final String targetName) {
+  protected String getTargetEnemyName(final BattleEntity27c target, final String targetName) {
     // Seems to be special-case handling to replace Tentacle, since the Melbu fight has more enemies than the engine can handle
     if(target.charId_272 == 0x185) {
       final int stageProgression = battleState_8006e398.battlePhase_eec;

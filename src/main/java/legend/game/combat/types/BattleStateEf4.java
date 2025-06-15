@@ -12,7 +12,9 @@ import legend.game.types.TmdAnimationFile;
 import legend.game.unpacker.FileData;
 import legend.lodmod.LodMod;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static legend.game.Scus94491BpeSegment.loadDrgnFile;
 import static legend.game.Scus94491BpeSegment.simpleRand;
@@ -659,6 +661,11 @@ public class BattleStateEf4 {
 
   @Method(0x800c7ea0L)
   public ScriptState<? extends BattleEntity27c> getCurrentTurnBent() {
+    return this.getNextTurnBents(1, true).getFirst();
+  }
+
+  public List<ScriptState<? extends BattleEntity27c>> getNextTurnBents(final int amount, final boolean write) {
+    final List<ScriptState<? extends BattleEntity27c>> nextTurnBents = new ArrayList<>();
     //LAB_800c7ee4
     for(int s4 = 0; s4 < 32; s4++) {
       //LAB_800c7ef0
@@ -684,8 +691,12 @@ public class BattleStateEf4 {
           gameState_800babc8._b8++;
         }
 
-        //LAB_800c7f9c
-        return state;
+        nextTurnBents.add(state);
+
+        if(nextTurnBents.size() >= amount) {
+          //LAB_800c7f9c
+          return nextTurnBents;
+        }
       }
 
       //LAB_800c7fa4
@@ -699,8 +710,9 @@ public class BattleStateEf4 {
       //LAB_800c8028
     }
 
+    nextTurnBents.add(this.alivePlayerBents_eac[0]);
     //LAB_800c8040
-    return this.alivePlayerBents_eac[0];
+    return nextTurnBents;
   }
 
   @Method(0x800ca31cL)
