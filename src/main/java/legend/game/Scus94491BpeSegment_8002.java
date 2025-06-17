@@ -1001,8 +1001,36 @@ public final class Scus94491BpeSegment_8002 {
 
   @Method(0x80022cd0L)
   public static int addSp(final int charIndex, final int amount) {
-    assert false;
-    return 0;
+    final CharacterData2c charData = gameState_800babc8.charData_32c[charIndex];
+    final ActiveStatsa0 stats = stats_800be5f8[charIndex];
+    final int maxSp = stats.dlevel_0f * 100;
+
+    if(stats.dlevel_0f == 0 || charData.sp_0c == maxSp) {
+      return -2;
+    }
+
+    //LAB_80022c78
+    final int ret;
+    if(amount == -1) {
+      charData.sp_0c = maxSp;
+      ret = -1;
+    } else {
+      //LAB_80022c8c
+      charData.sp_0c += amount;
+
+      if(charData.sp_0c < maxSp) {
+        ret = amount;
+      } else {
+        charData.sp_0c = maxSp;
+        ret = -1;
+      }
+    }
+
+    //LAB_80022cb4
+    loadCharacterStats();
+
+    //LAB_80022cc0
+    return ret;
   }
 
   public static boolean takeItemId(final Item item) {
@@ -3517,11 +3545,21 @@ public final class Scus94491BpeSegment_8002 {
 
   @Method(0x80029300L)
   public static void renderText(final String text, final float originX, final float originY, final FontOptions options) {
-    renderText(text, originX, originY, options, null);
+    renderText(text, originX, originY, options, null, 0);
+  }
+
+  @Method(0x80029300L)
+  public static void renderText(final String text, final float originX, final float originY, final FontOptions options, final float overrideZ) {
+    renderText(text, originX, originY, options, null, overrideZ);
   }
 
   @Method(0x80029300L)
   public static void renderText(final String text, final float originX, final float originY, final FontOptions options, @Nullable final Consumer<QueuedModelStandard> queueCallback) {
+    renderText(text, originX, originY, options, queueCallback, 0);
+  }
+
+  @Method(0x80029300L)
+  public static void renderText(final String text, final float originX, final float originY, final FontOptions options, @Nullable final Consumer<QueuedModelStandard> queueCallback, final float overrideZ) {
     final float height = 12.0f * options.getSize();
     final float trim = MathHelper.clamp(options.getTrim() * options.getSize(), -height, height);
 
@@ -3560,6 +3598,10 @@ public final class Scus94491BpeSegment_8002 {
 
             if(trim < 0) {
               textTransforms.transfer.y += trim;
+            }
+
+            if(overrideZ > 0) {
+              textTransforms.transfer.z = overrideZ;
             }
 
             final QueuedModelStandard model = RENDERER.queueOrthoModel(RENDERER.chars, textTransforms, QueuedModelStandard.class)

@@ -8,14 +8,16 @@ import legend.game.inventory.UseItemResponse;
 
 import static legend.game.Scus94491BpeSegment_8002.addSp;
 
-public class RecoverSpItem extends Item {
+public class RecoverSpItem extends BattleItem {
   private final boolean targetAll;
   private final int percentage;
+  private final int amount;
 
-  public RecoverSpItem(final int price, final boolean targetAll, final int percentage) {
+  public RecoverSpItem(final int price, final boolean targetAll, final int percentage, final int amount) {
     super(ItemIcon.RED_POTION, price);
     this.targetAll = targetAll;
     this.percentage = percentage;
+    this.amount = amount;
   }
 
   @Override
@@ -32,7 +34,10 @@ public class RecoverSpItem extends Item {
   @Method(0x80022d88L)
   public void useInMenu(final UseItemResponse response, final int charId) {
     final int amount;
-    if(this.percentage == 100) {
+
+    if(this.amount > 0) {
+      amount = this.amount;
+    } else if(this.percentage == 100) {
       amount = -1;
     } else {
       amount = this.percentage;

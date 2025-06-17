@@ -2,10 +2,10 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.memory.Method;
-import legend.game.combat.ui.FooterActions;
-import legend.game.combat.ui.FooterActionsHud;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.Item;
 import legend.game.inventory.UseItemResponse;
@@ -24,6 +24,7 @@ import static legend.game.SItem.glyph_801142d4;
 import static legend.game.SItem.initGlyph;
 import static legend.game.SItem.loadCharacterStats;
 import static legend.game.SItem.menuStack;
+import static legend.game.SItem.renderCharacter;
 import static legend.game.SItem.renderCharacterStatusEffect;
 import static legend.game.SItem.renderFourDigitHp;
 import static legend.game.SItem.renderFourDigitNumber;
@@ -37,6 +38,7 @@ import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryItems;
 import static legend.game.Scus94491BpeSegment_8002.menuItemIconComparator;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.takeItemId;
 import static legend.game.Scus94491BpeSegment_8002.unloadRenderable;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
@@ -89,6 +91,8 @@ public class UseItemScreen extends MenuScreen {
   private final Renderable58[] _8011d718 = new Renderable58[7];
 
   private final MenuEntries<Item> menuItems = new MenuEntries<>();
+
+  private final FontOptions statTextFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).size(0.80f).trim(1).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN);
 
   public UseItemScreen(final Runnable unload) {
     this.unload = unload;
@@ -210,8 +214,16 @@ public class UseItemScreen extends MenuScreen {
         renderFourDigitNumber(x + 25, y + 68, stats.maxHp_66);
         renderFourDigitNumber(x + 25, y + 79, stats.mp_06);
         renderFourDigitNumber(x + 25, y + 90, stats.maxMp_6e);
+
+        if(stats.dlevel_0f > 0) {
+          renderFourDigitNumber(x + 9, y - 3, stats.sp_08 / 10);
+          renderCharacter(x + 32, y - 3, 11);
+          renderFourDigitNumber(x + 25, y - 3, stats.dlevel_0f * 10);
+        }
       }
     }
+
+    renderText("SP", x - 3, y - 3, this.statTextFont);
   }
 
   private int getUsableItemsInMenu() {

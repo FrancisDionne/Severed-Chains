@@ -4,14 +4,31 @@ import legend.game.combat.bent.BattleEntity27c;
 import legend.game.inventory.ItemIcon;
 import legend.game.scripting.ScriptState;
 
-public class SpiritPotionItem extends RecoverHpItem {
+import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
+import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
+import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
+
+public class SpiritPotionItem extends RecoverSpItem {
   public SpiritPotionItem() {
-    super(ItemIcon.RED_POTION, 10, false, 100);
+    super(10, false, 0, 100);
   }
 
   @Override
   public boolean canBeUsed(final UsageLocation location) {
-    return location == UsageLocation.BATTLE;
+    return location == UsageLocation.BATTLE || location == UsageLocation.MENU;
+  }
+
+  @Override
+  public boolean canBeUsedNow(final UsageLocation location) {
+    boolean canRecover = false;
+    for(int i = 0; i < characterIndices_800bdbb8.length; i++) {
+      if((gameState_800babc8.charData_32c[i].partyFlags_04 & 0x3) != 0 && stats_800be5f8[i].dlevel_0f * 100 > stats_800be5f8[i].sp_08) {
+        canRecover = true;
+        break;
+      }
+    }
+
+    return canRecover;
   }
 
   @Override
