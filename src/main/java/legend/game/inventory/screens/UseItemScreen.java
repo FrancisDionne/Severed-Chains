@@ -195,6 +195,8 @@ public class UseItemScreen extends MenuScreen {
     if(charIndex != -1) {
       renderCharacterStatusEffect(x - 4, y - 6, charIndex);
 
+      final ActiveStatsa0 stats = stats_800be5f8[charIndex];
+
       if(allocate) {
         allocateUiElement(112, 112, x, y).z_3c = 33;
 
@@ -209,7 +211,7 @@ public class UseItemScreen extends MenuScreen {
         }
 
         //LAB_80108544
-        final ActiveStatsa0 stats = stats_800be5f8[charIndex];
+
         renderFourDigitHp(x + 25, y + 57, stats.hp_04, stats.maxHp_66);
         renderFourDigitNumber(x + 25, y + 68, stats.maxHp_66);
         renderFourDigitNumber(x + 25, y + 79, stats.mp_06);
@@ -221,9 +223,11 @@ public class UseItemScreen extends MenuScreen {
           renderFourDigitNumber(x + 25, y - 3, stats.dlevel_0f * 10);
         }
       }
-    }
 
-    renderText("SP", x - 3, y - 3, this.statTextFont);
+      if(stats.dlevel_0f > 0) {
+        renderText("SP", x - 3, y - 3, this.statTextFont);
+      }
+    }
   }
 
   private int getUsableItemsInMenu() {
