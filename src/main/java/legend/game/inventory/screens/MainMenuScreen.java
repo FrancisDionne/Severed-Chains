@@ -13,6 +13,7 @@ import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
+import legend.game.statistics.Statistics;
 import legend.game.types.MessageBoxResult;
 import legend.game.types.Translucency;
 import org.joml.Matrix4f;
@@ -377,6 +378,7 @@ public class MainMenuScreen extends MenuScreen {
       }
 
       currentEngineState_8004dd04.loadGameFromMenu(gameState_800babc8);
+      Statistics.load(gameState_800babc8.campaign.path, save.fileName);
     }, () -> {
       menuStack.popScreen();
       this.fadeOutArrows();

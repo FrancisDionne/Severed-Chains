@@ -121,6 +121,7 @@ import legend.game.scripting.ScriptedObject;
 import legend.game.sound.QueuedSound28;
 import legend.game.sound.SoundFile;
 import legend.game.sound.SpuStruct08;
+import legend.game.statistics.Statistics;
 import legend.game.tim.Tim;
 import legend.game.tmd.Renderer;
 import legend.game.tmd.UvAdjustmentMetrics14;
@@ -8093,6 +8094,8 @@ public class Battle extends EngineState {
     final boolean isDragoon = attacker instanceof final PlayerBattleEntity player && player.isDragoon();
     this.trySetPreferredCameraAngle(false, !isDragoon);
 
+    Statistics.appendStat(attacker, Statistics.Stats.TOTAL_PHYSICAL_DAMAGE, damage);
+
     return FlowControl.CONTINUE;
   }
 
@@ -8132,6 +8135,8 @@ public class Battle extends EngineState {
 
     this.trySetPreferredCameraAngle(false, false);
 
+    Statistics.appendStat(attacker, Statistics.Stats.TOTAL_MAGICAL_DAMAGE, damage);
+
     return FlowControl.CONTINUE;
   }
 
@@ -8168,6 +8173,8 @@ public class Battle extends EngineState {
     this.applyItemSpecialEffects(attacker, defender);
 
     this.trySetPreferredCameraAngle(false, true);
+
+    Statistics.appendStat(attacker, Statistics.Stats.TOTAL_MAGICAL_DAMAGE, damage);
 
     return FlowControl.CONTINUE;
   }

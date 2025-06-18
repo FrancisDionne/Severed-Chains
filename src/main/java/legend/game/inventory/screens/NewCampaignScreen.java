@@ -14,6 +14,7 @@ import legend.game.modding.events.gamestate.NewGameEvent;
 import legend.game.saves.Campaign;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
+import legend.game.statistics.Statistics;
 import legend.game.types.GameState52c;
 
 import java.nio.file.Path;
@@ -112,6 +113,8 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
 
       this.state.campaign.loadConfigInto(CONFIG);
       CONFIG.setConfig(CoreMod.ENABLED_MODS_CONFIG.get(), this.enabledMods.toArray(String[]::new));
+
+      Statistics.load(null, null);
 
       loadingNewGameState_800bdc34 = true;
       playMenuSound(2);

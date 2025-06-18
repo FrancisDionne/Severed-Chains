@@ -14,6 +14,7 @@ import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.saves.Campaign;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
+import legend.game.statistics.Statistics;
 import legend.game.types.MessageBoxResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -124,6 +125,8 @@ public class CampaignSelectionScreen extends MenuScreen {
       if(gameState_800babc8.submapCut_a8 == 264) { // Somewhere in Home of Giganto
         submapScene_80052c34 = 53;
       }
+
+      Statistics.load(gameState_800babc8.campaign.path, save.fileName);
     }, () -> {
       menuStack.popScreen();
       startFadeEffect(2, 10);

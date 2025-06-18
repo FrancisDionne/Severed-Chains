@@ -6,6 +6,7 @@ import legend.core.IoHelper;
 import legend.core.memory.types.IntRef;
 import legend.game.EngineStateEnum;
 import legend.game.inventory.WhichMenu;
+import legend.game.statistics.Statistics;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.GameState52c;
 import legend.game.unpacker.ExpandableFileData;
@@ -336,6 +337,8 @@ public final class SaveManager {
 
       Files.createDirectories(state.campaign.path);
       Files.write(file, data.slice(0, offset.get()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+      Statistics.save(gameState_800babc8.campaign.path, fileName);
+
       return file;
     } catch(final IOException e) {
       throw new SaveFailedException("Failed to save game", e);

@@ -2,6 +2,7 @@ package legend.game.saves;
 
 import legend.core.IoHelper;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.statistics.Statistics;
 import legend.game.unpacker.FileData;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -72,6 +73,7 @@ public final class Campaign {
 
   public void deleteSave(final String saveName) throws IOException {
     Files.delete(this.path.resolve(saveName + ".dsav"));
+    Statistics.delete(this.path, saveName);
   }
 
   public void delete() throws IOException {
