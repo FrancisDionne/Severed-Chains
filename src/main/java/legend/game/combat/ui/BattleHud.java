@@ -1115,10 +1115,8 @@ public class BattleHud {
       } else {
         //LAB_800f37f4
         digit.obj = this.type3FloatingDigits[damageDigits[digitIdx]];
-        displayPosX += 8;
+        displayPosX += Math.round(8 * num.scale);
       }
-
-      displayPosX = Math.round(displayPosX * num.scale);
 
       //LAB_800f3898
       digit.digit_0c = damageDigits[digitIdx];
