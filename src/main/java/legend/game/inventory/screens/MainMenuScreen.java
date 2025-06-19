@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.platform.input.InputAction;
 import legend.game.EngineStateEnum;
+import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
@@ -63,9 +64,11 @@ import static legend.game.Scus94491BpeSegment_800b.submapId_800bd808;
 import static legend.game.Scus94491BpeSegment_800b.textZ_800bdf00;
 import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class MainMenuScreen extends MenuScreen {
@@ -260,7 +263,7 @@ public class MainMenuScreen extends MenuScreen {
       }
     }
 
-    FooterActionsHud.renderMenuActions();
+    FooterActionsHud.renderMenuActions(FooterActions.STATS, null, null);
   }
 
   private void renderInventoryMenu(final long a2) {
@@ -338,6 +341,10 @@ public class MainMenuScreen extends MenuScreen {
 
   private void showAdditionsScreen() {
     this.showScreen(AdditionsScreen::new);
+  }
+
+  private void showStatisticsScreen() {
+    this.showScreen(StatisticsScreen::new);
   }
 
   private void showCharSwapScreen() {
@@ -431,6 +438,11 @@ public class MainMenuScreen extends MenuScreen {
     if(this.loadingStage == 2) {
       if(action == INPUT_ACTION_MENU_BACK.get() && !repeat) {
         this.menuEscape();
+        return InputPropagation.HANDLED;
+      }
+
+      if(action == INPUT_ACTION_MENU_DELETE.get() && !repeat) {
+        this.showStatisticsScreen();
         return InputPropagation.HANDLED;
       }
     }

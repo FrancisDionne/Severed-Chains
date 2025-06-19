@@ -1,15 +1,13 @@
 package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
-import legend.game.combat.ui.FooterActionsHud;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.types.MenuAdditionInfo;
 import legend.game.types.Renderable58;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import static legend.core.GameEngine.PLATFORM;
@@ -23,7 +21,6 @@ import static legend.game.SItem.additions_8011a064;
 import static legend.game.SItem.allocateUiElement;
 import static legend.game.SItem.characterCount_8011d7c4;
 import static legend.game.SItem.loadAdditions;
-import static legend.game.SItem.menuStack;
 import static legend.game.SItem.renderCharacter;
 import static legend.game.SItem.renderCharacterSlot;
 import static legend.game.SItem.renderGlyphs;

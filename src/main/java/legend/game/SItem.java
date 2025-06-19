@@ -652,12 +652,17 @@ public final class SItem {
 
   @Method(0x801034ccL)
   public static void FUN_801034cc(final int charSlot, final int charCount) {
+    FUN_801034cc(charSlot, charCount, 0);
+  }
+
+  @Method(0x801034ccL)
+  public static void FUN_801034cc(final int charSlot, final int charCount, final int yOffset) {
     setRandomRepeatGlyph(renderablePtr_800bdba4, 0x2d, 0x34, 0xaa, 0xb1);
     setRandomRepeatGlyph(renderablePtr_800bdba8, 0x25, 0x2c, 0xa2, 0xa9);
 
     if(charSlot != 0) {
       if(renderablePtr_800bdba4 == null) {
-        final Renderable58 renderable = allocateUiElement(0x6f, 0x6c, 18, 16);
+        final Renderable58 renderable = allocateUiElement(0x6f, 0x6c, 18, 16 + yOffset);
         renderable.repeatStartGlyph_18 = 0x2d;
         renderable.repeatEndGlyph_1c = 0x34;
         renderablePtr_800bdba4 = renderable;
@@ -674,7 +679,7 @@ public final class SItem {
     //LAB_80103598
     if(charSlot < charCount - 1) {
       if(renderablePtr_800bdba8 == null) {
-        final Renderable58 renderable = allocateUiElement(0x6f, 0x6c, 350, 16);
+        final Renderable58 renderable = allocateUiElement(0x6f, 0x6c, 350, 16 + yOffset);
         renderable.repeatStartGlyph_18 = 0x25;
         renderable.repeatEndGlyph_1c = 0x2c;
         renderablePtr_800bdba8 = renderable;

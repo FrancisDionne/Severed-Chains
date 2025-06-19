@@ -35,9 +35,9 @@ public final class Statistics {
   //x8 Kongol
   //x9 Miranda
   public enum Stats {
-    TOTAL_DAMAGE(0),
-    TOTAL_PHYSICAL_DAMAGE(-10),
-    TOTAL_MAGICAL_DAMAGE(-20),
+    TOTAL_DAMAGE(0, "Damage"),
+    TOTAL_PHYSICAL_DAMAGE(-10, "Physical Damage"),
+    TOTAL_MAGICAL_DAMAGE(-20, "Magical Damage"),
 
     DART_PHYSICAL_DAMAGE(11),
     LAVITZ_PHYSICAL_DAMAGE(12),
@@ -60,9 +60,22 @@ public final class Statistics {
     MIRANDA_MAGICAL_DAMAGE(29);
 
     private final int stat;
+    private final String name;
+
+    Stats(final int stat, final String name) {
+      this.stat = stat;
+      this.name = name;
+    }
+
     Stats(final int stat) {
       this.stat = stat;
+      this.name = null;
     }
+
+    public String getName() {
+      return this.name;
+    }
+
     public int asInt() {
       return this.stat;
     }
@@ -86,7 +99,7 @@ public final class Statistics {
       final File myObj = new File(fileName);
       myObj.createNewFile();
       final FileWriter myWriter = new FileWriter(fileName);
-      myWriter.write(getStats());
+      myWriter.write(getStatsString());
       myWriter.close();
     } catch(final IOException ex) {
       LOGGER.error(ex);
@@ -120,7 +133,7 @@ public final class Statistics {
     }
   }
 
-  private static String getStats() {
+  private static String getStatsString() {
     final StringBuilder text = new StringBuilder();
     for (final Stats stat : Stats.values()) {
       final int i = stat.asInt();
@@ -147,18 +160,18 @@ public final class Statistics {
   }
 
   public static float getStat(final Stats stat) {
+    return getStat(stat, 0);
+  }
+
+  public static float getStat(final Stats stat, final int offset) {
     float value = 0f;
     switch(stat) {
       case Stats.TOTAL_DAMAGE:
-        value += getStat(Stats.TOTAL_PHYSICAL_DAMAGE);
-        value += getStat(Stats.TOTAL_MAGICAL_DAMAGE);
-        break;
-      case Stats.TOTAL_PHYSICAL_DAMAGE:
-      case Stats.TOTAL_MAGICAL_DAMAGE:
-        value += getSumForCharacterStats(stat);
+        value += getStat(Stats.TOTAL_PHYSICAL_DAMAGE, Math.abs(Stats.TOTAL_PHYSICAL_DAMAGE.asInt() * 2) + offset);
+        value += getStat(Stats.TOTAL_MAGICAL_DAMAGE, Math.abs(Stats.TOTAL_MAGICAL_DAMAGE.asInt() * 2) + offset);
         break;
       default:
-        final int i = stat.asInt();
+        final int i = stat.asInt() + offset;
         if(statistics.containsKey(i)) {
           value = statistics.get(i);
         }
@@ -177,5 +190,25 @@ public final class Statistics {
       value += getStat(Stats.asStat(i));
     }
     return value;
+  }
+
+  public static float[] getStats(final Stats stat) {
+    final float[] stats;
+    final int statIndex = Math.abs(stat.asInt());
+    if (statIndex > 0) {
+      stats = new float[9];
+      for(int i = 0; i < stats.length; i++) {
+        stats[i] = getStat(Stats.asStat(statIndex + i + 1));
+      }
+    } else if(statIndex == 0) {
+      stats = new float[9];
+      for(int i = 0; i < stats.length; i++) {
+        stats[i] = getStat(Stats.asStat(statIndex), i + 1);
+      }
+    } else {
+      stats = new float[1];
+      stats[0] = getStat(stat);
+    }
+    return stats;
   }
 }

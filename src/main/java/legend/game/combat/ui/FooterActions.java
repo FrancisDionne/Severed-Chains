@@ -9,5 +9,6 @@ public enum FooterActions {
   BACK,
   ADDITIONS,
   HELP,
-  MODS
+  MODS,
+  STATS
 }
