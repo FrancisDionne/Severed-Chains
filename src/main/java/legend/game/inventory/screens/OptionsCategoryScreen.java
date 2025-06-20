@@ -26,11 +26,9 @@ public class OptionsCategoryScreen extends VerticalLayoutScreen {
 
   public OptionsCategoryScreen(final ConfigCollection config, final Set<ConfigStorageLocation> validLocations, final Runnable unload) {
     deallocateRenderables(0xff);
-    startFadeEffect(2, 10);
 
     this.unload = unload;
-
-    this.addControl(new Background());
+    this.init();
 
     for(final ConfigCategory category : ConfigCategory.values()) {
       if (category == ConfigCategory.ADDITIONS) {
@@ -48,10 +46,7 @@ public class OptionsCategoryScreen extends VerticalLayoutScreen {
 
       if(count != 0) {
         final Button button = new Button(I18n.translate(CoreMod.MOD_ID + ".config.category.configure"));
-        button.onPressed(() -> button.getScreen().getStack().pushScreen(new OptionsScreen(config, validLocations, category, () -> {
-          startFadeEffect(2, 10);
-          SItem.menuStack.popScreen();
-        })));
+        button.onPressed(() -> button.getScreen().getStack().pushScreen(this.createOptionsScreen(config, validLocations, category)));
 
         this.addRow(I18n.translate(CoreMod.MOD_ID + ".config.category." + category.name().toLowerCase(Locale.US) + ".label"), button);
       }
@@ -59,6 +54,18 @@ public class OptionsCategoryScreen extends VerticalLayoutScreen {
 
     FooterActionsHud.setMenuActions(null, null, null);
     this.addHotkey(I18n.translate("lod_core.ui.options_category.back"), INPUT_ACTION_MENU_BACK, this::back);
+  }
+
+  protected void init() {
+    startFadeEffect(2, 10);
+    this.addControl(new Background());
+  }
+
+  protected MenuScreen createOptionsScreen(final ConfigCollection config, final Set<ConfigStorageLocation> validLocations, final ConfigCategory category) {
+    return new OptionsScreen(config, validLocations, category, () -> {
+      startFadeEffect(2, 10);
+      SItem.menuStack.popScreen();
+    });
   }
 
   private void back() {

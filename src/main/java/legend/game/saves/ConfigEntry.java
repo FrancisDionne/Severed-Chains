@@ -62,6 +62,13 @@ public class ConfigEntry<T> extends RegistryEntry {
     return text != null && !text.isEmpty() && !key.equals(text);
   }
 
+  /**
+   * Whether this config entry will appear in the battle options menu
+   */
+  public boolean availableInBattle() {
+    return true;
+  }
+
   public void onChange(final ConfigCollection configCollection, final T oldValue, final T newValue) {
 
   }
