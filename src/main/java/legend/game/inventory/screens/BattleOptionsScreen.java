@@ -5,11 +5,9 @@ import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputButton;
 import legend.core.platform.input.InputKey;
 import legend.core.platform.input.InputMod;
-import legend.game.combat.ui.FooterActions;
-import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
-import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Label;
+import legend.game.inventory.screens.controls.Panel;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigCollection;
 import legend.game.saves.ConfigEntry;
@@ -19,69 +17,69 @@ import org.apache.logging.log4j.Logger;
 import org.legendofdragoon.modloader.registries.RegistryId;
 
 import javax.annotation.Nullable;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HELP;
 
-public class OptionsScreen extends VerticalLayoutScreen {
-  private static final Logger LOGGER = LogManager.getFormatterLogger(OptionsScreen.class);
+public class BattleOptionsScreen extends VerticalLayoutScreen {
+  private static final Logger LOGGER = LogManager.getFormatterLogger(BattleOptionsScreen.class);
   private final Runnable unload;
+
+  private final Panel panel;
 
   private final Map<Control, Label> helpLabels = new HashMap<>();
   private final Map<Control, ConfigEntry<?>> helpEntries = new HashMap<>();
 
-  public OptionsScreen(final ConfigCollection config, final Set<ConfigStorageLocation> validLocations, final ConfigCategory category, final Runnable unload) {
+  public BattleOptionsScreen(final ConfigCollection config, final Set<ConfigStorageLocation> validLocations, final ConfigCategory category, final Runnable unload) {
     deallocateRenderables(0xff);
 
     this.unload = unload;
-    this.init();
 
-    final Map<ConfigEntry<?>, SettingEntry> translations = new HashMap<>();
+    this.panel = this.addControl(Panel.panel());
+    this.panel.setPos(12, 20);
+    this.panel.setSize(296, 140);
+
+    final Map<ConfigEntry<?>, String> translations = new HashMap<>();
 
     for(final RegistryId configId : GameEngine.REGISTRIES.config) {
       final ConfigEntry<?> entry = GameEngine.REGISTRIES.config.getEntry(configId).get();
+
       if(entry.category == category) {
-        translations.put(entry, new SettingEntry(I18n.translate(entry.getLabelTranslationKey()), entry.order));
+        translations.put(entry, I18n.translate(entry.getLabelTranslationKey()));
       }
     }
 
     translations.entrySet().stream()
-      .sorted((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getValue().label, o2.getValue().label))
-      .sorted(Comparator.comparingDouble(o -> o.getValue().order))
+      .sorted((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getValue(), o2.getValue()))
       .forEach(entry -> {
         //noinspection rawtypes
         final ConfigEntry configEntry = entry.getKey();
-        final String text = entry.getValue().label;
+        final String text = entry.getValue();
 
-        if(validLocations.contains(configEntry.storageLocation) && (configEntry.hasEditControl()|| configEntry.header) && (!this.hideNonBattleEntries() || configEntry.availableInBattle())) {
-          Control editControl = null;
+        if(validLocations.contains(configEntry.storageLocation) && configEntry.hasEditControl()) {
+          Control editControl;
           boolean error = false;
 
-          if(!configEntry.header) {
-            try {
-              //noinspection unchecked
-              editControl = configEntry.makeEditControl(config.getConfig(configEntry), config);
-            } catch(final Throwable ex) {
-              editControl = this.createErrorLabel("Error creating control", ex, false);
-              error = true;
-            }
-            editControl.setZ(35);
+          try {
+            //noinspection unchecked
+            editControl = configEntry.makeEditControl(config.getConfig(configEntry), config);
+          } catch(final Throwable ex) {
+            editControl = this.createErrorLabel("Error creating control", ex, false);
+            error = true;
           }
+
+          editControl.setZ(35);
 
           final Label label = this.addRow(text, editControl);
 
           if(error) {
             label.getFontOptions().colour(0.30f, 0.0f, 0.0f).shadowColour(TextColour.LIGHT_BROWN);
-          } else if (configEntry.header) {
-            label.getFontOptions().colour(TextColour.DARKER_GREY).shadowColour(TextColour.MIDDLE_BROWN);
           }
 
           if(configEntry.hasHelp()) {
@@ -95,18 +93,8 @@ public class OptionsScreen extends VerticalLayoutScreen {
         }
       });
 
-    FooterActionsHud.setMenuActions(FooterActions.HELP, null, null);
     this.addHotkey(I18n.translate("lod_core.ui.options.help"), INPUT_ACTION_MENU_HELP, this::help);
     this.addHotkey(I18n.translate("lod_core.ui.options.back"), INPUT_ACTION_MENU_BACK, this::back);
-  }
-
-  protected void init() {
-    startFadeEffect(2, 10);
-    this.addControl(new Background());
-  }
-
-  protected boolean hideNonBattleEntries() {
-    return false;
   }
 
   private Label createErrorLabel(final String log, final Throwable ex, final boolean setSize) {
@@ -265,5 +253,21 @@ public class OptionsScreen extends VerticalLayoutScreen {
       this.replaceControlWithErrorLabel("Error on mouseScrollHighRes", ex);
     }
     return InputPropagation.PROPAGATE;
+  }
+
+  @Override
+  public int getWidth() {
+    return 320;
+  }
+
+  @Override
+  protected int maxVisibleEntries() {
+    return (this.panel.getHeight() - 14) / 14;
+  }
+
+  @Override
+  protected void updateArrowPositions() {
+    this.upArrow.setPos((int)(this.getWidth() - 20 * this.getSizeScale()), this.panel.getY() + 6);
+    this.downArrow.setPos((int)(this.getWidth() - 20 * this.getSizeScale()), this.panel.getY() + this.panel.getHeight() - 24);
   }
 }
