@@ -9,6 +9,7 @@ import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.statistics.Statistics;
+import legend.game.types.Translucency;
 import org.joml.Matrix4f;
 
 import java.nio.file.Path;
@@ -35,9 +36,9 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 public class StatisticsScreen extends MenuScreen {
 
   private static class StatisticPage {
-    public List<Integer> stats;
+    public List<Statistics.Stats> stats;
     public String name;
-    public StatisticPage(final String name, final List<Integer> stats) {
+    public StatisticPage(final String name, final List<Statistics.Stats> stats) {
       this.name = name;
       this.stats = stats;
     }
@@ -73,11 +74,12 @@ public class StatisticsScreen extends MenuScreen {
   };
 
   private static final FontOptions labelFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).size(0.8f).horizontalAlign(HorizontalAlign.CENTRE);
-  private static final FontOptions statFont = new FontOptions().colour(TextColour.LIGHT_GREY_WHITE).shadowColour(TextColour.DARK_GREY).size(0.5f).horizontalAlign(HorizontalAlign.CENTRE);
+  private static final FontOptions statFont = new FontOptions().colour(TextColour.LIGHT_GREY_WHITE).shadowColour(TextColour.DARK_GREY).size(0.38f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions numberFont = new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions highNumberFont = new FontOptions().colour(TextColour.FOOTER_GREEN).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions lowNumberFont = new FontOptions().colour(TextColour.FOOTER_RED).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions totalFont = new FontOptions().colour(TextColour.FOOTER_YELLOW).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
+  private static final FontOptions notApplicableFont = new FontOptions().colour(TextColour.GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
 
   public StatisticsScreen(final Runnable unload) {
     this.unload = unload;
@@ -96,24 +98,34 @@ public class StatisticsScreen extends MenuScreen {
     this.statisticPages.put(this.statisticPages.size(), page);
   }
 
-  private ArrayList<Integer> getPage0() {
-    final ArrayList<Integer> l = new ArrayList<>();
-    l.add(Statistics.Stats.TOTAL_DAMAGE.asInt());
-    l.add(Statistics.Stats.TOTAL_PHYSICAL_DAMAGE.asInt());
-    l.add(Statistics.Stats.TOTAL_MAGICAL_DAMAGE.asInt());
+  private ArrayList<Statistics.Stats> getPage0() {
+    final ArrayList<Statistics.Stats> l = new ArrayList<>();
+    l.add(Statistics.Stats.TOTAL_DAMAGE);
+    l.add(Statistics.Stats.TOTAL_PHYSICAL_DAMAGE);
+    l.add(Statistics.Stats.TOTAL_MAGICAL_DAMAGE);
+    l.add(Statistics.Stats.TOTAL_TAKEN);
+    l.add(Statistics.Stats.TOTAL_PHYSICAL_TAKEN);
+    l.add(Statistics.Stats.TOTAL_MAGICAL_TAKEN);
+    l.add(Statistics.Stats.TOTAL_ATTACK);
+    l.add(Statistics.Stats.TOTAL_PHYSICAL_ATTACK);
+    l.add(Statistics.Stats.TOTAL_MAGICAL_ATTACK);
+    l.add(Statistics.Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK);
+    l.add(Statistics.Stats.TOTAL_DRAGOON_MAGICAL_ATTACK);
+    l.add(Statistics.Stats.TOTAL_EVADE);
     return l;
   }
 
-  private ArrayList<Integer> getPage1() {
-    final ArrayList<Integer> l = new ArrayList<>();
-    l.add(Statistics.Stats.TOTAL_DAMAGE.asInt());
-    l.add(Statistics.Stats.TOTAL_PHYSICAL_DAMAGE.asInt());
+  private ArrayList<Statistics.Stats> getPage1() {
+    final ArrayList<Statistics.Stats> l = new ArrayList<>();
+    l.add(Statistics.Stats.TOTAL_HP_RECOVER);
+    l.add(Statistics.Stats.TOTAL_MP_RECOVER);
+    l.add(Statistics.Stats.TOTAL_SP_RECOVER);
     return l;
   }
 
-  private ArrayList<Integer> getPage2() {
-    final ArrayList<Integer> l = new ArrayList<>();
-    l.add(Statistics.Stats.TOTAL_DAMAGE.asInt());
+  private ArrayList<Statistics.Stats> getPage2() {
+    final ArrayList<Statistics.Stats> l = new ArrayList<>();
+    l.add(Statistics.Stats.TOTAL_TAKEN);
     return l;
   }
 
@@ -156,20 +168,24 @@ public class StatisticsScreen extends MenuScreen {
   }
 
   private void renderStats() {
-    final List<Integer> pageStats = this.statisticPages.get(this.pageIndex).stats;
-
+    final List<Statistics.Stats> pageStats = this.statisticPages.get(this.pageIndex).stats;
     for(int i = 0; i < pageStats.size(); i++) {
-      final Statistics.Stats stat = Statistics.Stats.asStat(pageStats.get(i));
+      final Statistics.Stats stat = pageStats.get(i);
       final float[] stats = Statistics.getStats(stat);
       final float max = this.getStatHighscore(stats);
       //final float min = this.getStatLowscore(stats);
       int total = 0;
-      for(int j = 0; j < stats.length; j++) {
-        final int value = (int)stats[j];
-        total += value;
-        renderText(String.valueOf(value), 28 * j + 86f, 14.7f * i + 42.2f, value == (int)max ? highNumberFont : numberFont, 100);
+      for(int j = 0; j < 9; j++) {
+        if (j < stats.length) {
+          final int value = (int)stats[j];
+          total += value;
+          renderText(String.valueOf(value), 28 * j + 86f, 14.7f * i + 42.2f, value == (int)max && max > 0 ? highNumberFont : numberFont, 100);
+        } else {
+          renderText("-", 28 * j + 86f, 14.7f * i + 42.2f, notApplicableFont, 100);
+        }
       }
-      renderText(stat.getName(), 40.5f, 14.7f * i + 41, statFont, 100);
+      final String statName = stat.getName();
+      renderText(statName, 40.5f, 14.7f * i + 42.4f + (statName.contains("\n") ? -2.7f : 0), statFont, 100);
       renderText(String.valueOf(total), 28 * 9 + 89.5f, 14.7f * i + 42.2f, totalFont, 100);
     }
   }
@@ -217,13 +233,25 @@ public class StatisticsScreen extends MenuScreen {
       m.translation(x + xOffset, 15, 3);
       m.scale(22, 22, 120);
 
-      RENDERER
-        .queueOrthoModel(quad, m, QueuedModelStandard.class)
-        .texture(portrait);
+      if(isCharacterUnlocked(charIndex)) {
+        RENDERER
+          .queueOrthoModel(quad, m, QueuedModelStandard.class)
+          .texture(portrait);
+      } else {
+        RENDERER
+          .queueOrthoModel(quad, m, QueuedModelStandard.class)
+          .colour(0,0,0)
+          .translucency(Translucency.HALF_B_PLUS_HALF_F)
+          .texture(portrait);
+      }
     }
 
     renderText(this.statisticPages.get(this.pageIndex).name, 41, 26, labelFont, 100);
     renderText("Total", 341, 26, labelFont, 100);
+  }
+
+  private static boolean isCharacterUnlocked(final int charIndex) {
+    return true;
   }
 
   @Override

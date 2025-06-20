@@ -10,6 +10,7 @@ import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.events.inventory.RepeatItemReturnEvent;
 import legend.game.scripting.RunningScript;
+import legend.game.statistics.Statistics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +66,10 @@ public class ItemListMenu extends ListMenu {
 
     if(repeatItemReturnEvent.returnItem) {
       this.hud.battle.usedRepeatItems_800c6c3c.add(item);
+    }
+
+    if(this.player_08.item_d4.canTarget(Item.TargetType.ENEMIES)) {
+      Statistics.appendStat(this.player_08, Statistics.Stats.TOTAL_MAGICAL_ATTACK, 1);
     }
   }
 

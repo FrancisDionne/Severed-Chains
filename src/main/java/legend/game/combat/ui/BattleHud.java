@@ -1442,7 +1442,7 @@ public class BattleHud {
   }
 
   @Method(0x800f4268L)
-  public void addFloatingNumberForBent(@Nullable final BattleEntity27c attacker, final int bentIndex, final int damage, int colour) {
+  public void addFloatingNumberForBent(@Nullable final BattleEntity27c attacker, final int bentIndex, final int damage, final int colour) {
     final ScriptState<?> state = scriptStatePtrArr_800bc1c0[bentIndex];
     final BattleEntity27c bent = (BattleEntity27c)state.innerStruct_00;
 

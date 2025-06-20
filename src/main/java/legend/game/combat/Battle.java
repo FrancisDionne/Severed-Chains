@@ -3566,6 +3566,9 @@ public class Battle extends EngineState {
   @Method(0x800ccb3cL)
   public FlowControl scriptRenderDamage(final RunningScript<?> script) {
     this.hud.renderDamage(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[0].get(), script.params_20[1].get());
+    if (script.params_20[1].get() == -1) {
+      Statistics.appendStat((BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00, Statistics.Stats.TOTAL_EVADE, 1);
+    }
     return FlowControl.CONTINUE;
   }
 
@@ -8095,6 +8098,7 @@ public class Battle extends EngineState {
     this.trySetPreferredCameraAngle(false, !isDragoon);
 
     Statistics.appendStat(attacker, Statistics.Stats.TOTAL_PHYSICAL_DAMAGE, damage);
+    Statistics.appendStat(defender, Statistics.Stats.TOTAL_PHYSICAL_TAKEN, damage);
 
     return FlowControl.CONTINUE;
   }
@@ -8136,6 +8140,7 @@ public class Battle extends EngineState {
     this.trySetPreferredCameraAngle(false, false);
 
     Statistics.appendStat(attacker, Statistics.Stats.TOTAL_MAGICAL_DAMAGE, damage);
+    Statistics.appendStat(defender, Statistics.Stats.TOTAL_MAGICAL_TAKEN, damage);
 
     return FlowControl.CONTINUE;
   }
@@ -8175,6 +8180,7 @@ public class Battle extends EngineState {
     this.trySetPreferredCameraAngle(false, true);
 
     Statistics.appendStat(attacker, Statistics.Stats.TOTAL_MAGICAL_DAMAGE, damage);
+    Statistics.appendStat(defender, Statistics.Stats.TOTAL_MAGICAL_TAKEN, damage);
 
     return FlowControl.CONTINUE;
   }
@@ -8258,15 +8264,18 @@ public class Battle extends EngineState {
       return FlowControl.PAUSE_AND_REWIND;
     }
 
-    //Addition Frenzy Mode - Changes addition to a random one every time the player attacks
-    if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 instanceof final PlayerBattleEntity player && !player.isDragoon() && CONFIG.getConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get())) {
-      final int additionIndex = new Random().nextInt(AdditionListMenu.getAdditions(player.charId_272).size());
-      AdditionListMenu.setAddition(player, additionIndex, this.hud);
-    }
-
     if(ret == 1) { // Pressed X
       //LAB_800f4930
       ret = menu.target_48;
+
+      if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 instanceof final PlayerBattleEntity player) {
+        //Addition Frenzy Mode - Changes addition to a random one every time the player attacks
+        if(!player.isDragoon() && CONFIG.getConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get())) {
+          final int additionIndex = new Random().nextInt(AdditionListMenu.getAdditions(player.charId_272).size());
+          AdditionListMenu.setAddition(player, additionIndex, this.hud);
+        }
+        Statistics.appendStat(player, player.isDragoon() ? Statistics.Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK : Statistics.Stats.TOTAL_PHYSICAL_ATTACK, 1);
+      }
     } else { // Pressed O
       //LAB_800f4944
       //LAB_800f4948
@@ -8571,6 +8580,7 @@ public class Battle extends EngineState {
   @Method(0x800f984cL)
   public FlowControl scriptRenderRecover(final RunningScript<?> script) {
     this.hud.addFloatingNumberForBent(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[0].get(), script.params_20[1].get(), script.params_20[2].get());
+    Statistics.appendRecoverStat(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[1].get(), script.params_20[2].get());
     return FlowControl.CONTINUE;
   }
 

@@ -9,6 +9,7 @@ import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.events.battle.SpellStatsEvent;
 import legend.game.scripting.RunningScript;
+import legend.game.statistics.Statistics;
 import legend.game.types.SpellStats0c;
 import legend.lodmod.LodMod;
 
@@ -117,6 +118,7 @@ public class SpellListMenu extends ListMenu {
   protected void onUse(final int index) {
     final VitalsStat mp = this.player_08.stats.getStat(LodMod.MP_STAT.get());
     mp.setCurrent(mp.getCurrent() - this.player_08.spell_94.mp_06);
+    Statistics.appendStat(this.player_08, Statistics.Stats.TOTAL_DRAGOON_MAGICAL_ATTACK, 1);
   }
 
   @Override
