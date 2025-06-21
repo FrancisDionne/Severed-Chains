@@ -51,6 +51,27 @@ public final class Statistics {
     TOTAL_MAGICAL_ATTACK(-100, "Magical Attack"),
     TOTAL_DRAGOON_PHYSICAL_ATTACK(-110, "D-Physical Attack"),
     TOTAL_DRAGOON_MAGICAL_ATTACK(-120, "D-Magical Attack"),
+    TOTAL_GUARD(-130, "Guard"),
+    TOTAL_DEATH(-140, "Death"),
+    TOTAL_ADDITION(-150, "Addition Attempt"),
+    TOTAL_ADDITION_COMPLETE(-160, "Addition Complete", "%"),
+    TOTAL_ADDITION_FLAWLESS(-170, "Addition Flawless", "%"),
+    TOTAL_ADDITION_HIT(-180, "Addition Hits"),
+    TOTAL_ADDITION_COUNTER(-190, "Counter"),
+    TOTAL_ADDITION_COUNTER_BLOCK(-200, "Counter Block", "%"),
+    TOTAL_DRAGOON_ADDITION(-210, "D-Addition Attempt"),
+    TOTAL_DRAGOON_ADDITION_COMPLETED(-220, "D-Addition Complete", "%"),
+    TOTAL_DRAGOON_ADDITION_HIT(-230, "D-Addition Hits"),
+
+    DART_UNLOCKED(1, true),
+    LAVITZ_UNLOCKED(2, true),
+    SHANA_UNLOCKED(3, true),
+    ROSE_UNLOCKED(4, true),
+    HASCHEL_UNLOCKED(5, true),
+    ALBERT_UNLOCKED(6, true),
+    MERU_UNLOCKED(7, true),
+    KONGOL_UNLOCKED(8, true),
+    MIRANDA_UNLOCKED(9, true),
 
     DART_PHYSICAL_DAMAGE(11),
     LAVITZ_PHYSICAL_DAMAGE(12),
@@ -172,19 +193,148 @@ public final class Statistics {
     KONGOL_DRAGOON_MAGICAL_ATTACK(128),
     MIRANDA_DRAGOON_MAGICAL_ATTACK(129),
 
+    DART_GUARD(131),
+    LAVITZ_GUARD(132),
+    SHANA_GUARD(133),
+    ROSE_GUARD(134),
+    HASCHEL_GUARD(135),
+    ALBERT_GUARD(136),
+    MERU_GUARD(137),
+    KONGOL_GUARD(138),
+    MIRANDA_GUARD(139),
+
+    DART_DEATH(141),
+    LAVITZ_DEATH(142),
+    SHANA_DEATH(143),
+    ROSE_DEATH(144),
+    HASCHEL_DEATH(145),
+    ALBERT_DEATH(146),
+    MERU_DEATH(147),
+    KONGOL_DEATH(148),
+    MIRANDA_DEATH(149),
+
+    DART_ADDITION(151),
+    LAVITZ_ADDITION(152),
+    SHANA_ADDITION(153),
+    ROSE_ADDITION(154),
+    HASCHEL_ADDITION(155),
+    ALBERT_ADDITION(156),
+    MERU_ADDITION(157),
+    KONGOL_ADDITION(158),
+    MIRANDA_ADDITION(159),
+
+    DART_ADDITION_COMPLETE(161),
+    LAVITZ_ADDITION_COMPLETE(162),
+    SHANA_ADDITION_COMPLETE(163),
+    ROSE_ADDITION_COMPLETE(164),
+    HASCHEL_ADDITION_COMPLETE(165),
+    ALBERT_ADDITION_COMPLETE(166),
+    MERU_ADDITION_COMPLETE(167),
+    KONGOL_ADDITION_COMPLETE(168),
+    MIRANDA_ADDITION_COMPLETE(169),
+
+    DART_ADDITION_FLAWLESS(171),
+    LAVITZ_ADDITION_FLAWLESS(172),
+    SHANA_ADDITION_FLAWLESS(173),
+    ROSE_ADDITION_FLAWLESS(174),
+    HASCHEL_ADDITION_FLAWLESS(175),
+    ALBERT_ADDITION_FLAWLESS(176),
+    MERU_ADDITION_FLAWLESS(177),
+    KONGOL_ADDITION_FLAWLESS(178),
+    MIRANDA_ADDITION_FLAWLESS(179),
+
+    DART_ADDITION_HIT(181),
+    LAVITZ_ADDITION_HIT(182),
+    SHANA_ADDITION_HIT(183),
+    ROSE_ADDITION_HIT(184),
+    HASCHEL_ADDITION_HIT(185),
+    ALBERT_ADDITION_HIT(186),
+    MERU_ADDITION_HIT(187),
+    KONGOL_ADDITION_HIT(188),
+    MIRANDA_ADDITION_HIT(189),
+
+    DART_ADDITION_COUNTER(191),
+    LAVITZ_ADDITION_COUNTER(192),
+    SHANA_ADDITION_COUNTER(193),
+    ROSE_ADDITION_COUNTER(194),
+    HASCHEL_ADDITION_COUNTER(195),
+    ALBERT_ADDITION_COUNTER(196),
+    MERU_ADDITION_COUNTER(197),
+    KONGOL_ADDITION_COUNTER(198),
+    MIRANDA_ADDITION_COUNTER(199),
+
+    DART_ADDITION_COUNTER_BLOCK(201),
+    LAVITZ_ADDITION_COUNTER_BLOCK(202),
+    SHANA_ADDITION_COUNTER_BLOCK(203),
+    ROSE_ADDITION_COUNTER_BLOCK(204),
+    HASCHEL_ADDITION_COUNTER_BLOCK(205),
+    ALBERT_ADDITION_COUNTER_BLOCK(206),
+    MERU_ADDITION_COUNTER_BLOCK(207),
+    KONGOL_ADDITION_COUNTER_BLOCK(208),
+    MIRANDA_ADDITION_COUNTER_BLOCK(209),
+
+    DART_DRAGOON_ADDITION(211),
+    LAVITZ_DRAGOON_ADDITION(212),
+    SHANA_DRAGOON_ADDITION(213),
+    ROSE_DRAGOON_ADDITION(214),
+    HASCHEL_DRAGOON_ADDITION(215),
+    ALBERT_DRAGOON_ADDITION(216),
+    MERU_DRAGOON_ADDITION(217),
+    KONGOL_DRAGOON_ADDITION(218),
+    MIRANDA_DRAGOON_ADDITION(219),
+
+    DART_DRAGOON_ADDITION_COMPLETE(221),
+    LAVITZ_DRAGOON_ADDITION_COMPLETE(222),
+    SHANA_DRAGOON_ADDITION_COMPLETE(223),
+    ROSE_DRAGOON_ADDITION_COMPLETE(224),
+    HASCHEL_DRAGOON_ADDITION_COMPLETE(225),
+    ALBERT_DRAGOON_ADDITION_COMPLETE(226),
+    MERU_DRAGOON_ADDITION_COMPLETE(227),
+    KONGOL_DRAGOON_ADDITION_COMPLETE(228),
+    MIRANDA_DRAGOON_ADDITION_COMPLETE(229),
+
+    DART_DRAGOON_ADDITION_HIT(231),
+    LAVITZ_DRAGOON_ADDITION_HIT(232),
+    SHANA_DRAGOON_ADDITION_HIT(233),
+    ROSE_DRAGOON_ADDITION_HIT(234),
+    HASCHEL_DRAGOON_ADDITION_HIT(235),
+    ALBERT_DRAGOON_ADDITION_HIT(236),
+    MERU_DRAGOON_ADDITION_HIT(237),
+    KONGOL_DRAGOON_ADDITION_HIT(238),
+    MIRANDA_DRAGOON_ADDITION_HIT(239),
+
     ;
 
     private final int stat;
     private final String name;
-
-    Stats(final int stat, final String name) {
-      this.stat = stat;
-      this.name = name;
-    }
+    private final boolean isBool;
+    private final String type;
 
     Stats(final int stat) {
+      this(stat, null);
+    }
+
+    Stats(final int stat, final boolean isBool) {
+      this(stat, null, isBool);
+    }
+
+    Stats(final int stat, final String name) {
+      this(stat, name, false);
+    }
+
+    Stats(final int stat, final String name, final String type) {
+      this(stat, name, false, type);
+    }
+
+    Stats(final int stat, final String name, final boolean isBool) {
+      this(stat, name, isBool, null);
+    }
+
+    Stats(final int stat, final String name, final boolean isBool, final String type) {
       this.stat = stat;
-      this.name = null;
+      this.name = name;
+      this.isBool = isBool;
+      this.type = type;
     }
 
     public String getName() {
@@ -193,6 +343,14 @@ public final class Statistics {
 
     public int asInt() {
       return this.stat;
+    }
+
+    public boolean isBool() {
+      return this.isBool;
+    }
+
+    public String type() {
+      return this.type;
     }
 
     public static Stats asStat(final int value) {
@@ -229,7 +387,7 @@ public final class Statistics {
           line = line.trim();
           if(!line.isEmpty()) {
             final int i = Integer.parseInt(line.substring(0, line.indexOf('=')));
-            if(i > -1) {
+            if(i > 0) {
               statistics.put(i, Float.parseFloat(line.replace(i + "=", "")));
             }
           }
@@ -252,7 +410,7 @@ public final class Statistics {
     final StringBuilder text = new StringBuilder();
     for(final Stats stat : Stats.values()) {
       final int i = stat.asInt();
-      if(i > -1) {
+      if(i > 0) {
         text.append(i).append('=').append(statistics.getOrDefault(i, 0f)).append('\n');
       }
     }
@@ -264,7 +422,11 @@ public final class Statistics {
     if(!statistics.containsKey(i)) {
       statistics.put(i, 0f);
     }
-    statistics.put(i, statistics.get(i) + value);
+    float newValue = statistics.get(i) + value;
+    if (stat.isBool()) {
+      newValue = value > 0 ? 1 : 0;
+    }
+    statistics.put(i, newValue);
   }
 
   public static void appendStat(final BattleEntity27c bent, final Stats stat, final float value) {
@@ -272,6 +434,26 @@ public final class Statistics {
       final int statIndex = Math.abs(stat.asInt()) + player.charId_272 + 1;
       appendStat(Stats.asStat(statIndex), value);
     }
+  }
+
+  public static void appendStat(final Stats stat, final float value, final int statOffset) {
+    appendStat(Stats.asStat(stat.asInt() + statOffset), value);
+  }
+
+  public static void appendRecoverStat(final BattleEntity27c bent, final int amount, final int colour) {
+    final Stats stat = switch(colour) {
+      case 3, 7 -> Statistics.Stats.TOTAL_HP_RECOVER;
+      case 10, 12 -> Statistics.Stats.TOTAL_MP_RECOVER;
+      case 11, 13 -> Statistics.Stats.TOTAL_SP_RECOVER;
+      default -> null;
+    };
+    if (stat != null) {
+      appendStat(bent, stat, amount);
+    }
+  }
+
+  public static float getStat(final int statIndex) {
+    return getStat(Stats.asStat(statIndex), 0);
   }
 
   public static float getStat(final Stats stat) {
@@ -317,6 +499,10 @@ public final class Statistics {
     return value;
   }
 
+  public static float[] getStats(final int statIndex) {
+    return getStats(Stats.asStat(statIndex));
+  }
+
   public static float[] getStats(final Stats stat) {
     final float[] stats;
     final int statIndex = Math.abs(stat.asInt());
@@ -337,15 +523,28 @@ public final class Statistics {
     return stats;
   }
 
-  public static void appendRecoverStat(final BattleEntity27c bent, final int amount, final int colour) {
-    final Stats stat = switch(colour) {
-      case 3, 7 -> Statistics.Stats.TOTAL_HP_RECOVER;
-      case 10, 12 -> Statistics.Stats.TOTAL_MP_RECOVER;
-      case 11, 13 -> Statistics.Stats.TOTAL_SP_RECOVER;
-      default -> null;
-    };
-    if (stat != null) {
-      appendStat(bent, stat, amount);
+  private static float getPercentTotalValue(final Stats stat, final int charIndex, final boolean isTotal) {
+    switch(stat) {
+      case Stats.TOTAL_ADDITION_COMPLETE:
+      case Stats.TOTAL_ADDITION_FLAWLESS:
+        return isTotal ? getArraySum(getStats(Stats.TOTAL_ADDITION.asInt())) : getStat(Math.abs(Stats.TOTAL_ADDITION.asInt()) + charIndex);
     }
+    return 0;
+  }
+
+  public static String getDisplayValue(final int value, final Stats stat, final int charIndex, final boolean isTotal) {
+    if(stat.type != null && stat.type.equals("%")) {
+      final float total = getPercentTotalValue(stat, charIndex + 1, isTotal);
+      return String.valueOf(value) + '\n' + (total > 0 ? Math.round(value / total * 100) : 0) + '%';
+    }
+    return String.valueOf(value);
+  }
+
+  private static float getArraySum(final float[] array) {
+    float total = 0f;
+    for(final float value : array) {
+      total += value;
+    }
+    return total;
   }
 }

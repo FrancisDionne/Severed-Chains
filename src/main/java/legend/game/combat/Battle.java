@@ -3566,9 +3566,15 @@ public class Battle extends EngineState {
   @Method(0x800ccb3cL)
   public FlowControl scriptRenderDamage(final RunningScript<?> script) {
     this.hud.renderDamage(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[0].get(), script.params_20[1].get());
+
     if (script.params_20[1].get() == -1) {
       Statistics.appendStat((BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00, Statistics.Stats.TOTAL_EVADE, 1);
+    } else if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null) {
+      if(this.currentTurnBent_800c66c8.innerStruct_00 instanceof PlayerBattleEntity && scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00 instanceof final PlayerBattleEntity player) {
+        Statistics.appendStat(player, Statistics.Stats.TOTAL_PHYSICAL_TAKEN, script.params_20[1].get());
+      }
     }
+
     return FlowControl.CONTINUE;
   }
 
@@ -3766,6 +3772,8 @@ public class Battle extends EngineState {
               }
             }
           }
+        } else if(script.scriptState_04.innerStruct_00 instanceof final PlayerBattleEntity player) {
+          Statistics.appendStat(player, Statistics.Stats.TOTAL_DEATH, 1);
         }
       }
     } else {

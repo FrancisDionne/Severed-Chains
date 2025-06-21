@@ -89,9 +89,9 @@ public class StatisticsScreen extends MenuScreen {
 
   private void loadPages() {
     this.statisticPages = new HashMap<>();
-    this.addPage(new StatisticPage("Battle", this.getPage0()));
-    this.addPage(new StatisticPage("Something", this.getPage1()));
-    this.addPage(new StatisticPage("Thing", this.getPage2()));
+    this.addPage(new StatisticPage("Battle 1", this.getPage0()));
+    this.addPage(new StatisticPage("Battle 2", this.getPage1()));
+    this.addPage(new StatisticPage("Additions", this.getPage2()));
   }
 
   private void addPage(final StatisticPage page) {
@@ -111,12 +111,14 @@ public class StatisticsScreen extends MenuScreen {
     l.add(Statistics.Stats.TOTAL_MAGICAL_ATTACK);
     l.add(Statistics.Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK);
     l.add(Statistics.Stats.TOTAL_DRAGOON_MAGICAL_ATTACK);
-    l.add(Statistics.Stats.TOTAL_EVADE);
     return l;
   }
 
   private ArrayList<Statistics.Stats> getPage1() {
     final ArrayList<Statistics.Stats> l = new ArrayList<>();
+    l.add(Statistics.Stats.TOTAL_GUARD);
+    l.add(Statistics.Stats.TOTAL_EVADE);
+    l.add(Statistics.Stats.TOTAL_DEATH);
     l.add(Statistics.Stats.TOTAL_HP_RECOVER);
     l.add(Statistics.Stats.TOTAL_MP_RECOVER);
     l.add(Statistics.Stats.TOTAL_SP_RECOVER);
@@ -125,7 +127,15 @@ public class StatisticsScreen extends MenuScreen {
 
   private ArrayList<Statistics.Stats> getPage2() {
     final ArrayList<Statistics.Stats> l = new ArrayList<>();
-    l.add(Statistics.Stats.TOTAL_TAKEN);
+    l.add(Statistics.Stats.TOTAL_ADDITION);
+    l.add(Statistics.Stats.TOTAL_ADDITION_COMPLETE);
+    l.add(Statistics.Stats.TOTAL_ADDITION_FLAWLESS);
+    l.add(Statistics.Stats.TOTAL_ADDITION_HIT);
+    l.add(Statistics.Stats.TOTAL_ADDITION_COUNTER);
+    l.add(Statistics.Stats.TOTAL_ADDITION_COUNTER_BLOCK);
+    l.add(Statistics.Stats.TOTAL_DRAGOON_ADDITION);
+    l.add(Statistics.Stats.TOTAL_DRAGOON_ADDITION_COMPLETED);
+    l.add(Statistics.Stats.TOTAL_DRAGOON_ADDITION_HIT);
     return l;
   }
 
@@ -174,19 +184,22 @@ public class StatisticsScreen extends MenuScreen {
       final float[] stats = Statistics.getStats(stat);
       final float max = this.getStatHighscore(stats);
       //final float min = this.getStatLowscore(stats);
+      final float y = 14.7f * i + 42.2f;
+      final float yOffset = stat.type() != null ? -3 : 0;
       int total = 0;
       for(int j = 0; j < 9; j++) {
+        final float x = 28 * j + 86f;
         if (j < stats.length) {
           final int value = (int)stats[j];
           total += value;
-          renderText(String.valueOf(value), 28 * j + 86f, 14.7f * i + 42.2f, value == (int)max && max > 0 ? highNumberFont : numberFont, 100);
+          renderText(Statistics.getDisplayValue(value, stat, j, false), x, y + yOffset, value == (int)max && max > 0 ? highNumberFont : numberFont, 120);
         } else {
-          renderText("-", 28 * j + 86f, 14.7f * i + 42.2f, notApplicableFont, 100);
+          renderText("-", x, y, notApplicableFont, 120);
         }
       }
       final String statName = stat.getName();
-      renderText(statName, 40.5f, 14.7f * i + 42.4f + (statName.contains("\n") ? -2.7f : 0), statFont, 100);
-      renderText(String.valueOf(total), 28 * 9 + 89.5f, 14.7f * i + 42.2f, totalFont, 100);
+      renderText(statName, 40.5f, y + 0.2f + (statName.contains("\n") ? -2.7f : 0), statFont, 120);
+      renderText(Statistics.getDisplayValue(total, stat, 0, true), 28 * 9 + 89.5f, y + yOffset, totalFont, 120);
     }
   }
 
@@ -230,7 +243,7 @@ public class StatisticsScreen extends MenuScreen {
 
       x = 28 * charIndex + 76;
 
-      m.translation(x + xOffset, 15, 3);
+      m.translation(x + xOffset, 15, 120);
       m.scale(22, 22, 120);
 
       if(isCharacterUnlocked(charIndex)) {
@@ -246,12 +259,12 @@ public class StatisticsScreen extends MenuScreen {
       }
     }
 
-    renderText(this.statisticPages.get(this.pageIndex).name, 41, 26, labelFont, 100);
-    renderText("Total", 341, 26, labelFont, 100);
+    renderText(this.statisticPages.get(this.pageIndex).name, 41, 26, labelFont, 120);
+    renderText("Total", 341, 26, labelFont, 120);
   }
 
   private static boolean isCharacterUnlocked(final int charIndex) {
-    return true;
+    return Statistics.getStat(Statistics.Stats.DART_UNLOCKED, charIndex) > 0;
   }
 
   @Override

@@ -17,6 +17,7 @@ import legend.game.combat.ui.AdditionOverlayMode;
 import legend.game.combat.ui.ControllerStyle;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.scripting.ScriptState;
+import legend.game.statistics.Statistics;
 import legend.game.types.Translucency;
 import org.joml.Math;
 import org.joml.Vector3f;
@@ -63,6 +64,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
   /** ubyte; 0 = no auto complete, 2 = WC and UW auto-complete */
   public int autoCompleteType_3a;
 
+  private BattleEntity27c attackerBent;
   private AdditionButtonFeedback currentInputStatus;
   private int additionButtonFramesToRender; //Remaining frames that the addition button will render for
   private boolean flawlessAddition = true;
@@ -77,7 +79,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
 
   @Method(0x801062a8L)
   public AdditionOverlaysEffect44(final int attackerScriptIndex, final int targetScriptIndex, final int autoCompleteType) {
-    final BattleEntity27c s5 = (BattleEntity27c)scriptStatePtrArr_800bc1c0[attackerScriptIndex].innerStruct_00;
+    this.attackerBent = (BattleEntity27c)scriptStatePtrArr_800bc1c0[attackerScriptIndex].innerStruct_00;
 
     this.reticleBorderShadow = new QuadBuilder("Reticle background")
       .translucency(Translucency.B_MINUS_F)
@@ -93,7 +95,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
     int hitNum;
     for(hitNum = 0; hitNum < 8; hitNum++) {
       // Number of hits calculated by counting to first hit with 0 total frames
-      if((this.getHitProperty(s5.charSlot_276, hitNum, 1, autoCompleteType) & 0xff) == 0) {
+      if((this.getHitProperty(this.attackerBent.charSlot_276, hitNum, 1, autoCompleteType) & 0xff) == 0) {
         break;
       }
     }
@@ -116,10 +118,14 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
     additionResults = new AdditionResults();
     additionResults.additionHits = hitCount;
 
+    if(this.autoCompleteType_3a < 1 || this.autoCompleteType_3a > 2) {
+      Statistics.appendStat(this.attackerBent, Statistics.Stats.TOTAL_ADDITION, 1);
+    }
+
     //LAB_801063f0
     for(hitNum = 0; hitNum < this.count_30; hitNum++) {
       final AdditionOverlaysHit20 hitOverlay = hitArray[hitNum];
-      cumulativeOverlayDisplayDelay += this.getHitProperty(s5.charSlot_276, hitNum, 15, autoCompleteType) & 0xff;
+      cumulativeOverlayDisplayDelay += this.getHitProperty(this.attackerBent.charSlot_276, hitNum, 15, autoCompleteType) & 0xff;
       hitOverlay.unused_00 = 1;
       hitOverlay.hitSuccessful_01 = false;
       hitOverlay.shadowColour_08 = (short)0;
@@ -127,12 +133,12 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
       hitOverlay.borderColoursArrayIndex_02 = 3;
       hitOverlay.isCounter_1c = false;
       additionHitCompletionState_8011a014[hitNum] = 0;
-      int hitProperty = this.getHitProperty(s5.charSlot_276, hitNum, 1, autoCompleteType) & 0xff;
+      int hitProperty = this.getHitProperty(this.attackerBent.charSlot_276, hitNum, 1, autoCompleteType) & 0xff;
       cumulativeOverlayDisplayDelay += hitProperty; // Display delay for each hit
       hitOverlay.totalHitFrames_0a = (short)hitProperty;
-      hitProperty = this.getHitProperty(s5.charSlot_276, hitNum, 2, autoCompleteType) & 0xff;
+      hitProperty = this.getHitProperty(this.attackerBent.charSlot_276, hitNum, 2, autoCompleteType) & 0xff;
       hitOverlay.frameBeginDisplay_0c = (short)hitProperty;
-      hitProperty = this.getHitProperty(s5.charSlot_276, hitNum, 3, autoCompleteType) & 0xff;
+      hitProperty = this.getHitProperty(this.attackerBent.charSlot_276, hitNum, 3, autoCompleteType) & 0xff;
       hitOverlay.numSuccessFrames_0e = (short)hitProperty;
       final int successFrameTarget = hitOverlay.frameSuccessLowerBound_10 + hitOverlay.frameBeginDisplay_0c;
       hitOverlay.frameSuccessLowerBound_10 = (short)(successFrameTarget - hitOverlay.numSuccessFrames_0e / 2 + 1);
@@ -651,19 +657,28 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
                     if (this.flawlessAddition && this.currentInputStatus != AdditionButtonFeedback.PERFECT) {
                       this.flawlessAddition = false;
                     }
+
+                    Statistics.appendStat(this.attackerBent, Statistics.Stats.TOTAL_ADDITION_HIT, 1);
                   }
                   else { // Late/Early Input
                     this.currentInputStatus = this.currentFrame_34 < hitOverlay.frameSuccessLowerBound_10 ? AdditionButtonFeedback.EARLY : AdditionButtonFeedback.LATE;
                     this.flawlessAddition = false;
                   }
 
-                  additionResults.flawless = CONFIG.getConfig(CoreMod.ADDITION_GAMEPLAY_ENHANCE_CONFIG.get()) && this.flawlessAddition;
+                  if (hitNum == hitArray.length - 1) {
+                    additionResults.flawless = CONFIG.getConfig(CoreMod.ADDITION_GAMEPLAY_ENHANCE_CONFIG.get()) && this.flawlessAddition;
 
-                  if (SEffe.additionButtonFeedbackText != null) {
-                    if (hitNum == hitArray.length - 1 && this.flawlessAddition) {
-                      SEffe.additionButtonFeedbackText.setFeedbackTextElement(hitNum, AdditionButtonFeedback.FLAWLESS);
+                    if (SEffe.additionButtonFeedbackText != null) {
+                      SEffe.additionButtonFeedbackText.setFeedbackTextElement(hitNum, this.flawlessAddition ? AdditionButtonFeedback.FLAWLESS : this.currentInputStatus);
                     }
-                    else {
+
+                    Statistics.appendStat(this.attackerBent, Statistics.Stats.TOTAL_ADDITION_COMPLETE, 1);
+                    if(this.flawlessAddition) {
+                      Statistics.appendStat(this.attackerBent, Statistics.Stats.TOTAL_ADDITION_FLAWLESS, 1);
+                    }
+                  }
+                  else {
+                    if (SEffe.additionButtonFeedbackText != null) {
                       SEffe.additionButtonFeedbackText.setFeedbackTextElement(hitNum, this.currentInputStatus);
                     }
                   }

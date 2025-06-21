@@ -29,6 +29,7 @@ import legend.game.scripting.FlowControl;
 import legend.game.scripting.RunningScript;
 import legend.game.scripting.ScriptDescription;
 import legend.game.scripting.ScriptParam;
+import legend.game.statistics.Statistics;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.CharacterData2c;
 import legend.game.types.EquipmentSlot;
@@ -812,6 +813,10 @@ public final class SItem {
         if(gameState_800babc8.charIds_88[0] != slot && gameState_800babc8.charIds_88[1] != slot && gameState_800babc8.charIds_88[2] != slot) {
           secondaryCharIds_800bdbf8[usedCharacterSlots] = slot;
           usedCharacterSlots++;
+        }
+
+        if(Statistics.getStat(Statistics.Stats.DART_UNLOCKED, slot) < 1) {
+          Statistics.appendStat(Statistics.Stats.DART_UNLOCKED, 1, slot);
         }
       }
 

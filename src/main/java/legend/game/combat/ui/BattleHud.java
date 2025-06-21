@@ -31,6 +31,7 @@ import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.battle.StatDisplayEvent;
 import legend.game.saves.ConfigStorageLocation;
 import legend.game.scripting.ScriptState;
+import legend.game.statistics.Statistics;
 import legend.game.types.Translucency;
 import legend.lodmod.LodMod;
 import org.joml.Vector2f;
@@ -1872,6 +1873,10 @@ public class BattleHud {
 
     //LAB_800f6ae0
     this.renderActionMenu();
+
+    if(selectedAction == 1) { //Guard
+      Statistics.appendStat(this.battle.currentTurnBent_800c66c8.innerStruct_00, Statistics.Stats.TOTAL_GUARD, 1);
+    }
 
     //LAB_800f6aec
     return selectedAction;
