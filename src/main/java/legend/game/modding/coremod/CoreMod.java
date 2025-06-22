@@ -43,7 +43,6 @@ import legend.game.modding.coremod.config.EncounterRateConfigEntry;
 import legend.game.modding.coremod.config.FmvVolumeConfigEntry;
 import legend.game.modding.coremod.config.FooterActionColorConfigEntry;
 import legend.game.modding.coremod.config.FullscreenConfigEntry;
-import legend.game.modding.coremod.config.HighQualityProjectionConfigEntry;
 import legend.game.modding.coremod.config.IgnoreSteamInputModeConfigEntry;
 import legend.game.modding.coremod.config.IndicatorModeConfigEntry;
 import legend.game.modding.coremod.config.InventoryGroupConfigEntry;
@@ -107,7 +106,6 @@ public class CoreMod {
   public static final RegistryDelegate<IgnoreSteamInputModeConfigEntry> IGNORE_STEAM_INPUT_MODE_CONFIG = CONFIG_REGISTRAR.register("ignore_steam_input_mode", IgnoreSteamInputModeConfigEntry::new);
   public static final RegistryDelegate<BoolConfigEntry> ALLOW_WIDESCREEN_CONFIG = CONFIG_REGISTRAR.register("allow_widescreen", AllowWidescreenConfigEntry::new);
   public static final RegistryDelegate<LegacyWidescreenModeConfig> LEGACY_WIDESCREEN_MODE_CONFIG = CONFIG_REGISTRAR.register("submap_widescreen_mode", LegacyWidescreenModeConfig::new);
-  public static final RegistryDelegate<BoolConfigEntry> HIGH_QUALITY_PROJECTION_CONFIG = CONFIG_REGISTRAR.register("high_quality_projection", HighQualityProjectionConfigEntry::new);
   public static final RegistryDelegate<BoolConfigEntry> FULLSCREEN_CONFIG = CONFIG_REGISTRAR.register("fullscreen", FullscreenConfigEntry::new);
   public static final RegistryDelegate<ResolutionConfig> RESOLUTION_CONFIG = CONFIG_REGISTRAR.register("resolution", ResolutionConfig::new);
   public static final RegistryDelegate<MonitorConfigEntry> MONITOR_CONFIG = CONFIG_REGISTRAR.register("monitor", MonitorConfigEntry::new);
