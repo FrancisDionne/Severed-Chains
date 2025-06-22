@@ -79,6 +79,13 @@ public class StatisticsScreen extends MenuScreen {
     Texture.png(Path.of("gfx", "ui", "highlight_center.png")),  //11
     Texture.png(Path.of("gfx", "ui", "highlight_left.png")),    //12
     Texture.png(Path.of("gfx", "ui", "highlight_right.png")),   //13
+    Texture.png(Path.of("gfx", "ui", "box-top-left.png")),    //14
+    Texture.png(Path.of("gfx", "ui", "box-top.png")),         //15
+    Texture.png(Path.of("gfx", "ui", "box-top-right.png")),   //16
+    Texture.png(Path.of("gfx", "ui", "box-right.png")),       //17
+    Texture.png(Path.of("gfx", "ui", "box-bottom.png")),      //18
+    Texture.png(Path.of("gfx", "ui", "box-bottom-left.png")), //19
+    Texture.png(Path.of("gfx", "ui", "box-left.png")),        //20
   };
 
   private static final FontOptions labelFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).size(0.8f).horizontalAlign(HorizontalAlign.CENTRE);
@@ -280,7 +287,64 @@ public class StatisticsScreen extends MenuScreen {
       }
     }
 
-    m.translation(10, 214, 120);
+    m.translation(8.2f + xOffset, 12, 124);
+    m.scale(16f, 16f, 1);
+
+    RENDERER
+      .queueOrthoModel(quad, m, QueuedModelStandard.class)
+      .texture(textures[14]); //Top Left
+
+    m.translation(351 + xOffset, 12, 124);
+    m.scale(8.8f, 10f, 1);
+
+    RENDERER
+      .queueOrthoModel(quad, m, QueuedModelStandard.class)
+      .texture(textures[16]); //Top Right
+
+    m.translation(8.2f + xOffset, 205, 120);
+    m.scale(8.5f, 9.7f, 1);
+
+    RENDERER
+      .queueOrthoModel(quad, m, QueuedModelStandard.class)
+      .texture(textures[19]); //Bottom Left
+
+    for(int i = 0; i < 8; i++) {
+      m.translation(41f * i + 24f + xOffset, 12, 124);
+      m.scale(41, 2f, 1);
+
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(textures[15]); //Top
+    }
+
+    for(int i = 0; i < 4; i++) {
+      m.translation(359.21f + xOffset, 46 * i + 20, 124);
+      m.scale(2f, 55, 1);
+
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(textures[17]); //Right
+    }
+
+    for(int i = 0; i < 9; i++) {
+      m.translation(38f * i + 16f + xOffset, 212, 120);
+      m.scale(40, 2f, 1);
+
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(textures[18]); //Bottom
+    }
+
+    for(int i = 0; i < 5; i++) {
+      m.translation(8.2f + xOffset, 34f * i + 28, 121);
+      m.scale(2.4f, 41, 1);
+
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(textures[20]); //Left
+    }
+
+    m.translation(10 + xOffset, 215, 120);
     m.scale(6, 6, 120);
 
     RENDERER
@@ -289,13 +353,14 @@ public class StatisticsScreen extends MenuScreen {
 
     renderText(this.statisticPages.get(this.pageIndex).name, 41, 26, labelFont, 120);
     renderText("Total", 341, 26, labelFont, 120);
-    renderText("Display Mode: " + this.getDisplayModeName(), 17, 215.2f, displayModeFont, 120);
+    renderText("Display Mode: " + this.getDisplayModeName(), 17, 216.2f, displayModeFont, 120);
   }
 
   private void renderHighlight() {
+    final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
     final float x = 10;
     final float y = 14.66f * this.highlightIndex + 37f;
-    m.translation(x, y, 121);
+    m.translation(x + xOffset, y, 121);
     m.scale(349, 13.5f, 1);
 
     RENDERER
@@ -303,14 +368,14 @@ public class StatisticsScreen extends MenuScreen {
       .texture(textures[11])
       .translucency(Translucency.HALF_B_PLUS_HALF_F);
 
-    m.translation(x, y, 120);
+    m.translation(x + xOffset, y, 120);
     m.scale(4, 13.5f, 1);
 
     RENDERER
       .queueOrthoModel(quad, m, QueuedModelStandard.class)
       .texture(textures[12]);
 
-    m.translation(x + 344.96f, y, 120);
+    m.translation(x + 344.96f + xOffset, y, 120);
     m.scale(4, 13.5f, 1);
 
     RENDERER
