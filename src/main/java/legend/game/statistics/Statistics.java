@@ -335,33 +335,23 @@ public final class Statistics {
 
     private final int stat;
     private final String name;
-    private final boolean isBool;
     private final String format;
 
     Stats(final int stat) {
-      this(stat, null);
+      this(stat, null, null);
     }
 
     Stats(final int stat, final boolean isBool) {
-      this(stat, null, isBool);
+      this(stat, null, isBool ? "b" : null);
     }
 
     Stats(final int stat, final String name) {
-      this(stat, name, false);
+      this(stat, name, null);
     }
 
-    Stats(final int stat, final String name, final String format) {
-      this(stat, name, false, format);
-    }
-
-    Stats(final int stat, final String name, final boolean isBool) {
-      this(stat, name, isBool, null);
-    }
-
-    Stats(final int stat, final String name, final boolean isBool, final String format) {
+    Stats(final int stat, @Nullable final String name, @Nullable final String format) {
       this.stat = stat;
       this.name = name;
-      this.isBool = isBool;
       this.format = format;
     }
 
@@ -451,7 +441,7 @@ public final class Statistics {
       statistics.put(i, 0f);
     }
     float newValue = statistics.get(i) + value;
-    if(stat.isBool) {
+    if(stat.format.equals("b")) {
       newValue = value > 0 ? 1 : 0;
     }
     statistics.put(i, newValue);
@@ -521,14 +511,6 @@ public final class Statistics {
     return value;
   }
 
-  private static float getStat(final int statIndex, final int minRange, final int maxRange) {
-    float value = 0f;
-    for(int i = statIndex + minRange; i <= statIndex + maxRange; i++) {
-      value += getStat(Stats.asStat(i));
-    }
-    return value;
-  }
-
   public static float[] getStats(final int statIndex) {
     return getStats(Stats.asStat(statIndex));
   }
@@ -584,7 +566,7 @@ public final class Statistics {
       }
       return total > 0 ? String.valueOf(Math.round(value / total * 100)) + '%' : "0%";
     }
-    return stat.format != null ? String.format(stat.format, value) : String.valueOf((int)value);
+    return stat.format != null && !stat.format.equals("b") ? String.format(stat.format, value) : String.valueOf((int)value);
   }
 
   private static float getArraySum(final float[] array) {
