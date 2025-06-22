@@ -91,8 +91,8 @@ public class StatisticsScreen extends MenuScreen {
     Texture.png(Path.of("gfx", "ui", "stats_screen\\header-background.png")),    //23
   };
 
-  private static final FontOptions labelFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).size(0.8f).horizontalAlign(HorizontalAlign.CENTRE);
-  private static final FontOptions statFont = new FontOptions().colour(TextColour.LIGHT_GREY_WHITE).shadowColour(TextColour.DARK_GREY).size(0.38f).horizontalAlign(HorizontalAlign.CENTRE);
+  private static final FontOptions labelFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).size(0.8f).horizontalAlign(HorizontalAlign.RIGHT);
+  private static final FontOptions statFont = new FontOptions().colour(TextColour.LIGHT_GREY_WHITE).shadowColour(TextColour.DARK_GREY).size(0.38f).horizontalAlign(HorizontalAlign.RIGHT);
   private static final FontOptions numberFont = new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions highNumberFont = new FontOptions().colour(TextColour.FOOTER_GREEN).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions lowNumberFont = new FontOptions().colour(TextColour.FOOTER_RED).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
@@ -110,8 +110,8 @@ public class StatisticsScreen extends MenuScreen {
 
   private void loadPages() {
     this.statisticPages = new HashMap<>();
-    this.addPage(new StatisticPage("Battle 1", this.getPage0()));
-    this.addPage(new StatisticPage("Battle 2", this.getPage1()));
+    this.addPage(new StatisticPage("Battle", this.getPage0()));
+    this.addPage(new StatisticPage("Battle", this.getPage1()));
     this.addPage(new StatisticPage("Additions", this.getPage2()));
     this.addPage(new StatisticPage("Misc", this.getPage3()));
   }
@@ -231,7 +231,7 @@ public class StatisticsScreen extends MenuScreen {
         }
       }
       final String statName = stat.getName();
-      renderText(statName, 40.5f, y + 0.2f + (statName.contains("\n") ? -2.7f : 0), statFont, 120);
+      renderText(statName, 70f, y + 0.2f + (statName.contains("\n") ? -2.7f : 0), statFont, 120);
       renderText(stats.length > 1 ? Statistics.getDisplayValue(total, stat, 0, true, this.displayMode) : "-", 28 * 9 + 89.5f, y, stats.length > 1 ? totalFont : notApplicableFont, 120);
     }
   }
@@ -381,8 +381,8 @@ public class StatisticsScreen extends MenuScreen {
       .queueOrthoModel(quad, m, QueuedModelStandard.class)
       .texture(FooterActionsHud.getTexture(INPUT_ACTION_MENU_SORT.get()));
 
-    renderText(this.statisticPages.get(this.pageIndex).name, 41, 26, labelFont, 120);
-    renderText("Total", 341, 26, labelFont, 120);
+    renderText(this.statisticPages.get(this.pageIndex).name, 70, 25, labelFont, 120);
+    renderText("Total", 354.8f, 26, labelFont, 120);
     renderText("Display Mode: " + this.getDisplayModeName(), 17, 216.2f, displayModeFont, 120);
   }
 
