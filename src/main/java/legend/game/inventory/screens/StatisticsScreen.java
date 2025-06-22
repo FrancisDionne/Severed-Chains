@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import static legend.core.GameEngine.RENDERER;
-import static legend.game.SItem.FUN_801034cc;
 import static legend.game.SItem.allocateUiElement;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
@@ -88,6 +87,7 @@ public class StatisticsScreen extends MenuScreen {
     Texture.png(Path.of("gfx", "ui", "stats_screen\\box-left.png")),        //20
     Texture.png(Path.of("gfx", "ui", "stats_screen\\box-separator.png")),   //21
     Texture.png(Path.of("gfx", "ui", "stats_screen\\portrait-separator.png")),   //22
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\header-background.png")),    //23
   };
 
   private static final FontOptions labelFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).size(0.8f).horizontalAlign(HorizontalAlign.CENTRE);
@@ -205,7 +205,7 @@ public class StatisticsScreen extends MenuScreen {
     this.renderGraphics();
     this.renderStats();
     this.renderHighlight();
-    FUN_801034cc(this.pageIndex, this.statisticPages.size(), -10); // Left/right arrows
+    //FUN_801034cc(this.pageIndex, this.statisticPages.size(), -10); // Left/right arrows
   }
 
   private void renderStats() {
@@ -248,7 +248,7 @@ public class StatisticsScreen extends MenuScreen {
 
         RENDERER
           .queueOrthoModel(quad, m, QueuedModelStandard.class)
-          .texture(textures[9]);
+          .texture(textures[9]); //Backgrounds
       }
     }
 
@@ -262,7 +262,7 @@ public class StatisticsScreen extends MenuScreen {
 
         RENDERER
           .queueOrthoModel(quad, m, QueuedModelStandard.class)
-          .texture(textures[10]);
+          .texture(textures[10]); //Columns
       }
     }
 
@@ -298,6 +298,13 @@ public class StatisticsScreen extends MenuScreen {
       }
     }
 
+    m.translation(10.2f + xOffset, 13.8f, 125);
+    m.scale(349f, 22f, 1);
+
+    RENDERER
+      .queueOrthoModel(quad, m, QueuedModelStandard.class)
+      .texture(textures[23]); //Header Background
+
     m.translation(8.2f + xOffset, 12, 124);
     m.scale(16f, 16f, 1);
 
@@ -305,8 +312,8 @@ public class StatisticsScreen extends MenuScreen {
       .queueOrthoModel(quad, m, QueuedModelStandard.class)
       .texture(textures[14]); //Top Left
 
-    m.translation(351 + xOffset, 12, 124);
-    m.scale(8.8f, 10f, 1);
+    m.translation(352 + xOffset, 12f, 124);
+    m.scale(9.2f, 7.3f, 1);
 
     RENDERER
       .queueOrthoModel(quad, m, QueuedModelStandard.class)
@@ -320,7 +327,7 @@ public class StatisticsScreen extends MenuScreen {
       .texture(textures[19]); //Bottom Left
 
     for(int i = 0; i < 3; i++) {
-      m.translation(91f * i + 24f + xOffset, 12, 124);
+      m.translation(92f * i + 24f + xOffset, 12, 124);
       m.scale(145, 2f, 1);
 
       RENDERER
