@@ -391,7 +391,6 @@ public class MainMenuScreen extends MenuScreen {
       }
 
       currentEngineState_8004dd04.loadGameFromMenu(gameState_800babc8);
-      gameState_800babc8.campaign.latestLoad = save;
 
       Statistics.load(gameState_800babc8.campaign.path, save.fileName);
     }, () -> {

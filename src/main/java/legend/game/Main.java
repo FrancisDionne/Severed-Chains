@@ -56,7 +56,6 @@ public final class Main {
 
         try {
           SAVES.newSave(name, gameState_800babc8, stats_800be5f8);
-          Statistics.copy(gameState_800babc8.campaign.path, gameState_800babc8.campaign.latestLoad.fileName, name);
           generatedCrashSave = true;
         } catch(final SaveFailedException ex) {
           LOGGER.error("Failed to generate crash recovery save :(", ex);
