@@ -74,18 +74,20 @@ public class StatisticsScreen extends MenuScreen {
     Texture.png(Path.of("gfx", "portraits", "meru.png")),    //6
     Texture.png(Path.of("gfx", "portraits", "kongol.png")),  //7
     Texture.png(Path.of("gfx", "portraits", "miranda.png")), //8
-    Texture.png(Path.of("gfx", "ui", "background-lines.png")),  //9
-    Texture.png(Path.of("gfx", "ui", "column-line.png")),       //10
-    Texture.png(Path.of("gfx", "ui", "highlight_center.png")),  //11
-    Texture.png(Path.of("gfx", "ui", "highlight_left.png")),    //12
-    Texture.png(Path.of("gfx", "ui", "highlight_right.png")),   //13
-    Texture.png(Path.of("gfx", "ui", "box-top-left.png")),    //14
-    Texture.png(Path.of("gfx", "ui", "box-top.png")),         //15
-    Texture.png(Path.of("gfx", "ui", "box-top-right.png")),   //16
-    Texture.png(Path.of("gfx", "ui", "box-right.png")),       //17
-    Texture.png(Path.of("gfx", "ui", "box-bottom.png")),      //18
-    Texture.png(Path.of("gfx", "ui", "box-bottom-left.png")), //19
-    Texture.png(Path.of("gfx", "ui", "box-left.png")),        //20
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\background-lines.png")),  //9
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\column-line.png")),       //10
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\highlight_center.png")),  //11
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\highlight_left.png")),    //12
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\highlight_right.png")),   //13
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\box-top-left.png")),    //14
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\box-top.png")),         //15
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\box-top-right.png")),   //16
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\box-right.png")),       //17
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\box-bottom.png")),      //18
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\box-bottom-left.png")), //19
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\box-left.png")),        //20
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\box-separator.png")),   //21
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\portrait-separator.png")),   //22
   };
 
   private static final FontOptions labelFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).size(0.8f).horizontalAlign(HorizontalAlign.CENTRE);
@@ -232,8 +234,6 @@ public class StatisticsScreen extends MenuScreen {
   }
 
   private void renderGraphics() {
-    final Texture background = textures[9];
-    final Texture column = textures[10];
     final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
     int x;
     int y;
@@ -248,7 +248,7 @@ public class StatisticsScreen extends MenuScreen {
 
         RENDERER
           .queueOrthoModel(quad, m, QueuedModelStandard.class)
-          .texture(background);
+          .texture(textures[9]);
       }
     }
 
@@ -262,8 +262,19 @@ public class StatisticsScreen extends MenuScreen {
 
         RENDERER
           .queueOrthoModel(quad, m, QueuedModelStandard.class)
-          .texture(column);
+          .texture(textures[10]);
       }
+    }
+
+    for(int i = 0; i < 10; i++) {
+      x = 28 * i + 72;
+
+      m.translation(x + xOffset, 13, 125);
+      m.scale(2, 44, 1);
+
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(textures[22]);
     }
 
     for(int charIndex = 0; charIndex < 9; charIndex++) {
@@ -271,7 +282,7 @@ public class StatisticsScreen extends MenuScreen {
 
       x = 28 * charIndex + 76;
 
-      m.translation(x + xOffset, 15, 120);
+      m.translation(x + xOffset, 14, 120);
       m.scale(22, 22, 120);
 
       if(isCharacterUnlocked(charIndex)) {
@@ -308,13 +319,22 @@ public class StatisticsScreen extends MenuScreen {
       .queueOrthoModel(quad, m, QueuedModelStandard.class)
       .texture(textures[19]); //Bottom Left
 
-    for(int i = 0; i < 8; i++) {
-      m.translation(41f * i + 24f + xOffset, 12, 124);
-      m.scale(41, 2f, 1);
+    for(int i = 0; i < 3; i++) {
+      m.translation(91f * i + 24f + xOffset, 12, 124);
+      m.scale(145, 2f, 1);
 
       RENDERER
         .queueOrthoModel(quad, m, QueuedModelStandard.class)
         .texture(textures[15]); //Top
+    }
+
+    for(int i = 0; i < 3; i++) {
+      m.translation(102.2f * i + 10f + xOffset, 35, 124);
+      m.scale(145, 2f, 1);
+
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(textures[21]); //Top Middle
     }
 
     for(int i = 0; i < 4; i++) {
@@ -326,9 +346,9 @@ public class StatisticsScreen extends MenuScreen {
         .texture(textures[17]); //Right
     }
 
-    for(int i = 0; i < 9; i++) {
-      m.translation(38f * i + 16f + xOffset, 212, 120);
-      m.scale(40, 2f, 1);
+    for(int i = 0; i < 3; i++) {
+      m.translation(99.3f * i + 16f + xOffset, 212, 120);
+      m.scale(145, 2f, 1);
 
       RENDERER
         .queueOrthoModel(quad, m, QueuedModelStandard.class)
@@ -358,7 +378,7 @@ public class StatisticsScreen extends MenuScreen {
 
   private void renderHighlight() {
     final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
-    final float x = 10;
+    final float x = 10.2f;
     final float y = 14.66f * this.highlightIndex + 37f;
     m.translation(x + xOffset, y, 121);
     m.scale(349, 13.5f, 1);
@@ -375,7 +395,7 @@ public class StatisticsScreen extends MenuScreen {
       .queueOrthoModel(quad, m, QueuedModelStandard.class)
       .texture(textures[12]);
 
-    m.translation(x + 344.96f + xOffset, y, 120);
+    m.translation(x + 345.1f + xOffset, y, 120);
     m.scale(4, 13.5f, 1);
 
     RENDERER
@@ -389,7 +409,7 @@ public class StatisticsScreen extends MenuScreen {
 
   private String getDisplayModeName() {
     return switch(this.displayMode) {
-      case 1 -> "Column %";
+      case 1 -> "Group %";
       case 2 -> "Row %";
       default -> "Number";
     };
