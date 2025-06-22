@@ -12,6 +12,7 @@ import legend.game.statistics.Statistics;
 import legend.game.types.Translucency;
 import org.joml.Matrix4f;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,11 +40,23 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 public class StatisticsScreen extends MenuScreen {
 
   private static class StatisticPage {
-    public List<Statistics.Stats> stats;
+    public List<StatisticRow> statRows;
     public String name;
-    public StatisticPage(final String name, final List<Statistics.Stats> stats) {
+    public StatisticPage(final String name, final List<StatisticRow> statRows) {
       this.name = name;
-      this.stats = stats;
+      this.statRows = statRows;
+    }
+  }
+
+  private static class StatisticRow {
+    public Statistics.Stats stat;
+    public Statistics.Stats statGroupEnd;
+    public StatisticRow(final Statistics.Stats stat) {
+      this(stat, null);
+    }
+    public StatisticRow(final Statistics.Stats stat, @Nullable final Statistics.Stats statGroupEnd) {
+      this.stat = stat;
+      this.statGroupEnd = statGroupEnd;
     }
   }
 
@@ -89,6 +102,9 @@ public class StatisticsScreen extends MenuScreen {
     Texture.png(Path.of("gfx", "ui", "stats_screen\\box-separator.png")),   //21
     Texture.png(Path.of("gfx", "ui", "stats_screen\\portrait-separator.png")),   //22
     Texture.png(Path.of("gfx", "ui", "stats_screen\\header-background.png")),    //23
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\group-center.png")),  //24
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\group-top.png")),     //25
+    Texture.png(Path.of("gfx", "ui", "stats_screen\\group-bottom.png")),  //26
   };
 
   private static final FontOptions labelFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).size(0.8f).horizontalAlign(HorizontalAlign.RIGHT);
@@ -120,55 +136,55 @@ public class StatisticsScreen extends MenuScreen {
     this.statisticPages.put(this.statisticPages.size(), page);
   }
 
-  private ArrayList<Statistics.Stats> getPage0() {
-    final ArrayList<Statistics.Stats> l = new ArrayList<>();
-    l.add(Statistics.Stats.TOTAL_DAMAGE);
-    l.add(Statistics.Stats.TOTAL_PHYSICAL_DAMAGE);
-    l.add(Statistics.Stats.TOTAL_MAGICAL_DAMAGE);
-    l.add(Statistics.Stats.TOTAL_TAKEN);
-    l.add(Statistics.Stats.TOTAL_PHYSICAL_TAKEN);
-    l.add(Statistics.Stats.TOTAL_MAGICAL_TAKEN);
-    l.add(Statistics.Stats.TOTAL_ATTACK);
-    l.add(Statistics.Stats.TOTAL_PHYSICAL_ATTACK);
-    l.add(Statistics.Stats.TOTAL_MAGICAL_ATTACK);
-    l.add(Statistics.Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK);
-    l.add(Statistics.Stats.TOTAL_DRAGOON_MAGICAL_ATTACK);
+  private ArrayList<StatisticRow> getPage0() {
+    final ArrayList<StatisticRow> l = new ArrayList<>();
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_DAMAGE, Statistics.Stats.TOTAL_MAGICAL_DAMAGE));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_PHYSICAL_DAMAGE));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_MAGICAL_DAMAGE));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_TAKEN, Statistics.Stats.TOTAL_MAGICAL_TAKEN));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_PHYSICAL_TAKEN));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_MAGICAL_TAKEN));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_ATTACK, Statistics.Stats.TOTAL_DRAGOON_MAGICAL_ATTACK));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_PHYSICAL_ATTACK));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_MAGICAL_ATTACK));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_DRAGOON_MAGICAL_ATTACK));
     return l;
   }
 
-  private ArrayList<Statistics.Stats> getPage1() {
-    final ArrayList<Statistics.Stats> l = new ArrayList<>();
-    l.add(Statistics.Stats.TOTAL_GUARD);
-    l.add(Statistics.Stats.TOTAL_EVADE);
-    l.add(Statistics.Stats.TOTAL_HP_RECOVER);
-    l.add(Statistics.Stats.TOTAL_MP_RECOVER);
-    l.add(Statistics.Stats.TOTAL_SP_RECOVER);
-    l.add(Statistics.Stats.TOTAL_DEATH);
-    //l.add(Statistics.Stats.TOTAL_REVIVE);
-    //l.add(Statistics.Stats.TOTAL_REVIVED);
+  private ArrayList<StatisticRow> getPage1() {
+    final ArrayList<StatisticRow> l = new ArrayList<>();
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_GUARD));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_EVADE));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_HP_RECOVER));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_MP_RECOVER));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_SP_RECOVER));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_DEATH));
+    //l.add(new StatisticRow(Statistics.Stats.TOTAL_REVIVE));
+    //l.add(new StatisticRow(Statistics.Stats.TOTAL_REVIVED));
     return l;
   }
 
-  private ArrayList<Statistics.Stats> getPage2() {
-    final ArrayList<Statistics.Stats> l = new ArrayList<>();
-    l.add(Statistics.Stats.TOTAL_ADDITION);
-    l.add(Statistics.Stats.TOTAL_ADDITION_COMPLETE);
-    l.add(Statistics.Stats.TOTAL_ADDITION_FLAWLESS);
-    l.add(Statistics.Stats.TOTAL_ADDITION_HIT);
-    l.add(Statistics.Stats.TOTAL_ADDITION_COUNTER);
-    l.add(Statistics.Stats.TOTAL_ADDITION_COUNTER_BLOCK);
-    l.add(Statistics.Stats.TOTAL_DRAGOON_ADDITION);
-    l.add(Statistics.Stats.TOTAL_DRAGOON_ADDITION_COMPLETED);
-    l.add(Statistics.Stats.TOTAL_DRAGOON_ADDITION_HIT);
+  private ArrayList<StatisticRow> getPage2() {
+    final ArrayList<StatisticRow> l = new ArrayList<>();
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_ADDITION, Statistics.Stats.TOTAL_ADDITION_FLAWLESS));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_ADDITION_COMPLETE));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_ADDITION_FLAWLESS));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_ADDITION_HIT));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_ADDITION_COUNTER, Statistics.Stats.TOTAL_ADDITION_COUNTER_BLOCK));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_ADDITION_COUNTER_BLOCK));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_DRAGOON_ADDITION, Statistics.Stats.TOTAL_DRAGOON_ADDITION_COMPLETED));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_DRAGOON_ADDITION_COMPLETED));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_DRAGOON_ADDITION_HIT));
     return l;
   }
 
-  private ArrayList<Statistics.Stats> getPage3() {
-    final ArrayList<Statistics.Stats> l = new ArrayList<>();
-    l.add(Statistics.Stats.GOLD);
-    l.add(Statistics.Stats.CHEST);
-    l.add(Statistics.Stats.ENCOUNTERS);
-    l.add(Statistics.Stats.DISTANCE);
+  private ArrayList<StatisticRow> getPage3() {
+    final ArrayList<StatisticRow> l = new ArrayList<>();
+    l.add(new StatisticRow(Statistics.Stats.GOLD));
+    l.add(new StatisticRow(Statistics.Stats.CHEST));
+    l.add(new StatisticRow(Statistics.Stats.ENCOUNTERS));
+    l.add(new StatisticRow(Statistics.Stats.DISTANCE));
     return l;
   }
 
@@ -212,9 +228,11 @@ public class StatisticsScreen extends MenuScreen {
   }
 
   private void renderStats() {
-    final List<Statistics.Stats> pageStats = this.statisticPages.get(this.pageIndex).stats;
+    final List<StatisticRow> pageStats = this.statisticPages.get(this.pageIndex).statRows;
+    Statistics.Stats statGroupEnd = null;
     for(int i = 0; i < pageStats.size(); i++) {
-      final Statistics.Stats stat = pageStats.get(i);
+      final StatisticRow statRow = pageStats.get(i);
+      final Statistics.Stats stat = statRow.stat;
       final float[] stats = Statistics.getStats(stat);
       final float max = this.getStatHighscore(stats);
       //final float min = this.getStatLowscore(stats);
@@ -233,7 +251,37 @@ public class StatisticsScreen extends MenuScreen {
       final String statName = stat.getName();
       renderText(statName, 70f, y + 0.2f + (statName.contains("\n") ? -2.7f : 0), statFont, 120);
       renderText(stats.length > 1 ? Statistics.getDisplayValue(total, stat, 0, true, this.displayMode) : "-", 28 * 9 + 89.5f, y, stats.length > 1 ? totalFont : notApplicableFont, 120);
+
+      statGroupEnd = this.renderGroup(statRow, statGroupEnd, y);
     }
+  }
+
+  private Statistics.Stats renderGroup(final StatisticRow statRow, @Nullable Statistics.Stats statGroupEnd, float y) {
+    if (statRow.statGroupEnd != null || statGroupEnd != null) {
+      final Texture texture;
+
+      if(statGroupEnd == null) {
+        statGroupEnd = statRow.statGroupEnd;
+        texture = textures[25];
+        y = y - 4;
+      } else if(statGroupEnd == statRow.stat) {
+        statGroupEnd = null;
+        texture = textures[26];
+        y = y - 27.6f;
+      } else {
+        texture = textures[24];
+        y = y - 19f;
+      }
+
+      final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+      m.translation(5 + xOffset, y, 120);
+      m.scale(3.2f, 34.8f, 1);
+
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(texture);
+    }
+    return statGroupEnd;
   }
 
   private void renderGraphics() {
