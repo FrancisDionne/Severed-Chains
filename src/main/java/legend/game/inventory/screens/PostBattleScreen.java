@@ -10,6 +10,7 @@ import legend.core.opengl.QuadBuilder;
 import legend.game.combat.types.EnemyDrop;
 import legend.game.inventory.WhichMenu;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.statistics.Statistics;
 import legend.game.types.Renderable58;
 import legend.game.types.Translucency;
 
@@ -137,6 +138,7 @@ public class PostBattleScreen extends MenuScreen {
           for(int charSlot = 0; charSlot < 3; charSlot++) {
             if(this.characterIsAlive(charSlot)) {
               this.pendingXp_8011e180[gameState_800babc8.charIds_88[charSlot]] = totalXpFromCombat_800bc95c / xpDivisor;
+              Statistics.appendStat(gameState_800babc8.charIds_88[charSlot], Statistics.Stats.TOTAL_EXP, this.pendingXp_8011e180[gameState_800babc8.charIds_88[charSlot]]);
             }
           }
 
@@ -149,6 +151,7 @@ public class PostBattleScreen extends MenuScreen {
 
             if(secondaryCharIndex != -1) {
               this.pendingXp_8011e180[secondaryCharIndex] = (int)(MathHelper.safeDiv(totalXpFromCombat_800bc95c, xpDivisor) * secondaryCharXpMultiplier);
+              Statistics.appendStat(secondaryCharIndex, Statistics.Stats.TOTAL_EXP, this.pendingXp_8011e180[secondaryCharIndex]);
             }
 
             //LAB_8010da24

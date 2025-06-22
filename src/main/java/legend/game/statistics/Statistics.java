@@ -65,6 +65,7 @@ public final class Statistics {
     TOTAL_DRAGOON_ADDITION_HIT(-230, "D-Addition Hits"),
     TOTAL_REVIVE(-240, "Revive"),
     TOTAL_REVIVED(-250, "Revived"),
+    TOTAL_EXP(-260, "Exp. Gained"),
 
     GOLD(10000, "Gold Earned"),
     CHEST(10001, "Chests Opened"),
@@ -331,6 +332,15 @@ public final class Statistics {
     KONGOL_REVIVED(258),
     MIRANDA_REVIVED(259),
 
+    DART_EXP(261),
+    LAVITZ_EXP(262),
+    SHANA_EXP(263),
+    ROSE_EXP(264),
+    HASCHEL_EXP(265),
+    ALBERT_EXP(266),
+    MERU_EXP(267),
+    KONGOL_EXP(268),
+    MIRANDA_EXP(269),
     ;
 
     private final int stat;
@@ -441,7 +451,7 @@ public final class Statistics {
       statistics.put(i, 0f);
     }
     float newValue = statistics.get(i) + value;
-    if(stat.format.equals("b")) {
+    if(stat.format != null && stat.format.equals("b")) {
       newValue = value > 0 ? 1 : 0;
     }
     statistics.put(i, newValue);

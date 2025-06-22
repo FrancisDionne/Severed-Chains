@@ -163,6 +163,7 @@ public class StatisticsScreen extends MenuScreen {
     l.add(new StatisticRow(Statistics.Stats.TOTAL_DEATH));
     //l.add(new StatisticRow(Statistics.Stats.TOTAL_REVIVE));
     //l.add(new StatisticRow(Statistics.Stats.TOTAL_REVIVED));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_EXP));
     return l;
   }
 
