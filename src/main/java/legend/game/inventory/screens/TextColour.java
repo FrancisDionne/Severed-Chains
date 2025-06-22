@@ -13,6 +13,7 @@ public enum TextColour {
   BLACK(0x08, 0x08, 0x08),
   GREY(0x78, 0x78, 0x78),
   PURPLE(0x60, 0x00, 0xf8),
+  LIGHT_GREY(165, 165, 165),
   ;
 
   public final int r;
