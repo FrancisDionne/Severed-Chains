@@ -3763,6 +3763,8 @@ public class Battle extends EngineState {
           goldGainedFromCombat_800bc920 += enemyCombatant.gold_196;
           totalXpFromCombat_800bc95c += enemyCombatant.xp_194;
 
+          Statistics.appendStat(Statistics.Stats.GOLD, goldGainedFromCombat_800bc920);
+
           if((flags & FLAG_NO_LOOT) == 0) { // Hasn't already dropped loot
             for(final CombatantStruct1a8.ItemDrop drop : enemyCombatant.drops) {
               if(simpleRand() * 100 >> 16 < drop.chance()) {
