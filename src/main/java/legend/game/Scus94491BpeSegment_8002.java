@@ -1713,21 +1713,17 @@ public final class Scus94491BpeSegment_8002 {
       case 0xff -> 0xff;
       default -> {
         final int itemId = script.params_20[0].get();
-        final boolean result;
 
         if(itemId < 0xc0) {
-          result = giveEquipment(REGISTRIES.equipment.getEntry(LodMod.id(LodMod.EQUIPMENT_IDS[itemId])).get());
-        } else {
-          result = giveItem(REGISTRIES.items.getEntry(LodMod.id(LodMod.ITEM_IDS[itemId - 192])).get());
+          yield giveEquipment(REGISTRIES.equipment.getEntry(LodMod.id(LodMod.EQUIPMENT_IDS[itemId])).get()) ? 0 : 0xff;
         }
-
-        if(result) {
-          Statistics.appendStat(Statistics.Stats.CHEST, 1);
-        }
-
-        yield result ? 0 : 0xff;
+        yield giveItem(REGISTRIES.items.getEntry(LodMod.id(LodMod.ITEM_IDS[itemId - 192])).get()) ? 0 : 0xff;
       }
     };
+
+    if(a0 == 0) {
+      Statistics.appendStat(Statistics.Stats.CHEST, 1);
+    }
 
     //LAB_80024574
     script.params_20[1].set(a0);
