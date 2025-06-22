@@ -61,7 +61,7 @@ public final class FooterActionsHud {
     Texture.png(Path.of("gfx", "ui", "icon-sort-icon-asc.png")),     //20
   };
 
-  private static Texture getTexture(final InputAction inputAction) {
+  public static Texture getTexture(final InputAction inputAction) {
     final ControllerStyle style = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
     if (style == ControllerStyle.XBOX) {
       if (inputAction == INPUT_ACTION_MENU_CONFIRM.get()) return textures[10];

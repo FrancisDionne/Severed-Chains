@@ -86,6 +86,7 @@ import legend.game.scripting.ScriptDescription;
 import legend.game.scripting.ScriptFile;
 import legend.game.scripting.ScriptParam;
 import legend.game.scripting.ScriptState;
+import legend.game.statistics.Statistics;
 import legend.game.tmd.Renderer;
 import legend.game.types.GsF_LIGHT;
 import legend.game.types.Model124;
@@ -1440,6 +1441,9 @@ public final class SEffe {
         } else if((PLATFORM.isActionPressed(INPUT_ACTION_BTTL_ATTACK.get()) || CONFIG.getConfig(CoreMod.DRAGOON_ADDITION_MODE_CONFIG.get()) == DragoonAdditionMode.AUTOMATIC) && daddy.inputMode_13 != 2) {
           daddy.meterSpinning_10 = 1;
           daddyMeterSpinning_80119f42 = 1;
+          if(daddy.inputMode_13 == 0) {
+            Statistics.appendStat(state.innerStruct_00.charId_18, Statistics.Stats.TOTAL_DRAGOON_ADDITION, 1);
+          }
         }
       } else {
         //LAB_80108600
@@ -1483,6 +1487,9 @@ public final class SEffe {
               daddy.currentPressNumber_07 = currentPressNumber;
               daddy.countEyeFlashTicks_0d = 4;
               daddyHitsCompleted_80119f40 = 0;
+              if(daddy.inputMode_13 == 0) {
+                Statistics.appendStat(state.innerStruct_00.charId_18, Statistics.Stats.TOTAL_DRAGOON_ADDITION_HIT, 1);
+              }
             } else {
               //LAB_8010873c
               if(daddy.currentPressNumber_07 == 0) {
@@ -1507,6 +1514,9 @@ public final class SEffe {
               //LAB_801087a4
               if(daddy.currentPressNumber_07 == daddy.totalPressCount_14) {
                 allocatePerfectDragoonAdditionEffect();
+                if(daddy.inputMode_13 == 0) {
+                  Statistics.appendStat(state.innerStruct_00.charId_18, Statistics.Stats.TOTAL_DRAGOON_ADDITION_COMPLETED, 1);
+                }
               }
 
               //LAB_801087bc

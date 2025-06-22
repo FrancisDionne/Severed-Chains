@@ -54,14 +54,19 @@ public final class Statistics {
     TOTAL_GUARD(-130, "Guard"),
     TOTAL_DEATH(-140, "Death"),
     TOTAL_ADDITION(-150, "Addition Attempt"),
-    TOTAL_ADDITION_COMPLETE(-160, "Addition Complete", "%"),
-    TOTAL_ADDITION_FLAWLESS(-170, "Addition Flawless", "%"),
+    TOTAL_ADDITION_COMPLETE(-160, "Addition Complete"),
+    TOTAL_ADDITION_FLAWLESS(-170, "Addition Flawless"),
     TOTAL_ADDITION_HIT(-180, "Addition Hits"),
     TOTAL_ADDITION_COUNTER(-190, "Counter"),
-    TOTAL_ADDITION_COUNTER_BLOCK(-200, "Counter Block", "%"),
+    TOTAL_ADDITION_COUNTER_BLOCK(-200, "Counter Block"),
     TOTAL_DRAGOON_ADDITION(-210, "D-Addition Attempt"),
-    TOTAL_DRAGOON_ADDITION_COMPLETED(-220, "D-Addition Complete", "%"),
+    TOTAL_DRAGOON_ADDITION_COMPLETED(-220, "D-Addition Complete"),
     TOTAL_DRAGOON_ADDITION_HIT(-230, "D-Addition Hits"),
+
+    GOLD(10000, "Gold Earned"),
+    CHEST(10001, "Chests Opened"),
+    ENCOUNTERS(10002, "Encounters"),
+    DISTANCE(10003, "Distance Traveled", "%.2f"),
 
     DART_UNLOCKED(1, true),
     LAVITZ_UNLOCKED(2, true),
@@ -308,7 +313,7 @@ public final class Statistics {
     private final int stat;
     private final String name;
     private final boolean isBool;
-    private final String type;
+    private final String format;
 
     Stats(final int stat) {
       this(stat, null);
@@ -322,19 +327,19 @@ public final class Statistics {
       this(stat, name, false);
     }
 
-    Stats(final int stat, final String name, final String type) {
-      this(stat, name, false, type);
+    Stats(final int stat, final String name, final String format) {
+      this(stat, name, false, format);
     }
 
     Stats(final int stat, final String name, final boolean isBool) {
       this(stat, name, isBool, null);
     }
 
-    Stats(final int stat, final String name, final boolean isBool, final String type) {
+    Stats(final int stat, final String name, final boolean isBool, final String format) {
       this.stat = stat;
       this.name = name;
       this.isBool = isBool;
-      this.type = type;
+      this.format = format;
     }
 
     public String getName() {
@@ -343,14 +348,6 @@ public final class Statistics {
 
     public int asInt() {
       return this.stat;
-    }
-
-    public boolean isBool() {
-      return this.isBool;
-    }
-
-    public String type() {
-      return this.type;
     }
 
     public static Stats asStat(final int value) {
@@ -423,15 +420,21 @@ public final class Statistics {
       statistics.put(i, 0f);
     }
     float newValue = statistics.get(i) + value;
-    if (stat.isBool()) {
+    if (stat.isBool) {
       newValue = value > 0 ? 1 : 0;
     }
     statistics.put(i, newValue);
   }
 
   public static void appendStat(final BattleEntity27c bent, final Stats stat, final float value) {
-    if(value != 0 && bent instanceof final PlayerBattleEntity player) {
-      final int statIndex = Math.abs(stat.asInt()) + player.charId_272 + 1;
+    if(bent instanceof final PlayerBattleEntity player) {
+      appendStat(player.charId_272, stat, value);
+    }
+  }
+
+  public static void appendStat(final int charId, final Stats stat, final float value) {
+    if(value != 0) {
+      final int statIndex = Math.abs(stat.asInt()) + charId + 1;
       appendStat(Stats.asStat(statIndex), value);
     }
   }
@@ -487,10 +490,6 @@ public final class Statistics {
     return value;
   }
 
-  private static float getSumForCharacterStats(final Stats stat) {
-    return getStat(Math.abs(stat.asInt()), 1, 9);
-  }
-
   private static float getStat(final int statIndex, final int minRange, final int maxRange) {
     float value = 0f;
     for(int i = statIndex + minRange; i <= statIndex + maxRange; i++) {
@@ -506,7 +505,7 @@ public final class Statistics {
   public static float[] getStats(final Stats stat) {
     final float[] stats;
     final int statIndex = Math.abs(stat.asInt());
-    if(statIndex > 0) {
+    if(statIndex > 0 && statIndex < 9999) {
       stats = new float[9];
       for(int i = 0; i < stats.length; i++) {
         stats[i] = getStat(Stats.asStat(statIndex + i + 1));
@@ -523,21 +522,38 @@ public final class Statistics {
     return stats;
   }
 
-  private static float getPercentTotalValue(final Stats stat, final int charIndex, final boolean isTotal) {
-    switch(stat) {
-      case Stats.TOTAL_ADDITION_COMPLETE:
-      case Stats.TOTAL_ADDITION_FLAWLESS:
-        return isTotal ? getArraySum(getStats(Stats.TOTAL_ADDITION.asInt())) : getStat(Math.abs(Stats.TOTAL_ADDITION.asInt()) + charIndex);
+  private static float getPercentTotalValue(final Stats stat, final int charIndex, final boolean isTotal, final int displayMode) {
+    if(displayMode == 2) {
+        return getArraySum(getStats(stat));
+    }
+    if(displayMode == 1) {
+      final Stats totalStat = switch(stat) {
+        case Stats.TOTAL_PHYSICAL_DAMAGE, Stats.TOTAL_MAGICAL_DAMAGE -> Stats.TOTAL_DAMAGE;
+        case Stats.TOTAL_PHYSICAL_TAKEN, Stats.TOTAL_MAGICAL_TAKEN -> Stats.TOTAL_TAKEN;
+        case Stats.TOTAL_PHYSICAL_ATTACK, Stats.TOTAL_MAGICAL_ATTACK, Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK, Stats.TOTAL_DRAGOON_MAGICAL_ATTACK -> Stats.TOTAL_ATTACK;
+        case Stats.TOTAL_ADDITION_COMPLETE, Stats.TOTAL_ADDITION_FLAWLESS -> Stats.TOTAL_ADDITION;
+        case Stats.TOTAL_DRAGOON_ADDITION_COMPLETED -> Stats.TOTAL_DRAGOON_ADDITION;
+        default -> null;
+      };
+      if(totalStat != null) {
+        if(totalStat.asInt() != 0) {
+          return isTotal ? getArraySum(getStats(totalStat.asInt())) : getStat(Math.abs(totalStat.asInt()) + charIndex);
+        }
+        return isTotal ? getArraySum(getStats(totalStat)) : getStat(totalStat, charIndex);
+      }
     }
     return 0;
   }
 
-  public static String getDisplayValue(final int value, final Stats stat, final int charIndex, final boolean isTotal) {
-    if(stat.type != null && stat.type.equals("%")) {
-      final float total = getPercentTotalValue(stat, charIndex + 1, isTotal);
-      return String.valueOf(value) + '\n' + (total > 0 ? Math.round(value / total * 100) : 0) + '%';
+  public static String getDisplayValue(final float value, final Stats stat, final int charIndex, final boolean isTotal, final int displayMode) {
+    if(displayMode == 1 || displayMode == 2) {
+      float total = getPercentTotalValue(stat, charIndex + 1, isTotal, displayMode);
+      if (total == 0) {
+        total = value;
+      }
+      return total > 0 ? String.valueOf(Math.round(value / total * 100)) + '%' : "0%";
     }
-    return String.valueOf(value);
+    return stat.format != null ? String.format(stat.format, value) : String.valueOf((int)value);
   }
 
   private static float getArraySum(final float[] array) {

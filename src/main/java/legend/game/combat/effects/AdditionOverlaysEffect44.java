@@ -603,6 +603,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
             if(state.storage_44[8] != 0) {
               hitOverlay.isCounter_1c = true;
               state.storage_44[8] = 0;
+              Statistics.appendStat(this.attackerBent, Statistics.Stats.TOTAL_ADDITION_COUNTER, 1);
             }
 
             //LAB_801075e8
@@ -659,6 +660,10 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
                     }
 
                     Statistics.appendStat(this.attackerBent, Statistics.Stats.TOTAL_ADDITION_HIT, 1);
+
+                    if(hitOverlay.isCounter_1c) {
+                      Statistics.appendStat(this.attackerBent, Statistics.Stats.TOTAL_ADDITION_COUNTER_BLOCK, 1);
+                    }
                   }
                   else { // Late/Early Input
                     this.currentInputStatus = this.currentFrame_34 < hitOverlay.frameSuccessLowerBound_10 ? AdditionButtonFeedback.EARLY : AdditionButtonFeedback.LATE;

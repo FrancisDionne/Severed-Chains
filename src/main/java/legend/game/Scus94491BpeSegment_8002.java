@@ -39,6 +39,7 @@ import legend.game.scripting.ScriptParam;
 import legend.game.scripting.ScriptReadable;
 import legend.game.sound.QueuedSound28;
 import legend.game.sound.SoundFile;
+import legend.game.statistics.Statistics;
 import legend.game.submap.SubmapEnvState;
 import legend.game.tim.Tim;
 import legend.game.tmd.UvAdjustmentMetrics14;
@@ -1210,6 +1211,8 @@ public final class Scus94491BpeSegment_8002 {
       gameState_800babc8.gold_94 = 99999999;
     }
 
+    Statistics.appendStat(Statistics.Stats.GOLD, amount);
+
     //LAB_8002366c
     return 0;
   }
@@ -1710,11 +1713,19 @@ public final class Scus94491BpeSegment_8002 {
       case 0xff -> 0xff;
       default -> {
         final int itemId = script.params_20[0].get();
+        final boolean result;
 
         if(itemId < 0xc0) {
-          yield giveEquipment(REGISTRIES.equipment.getEntry(LodMod.id(LodMod.EQUIPMENT_IDS[itemId])).get()) ? 0 : 0xff;
+          result = giveEquipment(REGISTRIES.equipment.getEntry(LodMod.id(LodMod.EQUIPMENT_IDS[itemId])).get());
+        } else {
+          result = giveItem(REGISTRIES.items.getEntry(LodMod.id(LodMod.ITEM_IDS[itemId - 192])).get());
         }
-        yield giveItem(REGISTRIES.items.getEntry(LodMod.id(LodMod.ITEM_IDS[itemId - 192])).get()) ? 0 : 0xff;
+
+        if(result) {
+          Statistics.appendStat(Statistics.Stats.CHEST, 1);
+        }
+
+        yield result ? 0 : 0xff;
       }
     };
 

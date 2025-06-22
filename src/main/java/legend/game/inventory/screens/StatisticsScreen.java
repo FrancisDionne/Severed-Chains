@@ -26,12 +26,15 @@ import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HOME;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class StatisticsScreen extends MenuScreen {
 
@@ -49,6 +52,8 @@ public class StatisticsScreen extends MenuScreen {
 
   private HashMap<Integer, StatisticPage> statisticPages;
   private int pageIndex;
+  private int highlightIndex;
+  private int displayMode;
 
   private static final Matrix4f m = new Matrix4f();
   private static final Obj quad = new QuadBuilder("Statistics Quad")
@@ -59,7 +64,7 @@ public class StatisticsScreen extends MenuScreen {
     .bpp(Bpp.BITS_24)
     .build();
 
-  public static Texture[] portraits = {
+  public static Texture[] textures = {
     Texture.png(Path.of("gfx", "portraits", "dart.png")),    //0
     Texture.png(Path.of("gfx", "portraits", "lavitz.png")),  //1
     Texture.png(Path.of("gfx", "portraits", "shana.png")),   //2
@@ -71,6 +76,9 @@ public class StatisticsScreen extends MenuScreen {
     Texture.png(Path.of("gfx", "portraits", "miranda.png")), //8
     Texture.png(Path.of("gfx", "ui", "background-lines.png")),  //9
     Texture.png(Path.of("gfx", "ui", "column-line.png")),       //10
+    Texture.png(Path.of("gfx", "ui", "highlight_center.png")),  //11
+    Texture.png(Path.of("gfx", "ui", "highlight_left.png")),    //12
+    Texture.png(Path.of("gfx", "ui", "highlight_right.png")),   //13
   };
 
   private static final FontOptions labelFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).size(0.8f).horizontalAlign(HorizontalAlign.CENTRE);
@@ -80,11 +88,14 @@ public class StatisticsScreen extends MenuScreen {
   private static final FontOptions lowNumberFont = new FontOptions().colour(TextColour.FOOTER_RED).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions totalFont = new FontOptions().colour(TextColour.FOOTER_YELLOW).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions notApplicableFont = new FontOptions().colour(TextColour.GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
+  private static final FontOptions displayModeFont = new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.LEFT);
 
   public StatisticsScreen(final Runnable unload) {
     this.unload = unload;
     this.loadPages();
     this.pageIndex = 0;
+    this.highlightIndex = 0;
+    this.displayMode = 0;
   }
 
   private void loadPages() {
@@ -92,6 +103,7 @@ public class StatisticsScreen extends MenuScreen {
     this.addPage(new StatisticPage("Battle 1", this.getPage0()));
     this.addPage(new StatisticPage("Battle 2", this.getPage1()));
     this.addPage(new StatisticPage("Additions", this.getPage2()));
+    this.addPage(new StatisticPage("Misc", this.getPage3()));
   }
 
   private void addPage(final StatisticPage page) {
@@ -139,6 +151,15 @@ public class StatisticsScreen extends MenuScreen {
     return l;
   }
 
+  private ArrayList<Statistics.Stats> getPage3() {
+    final ArrayList<Statistics.Stats> l = new ArrayList<>();
+    l.add(Statistics.Stats.GOLD);
+    l.add(Statistics.Stats.CHEST);
+    l.add(Statistics.Stats.ENCOUNTERS);
+    l.add(Statistics.Stats.DISTANCE);
+    return l;
+  }
+
   @Override
   protected void render() {
     switch(this.loadingStage) {
@@ -174,6 +195,7 @@ public class StatisticsScreen extends MenuScreen {
   private void renderAll() {
     this.renderGraphics();
     this.renderStats();
+    this.renderHighlight();
     FUN_801034cc(this.pageIndex, this.statisticPages.size(), -10); // Left/right arrows
   }
 
@@ -185,27 +207,26 @@ public class StatisticsScreen extends MenuScreen {
       final float max = this.getStatHighscore(stats);
       //final float min = this.getStatLowscore(stats);
       final float y = 14.7f * i + 42.2f;
-      final float yOffset = stat.type() != null ? -3 : 0;
-      int total = 0;
+      float total = 0;
       for(int j = 0; j < 9; j++) {
         final float x = 28 * j + 86f;
         if (j < stats.length) {
-          final int value = (int)stats[j];
+          final float value = stats[j];
           total += value;
-          renderText(Statistics.getDisplayValue(value, stat, j, false), x, y + yOffset, value == (int)max && max > 0 ? highNumberFont : numberFont, 120);
+          renderText(Statistics.getDisplayValue(value, stat, j, false, this.displayMode), x, y, value == (int)max && max > 0 ? highNumberFont : numberFont, 120);
         } else {
           renderText("-", x, y, notApplicableFont, 120);
         }
       }
       final String statName = stat.getName();
       renderText(statName, 40.5f, y + 0.2f + (statName.contains("\n") ? -2.7f : 0), statFont, 120);
-      renderText(Statistics.getDisplayValue(total, stat, 0, true), 28 * 9 + 89.5f, y + yOffset, totalFont, 120);
+      renderText(stats.length > 1 ? Statistics.getDisplayValue(total, stat, 0, true, this.displayMode) : "-", 28 * 9 + 89.5f, y, stats.length > 1 ? totalFont : notApplicableFont, 120);
     }
   }
 
   private void renderGraphics() {
-    final Texture background = portraits[9];
-    final Texture column = portraits[10];
+    final Texture background = textures[9];
+    final Texture column = textures[10];
     final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
     int x;
     int y;
@@ -239,7 +260,7 @@ public class StatisticsScreen extends MenuScreen {
     }
 
     for(int charIndex = 0; charIndex < 9; charIndex++) {
-      final Texture portrait = portraits[charIndex];
+      final Texture portrait = textures[charIndex];
 
       x = 28 * charIndex + 76;
 
@@ -259,12 +280,54 @@ public class StatisticsScreen extends MenuScreen {
       }
     }
 
+    m.translation(10, 214, 120);
+    m.scale(6, 6, 120);
+
+    RENDERER
+      .queueOrthoModel(quad, m, QueuedModelStandard.class)
+      .texture(FooterActionsHud.getTexture(INPUT_ACTION_MENU_SORT.get()));
+
     renderText(this.statisticPages.get(this.pageIndex).name, 41, 26, labelFont, 120);
     renderText("Total", 341, 26, labelFont, 120);
+    renderText("Display Mode: " + this.getDisplayModeName(), 17, 215.2f, displayModeFont, 120);
+  }
+
+  private void renderHighlight() {
+    final float x = 10;
+    final float y = 14.66f * this.highlightIndex + 37f;
+    m.translation(x, y, 121);
+    m.scale(349, 13.5f, 1);
+
+    RENDERER
+      .queueOrthoModel(quad, m, QueuedModelStandard.class)
+      .texture(textures[11])
+      .translucency(Translucency.HALF_B_PLUS_HALF_F);
+
+    m.translation(x, y, 120);
+    m.scale(4, 13.5f, 1);
+
+    RENDERER
+      .queueOrthoModel(quad, m, QueuedModelStandard.class)
+      .texture(textures[12]);
+
+    m.translation(x + 344.96f, y, 120);
+    m.scale(4, 13.5f, 1);
+
+    RENDERER
+      .queueOrthoModel(quad, m, QueuedModelStandard.class)
+      .texture(textures[13]);
   }
 
   private static boolean isCharacterUnlocked(final int charIndex) {
     return Statistics.getStat(Statistics.Stats.DART_UNLOCKED, charIndex) > 0;
+  }
+
+  private String getDisplayModeName() {
+    return switch(this.displayMode) {
+      case 1 -> "Column %";
+      case 2 -> "Row %";
+      default -> "Number";
+    };
   }
 
   @Override
@@ -297,6 +360,18 @@ public class StatisticsScreen extends MenuScreen {
     }
   }
 
+  private void menuNavigateUp() {
+    if(this.highlightIndex > 0) {
+      this.highlightIndex--;
+    }
+  }
+
+  private void menuNavigateDown() {
+    if(this.highlightIndex < 11) {
+      this.highlightIndex++;
+    }
+  }
+
   @Override
   public InputPropagation inputActionPressed(final InputAction action, final boolean repeat) {
     if(super.inputActionPressed(action, repeat) == InputPropagation.HANDLED) {
@@ -322,6 +397,16 @@ public class StatisticsScreen extends MenuScreen {
       return InputPropagation.HANDLED;
     }
 
+    if(action == INPUT_ACTION_MENU_UP.get()) {
+      this.menuNavigateUp();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_DOWN.get()) {
+      this.menuNavigateDown();
+      return InputPropagation.HANDLED;
+    }
+
     if(action == INPUT_ACTION_MENU_HOME.get()) {
       this.pageIndex = 0;
       return InputPropagation.HANDLED;
@@ -330,6 +415,14 @@ public class StatisticsScreen extends MenuScreen {
     if(action == INPUT_ACTION_MENU_END.get()) {
       this.pageIndex = this.statisticPages.size() - 1;
       return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_SORT.get()) {
+      if(this.displayMode + 1 > 2) {
+        this.displayMode = 0;
+      } else {
+        this.displayMode++;
+      }
     }
 
     return InputPropagation.PROPAGATE;

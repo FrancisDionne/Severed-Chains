@@ -37,6 +37,7 @@ import legend.game.scripting.ScriptParam;
 import legend.game.scripting.ScriptState;
 import legend.game.scripting.ScriptStorageParam;
 import legend.game.scripting.ScriptedObject;
+import legend.game.statistics.Statistics;
 import legend.game.tim.Tim;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.AnimatedSprite08;
@@ -3392,6 +3393,8 @@ public class SMap extends EngineState {
     final EncounterRateMode mode = CONFIG.getConfig(CoreMod.ENCOUNTER_RATE_CONFIG.get());
 
     final float dist = mode.modifyDistance(this.prevPlayerPos_800c6ab0.x - mat.transfer.x + (this.prevPlayerPos_800c6ab0.z - mat.transfer.z)) * (2 / vsyncMode_8007a3b8);
+
+    Statistics.appendStat(Statistics.Stats.DISTANCE, dist / 10000f);
 
     if(dist < 9.0f) {
       //LAB_800e4a98

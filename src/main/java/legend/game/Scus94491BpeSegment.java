@@ -43,6 +43,7 @@ import legend.game.sound.SoundFile;
 import legend.game.sound.SoundFileIndices;
 import legend.game.sound.SpuStruct08;
 import legend.game.sound.Sshd;
+import legend.game.statistics.Statistics;
 import legend.game.types.BattleReportOverlay0e;
 import legend.game.types.BattleReportOverlayList10;
 import legend.game.types.BattleUiParts;
@@ -1882,6 +1883,8 @@ public final class Scus94491BpeSegment {
         battleStartDelayTicks_8004f6ec = 1;
         setBattleDissolveDarkeningMetrics(true, 300 / vsyncMode_8007a3b8 / speedDivisor);
         startFadeEffect(1, 1);
+
+        Statistics.appendStat(Statistics.Stats.ENCOUNTERS, 1);
       }
     }
 
