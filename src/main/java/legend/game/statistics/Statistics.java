@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -425,6 +426,14 @@ public final class Statistics {
     }
   }
 
+  public static void copy(final Path path, final String oldSaveName, final String newSaveName) {
+    try {
+      Files.copy(path.resolve(oldSaveName + ".stats"), path.resolve(newSaveName + ".stats"), StandardCopyOption.REPLACE_EXISTING);
+    } catch(final IOException ex) {
+      LOGGER.error(ex);
+    }
+  }
+
   private static String getStatsString() {
     final StringBuilder text = new StringBuilder();
     for(final Stats stat : Stats.values()) {
@@ -442,7 +451,7 @@ public final class Statistics {
       statistics.put(i, 0f);
     }
     float newValue = statistics.get(i) + value;
-    if (stat.isBool) {
+    if(stat.isBool) {
       newValue = value > 0 ? 1 : 0;
     }
     statistics.put(i, newValue);
@@ -472,7 +481,7 @@ public final class Statistics {
       case 11, 13 -> Stats.TOTAL_SP_RECOVER;
       default -> null;
     };
-    if (stat != null) {
+    if(stat != null) {
       appendStat(bent, stat, amount);
     }
   }
@@ -570,7 +579,7 @@ public final class Statistics {
   public static String getDisplayValue(final float value, final Stats stat, final int charIndex, final boolean isTotal, final int displayMode) {
     if(displayMode == 1 || displayMode == 2) {
       float total = getPercentTotalValue(stat, charIndex + 1, isTotal, displayMode);
-      if (total == 0) {
+      if(total == 0) {
         total = value;
       }
       return total > 0 ? String.valueOf(Math.round(value / total * 100)) + '%' : "0%";

@@ -240,7 +240,7 @@ public class StatisticsScreen extends MenuScreen {
       float total = 0;
       for(int j = 0; j < 9; j++) {
         final float x = 28 * j + 86f;
-        if (j < stats.length) {
+        if(j < stats.length) {
           final float value = stats[j];
           total += value;
           renderText(Statistics.getDisplayValue(value, stat, j, false, this.displayMode), x, y, value == (int)max && max > 0 && stats.length > 1 ? highNumberFont : numberFont, 120);
@@ -257,7 +257,7 @@ public class StatisticsScreen extends MenuScreen {
   }
 
   private Statistics.Stats renderGroup(final StatisticRow statRow, @Nullable Statistics.Stats statGroupEnd, float y) {
-    if (statRow.statGroupEnd != null || statGroupEnd != null) {
+    if(statRow.statGroupEnd != null || statGroupEnd != null) {
       final Texture texture;
 
       if(statGroupEnd == null) {
@@ -289,7 +289,7 @@ public class StatisticsScreen extends MenuScreen {
     int x;
     int y;
 
-    for (int j = 0; j < 4; j++) {
+    for(int j = 0; j < 4; j++) {
       for(int i = 0; i < 4; i++) {
         x = 83 * i + 10;
         y = 44 * j + 37;
@@ -303,7 +303,7 @@ public class StatisticsScreen extends MenuScreen {
       }
     }
 
-    for (int j = 0; j < 4; j++) {
+    for(int j = 0; j < 4; j++) {
       for(int i = 0; i < 10; i++) {
         x = 28 * i + 72;
         y = 44 * j + 37;

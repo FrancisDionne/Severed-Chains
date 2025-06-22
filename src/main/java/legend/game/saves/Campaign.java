@@ -24,6 +24,7 @@ public final class Campaign {
   public final Path path;
   public final String name;
   public final SavedGame latestSave;
+  public SavedGame latestLoad;
 
   public static Campaign load(final SaveManager manager, final Path path) {
     return new Campaign(manager, path);

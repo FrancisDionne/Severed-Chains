@@ -126,6 +126,8 @@ public class CampaignSelectionScreen extends MenuScreen {
         submapScene_80052c34 = 53;
       }
 
+      gameState_800babc8.campaign.latestLoad = save;
+
       Statistics.load(gameState_800babc8.campaign.path, save.fileName);
     }, () -> {
       menuStack.popScreen();

@@ -6,6 +6,7 @@ import legend.core.Version;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.SaveFailedException;
 import legend.game.saves.SavedGame;
+import legend.game.statistics.Statistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -55,6 +56,7 @@ public final class Main {
 
         try {
           SAVES.newSave(name, gameState_800babc8, stats_800be5f8);
+          Statistics.copy(gameState_800babc8.campaign.path, gameState_800babc8.campaign.latestLoad.fileName, name);
           generatedCrashSave = true;
         } catch(final SaveFailedException ex) {
           LOGGER.error("Failed to generate crash recovery save :(", ex);
