@@ -24,11 +24,11 @@ import legend.game.combat.environment.CombatPortraitBorderMetrics0c;
 import legend.game.combat.environment.NameAndPortraitDisplayMetrics0c;
 import legend.game.combat.environment.SpBarBorderMetrics04;
 import legend.game.combat.types.BattleHudStatLabelMetrics0c;
-import legend.game.combat.types.CombatantStruct1a8;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.BattleOptionsCategoryScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.battle.StatDisplayEvent;
+import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
 import legend.game.scripting.ScriptState;
 import legend.game.statistics.Statistics;
@@ -39,6 +39,7 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -404,11 +405,11 @@ public class BattleHud {
     displayStats.y_02 = charDisplay.y_0a;
   }
 
-  private final List<BattleEntity27c> sortedBents = new ArrayList<>();
+  private final List<String> sortedBents = new ArrayList<>();
   private final List<TurnOrder> turns = new ArrayList<>();
 
   private void drawTurnOrder() {
-    if(CONFIG.getConfig(CoreMod.SHOW_TURN_ORDER.get())) {
+    if(!this.battle.isBattleDisabled() && CONFIG.getConfig(CoreMod.SHOW_TURN_ORDER.get())) {
       final int oldSeed = simpleRandSeed_8004dd44;
       this.sortedBents.clear();
       this.turns.clear();
@@ -434,7 +435,7 @@ public class BattleHud {
         if(highestTurnValue > 0xd9) {
           final TurnOrder turnOrder = this.turns.get(highestIndex);
           turnOrder.turnValue -= 0xd9;
-          this.sortedBents.add(turnOrder.state.innerStruct_00);
+          this.sortedBents.add(turnOrder.state.innerStruct_00.getName());
           processedBents++;
         }
 
@@ -450,27 +451,18 @@ public class BattleHud {
         final ScriptState<? extends BattleEntity27c> state = battleState_8006e398.aliveBents_e78[bentIndex];
 
         if((state.storage_44[7] & (FLAG_400 | FLAG_CURRENT_TURN)) != 0) {
-          this.sortedBents.addFirst(state.innerStruct_00);
+          this.sortedBents.addFirst(state.innerStruct_00.getName());
         }
       }
 
       if(battleState_8006e398.getForcedTurnBent() != null) {
-        this.sortedBents.addFirst(battleState_8006e398.getForcedTurnBent().innerStruct_00);
+        this.sortedBents.addFirst(battleState_8006e398.getForcedTurnBent().innerStruct_00.getName() + " !");
       }
 
       final int oldZ = textZ_800bdf00;
       textZ_800bdf00 = 40;
       for(int bentIndex = 0; bentIndex < this.sortedBents.size(); bentIndex++) {
-        final BattleEntity27c bent = this.sortedBents.get(bentIndex);
-        final CombatantStruct1a8 combatant = bent.combatant_144;
-
-        final String name;
-        if((combatant.flags_19e & 0x4) == 0) {
-          name = this.battle.currentEnemyNames_800c69d0[bent.charSlot_276];
-        } else {
-          name = bent.charId_272 == 8 ? "Who?" : playerNames_800fb378[bent.charId_272];
-        }
-
+        final String name = this.sortedBents.get(bentIndex);
         renderText(name, 4, 4 + bentIndex * textHeight(name) * UI_WHITE_SMALL.getSize(), UI_WHITE_SMALL);
       }
       textZ_800bdf00 = oldZ;
@@ -1632,7 +1624,11 @@ public class BattleHud {
       case 1 -> {  // Checking for input
         if(whichMenu_800bdc38 == WhichMenu.NONE_0 && !this.battleMenu_800c6c34.displayTargetArrowAndName_4c && !this.battleMenu_800c6c34.targetArrowHiding && PLATFORM.isActionPressed(LodMod.INPUT_ACTION_BTTL_OPTIONS.get())) {
           whichMenu_800bdc38 = WhichMenu.RENDER_NEW_MENU;
-          menuStack.pushScreen(new BattleOptionsCategoryScreen(CONFIG, EnumSet.allOf(ConfigStorageLocation.class), () -> this.closeMenu = true));
+          menuStack.pushScreen(new BattleOptionsCategoryScreen(CONFIG, EnumSet.allOf(ConfigStorageLocation.class), () -> {
+            ConfigStorage.saveConfig(CONFIG, ConfigStorageLocation.GLOBAL, Path.of("config.dcnf"));
+            ConfigStorage.saveConfig(CONFIG, ConfigStorageLocation.CAMPAIGN, gameState_800babc8.campaign.path.resolve("campaign_config.dcnf"));
+            this.closeMenu = true;
+          }));
         }
 
         this.battleMenu_800c6c34.targetArrowHiding = false;
