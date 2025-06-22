@@ -94,6 +94,7 @@ public final class FooterActionsHud {
       case FooterActions.HELP -> "Help";
       case FooterActions.MODS -> "Mods";
       case FooterActions.STATS -> "Stats";
+      case FooterActions.TURN_ORDER -> "Turn";
     };
   }
 
@@ -120,8 +121,8 @@ public final class FooterActionsHud {
 
     if (color != null) {
       final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
-      int x;
-      final int y;
+      float x;
+      final float y;
       String text;
       int textWidth;
 
@@ -130,7 +131,7 @@ public final class FooterActionsHud {
       }
 
       if(style == 1) { // Battle
-        x = 250;
+        x = 277.5f;
         y = 227;
       } else { // Menu
         x = 358;
@@ -195,7 +196,7 @@ public final class FooterActionsHud {
     }
     final InputAction input = switch(action) {
       case FooterActions.BACK -> INPUT_ACTION_MENU_BACK.get();
-      case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD, FooterActions.STATS -> INPUT_ACTION_MENU_DELETE.get();
+      case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD, FooterActions.STATS, FooterActions.TURN_ORDER -> INPUT_ACTION_MENU_DELETE.get();
       case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS -> INPUT_ACTION_MENU_SORT.get();
       case FooterActions.SELECT -> INPUT_ACTION_MENU_CONFIRM.get();
     };
@@ -241,7 +242,7 @@ public final class FooterActionsHud {
   }
 
   public static void renderBattleActions() {
-    renderActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, null, null);
+    renderActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, FooterActions.TURN_ORDER, null);
   }
 
   public static void setSecondaryText(final int actionIndex, final Texture texture) {

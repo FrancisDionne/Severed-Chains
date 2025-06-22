@@ -10,5 +10,6 @@ public enum FooterActions {
   ADDITIONS,
   HELP,
   MODS,
-  STATS
+  STATS,
+  TURN_ORDER
 }

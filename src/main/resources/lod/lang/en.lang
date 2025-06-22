@@ -486,6 +486,7 @@ lod.input_actions.bttl_attack.name=Battle: attack
 lod.input_actions.bttl_counter.name=Battle: counter
 lod.input_actions.bttl_rotate_camera.name=Battle: change camera
 lod.input_actions.bttl_additions.name=Battle: change additions
+lod.input_actions.bttl_turn_order.name=Battle: show turn order
 lod.input_actions.bttl_transform.name=Battle: transform
 lod.input_actions.bttl_special.name=Battle: special
 lod.input_actions.bttl_escape.name=Battle: escape

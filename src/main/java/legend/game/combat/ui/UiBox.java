@@ -29,16 +29,16 @@ public class UiBox {
   private Obj hudBackgroundBorders;
   private final MV transforms = new MV();
 
-  public UiBox(final String name, final int x, final int y, final int width, final int height) {
+  public UiBox(final String name, final float x, final float y, final float width, final float height) {
     this(name, x, y, width, height, 1.0f, 1.0f, 1.0f);
   }
 
-  public UiBox(final String name, final int x, final int y, final int width, final int height, final Vector3f colour) {
+  public UiBox(final String name, final float x, final float y, final float width, final float height, final Vector3f colour) {
     this(name, x, y, width, height, colour.x, colour.y, colour.z);
   }
 
   @Method(0x800f1268L) // buildBattleHudBackground
-  public UiBox(final String name, final int x, final int y, final int width, final int height, final float r, final float g, final float b) {
+  public UiBox(final String name, final float x, final float y, final float width, final float height, final float r, final float g, final float b) {
     // Gradient
     this.hudBackgroundObj = new QuadBuilder(name + " Background")
       .translucency(Translucency.HALF_B_PLUS_HALF_F)
@@ -62,12 +62,12 @@ public class UiBox {
   }
 
   @Method(0x800f0f5cL)
-  private void buildBattleHudBorder(final int x0, final int y0, final int x1, final int y1) {
+  private void buildBattleHudBorder(final float x0, final float y0, final float x1, final float y1) {
     //LAB_800f0fe4
     //LAB_800f0fe8
     //LAB_800f1014
-    final int[] xs = new int[4];
-    final int[] ys = new int[4];
+    final float[] xs = new float[4];
+    final float[] ys = new float[4];
     xs[0] = x0 + 1;
     ys[0] = y0;
     xs[1] = x1 - 1;
@@ -83,12 +83,12 @@ public class UiBox {
     for(int i = 0; i < 8; i++) {
       final BattleHudBorderMetrics14 borderMetrics = battleHudBorderMetrics_800c6f4c[i];
 
-      final int leftX;
-      final int rightX;
+      final float leftX;
+      final float rightX;
       final int leftU;
       final int rightU;
-      final int topY = ys[borderMetrics.indexXy0_00] - borderMetrics.offsetY_0a;
-      final int bottomY = ys[borderMetrics.indexXy1_02] + borderMetrics.offsetY_0a;
+      final float topY = ys[borderMetrics.indexXy0_00] - borderMetrics.offsetY_0a;
+      final float bottomY = ys[borderMetrics.indexXy1_02] + borderMetrics.offsetY_0a;
       final int topV = borderMetrics.v_06;
       final int bottomV = topV + borderMetrics.h_0e;
 

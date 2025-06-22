@@ -26,7 +26,6 @@ import legend.game.combat.environment.SpBarBorderMetrics04;
 import legend.game.combat.types.BattleHudStatLabelMetrics0c;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.BattleOptionsCategoryScreen;
-import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.battle.StatDisplayEvent;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
@@ -51,7 +50,6 @@ import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.UI_WHITE;
-import static legend.game.SItem.UI_WHITE_SMALL;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.centreScreenX_1f8003dc;
 import static legend.game.Scus94491BpeSegment.centreScreenY_1f8003de;
@@ -59,7 +57,6 @@ import static legend.game.Scus94491BpeSegment.playSound;
 import static legend.game.Scus94491BpeSegment.simpleRand;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
-import static legend.game.Scus94491BpeSegment_8002.textHeight;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.Scus94491BpeSegment_8004.additionCounts_8004f5c0;
 import static legend.game.Scus94491BpeSegment_8004.simpleRandSeed_8004dd44;
@@ -90,6 +87,7 @@ import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_ITEMS;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_ROTATE_CAMERA;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_SPECIAL;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_TRANSFORM;
+import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_TURN_ORDER;
 
 public class BattleHud {
   private static final CombatPortraitBorderMetrics0c[] combatPortraitBorderVertexCoords_800c6e9c = {
@@ -405,11 +403,11 @@ public class BattleHud {
     displayStats.y_02 = charDisplay.y_0a;
   }
 
-  private final List<String> sortedBents = new ArrayList<>();
+  private final List<TurnOrderInfo> sortedBents = new ArrayList<>();
   private final List<TurnOrder> turns = new ArrayList<>();
 
   private void drawTurnOrder() {
-    if(!this.battle.isBattleDisabled() && CONFIG.getConfig(CoreMod.SHOW_TURN_ORDER.get())) {
+    if(!this.battle.isBattleDisabled() && TurnOrderHud.isVisible()) {
       final int oldSeed = simpleRandSeed_8004dd44;
       this.sortedBents.clear();
       this.turns.clear();
@@ -435,7 +433,7 @@ public class BattleHud {
         if(highestTurnValue > 0xd9) {
           final TurnOrder turnOrder = this.turns.get(highestIndex);
           turnOrder.turnValue -= 0xd9;
-          this.sortedBents.add(turnOrder.state.innerStruct_00.getName());
+          this.addTurnOrderBent(turnOrder.state.innerStruct_00, false, false);
           processedBents++;
         }
 
@@ -451,21 +449,27 @@ public class BattleHud {
         final ScriptState<? extends BattleEntity27c> state = battleState_8006e398.aliveBents_e78[bentIndex];
 
         if((state.storage_44[7] & (FLAG_400 | FLAG_CURRENT_TURN)) != 0) {
-          this.sortedBents.addFirst(state.innerStruct_00.getName());
+          this.addTurnOrderBent(state.innerStruct_00, false, true);
         }
       }
 
       if(battleState_8006e398.getForcedTurnBent() != null) {
-        this.sortedBents.addFirst(battleState_8006e398.getForcedTurnBent().innerStruct_00.getName() + " !");
+        this.addTurnOrderBent(battleState_8006e398.getForcedTurnBent().innerStruct_00, true, false);
       }
 
       final int oldZ = textZ_800bdf00;
       textZ_800bdf00 = 40;
-      for(int bentIndex = 0; bentIndex < this.sortedBents.size(); bentIndex++) {
-        final String name = this.sortedBents.get(bentIndex);
-        renderText(name, 4, 4 + bentIndex * textHeight(name) * UI_WHITE_SMALL.getSize(), UI_WHITE_SMALL);
-      }
+      TurnOrderHud.render(this.sortedBents);
       textZ_800bdf00 = oldZ;
+    }
+  }
+
+  private void addTurnOrderBent(final BattleEntity27c bent, final boolean forcedTurn, final boolean addFirst) {
+    final TurnOrderInfo info = new TurnOrderInfo(bent, forcedTurn);
+    if(addFirst) {
+      this.sortedBents.addFirst(info);
+    } else {
+      this.sortedBents.add(info);
     }
   }
 
@@ -1728,6 +1732,16 @@ public class BattleHud {
             this.initListMenu((PlayerBattleEntity)this.battle.currentTurnBent_800c66c8.innerStruct_00, 2);
           } else {
             playSound(0, 40, (short)0, (short)0);
+          }
+        }
+
+        if(PLATFORM.isActionPressed(INPUT_ACTION_BTTL_TURN_ORDER.get())) {
+          if(additionCounts_8004f5c0[this.battle.currentTurnBent_800c66c8.innerStruct_00.charId_272] != 0) {
+            if(TurnOrderHud.toggleVisibility()) {
+              playSound(0, 2, (short)0, (short)0);
+            } else {
+              playSound(0, 3, (short)0, (short)0);
+            }
           }
         }
 
