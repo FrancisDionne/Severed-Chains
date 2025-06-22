@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import static legend.core.GameEngine.RENDERER;
+import static legend.game.SItem.FUN_801034cc;
 import static legend.game.SItem.allocateUiElement;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
@@ -139,10 +140,12 @@ public class StatisticsScreen extends MenuScreen {
     final ArrayList<Statistics.Stats> l = new ArrayList<>();
     l.add(Statistics.Stats.TOTAL_GUARD);
     l.add(Statistics.Stats.TOTAL_EVADE);
-    l.add(Statistics.Stats.TOTAL_DEATH);
     l.add(Statistics.Stats.TOTAL_HP_RECOVER);
     l.add(Statistics.Stats.TOTAL_MP_RECOVER);
     l.add(Statistics.Stats.TOTAL_SP_RECOVER);
+    l.add(Statistics.Stats.TOTAL_DEATH);
+    //l.add(Statistics.Stats.TOTAL_REVIVE);
+    //l.add(Statistics.Stats.TOTAL_REVIVED);
     return l;
   }
 
@@ -205,7 +208,7 @@ public class StatisticsScreen extends MenuScreen {
     this.renderGraphics();
     this.renderStats();
     this.renderHighlight();
-    //FUN_801034cc(this.pageIndex, this.statisticPages.size(), -10); // Left/right arrows
+    FUN_801034cc(this.pageIndex, this.statisticPages.size(), -10); // Left/right arrows
   }
 
   private void renderStats() {
@@ -222,7 +225,7 @@ public class StatisticsScreen extends MenuScreen {
         if (j < stats.length) {
           final float value = stats[j];
           total += value;
-          renderText(Statistics.getDisplayValue(value, stat, j, false, this.displayMode), x, y, value == (int)max && max > 0 ? highNumberFont : numberFont, 120);
+          renderText(Statistics.getDisplayValue(value, stat, j, false, this.displayMode), x, y, value == (int)max && max > 0 && stats.length > 1 ? highNumberFont : numberFont, 120);
         } else {
           renderText("-", x, y, notApplicableFont, 120);
         }
@@ -319,7 +322,7 @@ public class StatisticsScreen extends MenuScreen {
       .queueOrthoModel(quad, m, QueuedModelStandard.class)
       .texture(textures[16]); //Top Right
 
-    m.translation(8.2f + xOffset, 205, 120);
+    m.translation(8.2f + xOffset, 205, 121);
     m.scale(8.5f, 9.7f, 1);
 
     RENDERER
@@ -455,12 +458,16 @@ public class StatisticsScreen extends MenuScreen {
   private void menuNavigateUp() {
     if(this.highlightIndex > 0) {
       this.highlightIndex--;
+    } else {
+      this.highlightIndex = 11;
     }
   }
 
   private void menuNavigateDown() {
     if(this.highlightIndex < 11) {
       this.highlightIndex++;
+    } else {
+      this.highlightIndex = 0;
     }
   }
 

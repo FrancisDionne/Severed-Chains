@@ -62,6 +62,8 @@ public final class Statistics {
     TOTAL_DRAGOON_ADDITION(-210, "D-Addition Attempt"),
     TOTAL_DRAGOON_ADDITION_COMPLETED(-220, "D-Addition Complete"),
     TOTAL_DRAGOON_ADDITION_HIT(-230, "D-Addition Hits"),
+    TOTAL_REVIVE(-240, "Revive"),
+    TOTAL_REVIVED(-250, "Revived"),
 
     GOLD(10000, "Gold Earned"),
     CHEST(10001, "Chests Opened"),
@@ -308,6 +310,26 @@ public final class Statistics {
     KONGOL_DRAGOON_ADDITION_HIT(238),
     MIRANDA_DRAGOON_ADDITION_HIT(239),
 
+    DART_REVIVE(241),
+    LAVITZ_REVIVE(242),
+    SHANA_REVIVE(243),
+    ROSE_REVIVE(244),
+    HASCHEL_REVIVE(245),
+    ALBERT_REVIVE(246),
+    MERU_REVIVE(247),
+    KONGOL_REVIVE(248),
+    MIRANDA_REVIVE(249),
+
+    DART_REVIVED(251),
+    LAVITZ_REVIVED(252),
+    SHANA_REVIVED(253),
+    ROSE_REVIVED(254),
+    HASCHEL_REVIVED(255),
+    ALBERT_REVIVED(256),
+    MERU_REVIVED(257),
+    KONGOL_REVIVED(258),
+    MIRANDA_REVIVED(259),
+
     ;
 
     private final int stat;
@@ -445,9 +467,9 @@ public final class Statistics {
 
   public static void appendRecoverStat(final BattleEntity27c bent, final int amount, final int colour) {
     final Stats stat = switch(colour) {
-      case 3, 7 -> Statistics.Stats.TOTAL_HP_RECOVER;
-      case 10, 12 -> Statistics.Stats.TOTAL_MP_RECOVER;
-      case 11, 13 -> Statistics.Stats.TOTAL_SP_RECOVER;
+      case 3, 7 -> Stats.TOTAL_HP_RECOVER;
+      case 10, 12 -> Stats.TOTAL_MP_RECOVER;
+      case 11, 13 -> Stats.TOTAL_SP_RECOVER;
       default -> null;
     };
     if (stat != null) {
