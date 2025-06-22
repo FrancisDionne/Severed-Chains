@@ -31,6 +31,9 @@ public enum TextColour {
   FOOTER_LIME(166, 212, 116),
   FOOTER_YELLOW(212, 212, 116),
   FOOTER_ORANGE(212, 166, 116),
+
+  STATS_YELLOW(245, 233, 62),
+  STATS_GREEN(68, 235, 129),
   ;
 
   public final int r;

@@ -111,9 +111,9 @@ public class StatisticsScreen extends MenuScreen {
   private static final FontOptions labelFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).size(0.8f).horizontalAlign(HorizontalAlign.RIGHT);
   private static final FontOptions statFont = new FontOptions().colour(TextColour.LIGHT_GREY_WHITE).shadowColour(TextColour.DARK_GREY).size(0.38f).horizontalAlign(HorizontalAlign.RIGHT);
   private static final FontOptions numberFont = new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
-  private static final FontOptions highNumberFont = new FontOptions().colour(TextColour.FOOTER_GREEN).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
+  private static final FontOptions highNumberFont = new FontOptions().colour(TextColour.STATS_GREEN).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions lowNumberFont = new FontOptions().colour(TextColour.FOOTER_RED).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
-  private static final FontOptions totalFont = new FontOptions().colour(TextColour.FOOTER_YELLOW).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
+  private static final FontOptions totalFont = new FontOptions().colour(TextColour.STATS_YELLOW).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions notApplicableFont = new FontOptions().colour(TextColour.GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
   private static final FontOptions displayModeFont = new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.LEFT);
 
@@ -241,7 +241,7 @@ public class StatisticsScreen extends MenuScreen {
       float total = 0;
       for(int j = 0; j < 9; j++) {
         final float x = 28 * j + 86f;
-        if(j < stats.length) {
+        if(j < stats.length && this.isCharacterUnlocked(j)) {
           final float value = stats[j];
           total += value;
           renderText(Statistics.getDisplayValue(value, stat, j, false, this.displayMode), x, y, value == (int)max && max > 0 && stats.length > 1 ? highNumberFont : numberFont, 120);
@@ -337,7 +337,7 @@ public class StatisticsScreen extends MenuScreen {
       m.translation(x + xOffset, 14, 120);
       m.scale(22, 22, 120);
 
-      if(isCharacterUnlocked(charIndex)) {
+      if(this.isCharacterUnlocked(charIndex)) {
         RENDERER
           .queueOrthoModel(quad, m, QueuedModelStandard.class)
           .texture(portrait);
@@ -462,7 +462,7 @@ public class StatisticsScreen extends MenuScreen {
       .texture(textures[13]);
   }
 
-  private static boolean isCharacterUnlocked(final int charIndex) {
+  private boolean isCharacterUnlocked(final int charIndex) {
     return Statistics.getStat(Statistics.Stats.DART_UNLOCKED, charIndex) > 0;
   }
 
