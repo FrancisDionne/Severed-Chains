@@ -69,7 +69,6 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
-import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class MainMenuScreen extends MenuScreen {
@@ -451,6 +450,7 @@ public class MainMenuScreen extends MenuScreen {
       }
 
       if(action == INPUT_ACTION_MENU_DELETE.get() && !repeat) {
+        playMenuSound(2);
         this.showStatisticsScreen();
         return InputPropagation.HANDLED;
       }

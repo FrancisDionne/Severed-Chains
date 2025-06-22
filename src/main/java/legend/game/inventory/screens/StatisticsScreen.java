@@ -7,6 +7,7 @@ import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
+import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.statistics.Statistics;
 import legend.game.types.Translucency;
@@ -217,7 +218,7 @@ public class StatisticsScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    FooterActionsHud.renderMenuActions();
+    FooterActionsHud.renderActions(0, FooterActions.BACK, null, null, null, null);
   }
 
   private void renderAll() {
@@ -493,17 +494,20 @@ public class StatisticsScreen extends MenuScreen {
 
   private void menuNavigateLeft() {
     if(this.pageIndex > 0) {
+      playMenuSound(1);
       this.pageIndex--;
     }
   }
 
   private void menuNavigateRight() {
     if(this.pageIndex < this.statisticPages.size() - 1) {
+      playMenuSound(1);
       this.pageIndex++;
     }
   }
 
   private void menuNavigateUp() {
+    playMenuSound(1);
     if(this.highlightIndex > 0) {
       this.highlightIndex--;
     } else {
@@ -512,6 +516,7 @@ public class StatisticsScreen extends MenuScreen {
   }
 
   private void menuNavigateDown() {
+    playMenuSound(1);
     if(this.highlightIndex < 11) {
       this.highlightIndex++;
     } else {
@@ -565,6 +570,7 @@ public class StatisticsScreen extends MenuScreen {
     }
 
     if(action == INPUT_ACTION_MENU_SORT.get()) {
+      playMenuSound(2);
       if(this.displayMode + 1 > 2) {
         this.displayMode = 0;
       } else {
