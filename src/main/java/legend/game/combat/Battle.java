@@ -414,6 +414,7 @@ public class Battle extends EngineState {
   private ScriptState<ScriptedObject> scriptState_800c674c;
 
   public boolean shouldRenderStage_800c6754;
+  public int lastSelectedAction;
 
   private int currentDisplayableIconsBitset_800c675c;
 
@@ -1727,6 +1728,7 @@ public class Battle extends EngineState {
 
   @Method(0x800c79f0L)
   public void FUN_800c79f0() {
+    this.lastSelectedAction = -1;
     this.currentTurnBent_800c66c8 = battleState_8006e398.allBents_e0c[0];
     this.hud.FUN_800f417c();
 
@@ -1769,6 +1771,7 @@ public class Battle extends EngineState {
         this.forcedTurnBent_800c66bc = battleState_8006e398.getForcedTurnBent();
 
         if(this.forcedTurnBent_800c66bc != null) { // A bent has a forced turn
+          this.lastSelectedAction = -1;
           this.forcedTurnBent_800c66bc.storage_44[7] = this.forcedTurnBent_800c66bc.storage_44[7] & ~FLAG_TAKE_FORCED_TURN | FLAG_1000 | FLAG_CURRENT_TURN;
           this.currentTurnBent_800c66c8 = this.forcedTurnBent_800c66bc;
           EVENTS.postEvent(new BattleEntityTurnEvent<>(this.forcedTurnBent_800c66bc));
@@ -1776,6 +1779,7 @@ public class Battle extends EngineState {
           //LAB_800c7ce8
           if(battleState_8006e398.hasAliveMonsters()) { // Monsters alive, calculate next bent turn
             //LAB_800c7d3c
+            this.lastSelectedAction = -1;
             this.currentTurnBent_800c66c8 = battleState_8006e398.getCurrentTurnBent();
             this.currentTurnBent_800c66c8.storage_44[7] |= FLAG_1000 | FLAG_CURRENT_TURN;
             EVENTS.postEvent(new BattleEntityTurnEvent<>(this.currentTurnBent_800c66c8));
@@ -1848,6 +1852,10 @@ public class Battle extends EngineState {
       //LAB_800c8104
       for(int i = 0; i < aliveCharBents; i++) {
         livingCharIds_800bc968[i] = battleState_8006e398.alivePlayerBents_eac[i].innerStruct_00.charId_272;
+      }
+
+      if(this.lastSelectedAction == 6 && this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null) {
+        Statistics.appendStat(this.currentTurnBent_800c66c8.innerStruct_00, Statistics.Stats.TOTAL_ESCAPE, 1);
       }
 
       //LAB_800c8144

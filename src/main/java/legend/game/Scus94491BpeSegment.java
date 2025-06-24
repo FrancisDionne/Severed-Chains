@@ -23,8 +23,6 @@ import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.environment.BattlePreloadedEntities_18cb0;
 import legend.game.combat.environment.EncounterData38;
 import legend.game.combat.environment.StageData2c;
-import legend.game.debugger.CombatDebuggerController;
-import legend.game.debugger.Debugger;
 import legend.game.inventory.WhichMenu;
 import legend.game.modding.events.RenderEvent;
 import legend.game.modding.events.battle.BattleMusicEvent;
@@ -1891,7 +1889,11 @@ public final class Scus94491BpeSegment {
         setBattleDissolveDarkeningMetrics(true, 300 / vsyncMode_8007a3b8 / speedDivisor);
         startFadeEffect(1, 1);
 
-        Statistics.appendStat(Statistics.Stats.ENCOUNTERS, 1);
+        for(final int charId : gameState_800babc8.charIds_88) {
+          if(charId > -1) {
+            Statistics.appendStat(charId, Statistics.Stats.TOTAL_ENCOUNTER, 1);
+          }
+        }
       }
     }
 

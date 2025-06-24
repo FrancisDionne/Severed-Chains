@@ -1895,6 +1895,8 @@ public class BattleHud {
       Statistics.appendStat(this.battle.currentTurnBent_800c66c8.innerStruct_00, Statistics.Stats.TOTAL_GUARD, 1);
     }
 
+    this.battle.lastSelectedAction = selectedAction;
+
     //LAB_800f6aec
     return selectedAction;
   }

@@ -160,6 +160,7 @@ public class StatisticsScreen extends MenuScreen {
     l.add(new StatisticRow(Statistics.Stats.TOTAL_HP_RECOVER));
     l.add(new StatisticRow(Statistics.Stats.TOTAL_MP_RECOVER));
     l.add(new StatisticRow(Statistics.Stats.TOTAL_SP_RECOVER));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_ESCAPE));
     l.add(new StatisticRow(Statistics.Stats.TOTAL_DEATH));
     //l.add(new StatisticRow(Statistics.Stats.TOTAL_REVIVE));
     //l.add(new StatisticRow(Statistics.Stats.TOTAL_REVIVED));
@@ -183,10 +184,10 @@ public class StatisticsScreen extends MenuScreen {
 
   private ArrayList<StatisticRow> getPage3() {
     final ArrayList<StatisticRow> l = new ArrayList<>();
+    l.add(new StatisticRow(Statistics.Stats.DISTANCE));
     l.add(new StatisticRow(Statistics.Stats.GOLD));
     l.add(new StatisticRow(Statistics.Stats.CHEST));
-    l.add(new StatisticRow(Statistics.Stats.ENCOUNTERS));
-    l.add(new StatisticRow(Statistics.Stats.DISTANCE));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_ENCOUNTER));
     return l;
   }
 

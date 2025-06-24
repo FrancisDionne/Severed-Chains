@@ -66,10 +66,11 @@ public final class Statistics {
     TOTAL_REVIVE(-240, "Revive"),
     TOTAL_REVIVED(-250, "Revived"),
     TOTAL_EXP(-260, "Exp. Gained"),
+    TOTAL_ENCOUNTER(-270, "Encounters"),
+    TOTAL_ESCAPE(-280, "Escape"),
 
     GOLD(10000, "Gold Earned"),
     CHEST(10001, "Chests Opened"),
-    ENCOUNTERS(10002, "Encounters"),
     DISTANCE(10003, "Distance Traveled", "%.2f"),
 
     DART_UNLOCKED(1, true),
@@ -341,6 +342,26 @@ public final class Statistics {
     MERU_EXP(267),
     KONGOL_EXP(268),
     MIRANDA_EXP(269),
+
+    DART_ENCOUNTER(271),
+    LAVITZ_ENCOUNTER(272),
+    SHANA_ENCOUNTER(273),
+    ROSE_ENCOUNTER(274),
+    HASCHEL_ENCOUNTER(275),
+    ALBERT_ENCOUNTER(276),
+    MERU_ENCOUNTER(277),
+    KONGOL_ENCOUNTER(278),
+    MIRANDA_ENCOUNTER(279),
+
+    DART_ESCAPE(281),
+    LAVITZ_ESCAPE(282),
+    SHANA_ESCAPE(283),
+    ROSE_ESCAPE(284),
+    HASCHEL_ESCAPE(285),
+    ALBERT_ESCAPE(286),
+    MERU_ESCAPE(287),
+    KONGOL_ESCAPE(288),
+    MIRANDA_ESCAPE(289),
     ;
 
     private final int stat;
