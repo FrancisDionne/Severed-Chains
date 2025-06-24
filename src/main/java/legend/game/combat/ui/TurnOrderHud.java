@@ -6,6 +6,7 @@ import legend.core.gpu.Bpp;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
+import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.HorizontalAlign;
@@ -49,7 +50,12 @@ public final class TurnOrderHud {
     Texture.png(Path.of("gfx", "portraits", "miranda.png")), //8
     Texture.png(Path.of("gfx", "ui", "skull_icon.png")),       //9
     Texture.png(Path.of("gfx", "ui", "turn_order_arrow.png")), //10
+    Texture.png(Path.of("gfx", "ui", "arrow_blue_right.png")),   //11
+    Texture.png(Path.of("gfx", "ui", "arrow_yellow_right.png")), //12
+    Texture.png(Path.of("gfx", "ui", "arrow_red_right.png")),    //13
   };
+
+  public static BattleEntity27c target;
 
   private TurnOrderHud() {
   }
@@ -71,39 +77,72 @@ public final class TurnOrderHud {
     return isVisible;
   }
 
-  public static void render(final List<TurnOrderInfo> sortedBents) {
+  public static void render(final BattleMenuStruct58 menu, final List<TurnOrderInfo> sortedBents) {
     final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+    final float x = 5.5f;
     float longestName = 0f;
     for(int bentIndex = 0; bentIndex < sortedBents.size(); bentIndex++) {
       final TurnOrderInfo info = sortedBents.get(bentIndex);
       final String name = info.bent.getName();
       final boolean isPlayer = info.bent instanceof PlayerBattleEntity;
       final Texture portrait = textures[isPlayer ? info.bent.charId_272 : 9];
-      final float y = bentIndex * 8f + 6 + 6;
+      final float y = bentIndex * 8f + 15;
+      final float textWidth = textWidth(name) * nameFont.getSize();
 
-      longestName = Math.max(textWidth(name) * (nameFont.getSize() + 0.55f), longestName);
+      longestName = Math.max(textWidth, longestName);
 
-      m.translation(2, y - (isPlayer ? 2.7f : 2.2f), 120);
+      boolean isTarget = false;
+      if(menu.displayTargetArrowAndName_4c) {
+        if(menu.combatantIndex_54 == -1) { //Target Multi
+          if(menu.targetType_50 == 0) { //Allies
+            isTarget = isPlayer;
+          } else if(menu.targetType_50 == 1) { //Enemies
+            isTarget = !isPlayer;
+          } else { //All
+            isTarget = true;
+          }
+        } else {
+          isTarget = target == info.bent;
+        }
+
+        if(isTarget) {
+          final int colour = BattleHud.getTargetArrowColour(info.bent, false);
+          if(colour > -1) {
+            final Texture arrow = textures[11 + colour];
+
+            m.translation(x, y - 0.75f, 120);
+            m.scale(5, 5, 1);
+
+            RENDERER
+              .queueOrthoModel(quad, m, QueuedModelStandard.class)
+              .texture(arrow);
+          } else {
+            isTarget = false;
+          }
+        }
+      }
+
+      m.translation(x + 2 + (isTarget ? 4f : 0f), y - (isPlayer ? 2.7f : 2.2f), 120);
       m.scale(isPlayer ? 6f : 6.2f, isPlayer ? 7f : 6.8f, 1);
 
       RENDERER
         .queueOrthoModel(quad, m, QueuedModelStandard.class)
         .texture(portrait);
 
-      renderText(name, 9 - xOffset, y, bentIndex == 0 ? activeNameFont : nameFont, 120);
+      renderText(name, x + 9 - xOffset+ (isTarget ? 4f : 0f), y, bentIndex == 0 ? activeNameFont : nameFont, 120);
     }
 
-    final float boxWidth = Math.max(longestName - 13, 44);
+    final float boxWidth = Math.max(longestName + x + 15, 50);
     if (turnOrderBox == null || currentBoxWidth != boxWidth || currentBoxOffsetX != xOffset) {
       currentBoxWidth = boxWidth;
       currentBoxOffsetX = xOffset;
-      turnOrderBox = new UiBox("Turn Order Box", -1 - xOffset, 0f, currentBoxWidth, 67f);
+      turnOrderBox = new UiBox("Turn Order Box", x - 2 - xOffset, 4f, currentBoxWidth, 67f);
     }
 
     turnOrderBox.render(Config.changeBattleRgb() ? Config.getBattleRgb() : Config.defaultUiColour);
-    renderText("Turn Order", 1 - xOffset, 2, titleFont, 120);
+    renderText("Turn Order", x + 1 - xOffset, 6, titleFont, 120);
 
-    m.translation(36, 0.5f, 120);
+    m.translation(x + 36, 4.5f, 120);
     m.scale(6, 6, 1);
 
     RENDERER

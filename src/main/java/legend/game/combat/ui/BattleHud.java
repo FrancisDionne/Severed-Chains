@@ -250,19 +250,24 @@ public class BattleHud {
     num.flags_02 = 0;
   }
 
+  public static int getTargetArrowColour(final BattleEntity27c target, final boolean allowDead) {
+    final int colour;
+    final VitalsStat targetHp = target.stats.getStat(LodMod.HP_STAT.get());
+    if(targetHp.getCurrent() > targetHp.getMax() / 4) {
+      colour = targetHp.getCurrent() > targetHp.getMax() / 2 ? 0 : 1;
+    } else {
+      colour = allowDead || targetHp.getCurrent() > 0 ? 2 : -1;
+    }
+    return colour;
+  }
+
   @Method(0x800eca98L)
   private void drawTargetArrow(final int targetType, final int combatantIdx) {
     if(combatantIdx != -1) {
       //LAB_800ecb50
       //LAB_800ecb54
       final BattleEntity27c target = battleState_8006e398.getBentsForTargetType(targetType)[combatantIdx].innerStruct_00;
-      final int colour;
-      final VitalsStat targetHp = target.stats.getStat(LodMod.HP_STAT.get());
-      if(targetHp.getCurrent() > targetHp.getMax() / 4) {
-        colour = targetHp.getCurrent() > targetHp.getMax() / 2 ? 0 : 1;
-      } else {
-        colour = 2;
-      }
+      final int colour = getTargetArrowColour(target, true);
 
       //LAB_800ecb90
       this.drawTargetArrow(colour, target);
@@ -459,7 +464,7 @@ public class BattleHud {
 
       final int oldZ = textZ_800bdf00;
       textZ_800bdf00 = 40;
-      TurnOrderHud.render(this.sortedBents);
+      TurnOrderHud.render(this.battleMenu_800c6c34, this.sortedBents);
       textZ_800bdf00 = oldZ;
     }
   }
@@ -849,6 +854,7 @@ public class BattleHud {
         if(targetCombatant == -1) {  // Target all
           str = targeting_800fb36c[menu.targetType_50];
           element = LodMod.DIVINE_ELEMENT.get();
+          TurnOrderHud.target = null;
         } else {  // Target single
           final BattleEntity27c targetBent;
 
@@ -868,13 +874,16 @@ public class BattleHud {
             //LAB_800f0d10
             str = this.getTargetEnemyName(monsterBent, this.battle.currentEnemyNames_800c69d0[enemySlot]);
             targetBent = monsterBent;
+            TurnOrderHud.target = targetBent;
           } else if(menu.targetType_50 == 0) {
             targetBent = battleState_8006e398.playerBents_e40[targetCombatant].innerStruct_00;
             str = playerNames_800fb378[targetBent.charId_272];
+            TurnOrderHud.target = targetBent;
           } else {
             //LAB_800f0d58
             //LAB_800f0d5c
             targetBent = battleState_8006e398.allBents_e0c[targetCombatant].innerStruct_00;
+            TurnOrderHud.target = targetBent;
             if(targetBent instanceof final MonsterBattleEntity monsterBent) {
               //LAB_800f0e24
               str = this.getTargetEnemyName(monsterBent, this.battle.currentEnemyNames_800c69d0[targetCombatant]);
@@ -1736,12 +1745,10 @@ public class BattleHud {
         }
 
         if(PLATFORM.isActionPressed(INPUT_ACTION_BTTL_TURN_ORDER.get())) {
-          if(additionCounts_8004f5c0[this.battle.currentTurnBent_800c66c8.innerStruct_00.charId_272] != 0) {
-            if(TurnOrderHud.toggleVisibility()) {
-              playSound(0, 2, (short)0, (short)0);
-            } else {
-              playSound(0, 3, (short)0, (short)0);
-            }
+          if(TurnOrderHud.toggleVisibility()) {
+            playSound(0, 2, (short)0, (short)0);
+          } else {
+            playSound(0, 3, (short)0, (short)0);
           }
         }
 
@@ -2090,6 +2097,14 @@ public class BattleHud {
     } else {
       //LAB_800f77f0
       count = battleState_8006e398.getAliveBentCount();
+    }
+
+    if(PLATFORM.isActionPressed(INPUT_ACTION_BTTL_TURN_ORDER.get())) {
+      if(TurnOrderHud.toggleVisibility()) {
+        playSound(0, 2, (short)0, (short)0);
+      } else {
+        playSound(0, 3, (short)0, (short)0);
+      }
     }
 
     //LAB_800f77f4

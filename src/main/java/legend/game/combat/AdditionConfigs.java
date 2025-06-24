@@ -7,7 +7,7 @@ import legend.game.modding.coremod.CoreMod;
 
 import static legend.core.GameEngine.CONFIG;
 
-public class AdditionConfigs {
+public final class AdditionConfigs {
 
   public static AdditionHits80[] additionHits_8010e658;
   public static final String[] additionNames_800fa8d4 = {
@@ -21,6 +21,9 @@ public class AdditionConfigs {
   };
 
   private static boolean fc; //Frame Correction (shorthanded to keep the ternaries in the createAdditionHits calls lean). Main use is to make the No HUD option on Additions feel way more intuitive
+
+  private AdditionConfigs() {
+  }
 
   public static void load() {
     fc = CONFIG.getConfig(CoreMod.ADDITION_TIMING_MODE_CONFIG.get()) == AdditionTimingMode.ADJUSTED;
