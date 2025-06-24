@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.legendofdragoon.modloader.registries.RegistryId;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -45,41 +46,44 @@ public class BattleOptionsScreen extends VerticalLayoutScreen {
     this.panel.setPos(12, 20);
     this.panel.setSize(296, 140);
 
-    final Map<ConfigEntry<?>, String> translations = new HashMap<>();
+    final Map<ConfigEntry<?>, SettingEntry> translations = new HashMap<>();
 
     for(final RegistryId configId : GameEngine.REGISTRIES.config) {
       final ConfigEntry<?> entry = GameEngine.REGISTRIES.config.getEntry(configId).get();
-
       if(entry.category == category) {
-        translations.put(entry, I18n.translate(entry.getLabelTranslationKey()));
+        translations.put(entry, new SettingEntry(I18n.translate(entry.getLabelTranslationKey()), entry.order));
       }
     }
 
     translations.entrySet().stream()
-      .sorted((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getValue(), o2.getValue()))
+      .sorted((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getValue().label, o2.getValue().label))
+      .sorted(Comparator.comparingDouble(o -> o.getValue().order))
       .forEach(entry -> {
         //noinspection rawtypes
         final ConfigEntry configEntry = entry.getKey();
-        final String text = entry.getValue();
+        final String text = entry.getValue().label;
 
-        if(validLocations.contains(configEntry.storageLocation) && configEntry.hasEditControl()) {
-          Control editControl;
+        if(validLocations.contains(configEntry.storageLocation) && (configEntry.hasEditControl() || configEntry.header)) {
+          Control editControl = null;
           boolean error = false;
 
-          try {
-            //noinspection unchecked
-            editControl = configEntry.makeEditControl(config.getConfig(configEntry), config);
-          } catch(final Throwable ex) {
-            editControl = this.createErrorLabel("Error creating control", ex, false);
-            error = true;
+          if(!configEntry.header) {
+            try {
+              //noinspection unchecked
+              editControl = configEntry.makeEditControl(config.getConfig(configEntry), config);
+            } catch(final Throwable ex) {
+              editControl = this.createErrorLabel("Error creating control", ex, false);
+              error = true;
+            }
+            editControl.setZ(35);
           }
-
-          editControl.setZ(35);
 
           final Label label = this.addRow(text, editControl);
 
           if(error) {
             label.getFontOptions().colour(0.30f, 0.0f, 0.0f).shadowColour(TextColour.LIGHT_BROWN);
+          } else if (configEntry.header) {
+            label.getFontOptions().colour(TextColour.DARKER_GREY).shadowColour(TextColour.MIDDLE_BROWN);
           }
 
           if(configEntry.hasHelp()) {
