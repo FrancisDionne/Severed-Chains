@@ -519,18 +519,18 @@ public final class Statistics {
     float value = 0f;
     switch(stat) {
       case Stats.TOTAL_DAMAGE:
-        value += getStat(Stats.TOTAL_PHYSICAL_DAMAGE, Math.abs(Stats.TOTAL_PHYSICAL_DAMAGE.asInt() * 2) + offset);
-        value += getStat(Stats.TOTAL_MAGICAL_DAMAGE, Math.abs(Stats.TOTAL_MAGICAL_DAMAGE.asInt() * 2) + offset);
+        value += getOffsetStat(Stats.TOTAL_PHYSICAL_DAMAGE, offset);
+        value += getOffsetStat(Stats.TOTAL_MAGICAL_DAMAGE, offset);
         break;
       case Stats.TOTAL_TAKEN:
-        value += getStat(Stats.TOTAL_PHYSICAL_TAKEN, Math.abs(Stats.TOTAL_PHYSICAL_TAKEN.asInt() * 2) + offset);
-        value += getStat(Stats.TOTAL_MAGICAL_TAKEN, Math.abs(Stats.TOTAL_MAGICAL_TAKEN.asInt() * 2) + offset);
+        value += getOffsetStat(Stats.TOTAL_PHYSICAL_TAKEN, offset);
+        value += getOffsetStat(Stats.TOTAL_MAGICAL_TAKEN, offset);
         break;
       case Stats.TOTAL_ATTACK:
-        value += getStat(Stats.TOTAL_PHYSICAL_ATTACK, Math.abs(Stats.TOTAL_PHYSICAL_ATTACK.asInt() * 2) + offset);
-        value += getStat(Stats.TOTAL_MAGICAL_ATTACK, Math.abs(Stats.TOTAL_MAGICAL_ATTACK.asInt() * 2) + offset);
-        value += getStat(Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK, Math.abs(Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK.asInt() * 2) + offset);
-        value += getStat(Stats.TOTAL_DRAGOON_MAGICAL_ATTACK, Math.abs(Stats.TOTAL_DRAGOON_MAGICAL_ATTACK.asInt() * 2) + offset);
+        value += getOffsetStat(Stats.TOTAL_PHYSICAL_ATTACK, offset);
+        value += getOffsetStat(Stats.TOTAL_MAGICAL_ATTACK, offset);
+        value += getOffsetStat(Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK, offset);
+        value += getOffsetStat(Stats.TOTAL_DRAGOON_MAGICAL_ATTACK, offset);
         break;
       default:
         final int i = stat.asInt() + offset;
@@ -540,6 +540,10 @@ public final class Statistics {
         break;
     }
     return value;
+  }
+
+  private static float getOffsetStat(final Stats stat, final int offset) {
+    return getStat(stat, Math.abs(stat.asInt()) * 2 + offset);
   }
 
   public static float[] getStats(final int statIndex) {
