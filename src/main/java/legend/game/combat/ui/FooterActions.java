@@ -10,6 +10,8 @@ public enum FooterActions {
   ADDITIONS,
   HELP,
   MODS,
-  STATS,
-  TURN_ORDER
+  ARCHIVE,
+  TURN_ORDER,
+  ARCHIVE_STATS,
+  ARCHIVE_BESTIARY,
 }

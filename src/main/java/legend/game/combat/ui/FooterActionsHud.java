@@ -93,8 +93,10 @@ public final class FooterActionsHud {
       case FooterActions.ADDITIONS -> "Additions";
       case FooterActions.HELP -> "Help";
       case FooterActions.MODS -> "Mods";
-      case FooterActions.STATS -> "Stats";
+      case FooterActions.ARCHIVE -> "Archive";
       case FooterActions.TURN_ORDER -> "Turn";
+      case FooterActions.ARCHIVE_BESTIARY -> "Bestiary";
+      case FooterActions.ARCHIVE_STATS -> "Statistics";
     };
   }
 
@@ -196,7 +198,7 @@ public final class FooterActionsHud {
     }
     final InputAction input = switch(action) {
       case FooterActions.BACK -> INPUT_ACTION_MENU_BACK.get();
-      case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD, FooterActions.STATS, FooterActions.TURN_ORDER -> INPUT_ACTION_MENU_DELETE.get();
+      case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD, FooterActions.ARCHIVE, FooterActions.TURN_ORDER, FooterActions.ARCHIVE_BESTIARY, FooterActions.ARCHIVE_STATS -> INPUT_ACTION_MENU_DELETE.get();
       case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS -> INPUT_ACTION_MENU_SORT.get();
       case FooterActions.SELECT -> INPUT_ACTION_MENU_CONFIRM.get();
     };

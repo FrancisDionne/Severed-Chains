@@ -263,7 +263,7 @@ public class MainMenuScreen extends MenuScreen {
       }
     }
 
-    FooterActionsHud.renderMenuActions(FooterActions.STATS, null, null);
+    FooterActionsHud.renderMenuActions(FooterActions.ARCHIVE, null, null);
   }
 
   private void renderInventoryMenu(final long a2) {
@@ -344,7 +344,7 @@ public class MainMenuScreen extends MenuScreen {
   }
 
   private void showStatisticsScreen() {
-    this.showScreen(StatisticsScreen::new);
+    this.showScreen(ArchiveScreen::new);
   }
 
   private void showCharSwapScreen() {
