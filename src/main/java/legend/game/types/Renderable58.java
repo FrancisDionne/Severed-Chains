@@ -32,8 +32,8 @@ public class Renderable58 {
   public float widthScale;
   public float heightScale_38;
   public float z_3c;
-  public int x_40;
-  public int y_44;
+  public float x_40;
+  public float y_44;
 
   public Renderable58 child_50;
   public Renderable58 parent_54;

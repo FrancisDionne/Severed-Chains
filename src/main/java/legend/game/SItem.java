@@ -711,7 +711,7 @@ public final class SItem {
     //LAB_801037f4
   }
 
-  public static Renderable58 allocateUiElement(final Renderable58 renderable, final int startGlyph, final int endGlyph, final int x, final int y) {
+  public static Renderable58 allocateUiElement(final Renderable58 renderable, final int startGlyph, final int endGlyph, final float x, final float y) {
     if(endGlyph >= startGlyph) {
       renderable.glyph_04 = startGlyph;
       renderable.startGlyph_10 = startGlyph;
@@ -739,13 +739,21 @@ public final class SItem {
   }
 
   @Method(0x80103818L)
-  public static Renderable58 allocateUiElement(final int startGlyph, final int endGlyph, final int x, final int y) {
+  public static Renderable58 allocateUiElement(final int startGlyph, final int endGlyph, final float x, final float y) {
     final Renderable58 renderable = allocateRenderable(uiFile_800bdc3c.uiElements_0000(), null);
     return allocateUiElement(renderable, startGlyph, endGlyph, x, y);
   }
 
+  public static Renderable58 renderItemIcon(final ItemIcon icon, final float x, final float y, final float z, final float widthScale, final float heightScale, final int flags) {
+    final Renderable58 renderable = renderItemIcon(icon, x, y, flags);
+    renderable.z_3c = z;
+    renderable.widthScale = widthScale;
+    renderable.heightScale_38 = heightScale;
+    return renderable;
+  }
+
   @Method(0x80103910L)
-  public static Renderable58 renderItemIcon(final ItemIcon icon, final int x, final int y, final int flags) {
+  public static Renderable58 renderItemIcon(final ItemIcon icon, final float x, final float y, final int flags) {
     final Renderable58 renderable = allocateRenderable(uiFile_800bdc3c.itemIcons_c6a4(), null);
     renderable.flags_00 |= flags | Renderable58.FLAG_NO_ANIMATION;
     renderable.glyph_04 = icon.resolve().icon;

@@ -20,6 +20,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Optional;
 
+import static legend.game.combat.Monsters.monsterNames_80112068;
+
 public final class Statistics {
 
   private static final Logger LOGGER = LogManager.getFormatterLogger(DiscordRichPresence.class);
@@ -462,6 +464,10 @@ public final class Statistics {
       if(i > 0) {
         text.append(i).append('=').append(statistics.getOrDefault(i, 0f)).append('\n');
       }
+    }
+    for(int i = 0; i < monsterNames_80112068.length; i++) {
+      final int enemyStatId = i + 100000;
+      text.append(enemyStatId).append('=').append(statistics.getOrDefault(enemyStatId, 0f)).append('\n');
     }
     return text.toString();
   }

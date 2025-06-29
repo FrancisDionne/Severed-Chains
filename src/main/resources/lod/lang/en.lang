@@ -1,6 +1,16 @@
 # Mod metadata
 lod.name=Legend of Dragoon
 
+# Elements
+lod.elements.dark.name=Dark
+lod.elements.fire.name=Fire
+lod.elements.divine.name=None
+lod.elements.earth.name=Earth
+lod.elements.water.name=Water
+lod.elements.wind.name=Wind
+lod.elements.light.name=Light
+lod.elements.thunder.name=Thunder
+
 # Equipment
 lod.equipment.broad_sword.name=Broad Sword
 lod.equipment.broad_sword.description=

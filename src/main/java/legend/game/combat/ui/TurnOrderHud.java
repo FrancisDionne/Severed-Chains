@@ -32,7 +32,7 @@ public final class TurnOrderHud {
   private static final FontOptions activeNameFont = new FontOptions().colour(TextColour.WHITE).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
   private static final FontOptions nameFont = new FontOptions().colour(TextColour.LIGHT_GREY).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
   private static final FontOptions titleFont = new FontOptions().colour(TextColour.YELLOW).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
-  private static UiBox turnOrderBox = null;
+  private static UiBox turnOrderBox;
 
   private static float currentBoxOffsetX = 0f;
   private static float currentBoxWidth = 0f;

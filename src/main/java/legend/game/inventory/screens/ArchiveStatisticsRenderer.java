@@ -192,7 +192,7 @@ public class ArchiveStatisticsRenderer {
     this.renderGraphics();
     this.renderStats();
     this.renderHighlight();
-    FUN_801034cc(this.pageIndex, this.statisticPages.size(), -10); // Left/right arrows
+    FUN_801034cc(this.pageIndex, this.getPageCount(), -10); // Left/right arrows
   }
 
   private void renderStats() {
@@ -241,7 +241,7 @@ public class ArchiveStatisticsRenderer {
         y = y - 19f;
       }
 
-      final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+      final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
       this.m.translation(5 + xOffset, y, 120);
       this.m.scale(3.2f, 34.8f, 1);
 
@@ -253,7 +253,7 @@ public class ArchiveStatisticsRenderer {
   }
 
   private void renderGraphics() {
-    final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+    final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
     int x;
     int y;
 
@@ -403,7 +403,7 @@ public class ArchiveStatisticsRenderer {
   }
 
   private void renderHighlight() {
-    final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+    final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
     final float x = 10.2f;
     final float y = 14.66f * this.highlightIndex + 37f;
     this.m.translation(x + xOffset, y, 121);
