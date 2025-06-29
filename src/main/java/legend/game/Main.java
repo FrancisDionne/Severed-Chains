@@ -40,7 +40,6 @@ public final class Main {
   public static void main(final String[] args) {
     try {
       LOGGER.info("Initialising LWJGL version %s", org.lwjgl.Version.getVersion());
-      DiscordRichPresence.start();
       GameEngine.start();
     } catch(final Throwable e) {
       boolean generatedCrashSave = false;
@@ -89,8 +88,6 @@ public final class Main {
       LogManager.shutdown();
       System.exit(1);
     }
-
-    DiscordRichPresence.stop();
   }
 
   private static void getExceptionMessages(final Throwable e, final List<String> messages) {

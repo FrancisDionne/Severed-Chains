@@ -8,7 +8,7 @@ import legend.game.saves.ConfigStorageLocation;
 
 public class AdditionOverlaySizeConfigEntry extends ConfigEntry<Float> {
   public AdditionOverlaySizeConfigEntry() {
-    super(1.25f, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, AdditionOverlaySizeConfigEntry::serializer, AdditionOverlaySizeConfigEntry::deserializer);
+    super(1.25f, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS, AdditionOverlaySizeConfigEntry::serializer, AdditionOverlaySizeConfigEntry::deserializer, 4);
 
     this.setEditControl((number, gameState) -> {
       final NumberSpinner<Float> spinner = NumberSpinner.percentSpinner(number, 0.05f, 0.25f, 0.25f, 2.0f);
