@@ -28,17 +28,22 @@ public class UiBox {
   private final Obj hudBackgroundButDarkerObj;
   private Obj hudBackgroundBorders;
   private final MV transforms = new MV();
+  private final float backgroundAlpha;
 
   public UiBox(final String name, final float x, final float y, final float width, final float height) {
-    this(name, x, y, width, height, 1.0f, 1.0f, 1.0f);
+    this(name, x, y, width, height, 1.0f, 1.0f, 1.0f, -1);
   }
 
   public UiBox(final String name, final float x, final float y, final float width, final float height, final Vector3f colour) {
-    this(name, x, y, width, height, colour.x, colour.y, colour.z);
+    this(name, x, y, width, height, colour.x, colour.y, colour.z, -1);
+  }
+
+  public UiBox(final String name, final float x, final float y, final float width, final float height, final float backgroundAlpha) {
+    this(name, x, y, width, height, 1.0f, 1.0f, 1.0f, backgroundAlpha);
   }
 
   @Method(0x800f1268L) // buildBattleHudBackground
-  public UiBox(final String name, final float x, final float y, final float width, final float height, final float r, final float g, final float b) {
+  public UiBox(final String name, final float x, final float y, final float width, final float height, final float r, final float g, final float b, final float backgroundAlpha) {
     // Gradient
     this.hudBackgroundObj = new QuadBuilder(name + " Background")
       .translucency(Translucency.HALF_B_PLUS_HALF_F)
@@ -58,6 +63,7 @@ public class UiBox {
       .size(width, height)
       .build();
 
+    this.backgroundAlpha = backgroundAlpha;
     this.buildBattleHudBorder(x, y, x + width, y + height);
   }
 
@@ -132,7 +138,13 @@ public class UiBox {
   public void render(final float r, final float g, final float b) {
     this.transforms.transfer.set(0.0f, 0.0f, 125.0f);
 
-    RENDERER.queueOrthoModel(this.hudBackgroundButDarkerObj, this.transforms, QueuedModelStandard.class);
+    if(this.backgroundAlpha > -1) {
+      RENDERER.queueOrthoModel(this.hudBackgroundButDarkerObj, this.transforms, QueuedModelStandard.class)
+        .alpha(this.backgroundAlpha);
+    } else {
+      RENDERER.queueOrthoModel(this.hudBackgroundButDarkerObj, this.transforms, QueuedModelStandard.class);
+    }
+
     RENDERER.queueOrthoModel(this.hudBackgroundObj, this.transforms, QueuedModelStandard.class)
       .colour(r, g, b);
 

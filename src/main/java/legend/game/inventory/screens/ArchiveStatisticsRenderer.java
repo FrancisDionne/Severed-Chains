@@ -192,7 +192,7 @@ public class ArchiveStatisticsRenderer {
     this.renderGraphics();
     this.renderStats();
     this.renderHighlight();
-    FUN_801034cc(this.pageIndex, this.getPageCount(), -10); // Left/right arrows
+    FUN_801034cc(this.pageIndex, this.getPageCount(), -10, false); // Left/right arrows
   }
 
   private void renderStats() {

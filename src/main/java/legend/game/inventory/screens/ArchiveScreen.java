@@ -66,7 +66,7 @@ public class ArchiveScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    FooterActionsHud.renderActions(0, FooterActions.BACK, this.currentArchiveType == 0 ? FooterActions.ARCHIVE_BESTIARY : FooterActions.ARCHIVE_STATS, null, null, null);
+    FooterActionsHud.renderActions(0, FooterActions.BACK, this.currentArchiveType == 0 ? FooterActions.ARCHIVE_BESTIARY : FooterActions.ARCHIVE_STATS, this.currentArchiveType == 1 ? FooterActions.LIST : null, null, null);
   }
 
   private void renderArchive() {
@@ -98,7 +98,7 @@ public class ArchiveScreen extends MenuScreen {
     this.loadingStage = 100;
   }
 
-  private void menuNavigateLeft() {
+  private void menuNavigateLeft(final int steps) {
     switch(this.currentArchiveType) {
       case 0:
         if(this.statisticsRenderer.pageIndex > 0) {
@@ -107,16 +107,15 @@ public class ArchiveScreen extends MenuScreen {
         }
         break;
       case 1:
-        if(this.bestiaryRenderer.pageIndex > 0) {
+        if(this.bestiaryRenderer.previous(steps)) {
           playMenuSound(1);
-          this.bestiaryRenderer.pageIndex--;
           this.bestiaryRenderer.loadCurrentPage();
         }
         break;
     }
   }
 
-  private void menuNavigateRight() {
+  private void menuNavigateRight(final int steps) {
     switch(this.currentArchiveType) {
       case 0:
         if(this.statisticsRenderer.pageIndex < this.statisticsRenderer.getPageCount() - 1) {
@@ -125,9 +124,8 @@ public class ArchiveScreen extends MenuScreen {
         }
         break;
       case 1:
-        if(this.bestiaryRenderer.pageIndex < this.bestiaryRenderer.getPageCount() - 1) {
+        if(this.bestiaryRenderer.next(steps)) {
           playMenuSound(1);
-          this.bestiaryRenderer.pageIndex++;
           this.bestiaryRenderer.loadCurrentPage();
         }
         break;
@@ -135,9 +133,9 @@ public class ArchiveScreen extends MenuScreen {
   }
 
   private void menuNavigateUp() {
-    playMenuSound(1);
     switch(this.currentArchiveType) {
       case 0:
+        playMenuSound(1);
         if(this.statisticsRenderer.highlightIndex > 0) {
           this.statisticsRenderer.highlightIndex--;
         } else {
@@ -148,9 +146,9 @@ public class ArchiveScreen extends MenuScreen {
   }
 
   private void menuNavigateDown() {
-    playMenuSound(1);
     switch(this.currentArchiveType) {
       case 0:
+        playMenuSound(1);
         if(this.statisticsRenderer.highlightIndex < 11) {
           this.statisticsRenderer.highlightIndex++;
         } else {
@@ -171,38 +169,84 @@ public class ArchiveScreen extends MenuScreen {
     }
 
     if(action == INPUT_ACTION_MENU_BACK.get() && !repeat) {
-      this.menuEscape();
+      if(this.currentArchiveType == 1 && this.bestiaryRenderer.isListVisible) {
+        playMenuSound(3);
+        this.bestiaryRenderer.isListVisible = false;
+      } else {
+        this.menuEscape();
+      }
       return InputPropagation.HANDLED;
     }
 
-    if(action == INPUT_ACTION_MENU_LEFT.get() || action == INPUT_ACTION_MENU_PAGE_UP.get()) {
-      this.menuNavigateLeft();
+    if(action == INPUT_ACTION_MENU_PAGE_UP.get()) {
+      this.menuNavigateLeft(10);
       return InputPropagation.HANDLED;
     }
 
-    if(action == INPUT_ACTION_MENU_RIGHT.get() || action == INPUT_ACTION_MENU_PAGE_DOWN.get()) {
-      this.menuNavigateRight();
+    if(action == INPUT_ACTION_MENU_PAGE_DOWN.get()) {
+      this.menuNavigateRight(10);
       return InputPropagation.HANDLED;
     }
 
-    if(action == INPUT_ACTION_MENU_UP.get()) {
-      this.menuNavigateUp();
-      return InputPropagation.HANDLED;
+    if(action == INPUT_ACTION_MENU_LEFT.get()) {
+      if(this.currentArchiveType == 1) {
+        if(!this.bestiaryRenderer.isListVisible) {
+          this.menuNavigateLeft(1);
+          return InputPropagation.HANDLED;
+        }
+      } else {
+        this.menuNavigateLeft(1);
+        return InputPropagation.HANDLED;
+      }
+    }
+
+    if(action == INPUT_ACTION_MENU_RIGHT.get()) {
+      if(this.currentArchiveType == 1) {
+        if(!this.bestiaryRenderer.isListVisible) {
+          this.menuNavigateRight(1);
+          return InputPropagation.HANDLED;
+        }
+      } else {
+        this.menuNavigateRight(1);
+        return InputPropagation.HANDLED;
+      }
     }
 
     if(action == INPUT_ACTION_MENU_DOWN.get()) {
-      this.menuNavigateDown();
-      return InputPropagation.HANDLED;
+      if(this.currentArchiveType == 1) {
+        if(this.bestiaryRenderer.isListVisible) {
+          this.menuNavigateRight(1);
+          return InputPropagation.HANDLED;
+        }
+      } else {
+        this.menuNavigateDown();
+        return InputPropagation.HANDLED;
+      }
+    }
+
+    if(action == INPUT_ACTION_MENU_UP.get()) {
+      if(this.currentArchiveType == 1) {
+        if (this.bestiaryRenderer.isListVisible) {
+          this.menuNavigateLeft(1);
+          return InputPropagation.HANDLED;
+        }
+      } else {
+        this.menuNavigateUp();
+        return InputPropagation.HANDLED;
+      }
     }
 
     if(action == INPUT_ACTION_MENU_HOME.get()) {
       switch(this.currentArchiveType) {
         case 0:
+          playMenuSound(1);
           this.statisticsRenderer.pageIndex = 0;
           break;
         case 1:
-          this.bestiaryRenderer.pageIndex = 0;
-          this.bestiaryRenderer.loadCurrentPage();
+          if(this.bestiaryRenderer.jump(0)) {
+            playMenuSound(1);
+            this.bestiaryRenderer.loadCurrentPage();
+          }
           break;
       }
       return InputPropagation.HANDLED;
@@ -211,11 +255,14 @@ public class ArchiveScreen extends MenuScreen {
     if(action == INPUT_ACTION_MENU_END.get()) {
       switch(this.currentArchiveType) {
         case 0:
+          playMenuSound(1);
           this.statisticsRenderer.pageIndex = this.statisticsRenderer.getPageCount() - 1;
           break;
         case 1:
-          this.bestiaryRenderer.pageIndex = this.bestiaryRenderer.getPageCount() - 1;
-          this.bestiaryRenderer.loadCurrentPage();
+          if(this.bestiaryRenderer.jump(this.bestiaryRenderer.getPageCount() - 1)) {
+            playMenuSound(1);
+            this.bestiaryRenderer.loadCurrentPage();
+          }
           break;
       }
       return InputPropagation.HANDLED;
@@ -232,7 +279,7 @@ public class ArchiveScreen extends MenuScreen {
           }
           break;
         case 1:
-          //TODO: Display List
+          this.bestiaryRenderer.isListVisible = !this.bestiaryRenderer.isListVisible;
           break;
       }
     }

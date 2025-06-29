@@ -3772,6 +3772,7 @@ public class Battle extends EngineState {
           totalXpFromCombat_800bc95c += enemyCombatant.xp_194;
 
           Statistics.appendStat(Statistics.Stats.GOLD, goldGainedFromCombat_800bc920);
+          Statistics.incrementMonsterKill(data.combatant_144.charIndex_1a2);
 
           if((flags & FLAG_NO_LOOT) == 0) { // Hasn't already dropped loot
             for(final CombatantStruct1a8.ItemDrop drop : enemyCombatant.drops) {

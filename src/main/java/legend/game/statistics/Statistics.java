@@ -467,7 +467,9 @@ public final class Statistics {
     }
     for(int i = 0; i < monsterNames_80112068.length; i++) {
       final int enemyStatId = i + 100000;
-      text.append(enemyStatId).append('=').append(statistics.getOrDefault(enemyStatId, 0f)).append('\n');
+      if(statistics.containsKey(enemyStatId)) {
+        text.append(enemyStatId).append('=').append(statistics.get(enemyStatId)).append('\n');
+      }
     }
     return text.toString();
   }
@@ -482,6 +484,13 @@ public final class Statistics {
       newValue = value > 0 ? 1 : 0;
     }
     statistics.put(i, newValue);
+  }
+
+  public static void appendStat(final int statIndex, final float value) {
+    if(!statistics.containsKey(statIndex)) {
+      statistics.put(statIndex, 0f);
+    }
+    statistics.put(statIndex, statistics.get(statIndex) + value);
   }
 
   public static void appendStat(final BattleEntity27c bent, final Stats stat, final float value) {
@@ -511,6 +520,18 @@ public final class Statistics {
     if(stat != null) {
       appendStat(bent, stat, amount);
     }
+  }
+
+  public static void incrementMonsterKill(final int monsterId) {
+    appendStat(100000 + monsterId, 1);
+  }
+
+  public static int getMonsterKill(final int monsterId) {
+    final int statId = monsterId + 100000;
+    if(statistics.containsKey(statId)) {
+      return Math.round(statistics.get(statId));
+    }
+    return 0;
   }
 
   public static float getStat(final int statIndex) {

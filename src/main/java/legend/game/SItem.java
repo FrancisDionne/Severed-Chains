@@ -654,15 +654,15 @@ public final class SItem {
 
   @Method(0x801034ccL)
   public static void FUN_801034cc(final int charSlot, final int charCount) {
-    FUN_801034cc(charSlot, charCount, 0);
+    FUN_801034cc(charSlot, charCount, 0, false);
   }
 
   @Method(0x801034ccL)
-  public static void FUN_801034cc(final int charSlot, final int charCount, final int yOffset) {
+  public static void FUN_801034cc(final int charSlot, final int charCount, final int yOffset, final boolean hide) {
     setRandomRepeatGlyph(renderablePtr_800bdba4, 0x2d, 0x34, 0xaa, 0xb1);
     setRandomRepeatGlyph(renderablePtr_800bdba8, 0x25, 0x2c, 0xa2, 0xa9);
 
-    if(charSlot != 0) {
+    if(charSlot != 0 && !hide) {
       if(renderablePtr_800bdba4 == null) {
         final Renderable58 renderable = allocateUiElement(0x6f, 0x6c, 18, 16 + yOffset);
         renderable.repeatStartGlyph_18 = 0x2d;
@@ -679,7 +679,7 @@ public final class SItem {
     }
 
     //LAB_80103598
-    if(charSlot < charCount - 1) {
+    if(charSlot < charCount - 1 && !hide) {
       if(renderablePtr_800bdba8 == null) {
         final Renderable58 renderable = allocateUiElement(0x6f, 0x6c, 350, 16 + yOffset);
         renderable.repeatStartGlyph_18 = 0x25;
@@ -692,7 +692,6 @@ public final class SItem {
       fadeOutArrow(renderablePtr_800bdba8);
       renderablePtr_800bdba8 = null;
     }
-
     //LAB_80103604
   }
 

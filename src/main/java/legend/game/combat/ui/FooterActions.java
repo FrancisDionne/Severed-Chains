@@ -14,4 +14,5 @@ public enum FooterActions {
   TURN_ORDER,
   ARCHIVE_STATS,
   ARCHIVE_BESTIARY,
+  LIST,
 }
