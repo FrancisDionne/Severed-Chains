@@ -355,7 +355,10 @@ public class ArchiveBestiaryRenderer {
     this.renderEnemyStats();
     this.renderRewards();
     this.renderLore();
-    this.renderListBox();
+
+    if(this.isListVisible) {
+      this.renderList();
+    }
 
     FUN_801034cc(this.pageIndex, this.getPageCount(), -10, this.isListVisible); // Left/right arrows
   }
@@ -511,69 +514,67 @@ public class ArchiveBestiaryRenderer {
     }
   }
 
-  private void renderListBox() {
-    if(this.isListVisible) {
-      final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
-      final float x = 6f;
+  private void renderList() {
+    final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
+    final float x = 6f;
 
-      if(this.listBox == null || this.currentBoxOffsetX != xOffset) {
-        this.currentBoxOffsetX = xOffset;
-        this.listBox = new UiBox("Bestiary List", x - xOffset, 14f, 95f, 210f, 0.7f);
+    if(this.listBox == null || this.currentBoxOffsetX != xOffset) {
+      this.currentBoxOffsetX = xOffset;
+      this.listBox = new UiBox("Bestiary List", x - xOffset, 14f, 95f, 210f, 0.7f);
+    }
+
+    this.m.translation(0 - xOffset, 0, 126);
+    this.m.scale(368, 240, 1);
+
+    RENDERER
+      .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
+      .texture(this.textures[3]) //Black
+      .alpha(0.25f)
+      .translucency(Translucency.HALF_B_PLUS_HALF_F);
+
+    this.listBox.render(Config.changeBattleRgb() ? Config.getBattleRgb() : Config.defaultUiColour);
+
+    float y = 20f;
+    for(int i = 0; i < LIST_ITEM_COUNT; i++) {
+      final int recordIndex = this.listFirstVisibleItem + i;
+      final BestiaryRecord record = this.bestiaryPages.get(recordIndex);
+      final boolean highlighted = this.pageIndex == recordIndex;
+      float charX = 6;
+      for(final char c : this.nf.format(recordIndex).toCharArray()) {
+        renderText(String.valueOf(c), x + charX, y, highlighted ? this.listNumberHighlightFont : this.listNumberFont, 123);
+        charX += 3.7f;
+      }
+      renderText(":", x + 16f, y, highlighted ? this.listNumberHighlightFont : this.listNumberFont, 123);
+      renderText(record.rank > 0 ? record.name : "?????", x + 19f, y, highlighted ? this.listHighlightFont : this.listFont, 123);
+
+      if(highlighted) {
+        this.m.translation(x + 3f - xOffset, y - 1.5f, 124);
+        this.m.scale(83f, 7.5f, 1);
+
+        RENDERER
+          .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
+          .texture(this.textures[4]); //Highlight
       }
 
-      this.m.translation(0 - xOffset, 0, 126);
-      this.m.scale(368, 240, 1);
+      y += 7.5f;
+    }
+
+    if(this.listFirstVisibleItem > 0) {
+      this.m.translation(x + 86f - xOffset, 17f, 124);
+      this.m.scale(8, 8, 1);
 
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-        .texture(this.textures[3]) //Black
-        .alpha(0.25f)
-        .translucency(Translucency.HALF_B_PLUS_HALF_F);
+        .texture(this.textures[5]); //Up Arrow
+    }
 
-      this.listBox.render(Config.changeBattleRgb() ? Config.getBattleRgb() : Config.defaultUiColour);
+    if(this.listFirstVisibleItem < this.bestiaryPages.size() - LIST_ITEM_COUNT) {
+      this.m.translation(x + 86f - xOffset, 213f, 124);
+      this.m.scale(8, 8, 1);
 
-      float y = 20f;
-      for(int i = 0; i < LIST_ITEM_COUNT; i++) {
-        final int recordIndex = this.listFirstVisibleItem + i;
-        final BestiaryRecord record = this.bestiaryPages.get(recordIndex);
-        final boolean highlighted = this.pageIndex == recordIndex;
-        float charX = 6;
-        for(final char c : this.nf.format(recordIndex).toCharArray()) {
-          renderText(String.valueOf(c), x + charX, y, highlighted ? this.listNumberHighlightFont : this.listNumberFont, 123);
-          charX += 3.7f;
-        }
-        renderText(":", x + 16f, y, highlighted ? this.listNumberHighlightFont : this.listNumberFont, 123);
-        renderText(record.rank > 0 ? record.name : "?????", x + 19f, y, highlighted ? this.listHighlightFont : this.listFont, 123);
-
-        if(highlighted) {
-          this.m.translation(x + 3f - xOffset, y - 1.5f, 124);
-          this.m.scale(83f, 7.5f, 1);
-
-          RENDERER
-            .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-            .texture(this.textures[4]); //Highlight
-        }
-
-        y += 7.5f;
-      }
-
-      if(this.listFirstVisibleItem > 0) {
-        this.m.translation(x + 86f - xOffset, 17f, 124);
-        this.m.scale(8, 8, 1);
-
-        RENDERER
-          .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-          .texture(this.textures[5]); //Up Arrow
-      }
-
-      if(this.listFirstVisibleItem < this.bestiaryPages.size() - LIST_ITEM_COUNT) {
-        this.m.translation(x + 86f - xOffset, 213f, 124);
-        this.m.scale(8, 8, 1);
-
-        RENDERER
-          .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-          .texture(this.textures[6]); //Down Arrow
-      }
+      RENDERER
+        .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
+        .texture(this.textures[6]); //Down Arrow
     }
   }
 
