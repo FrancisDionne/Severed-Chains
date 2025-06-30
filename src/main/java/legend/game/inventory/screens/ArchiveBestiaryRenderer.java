@@ -34,7 +34,7 @@ import static legend.game.combat.Monsters.monsterStats_8010ba98;
 
 public class ArchiveBestiaryRenderer {
 
-  private static class BestiaryRecord {
+  private static class BestiaryEntry {
     public int charId;
     public String location;
     public MonsterStats1c stats;
@@ -45,7 +45,7 @@ public class ArchiveBestiaryRenderer {
     public int maxKill;
     public float[] elementRGB;
 
-    public BestiaryRecord(final int charId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
+    public BestiaryEntry(final int charId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
       this.charId = charId;
       this.location = map + (region.isEmpty() ? "" : " - " + region);
       this.stats = monsterStats_8010ba98[charId];
@@ -84,12 +84,12 @@ public class ArchiveBestiaryRenderer {
   private final Texture[] textures;
   private Texture headerTexture;
   private Texture modelTexture;
-  private List<BestiaryRecord> bestiaryEntries;
-  private BestiaryRecord monster;
+  private List<BestiaryEntry> bestiaryEntries;
+  private BestiaryEntry monster;
   private boolean bestiaryPerfect;
   private int bestiarySeenCount;
   private UiBox listBox;
-  private final WMapModelAndAnimData258 modelAndAnimData_800c66a8 = new WMapModelAndAnimData258();
+  private final WMapModelAndAnimData258 modelAndAnimData_800c66a8;
 
   private final FontOptions headerFont;
   private final FontOptions locationFont;
@@ -121,7 +121,7 @@ public class ArchiveBestiaryRenderer {
     return this.bestiaryEntries.size();
   }
 
-  private BestiaryRecord getCurrentRecord() {
+  private BestiaryEntry getCurrentRecord() {
     return this.bestiaryEntries.get(this.entryIndex);
   }
 
@@ -135,6 +135,7 @@ public class ArchiveBestiaryRenderer {
       .bpp(Bpp.BITS_24)
       .build();
 
+    this.modelAndAnimData_800c66a8 = new WMapModelAndAnimData258();
     this.modelAndAnimData_800c66a8.mapArrow = new MapMarker("MapArrow", 8, 16.0f, 16, 32, false);
     this.modelAndAnimData_800c66a8.mapArrow.setSize(10.0f);
     this.modelAndAnimData_800c66a8.coolonPlaceMarker = new MapMarker("CoolonPlaceMarker", 3, 10.0f, 16, 0, true);
@@ -395,7 +396,7 @@ public class ArchiveBestiaryRenderer {
   }
 
   private void addEntry(final int charId, final int killCount, @Nullable final String name, final String map, final String region, final String lore) {
-    this.bestiaryEntries.add(new BestiaryRecord(charId, killCount, name, map, region, lore));
+    this.bestiaryEntries.add(new BestiaryEntry(charId, killCount, name, map, region, lore));
   }
 
   public void loadCurrentEntry() {
@@ -461,7 +462,7 @@ public class ArchiveBestiaryRenderer {
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.modelTexture)
-        .colour(0,0,0)
+        .colour(0, 0, 0)
         .alpha(0.85f)
         .translucency(Translucency.HALF_B_PLUS_HALF_F);
     }
@@ -619,15 +620,15 @@ public class ArchiveBestiaryRenderer {
     float y = 32f;
     for(int i = 0; i < LIST_ITEM_COUNT; i++) {
       final int recordIndex = this.listFirstVisibleItem + i;
-      final BestiaryRecord record = this.bestiaryEntries.get(recordIndex);
+      final BestiaryEntry entry = this.bestiaryEntries.get(recordIndex);
       final boolean highlighted = this.entryIndex == recordIndex;
       float charX = 6;
       for(final char c : this.nf.format(recordIndex).toCharArray()) {
-        renderText(String.valueOf(c), x + charX, y, highlighted ? (record.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
+        renderText(String.valueOf(c), x + charX, y, highlighted ? (entry.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
         charX += 3.7f;
       }
-      renderText(":", x + 16f, y, highlighted ? (record.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
-      renderText(record.rank > 0 ? record.name : QUESTION_MARK_5, x + 19f, y, highlighted ? (record.isPerfect() ? this.listPerfectHighlightFont : this.listHighlightFont) : (record.isPerfect() ? this.listPerfectFont : this.listFont), 123);
+      renderText(":", x + 16f, y, highlighted ? (entry.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
+      renderText(entry.rank > 0 ? entry.name : QUESTION_MARK_5, x + 19f, y, highlighted ? (entry.isPerfect() ? this.listPerfectHighlightFont : this.listHighlightFont) : (entry.isPerfect() ? this.listPerfectFont : this.listFont), 123);
 
       if(highlighted) {
         this.m.translation(xOffset - x + 14.5f , y - 1.5f, 124);
@@ -761,7 +762,7 @@ public class ArchiveBestiaryRenderer {
 
   private void setBestiaryStatus() {
     int totalAtMaxRank = 0;
-    for(final BestiaryRecord r : this.bestiaryEntries) {
+    for(final BestiaryEntry r : this.bestiaryEntries) {
       if(r.kill > 0) {
         this.bestiarySeenCount++;
         if(r.isPerfect()) {
