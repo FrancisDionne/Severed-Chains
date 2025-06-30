@@ -13,6 +13,8 @@ import legend.game.combat.ui.UiBox;
 import legend.game.i18n.I18n;
 import legend.game.statistics.Statistics;
 import legend.game.types.Translucency;
+import legend.game.wmap.MapMarker;
+import legend.game.wmap.WMapModelAndAnimData258;
 import org.joml.Matrix4f;
 
 import javax.annotation.Nullable;
@@ -41,17 +43,21 @@ public class ArchiveBestiaryRenderer {
     public int rank;
     public String name;
     public int maxKill;
+    public float[] elementRGB;
 
-    public BestiaryRecord(final int charId, @Nullable final String name, final int maxKill, final String map, final String region, final String lore) {
+    public BestiaryRecord(final int charId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
       this.charId = charId;
-      this.location = map + " - " + region;
+      this.location = map + (region.isEmpty() ? "" : " - " + region);
       this.stats = monsterStats_8010ba98[charId];
       this.lore = lore;
       this.kill = Statistics.getMonsterKill(this.charId);
       this.name = name == null ? monsterNames_80112068[this.charId] : name;
       this.maxKill = maxKill;
 
-      if(this.kill >= 10) {
+      final int[] elementRGB = ArchiveBestiaryRenderer.getElementBackgroundRGB(this.stats.elementFlag_0f);
+      this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.75f };
+
+      if(this.kill >= 10 || (this.maxKill > -1 && this.kill >= this.maxKill)) {
         this.rank = 3;
       } else if(this.kill >= 5) {
         this.rank = 2;
@@ -62,43 +68,61 @@ public class ArchiveBestiaryRenderer {
       }
       this.rank = 3;
     }
+
+    public boolean isPerfect() {
+      return this.rank >= 3;
+    }
   }
 
-  private static final int LIST_ITEM_COUNT = 27;
+  private static final int LIST_ITEM_COUNT = 24;
+  private static final String QUESTION_MARK_5 = "?????";
+  private static final String QUESTION_MARK_3 = "???";
+  private static final String LORE_DEFAULT = "Lore coming to a QoL mod near you one day...";
 
   private final Matrix4f m;
   private final Obj quad;
   private final Texture[] textures;
   private Texture headerTexture;
   private Texture modelTexture;
-  private List<BestiaryRecord> bestiaryPages;
+  private List<BestiaryRecord> bestiaryEntries;
   private BestiaryRecord monster;
+  private boolean bestiaryPerfect;
+  private int bestiarySeenCount;
   private UiBox listBox;
+  private final WMapModelAndAnimData258 modelAndAnimData_800c66a8 = new WMapModelAndAnimData258();
 
   private final FontOptions headerFont;
+  private final FontOptions locationFont;
   private final FontOptions statsFont;
+  private final FontOptions loreFont;
   private final FontOptions titleFont;
   private final FontOptions resistFont;
   private final FontOptions resistNumberFont;
   private final FontOptions rewardTitleFont;
   private final FontOptions listNumberFont;
   private final FontOptions listNumberHighlightFont;
+  private final FontOptions listNumberPerfectHighlightFont;
   private final FontOptions listFont;
+  private final FontOptions listPerfectFont;
   private final FontOptions listHighlightFont;
+  private final FontOptions listPerfectHighlightFont;
+  private final FontOptions listTotalFont;
+  private final FontOptions listTotalPerfectFont;
+  private final FontOptions completeFont;
 
-  public int pageIndex;
+  public int entryIndex;
   private float currentBoxOffsetX;
   public boolean isListVisible;
   private int listFirstVisibleItem;
 
   private final NumberFormat nf = new DecimalFormat("000");
 
-  public int getPageCount() {
-    return this.bestiaryPages.size();
+  public int getEntryCount() {
+    return this.bestiaryEntries.size();
   }
 
   private BestiaryRecord getCurrentRecord() {
-    return this.bestiaryPages.get(this.pageIndex);
+    return this.bestiaryEntries.get(this.entryIndex);
   }
 
   public ArchiveBestiaryRenderer() {
@@ -111,16 +135,29 @@ public class ArchiveBestiaryRenderer {
       .bpp(Bpp.BITS_24)
       .build();
 
+    this.modelAndAnimData_800c66a8.mapArrow = new MapMarker("MapArrow", 8, 16.0f, 16, 32, false);
+    this.modelAndAnimData_800c66a8.mapArrow.setSize(10.0f);
+    this.modelAndAnimData_800c66a8.coolonPlaceMarker = new MapMarker("CoolonPlaceMarker", 3, 10.0f, 16, 0, true);
+    this.modelAndAnimData_800c66a8.coolonPlaceMarker.setSize(7.0f);
+
     this.headerFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.DARK_GREY).size(1.1f).horizontalAlign(HorizontalAlign.CENTRE);
     this.statsFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.65f).horizontalAlign(HorizontalAlign.LEFT);
+    this.loreFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
+    this.locationFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.55f).horizontalAlign(HorizontalAlign.LEFT);
     this.titleFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.75f).horizontalAlign(HorizontalAlign.RIGHT);
     this.resistFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.50f).horizontalAlign(HorizontalAlign.LEFT);
-    this.resistNumberFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.40f).horizontalAlign(HorizontalAlign.LEFT);
+    this.resistNumberFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
     this.rewardTitleFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.65f).horizontalAlign(HorizontalAlign.LEFT);
     this.listNumberFont = new FontOptions().colour(TextColour.LIGHTER_GREY).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.CENTRE);
     this.listNumberHighlightFont = new FontOptions().colour(TextColour.YELLOW).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.CENTRE);
+    this.listNumberPerfectHighlightFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.CENTRE);
     this.listFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
+    this.listPerfectFont = new FontOptions().colour(TextColour.LIGHT_GOLD).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
     this.listHighlightFont = new FontOptions().colour(TextColour.YELLOW).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
+    this.listPerfectHighlightFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
+    this.listTotalFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.DARKER_GREY).size(0.55f).horizontalAlign(HorizontalAlign.RIGHT);
+    this.listTotalPerfectFont = new FontOptions().colour(TextColour.LIGHT_GOLD).shadowColour(TextColour.DARKER_GREY).size(0.55f).horizontalAlign(HorizontalAlign.RIGHT);
+    this.completeFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.7f).horizontalAlign(HorizontalAlign.RIGHT);
 
     this.textures = new Texture[] {
       Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics.png")),  //0
@@ -130,237 +167,239 @@ public class ArchiveBestiaryRenderer {
       Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\highlight.png")),   //4
       Texture.png(Path.of("gfx", "ui", "arrow_blue_up.png")),    //5
       Texture.png(Path.of("gfx", "ui", "arrow_blue_down.png")),  //6
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\list_underline.png")),   //7
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\white.png")),   //8
     };
 
-    this.pageIndex = 0;
+    this.entryIndex = 0;
 
-    this.loadPages();
-    this.loadCurrentPage();
+    this.loadEntries();
+    this.setBestiaryStatus();
+    this.loadCurrentEntry();
   }
 
-  private void loadPages() {
-    this.bestiaryPages = new ArrayList<>();
-    this.addPage(0, null, -1, "Prairie", "Southern Serdio", "This is lore");
-    this.addPage(1, null, -1, "Barrens", "Tiberoa", "This is lore");
-    this.addPage(2, null, -1, "Kadessa", "", "This is lore");
-    this.addPage(3, null, -1, "Death Frontier", "Gloriano", "This is lore");
-    this.addPage(4, null, -1, "Marshland", "", "This is lore");
-    this.addPage(5, null, -1, "Kashua Glacier", "", "This is lore");
-    this.addPage(6, null, -1, "Mortal Dragon Mountain", "Mille Seseau", "This is lore");
-    this.addPage(7, null, -1, "Divine Tree", "Gloriano", "This is lore");
-    this.addPage(8, null, -1, "Forest", "Southern Serdio", "This is lore");
-    this.addPage(9, null, -1, "Aglis", "", "This is lore");
-    this.addPage(10, null, -1, "Mayfil", "", "This is lore");
-    this.addPage(11, null, -1, "Flanvel Tower", "", "This is lore");
-    this.addPage(12, null, -1, "Undersea Cavern", "", "This is lore");
-    this.addPage(13, null, -1, "Limestone Cave", "", "This is lore");
-    this.addPage(14, null, -1, "Valley of Corrupted Gravity", "", "This is lore");
-    this.addPage(15, null, -1, "Shirley's Shrine", "", "This is lore");
-    this.addPage(16, null, -1, "Valley of Corrupted Gravity", "", "This is lore");
-    this.addPage(17, null, -1, "Black Castle", "", "This is lore");
-    this.addPage(18, null, -1, "Phantom Ship", "", "This is lore");
-    this.addPage(19, null, -1, "Dragon's Nest", "", "This is lore");
-    this.addPage(20, null, -1, "Snowfield", "", "This is lore");
-    this.addPage(21, null, -1, "Forest", "", "This is lore");
-    this.addPage(22, null, -1, "Marshland", "", "This is lore");
-    this.addPage(23, null, -1, "Undersea Cavern", "", "This is lore");
-    this.addPage(24, null, -1, "Forest", "", "This is lore");
-    this.addPage(25, null, -1, "Flanvel Tower", "", "This is lore");
-    this.addPage(26, null, -1, "Barrens", "", "This is lore");
-    this.addPage(27, null, -1, "Prairie", "", "This is lore");
-    this.addPage(28, null, -1, "Marshland", "", "This is lore");
-    this.addPage(29, null, -1, "Valley of Corrupted Gravity", "", "This is lore");
-    this.addPage(30, null, -1, "Kadessa", "", "This is lore");
-    this.addPage(31, null, -1, "Snowfield", "", "This is lore");
-    this.addPage(32, null, -1, "Kashua Glacier", "", "This is lore");
-    this.addPage(33, null, -1, "Villude Volcano", "variant: 8 AT, 10% drop", "This is lore");
-    this.addPage(34, null, -1, "Moon", "", "This is lore");
-    this.addPage(35, null, -1, "Dragon's Nest", "", "This is lore");
-    this.addPage(36, null, -1, "Death Frontier", "", "This is lore");
-    this.addPage(37, null, -1, "Mortal Dragon Mountain", "", "This is lore");
-    this.addPage(38, null, -1, "Forest", "", "This is lore");
-    this.addPage(39, null, -1, "Vellweb", "", "This is lore");
-    this.addPage(40, null, -1, "Zenebatos", "", "This is lore");
-    this.addPage(41, null, -1, "Vellweb", "", "This is lore");
-    this.addPage(42, null, -1, "Moon", "", "This is lore");
-    this.addPage(43, null, -1, "Kadessa", "", "This is lore");
-    this.addPage(44, null, -1, "Kadessa", "", "This is lore");
-    this.addPage(45, null, -1, "Prairie", "", "This is lore");
-    this.addPage(46, null, -1, "Limestone Cave", "", "This is lore");
-    this.addPage(47, null, -1, "Vellweb", "", "This is lore");
-    this.addPage(48, null, -1, "Kashua Glacier", "", "This is lore");
-    this.addPage(49, null, -1, "Flanvel Tower", "", "This is lore");
-    this.addPage(50, null, -1, "Snowfield", "", "This is lore");
-    this.addPage(51, null, -1, "Evergreen Forest", "", "This is lore");
-    this.addPage(52, null, -1, "Valley of Corrupted Gravity", "", "This is lore");
-    this.addPage(53, null, -1, "Evergreen Forest", "", "This is lore");
-    this.addPage(54, null, -1, "World Map", "", "This is lore");
-    this.addPage(55, null, -1, "Shirley's Shrine", "", "This is lore");
-    this.addPage(56, null, -1, "Flanvel Tower", "", "This is lore");
-    this.addPage(57, null, -1, "Snowfield", "", "This is lore");
-    this.addPage(58, null, -1, "Shirley's Shrine", "", "This is lore");
-    this.addPage(59, null, -1, "Prairie", "", "This is lore");
-    this.addPage(60, null, -1, "Aglis", "", "This is lore");
-    this.addPage(61, null, -1, "Death Frontier", "", "This is lore");
-    this.addPage(62, null, -1, "Divine Tree", "", "This is lore");
-    this.addPage(63, null, -1, "Vellweb", "", "This is lore");
-    this.addPage(64, null, -1, "Limestone Cave", "", "This is lore");
-    this.addPage(65, null, -1, "Vellweb", "", "This is lore");
-    this.addPage(66, null, -1, "Shirley's Shrine", "", "This is lore");
-    this.addPage(67, null, -1, "Kashua Glacier", "", "This is lore");
-    this.addPage(68, null, -1, "Marshland", "", "This is lore");
-    this.addPage(69, null, -1, "Barrens", "", "This is lore");
-    this.addPage(70, null, -1, "Phantom Ship", "", "This is lore");
-    this.addPage(71, null, -1, "Moon", "", "This is lore");
-    this.addPage(72, null, -1, "Aglis", "", "This is lore");
-    this.addPage(73, null, -1, "Evergreen Forest", "", "This is lore");
-    this.addPage(74, null, -1, "Villude Volcano", "", "This is lore");
-    this.addPage(75, null, -1, "Aglis", "", "This is lore");
-    this.addPage(76, null, -1, "Undersea Cavern", "", "This is lore");
-    this.addPage(77, null, -1, "Divine Tree", "", "This is lore");
-    this.addPage(78, null, -1, "Mayfil", "", "This is lore");
-    this.addPage(79, null, -1, "Giganto Home", "", "This is lore");
-    this.addPage(80, null, -1, "Zenebatos", "", "This is lore");
-    this.addPage(81, null, -1, "Moon", "", "This is lore");
-    this.addPage(82, null, -1, "Giganto Home", "", "This is lore");
-    this.addPage(83, null, -1, "Giganto Home", "", "This is lore");
-    this.addPage(84, null, -1, "Mayfil", "", "This is lore");
-    this.addPage(85, null, -1, "Phantom Ship", "", "This is lore");
-    this.addPage(86, null, -1, "Phantom Ship", "", "This is lore");
-    this.addPage(87, null, -1, "", "", "This is lore");
-    this.addPage(88, null, -1, "Dragon's Nest", "", "This is lore");
-    this.addPage(89, null, -1, "Death Frontier", "", "This is lore");
-    this.addPage(90, null, -1, "Dragon's Nest", "", "This is lore");
-    this.addPage(91, null, -1, "Undersea Cavern", "", "This is lore");
-    this.addPage(92, null, -1, "Villude Volcano", "", "This is lore");
-    this.addPage(93, null, -1, "Moon", "", "This is lore");
-    this.addPage(94, null, -1, "Limestone Cave", "", "This is lore");
-    this.addPage(95, null, -1, "Evergreen Forest", "", "This is lore");
-    this.addPage(96, null, -1, "Mortal Dragon Mountain", "", "This is lore");
-    this.addPage(97, null, -1, "Zenebatos", "", "This is lore");
-    this.addPage(98, null, -1, "Divine Tree", "", "This is lore");
-    this.addPage(99, null, -1, "Giganto Home", "", "This is lore");
-    this.addPage(100, null, -1, "Villude Volcano", "", "This is lore");
-    this.addPage(101, null, -1, "Phantom Ship", "", "This is lore");
-    this.addPage(102, null, -1, "Hoax", "", "This is lore");
-    this.addPage(103, null, -1, "", "", "This is lore");
-    this.addPage(104, null, -1, "Limestone Cave", "", "This is lore");
-    this.addPage(105, null, -1, "Hellena Prison", "", "This is lore");
-    this.addPage(106, null, -1, "Valley of Corrupted Gravity", "", "This is lore");
-    this.addPage(107, null, -1, "Shirley's Shrine", "", "This is lore");
-    this.addPage(108, null, -1, "Barrens", "", "This is lore");
-    this.addPage(109, null, -1, "Giganto Home", "", "This is lore");
-    this.addPage(110, null, -1, "Undersea Cavern", "", "This is lore");
-    this.addPage(111, null, -1, "Kadessa", "", "This is lore");
-    this.addPage(112, null, -1, "Mortal Dragon Mountain", "", "This is lore");
-    this.addPage(113, null, -1, "Mortal Dragon Mountain", "", "This is lore");
-    this.addPage(114, null, -1, "Kashua Glacier", "", "This is lore");
-    this.addPage(115, null, -1, "Dragon's Nest", "", "This is lore");
-    this.addPage(116, null, -1, "Snowfield", "", "This is lore");
-    this.addPage(117, null, -1, "Evergreen Forest", "", "This is lore");
-    this.addPage(118, null, -1, "Zenebatos", "", "This is lore");
-    this.addPage(119, null, -1, "Death Frontier", "", "This is lore");
-    this.addPage(120, null, -1, "Moon", "", "This is lore");
-    this.addPage(121, null, -1, "Aglis", "", "This is lore");
-    this.addPage(122, null, -1, "Zenebatos", "", "This is lore");
-    this.addPage(123, null, -1, "Moon", "", "This is lore");
-    this.addPage(124, null, -1, "World Map", "", "This is lore");
-    this.addPage(125, null, -1, "Mayfil", "", "This is lore");
-    this.addPage(126, null, -1, "Divine Tree", "", "This is lore");
-    this.addPage(127, null, -1, "Moon", "", "This is lore");
-    this.addPage(128, null, -1, "Moon", "", "This is lore");
-    this.addPage(129, null, -1, "Hellena Prison", "", "This is lore");
-    this.addPage(130, null, -1, "", "", "This is lore");
-    this.addPage(131, null, -1, "", "", "This is lore");
-    this.addPage(132, null, -1, "Marshland", "", "This is lore");
-    this.addPage(133, null, -1, "Hellena Prison", "", "This is lore");
-    this.addPage(134, null, -1, "Hellena Prison", "", "This is lore");
-    this.addPage(135, null, -1, "", "", "This is lore");
-    this.addPage(136, null, -1, "", "", "This is lore");
-    this.addPage(137, null, -1, "", "", "This is lore");
-    this.addPage(138, null, -1, "", "", "This is lore");
-    this.addPage(139, null, -1, "", "", "This is lore");
-    this.addPage(144, null, -1, "", "", "This is lore");
-    this.addPage(146, null, -1, "Villude Volcano", "", "This is lore");
-    this.addPage(148, null, -1, "", "", "This is lore");
-    this.addPage(150, null, -1, "", "", "This is lore");
-    this.addPage(152, null, -1, "", "", "This is lore");
-    this.addPage(154, null, -1, "", "", "This is lore");
-    this.addPage(155, null, -1, "", "", "This is lore");
-    this.addPage(157, null, -1, "", "", "This is lore");
-    this.addPage(256, null, -1, "Seles", "", "This is lore");
-    this.addPage(257, null, -1, "Seles", "", "This is lore");
-    this.addPage(258, null, -1, "Black Castle", "", "This is lore");
-    this.addPage(259, null, -1, "", "", "This is lore");
-    this.addPage(260, null, -1, "", "", "This is lore");
-    this.addPage(261, null, -1, "", "", "This is lore");
-    this.addPage(262, null, -1, "", "", "This is lore");
-    this.addPage(263, null, -1, "Hellena Prison", "", "This is lore");
-    this.addPage(264, null, -1, "Hellena Prison", "", "This is lore");
-    this.addPage(267, null, -1, "Black Castle", "", "This is lore");
-    this.addPage(268, null, -1, "Black Castle", "", "This is lore");
-    this.addPage(269, null, -1, "Lohan", "", "This is lore");
-    this.addPage(270, null, -1, "Flanvel Tower", "", "This is lore");
-    this.addPage(273, null, -1, "", "", "This is lore");
-    this.addPage(275, null, -1, "Dragon's Nest", "", "This is lore");
-    this.addPage(279, null, -1, "Undersea Cavern", "", "This is lore");
-    this.addPage(283, null, -1, "Mortal Dragon Mountain", "", "This is lore");
-    this.addPage(287, null, -1, "Dragon's Nest", "", "This is lore");
-    this.addPage(288, null, -1, "Shirley's Shrine", "", "This is lore");
-    this.addPage(293, null, -1, "Fletz", "", "This is lore");
-    this.addPage(294, null, -1, "Undersea Cavern", "", "This is lore");
-    this.addPage(295, null, -1, "Vellweb", "", "This is lore");
-    this.addPage(296, null, -1, "Vellweb", "", "This is lore");
-    this.addPage(297, null, -1, "Vellweb", "", "This is lore");
-    this.addPage(298, null, -1, "Vellweb", "", "This is lore");
-    this.addPage(299, null, -1, "Barrens", "", "This is lore");
-    this.addPage(301, null, -1, "Giganto Home", "", "This is lore");
-    this.addPage(302, null, -1, "Lohan", "", "This is lore");
-    this.addPage(303, null, -1, "Lohan", "", "This is lore");
-    this.addPage(304, null, -1, "Lohan", "", "This is lore");
-    this.addPage(305, null, -1, "Lohan", "", "This is lore");
-    this.addPage(308, null, -1, "Villude Volcano", "", "This is lore");
-    this.addPage(311, null, -1, "Valley of Corrupted Gravity", "", "This is lore");
-    this.addPage(316, null, -1, "Moon", "", "This is lore");
-    this.addPage(325, null, -1, "Shirley's Shrine", "", "This is lore");
-    this.addPage(329, null, -1, "Hellena Prison", "", "This is lore");
-    this.addPage(332, null, -1, "Limestone Cave", "", "This is lore");
-    this.addPage(333, null, -1, "Villude Volcano", "", "This is lore");
-    this.addPage(334, null, -1, "Villude Volcano", "", "This is lore");
-    this.addPage(335, null, -1, "Kadessa", "", "This is lore");
-    this.addPage(340, null, -1, "Phantom Ship", "", "This is lore");
-    this.addPage(341, null, -1, "", "", "This is lore");
-    this.addPage(343, null, 1, "Evergreen Forest", "", "This is lore");
-    this.addPage(344, null, 1, "Flanvel Tower", "", "This is lore");
-    this.addPage(346, null, 1, "Kashua Glacier", "", "This is lore");
-    this.addPage(349, "Polter", 1, "Snowfield", "", "This is lore");
-    this.addPage(352, "Dragon Spirit (Divine Dragon)", 1, "Mayfil", "", "This is lore");
-    this.addPage(353, "Dragon Spirit (Regole)", 1, "Mayfil", "", "This is lore");
-    this.addPage(354, "Dragon Spirit (Feyrbrand)", 1, "Mayfil", "", "This is lore");
-    this.addPage(360, null, 1, "Zenebatos", "", "This is lore");
-    this.addPage(361, null, 1, "Zenebatos", "", "This is lore");
-    this.addPage(362, null, 1, "Zenebatos", "", "This is lore");
-    this.addPage(363, null, 1, "Mayfil", "", "This is lore");
-    this.addPage(364, null, 1, "Mayfil", "", "This is lore");
-    this.addPage(365, null, 1, "Aglis", "", "This is lore");
-    this.addPage(366, null, 1, "", "", "This is lore");
-    this.addPage(368, null, 1, "Divine Tree", "", "This is lore");
-    this.addPage(369, null, 1, "Divine Tree", "", "This is lore");
-    this.addPage(370, null, 1, "Divine Tree", "", "This is lore");
-    this.addPage(371, null, 1, "Moon", "", "This is lore");
-    this.addPage(378, null, 1, "Moon", "", "This is lore");
-    this.addPage(381, null, 1, "Moon", "", "This is lore");
-    this.addPage(382, null, 1, "Moon", "", "This is lore");
-    this.addPage(387, null, 1, "Moon", "", "This is lore");
-    this.addPage(388, null, 1, "Moon", "", "This is lore");
+  private void loadEntries() {
+    this.bestiaryEntries = new ArrayList<>();
+    this.addEntry(0, -1, null, "Prairie", "Southern Serdio", "");
+    this.addEntry(1, -1, null, "Barrens", "Tiberoa", "");
+    this.addEntry(2, -1, null, "Kadessa", "", "");
+    this.addEntry(3, -1, null, "Death Frontier", "Gloriano", "");
+    this.addEntry(4, -1, null, "Marshland", "", "");
+    this.addEntry(5, -1, null, "Kashua Glacier", "", "");
+    this.addEntry(6, -1, null, "Mortal Dragon Mountain", "Mille Seseau", "");
+    this.addEntry(7, -1, null, "Divine Tree", "Gloriano", "");
+    this.addEntry(8, -1, null, "Forest", "Southern Serdio", "");
+    this.addEntry(9, -1, null, "Aglis", "", "");
+    this.addEntry(10, -1, null, "Mayfil", "", "");
+    this.addEntry(11, -1, null, "Flanvel Tower", "", "");
+    this.addEntry(12, -1, null, "Undersea Cavern", "", "");
+    this.addEntry(13, -1, null, "Limestone Cave", "", "");
+    this.addEntry(14, -1, null, "Valley of Corrupted Gravity", "", "");
+    this.addEntry(15, -1, null, "Shirley's Shrine", "", "");
+    this.addEntry(16, -1, null, "Valley of Corrupted Gravity", "", "");
+    this.addEntry(17, -1, null, "Black Castle", "", "");
+    this.addEntry(18, -1, null, "Phantom Ship", "", "");
+    this.addEntry(19, -1, null, "Dragon's Nest", "", "");
+    this.addEntry(20, -1, null, "Snowfield", "", "");
+    this.addEntry(21, -1, null, "Forest", "", "");
+    this.addEntry(22, -1, null, "Marshland", "", "");
+    this.addEntry(23, -1, null, "Undersea Cavern", "", "");
+    this.addEntry(24, -1, null, "Forest", "", "");
+    this.addEntry(25, -1, null, "Flanvel Tower", "", "");
+    this.addEntry(26, -1, null, "Barrens", "", "");
+    this.addEntry(27, -1, null, "Prairie", "", "");
+    this.addEntry(28, -1, null, "Marshland", "", "");
+    this.addEntry(29, -1, null, "Valley of Corrupted Gravity", "", "");
+    this.addEntry(30, -1, null, "Kadessa", "", "");
+    this.addEntry(31, -1, null, "Snowfield", "", "");
+    this.addEntry(32, -1, null, "Kashua Glacier", "", "");
+    this.addEntry(33, -1, null, "Villude Volcano", "variant: 8 AT, 10% drop", "");
+    this.addEntry(34, -1, null, "Moon", "", "");
+    this.addEntry(35, -1, null, "Dragon's Nest", "", "");
+    this.addEntry(36, -1, null, "Death Frontier", "", "");
+    this.addEntry(37, -1, null, "Mortal Dragon Mountain", "", "");
+    this.addEntry(38, -1, null, "Forest", "", "");
+    this.addEntry(39, -1, null, "Vellweb", "", "");
+    this.addEntry(40, -1, null, "Zenebatos", "", "");
+    this.addEntry(41, -1, null, "Vellweb", "", "");
+    this.addEntry(42, -1, null, "Moon", "", "");
+    this.addEntry(43, -1, null, "Kadessa", "", "");
+    this.addEntry(44, -1, null, "Kadessa", "", "");
+    this.addEntry(45, -1, null, "Prairie", "", "");
+    this.addEntry(46, -1, null, "Limestone Cave", "", "");
+    this.addEntry(47, -1, null, "Vellweb", "", "");
+    this.addEntry(48, -1, null, "Kashua Glacier", "", "");
+    this.addEntry(49, -1, null, "Flanvel Tower", "", "");
+    this.addEntry(50, -1, null, "Snowfield", "", "");
+    this.addEntry(51, -1, null, "Evergreen Forest", "", "");
+    this.addEntry(52, -1, null, "Valley of Corrupted Gravity", "", "");
+    this.addEntry(53, -1, null, "Evergreen Forest", "", "");
+    this.addEntry(54, -1, null, "World Map", "", "");
+    this.addEntry(55, -1, null, "Shirley's Shrine", "", "");
+    this.addEntry(56, -1, null, "Flanvel Tower", "", "");
+    this.addEntry(57, -1, null, "Snowfield", "", "");
+    this.addEntry(58, -1, null, "Shirley's Shrine", "", "");
+    this.addEntry(59, -1, null, "Prairie", "", "");
+    this.addEntry(60, -1, null, "Aglis", "", "");
+    this.addEntry(61, -1, null, "Death Frontier", "", "");
+    this.addEntry(62, -1, null, "Divine Tree", "", "");
+    this.addEntry(63, -1, null, "Vellweb", "", "");
+    this.addEntry(64, -1, null, "Limestone Cave", "", "");
+    this.addEntry(65, -1, null, "Vellweb", "", "");
+    this.addEntry(66, -1, null, "Shirley's Shrine", "", "");
+    this.addEntry(67, -1, null, "Kashua Glacier", "", "");
+    this.addEntry(68, -1, null, "Marshland", "", "");
+    this.addEntry(69, -1, null, "Barrens", "", "");
+    this.addEntry(70, -1, null, "Phantom Ship", "", "");
+    this.addEntry(71, -1, null, "Moon", "", "");
+    this.addEntry(72, -1, null, "Aglis", "", "");
+    this.addEntry(73, -1, null, "Evergreen Forest", "", "");
+    this.addEntry(74, -1, null, "Villude Volcano", "", "");
+    this.addEntry(75, -1, null, "Aglis", "", "");
+    this.addEntry(76, -1, null, "Undersea Cavern", "", "");
+    this.addEntry(77, -1, null, "Divine Tree", "", "");
+    this.addEntry(78, -1, null, "Mayfil", "", "");
+    this.addEntry(79, -1, null, "Giganto Home", "", "");
+    this.addEntry(80, -1, null, "Zenebatos", "", "");
+    this.addEntry(81, -1, null, "Moon", "", "");
+    this.addEntry(82, -1, null, "Giganto Home", "", "");
+    this.addEntry(83, -1, null, "Giganto Home", "", "");
+    this.addEntry(84, -1, null, "Mayfil", "", "");
+    this.addEntry(85, -1, null, "Phantom Ship", "", "");
+    this.addEntry(86, -1, null, "Phantom Ship", "", "");
+    this.addEntry(87, -1, null, "", "", "");
+    this.addEntry(88, -1, null, "Dragon's Nest", "", "");
+    this.addEntry(89, -1, null, "Death Frontier", "", "");
+    this.addEntry(90, -1, null, "Dragon's Nest", "", "");
+    this.addEntry(91, -1, null, "Undersea Cavern", "", "");
+    this.addEntry(92, -1, null, "Villude Volcano", "", "");
+    this.addEntry(93, -1, null, "Moon", "", "");
+    this.addEntry(94, -1, null, "Limestone Cave", "", "");
+    this.addEntry(95, -1, null, "Evergreen Forest", "", "");
+    this.addEntry(96, -1, null, "Mortal Dragon Mountain", "", "");
+    this.addEntry(97, -1, null, "Zenebatos", "", "");
+    this.addEntry(98, -1, null, "Divine Tree", "", "");
+    this.addEntry(99, -1, null, "Giganto Home", "", "");
+    this.addEntry(100, -1, null, "Villude Volcano", "", "");
+    this.addEntry(101, -1, null, "Phantom Ship", "", "");
+    this.addEntry(102, -1, null, "Hoax", "", "");
+    this.addEntry(103, -1, null, "", "", "");
+    this.addEntry(104, -1, null, "Limestone Cave", "", "");
+    this.addEntry(105, -1, null, "Hellena Prison", "", "");
+    this.addEntry(106, -1, null, "Valley of Corrupted Gravity", "", "");
+    this.addEntry(107, -1, null, "Shirley's Shrine", "", "");
+    this.addEntry(108, -1, null, "Barrens", "", "");
+    this.addEntry(109, -1, null, "Giganto Home", "", "");
+    this.addEntry(110, -1, null, "Undersea Cavern", "", "");
+    this.addEntry(111, -1, null, "Kadessa", "", "");
+    this.addEntry(112, -1, null, "Mortal Dragon Mountain", "", "");
+    this.addEntry(113, -1, null, "Mortal Dragon Mountain", "", "");
+    this.addEntry(114, -1, null, "Kashua Glacier", "", "");
+    this.addEntry(115, -1, null, "Dragon's Nest", "", "");
+    this.addEntry(116, -1, null, "Snowfield", "", "");
+    this.addEntry(117, -1, null, "Evergreen Forest", "", "");
+    this.addEntry(118, -1, null, "Zenebatos", "", "");
+    this.addEntry(119, -1, null, "Death Frontier", "", "");
+    this.addEntry(120, -1, null, "Moon", "", "");
+    this.addEntry(121, -1, null, "Aglis", "", "");
+    this.addEntry(122, -1, null, "Zenebatos", "", "");
+    this.addEntry(123, -1, null, "Moon", "", "");
+    this.addEntry(124, -1, null, "World Map", "", "");
+    this.addEntry(125, -1, null, "Mayfil", "", "");
+    this.addEntry(126, -1, null, "Divine Tree", "", "");
+    this.addEntry(127, -1, null, "Moon", "", "");
+    this.addEntry(128, -1, null, "Moon", "", "");
+    this.addEntry(129, -1, null, "Hellena Prison", "", "");
+    this.addEntry(130, -1, null, "", "", "");
+    this.addEntry(131, -1, null, "", "", "");
+    this.addEntry(132, -1, null, "Marshland", "", "");
+    this.addEntry(133, -1, null, "Hellena Prison", "", "");
+    this.addEntry(134, -1, null, "Hellena Prison", "", "");
+    this.addEntry(135, -1, null, "", "", "");
+    this.addEntry(136, -1, null, "", "", "");
+    this.addEntry(137, -1, null, "", "", "");
+    this.addEntry(138, -1, null, "", "", "");
+    this.addEntry(139, -1, null, "", "", "");
+    this.addEntry(144, -1, null, "", "", "");
+    this.addEntry(146, -1, null, "Villude Volcano", "", "");
+    this.addEntry(148, -1, null, "", "", "");
+    this.addEntry(150, -1, null, "", "", "");
+    this.addEntry(152, -1, null, "", "", "");
+    this.addEntry(154, -1, null, "", "", "");
+    this.addEntry(155, -1, null, "", "", "");
+    this.addEntry(157, -1, null, "", "", "");
+    this.addEntry(256, -1, null, "Seles", "", "");
+    this.addEntry(257, -1, null, "Seles", "", "");
+    this.addEntry(258, -1, null, "Black Castle", "", "");
+    this.addEntry(259, -1, null, "", "", "");
+    this.addEntry(260, -1, null, "", "", "");
+    this.addEntry(261, 1, null, "", "", "");
+    this.addEntry(262, 1, null, "", "", "");
+    this.addEntry(263, 1, null, "Hellena Prison", "", "");
+    this.addEntry(264, 1, null, "Hellena Prison", "", "");
+    this.addEntry(267, 1, null, "Black Castle", "", "");
+    this.addEntry(268, 1, null, "Black Castle", "", "");
+    this.addEntry(269, 1, null, "Lohan", "", "");
+    this.addEntry(270, 1, "Lloyd (Wingly)", "Flanvel Tower", "", "");
+    this.addEntry(273, 1, null, "", "", "");
+    this.addEntry(275, 1, null, "Dragon's Nest", "", "");
+    this.addEntry(279, 1, null, "Undersea Cavern", "", "");
+    this.addEntry(283, 1, null, "Mortal Dragon Mountain", "", "");
+    this.addEntry(287, 1, null, "Dragon's Nest", "", "");
+    this.addEntry(288, 1, null, "Shirley's Shrine", "", "");
+    this.addEntry(293, 1, null, "Fletz", "", "");
+    this.addEntry(294, 1, null, "Undersea Cavern", "", "");
+    this.addEntry(295, 1, null, "Vellweb", "", "");
+    this.addEntry(296, 1, null, "Vellweb", "", "");
+    this.addEntry(297, 1, null, "Vellweb", "", "");
+    this.addEntry(298, 1, null, "Vellweb", "", "");
+    this.addEntry(299, 1, null, "Barrens", "", "");
+    this.addEntry(301, 1, null, "Giganto Home", "", "");
+    this.addEntry(302, 1, null, "Lohan", "", "");
+    this.addEntry(303, 1, null, "Lohan", "", "");
+    this.addEntry(304, 1, null, "Lohan", "", "");
+    this.addEntry(305, 1, null, "Lohan", "", "");
+    this.addEntry(308, 1, "Virage A", "Villude Volcano", "", "");
+    this.addEntry(311, 1, "Virage B", "Valley of Corrupted Gravity", "", "");
+    this.addEntry(316, 1, "Virage S ", "Moon", "", "");
+    this.addEntry(325, 1, null, "Shirley's Shrine", "", "");
+    this.addEntry(329, 1, null, "Hellena Prison", "", "");
+    this.addEntry(332, 1, null, "Limestone Cave", "", "");
+    this.addEntry(333, 1, null, "Villude Volcano", "", "");
+    this.addEntry(335, 1, null, "Kadessa", "", "");
+    this.addEntry(340, 1, null, "Phantom Ship", "", "");
+    this.addEntry(341, 1, null, "Phantom Ship", "", "");
+    this.addEntry(343, 1, null, "Evergreen Forest", "", "");
+    this.addEntry(344, 1, null, "Flanvel Tower", "", "");
+    this.addEntry(346, 1, null, "Kashua Glacier", "", "");
+    this.addEntry(349, 1, "Polter", "Snowfield", "", "");
+    this.addEntry(352, 1, "Divine Dragon Spirit", "Mayfil", "", "");
+    this.addEntry(353, 1, "Regole Spirit", "Mayfil", "", "");
+    this.addEntry(354, 1, "Feyrbrand Spirit", "Mayfil", "", "");
+    this.addEntry(360, 1, null, "Zenebatos", "", "");
+    this.addEntry(361, 1, null, "Zenebatos", "", "");
+    this.addEntry(362, 1, null, "Zenebatos", "", "");
+    this.addEntry(363, 1, null, "Mayfil", "", "");
+    this.addEntry(364, 1, null, "Mayfil", "", "");
+    this.addEntry(365, 1, null, "Aglis", "", "");
+    this.addEntry(366, 1, null, "", "", "");
+    this.addEntry(368, 1, null, "Divine Tree", "", "");
+    this.addEntry(369, 1, null, "Divine Tree", "", "");
+    this.addEntry(370, 1, null, "Divine Tree", "", "");
+    this.addEntry(371, 1, null, "Moon", "", "");
+    this.addEntry(378, 1, null, "Moon", "", "");
+    this.addEntry(381, 1, null, "Moon", "", "");
+    this.addEntry(382, 1, null, "Moon", "", "");
+    this.addEntry(387, 1, null, "Moon", "", "");
+    this.addEntry(388, 1, null, "Moon", "", "");
   }
 
-  private void addPage(final int charId, @Nullable final String name, final int killCount, final String map, final String region, final String lore) {
-    this.bestiaryPages.add(new BestiaryRecord(charId, name, killCount, map, region, lore));
+  private void addEntry(final int charId, final int killCount, @Nullable final String name, final String map, final String region, final String lore) {
+    this.bestiaryEntries.add(new BestiaryRecord(charId, killCount, name, map, region, lore));
   }
 
-  public void loadCurrentPage() {
-    this.monster = this.bestiaryPages.get(this.pageIndex);
+  public void loadCurrentEntry() {
+    this.monster = this.bestiaryEntries.get(this.entryIndex);
     this.headerTexture = Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\header_element_" + this.getElement(this.monster.stats.elementFlag_0f).getRegistryId().entryId() + ".png"));
 
     try {
@@ -382,7 +421,7 @@ public class ArchiveBestiaryRenderer {
       this.renderList();
     }
 
-    FUN_801034cc(this.pageIndex, this.getPageCount(), -10, this.isListVisible); // Left/right arrows
+    FUN_801034cc(this.entryIndex, this.bestiaryEntries.size(), -10, this.isListVisible); // Left/right arrows
   }
 
   private void renderGraphics() {
@@ -394,6 +433,18 @@ public class ArchiveBestiaryRenderer {
     RENDERER
       .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
       .texture(this.textures[0]);
+
+    if(this.monster.rank > 0) {
+      this.m.translation(xOffset - 10, 0, 130);
+      this.m.scale(390, 240, 1);
+
+      RENDERER
+        .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
+        .texture(this.textures[8]) //White
+        .colour(this.monster.elementRGB[0], this.monster.elementRGB[1], this.monster.elementRGB[2])
+        .alpha(this.monster.elementRGB[3])
+        .translucency(Translucency.HALF_B_PLUS_HALF_F);
+    }
   }
 
   private void renderModel() {
@@ -410,7 +461,9 @@ public class ArchiveBestiaryRenderer {
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.modelTexture)
-        .colour(0,0,0);
+        .colour(0,0,0)
+        .alpha(0.85f)
+        .translucency(Translucency.HALF_B_PLUS_HALF_F);
     }
   }
 
@@ -425,15 +478,25 @@ public class ArchiveBestiaryRenderer {
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.headerTexture); //Header
 
-      //renderText(monsterNames_80112068[this.getCurrentRecord().charId], 184, 10.5f, this.headerFont, 127);
-      renderText(monsterNames_80112068[this.getCurrentRecord().charId] + " [" + this.getCurrentRecord().charId + ']', 184, 10.5f, this.headerFont, 126);
-      renderText("Found In: " + this.monster.location, 23, 206, this.statsFont, 127);
+      //renderText(this.monster.name, 184, 10.5f, this.headerFont, 127);
+      renderText(this.monster.name + " [" + this.getCurrentRecord().charId + ']', 184, 10.5f, this.headerFont, 126);
+      renderText(this.monster.location, 31, 206.5f, this.locationFont, 127);
     } else {
-      renderText("?????", 184, 10.5f, this.headerFont, 126);
-      renderText("Found In: ?????", 23, 206, this.statsFont, 126);
+      renderText(QUESTION_MARK_5, 184, 10.5f, this.headerFont, 126);
+      renderText(QUESTION_MARK_5, 31, 206.5f, this.locationFont, 126);
     }
 
-    renderText("Defeated: " + this.monster.kill, 23, 123, this.statsFont, 127);
+//    int u = (int)(tickCount_800bb0fc / (3.0f / vsyncMode_8007a3b8)) & 0x7;
+//    this.modelAndAnimData_800c66a8.mapArrow.render(u, 2, 19.8f, 200, 126f);
+
+//    u = (int)(tickCount_800bb0fc / 5 / (3.0f / vsyncMode_8007a3b8) % 3);
+//    this.modelAndAnimData_800c66a8.coolonPlaceMarker.render(u, 2, 21f, 206f, 127f);
+
+    renderText("Defeated: " + (this.monster.maxKill > -1 ? Math.min(this.monster.maxKill, this.monster.kill) : this.monster.kill), 23, 123, this.statsFont, 127);
+
+    if(this.monster.isPerfect()) {
+      renderText("COMPLETE", 180.5f, 122.5f, this.completeFont, 126);
+    }
   }
 
   private void renderEnemyStats() {
@@ -446,55 +509,43 @@ public class ArchiveBestiaryRenderer {
       if(this.monster.rank >= 2) {
         renderText(String.valueOf(this.getStat(i)), x + 28f, y, this.statsFont, 127);
       } else {
-        renderText("???", x + 28f, y, this.statsFont, 127);
+        renderText(QUESTION_MARK_3, x + 28f, y, this.statsFont, 127);
       }
       y += 11.45f;
     }
 
     x = 272;
-    y = 47.4f - 11.45f;
+    y = 45.4f - 11.45f;
 
     if(this.monster.stats.elementalImmunityFlag_10 > 0) {
       y += 11.45f;
-      this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 100, 50, false);
+      this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 100, false);
     } else if(this.monster.stats.elementFlag_0f != 8) {
       y += 11.45f;
-      this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 50, 50, false);
+      this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 50, false);
     }
 
     final int counterElement = this.getCounterElement(this.monster.stats.elementFlag_0f);
     if(counterElement != 0) {
       y += 11.45f;
-      this.renderElementMultipliers(counterElement, x, y, xOffset, 50, 50, true);
+      this.renderElementMultipliers(counterElement, x, y, xOffset, 50, true);
     }
   }
 
-  private void renderElementMultipliers(final int elementFlag, final float x, final float y, final float xOffset, final int defPercent, final int attPercent, final boolean counter) {
+  private void renderElementMultipliers(final int elementFlag, final float x, final float y, final float xOffset, final int defPercent, final boolean counter) {
     final String guardSign = counter ? "-" : "+";
-    final String attackSign = counter ? "+" : "-";
 
-    renderText(this.monster.rank >= 2 ? I18n.translate(this.getElement(elementFlag).getTranslationKey()) : "?????", x, y, this.resistFont, 127);
+    renderText(this.monster.rank >= 2 ? I18n.translate(this.getElement(elementFlag).getTranslationKey()) : QUESTION_MARK_5, x, y, this.statsFont, 127);
 
     if(this.monster.rank >= 2) {
-      this.m.translation(x + 27.5f + xOffset, y - 1.5f, 124f);
-      this.m.scale(7, 7, 1);
+      this.m.translation(x + 51.5f + xOffset, y - 1f, 124f);
+      this.m.scale(8, 8, 1);
 
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.textures[2]); //Guard
 
-      renderText(guardSign + defPercent + '%', x + 35f, y + 0.3f, this.resistNumberFont, 127);
-
-      if(attPercent != 0) {
-        this.m.translation(x + 53f + xOffset, y - 1.5f, 124f);
-        this.m.scale(7, 7, 1);
-
-        RENDERER
-          .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-          .texture(this.textures[1]); //Attack
-
-        renderText(attackSign + attPercent + '%', x + 60f, y + 0.3f, this.resistNumberFont, 127);
-      }
+      renderText(guardSign + defPercent + '%', x + 60f, y + 2f, this.resistNumberFont, 127);
     }
   }
 
@@ -506,33 +557,33 @@ public class ArchiveBestiaryRenderer {
     renderText("Battle Rewards", x + 74, 150f, this.titleFont, 127);
 
     if(rewards.xp_00 > 0) {
-      renderText(this.monster.rank >= 3 ? "Exp." : "???", x, y, this.rewardTitleFont, 127);
-      renderText(this.monster.rank >= 3 ? String.valueOf(rewards.xp_00) : "?????", x + 28f, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isPerfect() ? "Exp." : QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isPerfect() ? String.valueOf(rewards.xp_00) : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
       y += 13.5f;
     }
 
     if(rewards.gold_02 > 0) {
-      renderText(this.monster.rank >= 3 ? "Gold" : "???", x, y, this.rewardTitleFont, 127);
-      renderText(this.monster.rank >= 3 ? String.valueOf(rewards.gold_02) : "?????", x + 28f, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isPerfect() ? "Gold" : QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isPerfect() ? String.valueOf(rewards.gold_02) : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
       y += 13.5f;
     }
 
     if(rewards.itemDrop_05 != null) {
-      renderText(this.monster.rank >= 3 ? I18n.translate(rewards.itemDrop_05.get().getNameTranslationKey()) + " (" + rewards.itemChance_04 + "%)" : "?????", x + 28f, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isPerfect() ? I18n.translate(rewards.itemDrop_05.get().getNameTranslationKey()) + " (" + rewards.itemChance_04 + "%)" : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
 
-      if(this.monster.rank >= 3) {
+      if(this.monster.isPerfect()) {
         renderItemIcon(rewards.itemDrop_05.get().getIcon(), x + 10f, y - 5f, 32, 0.9f, 0.9f, 0x8);
       } else {
-        renderText("???", x, y, this.rewardTitleFont, 127);
+        renderText(QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
       }
     }
   }
 
   private void renderLore() {
     if(this.monster.rank >= 2) {
-      renderText(this.monster.lore, 23f, 146f, this.statsFont, 127);
+      renderText(this.monster.lore.isEmpty() ? LORE_DEFAULT : this.monster.lore, 23f, 146f, this.loreFont, 127);
     } else {
-      renderText("?????", 23f, 146f, this.statsFont, 127);
+      renderText(QUESTION_MARK_5, 23f, 146f, this.statsFont, 127);
     }
   }
 
@@ -542,11 +593,11 @@ public class ArchiveBestiaryRenderer {
 
     if(this.listBox == null || this.currentBoxOffsetX != xOffset) {
       this.currentBoxOffsetX = xOffset;
-      this.listBox = new UiBox("Bestiary List", x - xOffset, 14f, 95f, 210f, 0.7f);
+      this.listBox = new UiBox("Bestiary List", x, 14f, 95f, 210f, 0.7f);
     }
 
-    this.m.translation(0 - xOffset, 0, 126);
-    this.m.scale(368, 240, 1);
+    this.m.translation(xOffset - 10, 0, 126);
+    this.m.scale(390, 240, 1);
 
     RENDERER
       .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
@@ -556,21 +607,30 @@ public class ArchiveBestiaryRenderer {
 
     this.listBox.render(Config.changeBattleRgb() ? Config.getBattleRgb() : Config.defaultUiColour);
 
-    float y = 20f;
+    this.m.translation(xOffset + 10.5f, 26.25f, 124);
+    this.m.scale(85, 1, 1);
+
+    RENDERER
+      .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
+      .texture(this.textures[7]); //Underline
+
+    renderText(this.bestiarySeenCount + "/" + this.bestiaryEntries.size(), x + 88f, 19.5f, this.bestiaryPerfect ? this.listTotalPerfectFont : this.listTotalFont, 123);
+
+    float y = 32f;
     for(int i = 0; i < LIST_ITEM_COUNT; i++) {
       final int recordIndex = this.listFirstVisibleItem + i;
-      final BestiaryRecord record = this.bestiaryPages.get(recordIndex);
-      final boolean highlighted = this.pageIndex == recordIndex;
+      final BestiaryRecord record = this.bestiaryEntries.get(recordIndex);
+      final boolean highlighted = this.entryIndex == recordIndex;
       float charX = 6;
       for(final char c : this.nf.format(recordIndex).toCharArray()) {
-        renderText(String.valueOf(c), x + charX, y, highlighted ? this.listNumberHighlightFont : this.listNumberFont, 123);
+        renderText(String.valueOf(c), x + charX, y, highlighted ? (record.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
         charX += 3.7f;
       }
-      renderText(":", x + 16f, y, highlighted ? this.listNumberHighlightFont : this.listNumberFont, 123);
-      renderText(record.rank > 0 ? record.name : "?????", x + 19f, y, highlighted ? this.listHighlightFont : this.listFont, 123);
+      renderText(":", x + 16f, y, highlighted ? (record.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
+      renderText(record.rank > 0 ? record.name : QUESTION_MARK_5, x + 19f, y, highlighted ? (record.isPerfect() ? this.listPerfectHighlightFont : this.listHighlightFont) : (record.isPerfect() ? this.listPerfectFont : this.listFont), 123);
 
       if(highlighted) {
-        this.m.translation(x + 3f - xOffset, y - 1.5f, 124);
+        this.m.translation(xOffset - x + 14.5f , y - 1.5f, 124);
         this.m.scale(83f, 7.5f, 1);
 
         RENDERER
@@ -582,7 +642,7 @@ public class ArchiveBestiaryRenderer {
     }
 
     if(this.listFirstVisibleItem > 0) {
-      this.m.translation(x + 86f - xOffset, 17f, 124);
+      this.m.translation(xOffset - x + 97.5f, 30f, 124);
       this.m.scale(8, 8, 1);
 
       RENDERER
@@ -590,8 +650,8 @@ public class ArchiveBestiaryRenderer {
         .texture(this.textures[5]); //Up Arrow
     }
 
-    if(this.listFirstVisibleItem < this.bestiaryPages.size() - LIST_ITEM_COUNT) {
-      this.m.translation(x + 86f - xOffset, 213f, 124);
+    if(this.listFirstVisibleItem < this.bestiaryEntries.size() - LIST_ITEM_COUNT) {
+      this.m.translation(xOffset - x + 97.5f, 203f, 124);
       this.m.scale(8, 8, 1);
 
       RENDERER
@@ -603,10 +663,10 @@ public class ArchiveBestiaryRenderer {
   public boolean next(final int steps) {
     boolean b = false;
     for(int i = 0; i < steps; i++) {
-      if(this.pageIndex < this.bestiaryPages.size() - 1) {
+      if(this.entryIndex < this.bestiaryEntries.size() - 1) {
         b = true;
-        this.pageIndex++;
-        if(this.listFirstVisibleItem < this.bestiaryPages.size() - LIST_ITEM_COUNT && this.listFirstVisibleItem + LIST_ITEM_COUNT * 0.85f < this.pageIndex) {
+        this.entryIndex++;
+        if(this.listFirstVisibleItem < this.bestiaryEntries.size() - LIST_ITEM_COUNT && this.listFirstVisibleItem + LIST_ITEM_COUNT * 0.85f < this.entryIndex) {
           this.listFirstVisibleItem++;
         }
       } else {
@@ -619,10 +679,10 @@ public class ArchiveBestiaryRenderer {
   public boolean previous(final int steps) {
     boolean b = false;
     for(int i = 0; i < steps; i++) {
-      if(this.pageIndex > 0) {
+      if(this.entryIndex > 0) {
         b = true;
-        this.pageIndex--;
-        if(this.listFirstVisibleItem > 0 && this.listFirstVisibleItem + LIST_ITEM_COUNT * 0.14f > this.pageIndex) {
+        this.entryIndex--;
+        if(this.listFirstVisibleItem > 0 && this.listFirstVisibleItem + LIST_ITEM_COUNT * 0.12f > this.entryIndex) {
           this.listFirstVisibleItem--;
         }
       } else {
@@ -633,9 +693,9 @@ public class ArchiveBestiaryRenderer {
   }
 
   public boolean jump(final int index) {
-    if(index != this.pageIndex) {
-      this.pageIndex = index;
-      this.listFirstVisibleItem = Math.clamp(index, 0, this.bestiaryPages.size() - LIST_ITEM_COUNT);
+    if(index != this.entryIndex) {
+      this.entryIndex = index;
+      this.listFirstVisibleItem = Math.clamp(index, 0, this.bestiaryEntries.size() - LIST_ITEM_COUNT);
       return true;
     }
     return false;
@@ -683,5 +743,32 @@ public class ArchiveBestiaryRenderer {
       case 32 -> 4;
       default -> 0;
     };
+  }
+
+  private static int[] getElementBackgroundRGB(final int elementFlag) {
+    return switch(elementFlag) {
+      case 1 -> new int[] { 0, 156, 255, 10 };    //Water
+      case 2 -> new int[] { 81, 55, 0, 20 };      //Earth
+      case 4 -> new int[] { 25, 0, 137, 10 };     //Dark
+      case 8 -> new int[] { 144, 144, 144, 18 };  //Divine
+      case 16 -> new int[] { 168, 0, 255, 8 };   //Thunder
+      case 32 -> new int[] { 230, 234, 130, 10 }; //Light
+      case 64 -> new int[] { 0, 211, 20, 5 };    //Wind
+      case 128 -> new int[] { 211, 20, 0, 10 };   //Fire
+      default -> new int[] { 0, 0, 0, 0 };
+    };
+  }
+
+  private void setBestiaryStatus() {
+    int totalAtMaxRank = 0;
+    for(final BestiaryRecord r : this.bestiaryEntries) {
+      if(r.kill > 0) {
+        this.bestiarySeenCount++;
+        if(r.isPerfect()) {
+          totalAtMaxRank++;
+        }
+      }
+    }
+    this.bestiaryPerfect = totalAtMaxRank >= this.bestiaryEntries.size();
   }
 }

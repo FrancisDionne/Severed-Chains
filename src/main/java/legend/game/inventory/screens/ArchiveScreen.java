@@ -109,7 +109,7 @@ public class ArchiveScreen extends MenuScreen {
       case 1:
         if(this.bestiaryRenderer.previous(steps)) {
           playMenuSound(1);
-          this.bestiaryRenderer.loadCurrentPage();
+          this.bestiaryRenderer.loadCurrentEntry();
         }
         break;
     }
@@ -126,7 +126,7 @@ public class ArchiveScreen extends MenuScreen {
       case 1:
         if(this.bestiaryRenderer.next(steps)) {
           playMenuSound(1);
-          this.bestiaryRenderer.loadCurrentPage();
+          this.bestiaryRenderer.loadCurrentEntry();
         }
         break;
     }
@@ -245,7 +245,7 @@ public class ArchiveScreen extends MenuScreen {
         case 1:
           if(this.bestiaryRenderer.jump(0)) {
             playMenuSound(1);
-            this.bestiaryRenderer.loadCurrentPage();
+            this.bestiaryRenderer.loadCurrentEntry();
           }
           break;
       }
@@ -259,9 +259,9 @@ public class ArchiveScreen extends MenuScreen {
           this.statisticsRenderer.pageIndex = this.statisticsRenderer.getPageCount() - 1;
           break;
         case 1:
-          if(this.bestiaryRenderer.jump(this.bestiaryRenderer.getPageCount() - 1)) {
+          if(this.bestiaryRenderer.jump(this.bestiaryRenderer.getEntryCount() - 1)) {
             playMenuSound(1);
-            this.bestiaryRenderer.loadCurrentPage();
+            this.bestiaryRenderer.loadCurrentEntry();
           }
           break;
       }
