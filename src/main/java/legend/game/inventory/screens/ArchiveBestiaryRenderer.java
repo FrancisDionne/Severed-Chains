@@ -55,7 +55,7 @@ public class ArchiveBestiaryRenderer {
       this.maxKill = maxKill;
 
       final int[] elementRGB = ArchiveBestiaryRenderer.getElementBackgroundRGB(this.stats.elementFlag_0f);
-      this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.75f };
+      this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.65f };
 
       if(this.kill >= 10 || (this.maxKill > -1 && this.kill >= this.maxKill)) {
         this.rank = 3;
@@ -404,7 +404,7 @@ public class ArchiveBestiaryRenderer {
     this.headerTexture = Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\header_element_" + this.getElement(this.monster.stats.elementFlag_0f).getRegistryId().entryId() + ".png"));
 
     try {
-      this.modelTexture = Texture.png(Path.of("gfx", "models", monster.charId + ".png"));
+      this.modelTexture = Texture.png(Path.of("gfx", "models", this.monster.charId + ".png"));
     } catch(final Exception e) {
       this.modelTexture = Texture.png(Path.of("gfx", "models", "-1.png"));
     }
