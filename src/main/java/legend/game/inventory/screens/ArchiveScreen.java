@@ -108,7 +108,7 @@ public class ArchiveScreen extends MenuScreen {
         break;
       case 1:
         if(this.bestiaryRenderer.isListVisible && !alt) {
-          playMenuSound(1);
+          playMenuSound(2);
           this.bestiaryRenderer.cycleSort(-1);
         } else {
           if(this.bestiaryRenderer.previous(steps)) {
@@ -130,7 +130,7 @@ public class ArchiveScreen extends MenuScreen {
         break;
       case 1:
         if(this.bestiaryRenderer.isListVisible && !alt) {
-          playMenuSound(1);
+          playMenuSound(2);
           this.bestiaryRenderer.cycleSort(1);
         } else {
           if(this.bestiaryRenderer.next(steps)) {

@@ -93,7 +93,7 @@ public final class FooterActionsHud {
       case FooterActions.ADDITIONS -> "Additions";
       case FooterActions.HELP -> "Help";
       case FooterActions.MODS -> "Mods";
-      case FooterActions.ARCHIVE -> "Archive";
+      case FooterActions.ARCHIVE -> "Archives";
       case FooterActions.TURN_ORDER -> "Turn";
       case FooterActions.ARCHIVE_BESTIARY -> "Bestiary";
       case FooterActions.ARCHIVE_STATS -> "Statistics";
