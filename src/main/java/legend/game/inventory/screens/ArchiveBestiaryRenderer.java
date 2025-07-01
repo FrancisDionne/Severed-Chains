@@ -77,7 +77,7 @@ public class ArchiveBestiaryRenderer {
   private static final int LIST_ITEM_COUNT = 24;
   private static final String QUESTION_MARK_5 = "?????";
   private static final String QUESTION_MARK_3 = "???";
-  private static final String LORE_DEFAULT = "Lore coming to a QoL mod near you one day...";
+  private static final String LORE_DEFAULT = "Lore coming one day to a QoL mod near you...";
 
   private final Matrix4f m;
   private final Obj quad;
@@ -181,16 +181,16 @@ public class ArchiveBestiaryRenderer {
 
   private void loadEntries() {
     this.bestiaryEntries = new ArrayList<>();
-    this.addEntry(0, -1, null, "Prairie", "Southern Serdio", "");
-    this.addEntry(1, -1, null, "Barrens", "Tiberoa", "");
+    this.addEntry(0, -1, null, "Prairie", "Southern Serdio", "The Mantis is a strong creature,\nfeaturing high physical stats and Power Up.\nWeaker to magic.");
+    this.addEntry(1, -1, null, "Barrens", "Tiberoa", "Decent physical attacker with good defense.\nWeaker to magic.\nNot named after the perfect emo movie.");
     this.addEntry(2, -1, null, "Kadessa", "Mille Seseau", "");
-    this.addEntry(3, -1, null, "Death Frontier", "Death Frontier", "");
+    this.addEntry(3, -1, null, "Death Frontier", "Death Frontier", "Physical attacker often accompanied by other creatures.\nHas a special sand attack.\nWishes it was a Graboid from the Tremors films.");
     this.addEntry(4, -1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(5, -1, null, "Kashua Glacier", "Mille Seseau", "");
     this.addEntry(6, -1, null, "Mortal Dragon Mountain", "Mille Seseau", "");
     this.addEntry(7, -1, null, "Divine Tree", "Gloriano", "");
-    this.addEntry(8, -1, null, "Forest", "Southern Serdio", "");
-    this.addEntry(9, -1, null, "Aglis", "Broken Islands", "");
+    this.addEntry(8, -1, null, "Forest", "Southern Serdio", "Strong fighter in the Prairie.\nSeems weak, but does very high damage\nwhen at low health.");
+    this.addEntry(9, -1, "Minotaur", "Aglis", "Broken Islands", "");
     this.addEntry(10, -1, null, "Mayfil", "Gloriano", "");
     this.addEntry(11, -1, null, "Flanvel Tower", "Mille Seseau", "");
     this.addEntry(12, -1, null, "Undersea Cavern", "Illisa Bay", "");
