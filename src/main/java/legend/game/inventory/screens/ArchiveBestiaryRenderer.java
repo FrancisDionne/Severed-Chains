@@ -70,7 +70,10 @@ public class ArchiveBestiaryRenderer {
       } else {
         this.rank = 0;
       }
-      this.rank = 3;
+
+      if(devMode) {
+        this.rank = 3;
+      }
     }
 
     public boolean isPerfect() {
@@ -78,6 +81,7 @@ public class ArchiveBestiaryRenderer {
     }
   }
 
+  public static final boolean devMode = true;
   private static final int LIST_ITEM_COUNT = 24;
   private static final String QUESTION_MARK_5 = "?????";
   private static final String QUESTION_MARK_3 = "???";
@@ -491,9 +495,11 @@ public class ArchiveBestiaryRenderer {
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.headerTexture); //Header
 
-      //renderText(this.monster.name, 184, 10.5f, this.headerFont, 126);
-      renderText(this.monster.name + " [" + this.getCurrentEntry().charId + ']', 184, 10.5f, this.headerFont, 126);
-      renderText(this.nf.format(this.monster.entryNumber), 14.5f, 28.5f, this.headerNumberFont, 126);
+      if(devMode) {
+        renderText(this.monster.name + " [" + this.getCurrentEntry().charId + ']', 184, 10.5f, this.headerFont, 126);
+      } else {
+        renderText(this.monster.name, 184, 10.5f, this.headerFont, 126);
+      }
       renderText(this.monster.location, 31, 206.5f, this.locationFont, 127);
     } else {
       renderText(QUESTION_MARK_5, 184, 10.5f, this.headerFont, 126);
@@ -506,6 +512,7 @@ public class ArchiveBestiaryRenderer {
 //    u = (int)(tickCount_800bb0fc / 5 / (3.0f / vsyncMode_8007a3b8) % 3);
 //    this.modelAndAnimData_800c66a8.coolonPlaceMarker.render(u, 2, 21f, 206f, 127f);
 
+    renderText(this.nf.format(this.monster.entryNumber), 14.5f, 28.5f, this.headerNumberFont, 126);
     renderText("Defeated: " + (this.monster.maxKill > -1 ? Math.min(this.monster.maxKill, this.monster.kill) : this.monster.kill), 23, 123, this.statsFont, 127);
 
     if(this.monster.isPerfect()) {

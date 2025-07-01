@@ -311,7 +311,8 @@ public class ArchiveStatisticsRenderer {
       } else {
         RENDERER
           .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-          .colour(0,0,0)
+          .colour(0, 0, 0)
+          .alpha(0.85f)
           .translucency(Translucency.HALF_B_PLUS_HALF_F)
           .texture(portrait);
       }

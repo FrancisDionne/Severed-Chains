@@ -32,7 +32,7 @@ public class ArchiveScreen extends MenuScreen {
 
   public ArchiveScreen(final Runnable unload) {
     this.unload = unload;
-    this.currentArchiveType = 1;
+    this.currentArchiveType = ArchiveBestiaryRenderer.devMode ? 1 : 0;
     this.statisticsRenderer = new ArchiveStatisticsRenderer();
     this.bestiaryRenderer = new ArchiveBestiaryRenderer();
   }
