@@ -124,7 +124,7 @@ public class ArchiveBestiaryRenderer {
   private float currentBoxOffsetX;
   public boolean isListVisible;
   private int listFirstVisibleItem;
-  private int currentSort = 0;
+  private int currentSort;
 
   private final NumberFormat nf = new DecimalFormat("000");
 
@@ -512,7 +512,7 @@ public class ArchiveBestiaryRenderer {
 //    u = (int)(tickCount_800bb0fc / 5 / (3.0f / vsyncMode_8007a3b8) % 3);
 //    this.modelAndAnimData_800c66a8.coolonPlaceMarker.render(u, 2, 21f, 206f, 127f);
 
-    renderText(this.nf.format(this.monster.entryNumber), 14.5f, 28.5f, this.headerNumberFont, 125);
+    renderText(this.nf.format(this.monster.entryNumber), 15f, 28.5f, this.headerNumberFont, 125);
     renderText("Defeated: " + (this.monster.maxKill > -1 ? Math.min(this.monster.maxKill, this.monster.kill) : this.monster.kill), 23, 123, this.statsFont, 127);
 
     if(this.monster.isPerfect()) {
