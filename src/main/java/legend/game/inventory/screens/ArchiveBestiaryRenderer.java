@@ -96,6 +96,7 @@ public class ArchiveBestiaryRenderer {
   private final WMapModelAndAnimData258 modelAndAnimData_800c66a8;
 
   private final FontOptions headerFont;
+  private final FontOptions headerNumberFont;
   private final FontOptions locationFont;
   private final FontOptions statsFont;
   private final FontOptions loreFont;
@@ -148,6 +149,7 @@ public class ArchiveBestiaryRenderer {
     this.modelAndAnimData_800c66a8.coolonPlaceMarker.setSize(7.0f);
 
     this.headerFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.DARK_GREY).size(1.1f).horizontalAlign(HorizontalAlign.CENTRE);
+    this.headerNumberFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.DARK_GREY).size(0.9f).horizontalAlign(HorizontalAlign.LEFT);
     this.statsFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.65f).horizontalAlign(HorizontalAlign.LEFT);
     this.loreFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
     this.locationFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.55f).horizontalAlign(HorizontalAlign.LEFT);
@@ -489,8 +491,9 @@ public class ArchiveBestiaryRenderer {
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.headerTexture); //Header
 
-      //renderText(this.monster.name, 184, 10.5f, this.headerFont, 127);
+      //renderText(this.monster.name, 184, 10.5f, this.headerFont, 126);
       renderText(this.monster.name + " [" + this.getCurrentEntry().charId + ']', 184, 10.5f, this.headerFont, 126);
+      renderText(this.nf.format(this.monster.entryNumber), 14.5f, 28.5f, this.headerNumberFont, 126);
       renderText(this.monster.location, 31, 206.5f, this.locationFont, 127);
     } else {
       renderText(QUESTION_MARK_5, 184, 10.5f, this.headerFont, 126);
