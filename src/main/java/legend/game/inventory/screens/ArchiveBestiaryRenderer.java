@@ -22,7 +22,9 @@ import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.FUN_801034cc;
@@ -35,6 +37,7 @@ import static legend.game.combat.Monsters.monsterStats_8010ba98;
 public class ArchiveBestiaryRenderer {
 
   private static class BestiaryEntry {
+    public int entryNumber;
     public int charId;
     public String location;
     public MonsterStats1c stats;
@@ -45,7 +48,8 @@ public class ArchiveBestiaryRenderer {
     public int maxKill;
     public float[] elementRGB;
 
-    public BestiaryEntry(final int charId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
+    public BestiaryEntry(final int entryNumber, final int charId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
+      this.entryNumber = entryNumber;
       this.charId = charId;
       this.location = map + (region.isEmpty() ? "" : " - " + region);
       this.stats = monsterStats_8010ba98[charId];
@@ -109,11 +113,13 @@ public class ArchiveBestiaryRenderer {
   private final FontOptions listTotalFont;
   private final FontOptions listTotalPerfectFont;
   private final FontOptions completeFont;
+  private final FontOptions sortFont;
 
   public int entryIndex;
   private float currentBoxOffsetX;
   public boolean isListVisible;
   private int listFirstVisibleItem;
+  private int currentSort = 0;
 
   private final NumberFormat nf = new DecimalFormat("000");
 
@@ -121,7 +127,7 @@ public class ArchiveBestiaryRenderer {
     return this.bestiaryEntries.size();
   }
 
-  private BestiaryEntry getCurrentRecord() {
+  private BestiaryEntry getCurrentEntry() {
     return this.bestiaryEntries.get(this.entryIndex);
   }
 
@@ -159,6 +165,7 @@ public class ArchiveBestiaryRenderer {
     this.listTotalFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.DARKER_GREY).size(0.55f).horizontalAlign(HorizontalAlign.RIGHT);
     this.listTotalPerfectFont = new FontOptions().colour(TextColour.LIGHT_GOLD).shadowColour(TextColour.DARKER_GREY).size(0.55f).horizontalAlign(HorizontalAlign.RIGHT);
     this.completeFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.7f).horizontalAlign(HorizontalAlign.RIGHT);
+    this.sortFont = new FontOptions().colour(TextColour.YELLOW).shadowColour(TextColour.DARKER_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
 
     this.textures = new Texture[] {
       Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics.png")),  //0
@@ -190,7 +197,7 @@ public class ArchiveBestiaryRenderer {
     this.addEntry(6, -1, null, "Mortal Dragon Mountain", "Mille Seseau", "");
     this.addEntry(7, -1, null, "Divine Tree", "Gloriano", "");
     this.addEntry(8, -1, null, "Forest", "Southern Serdio", "Strong fighter in the Prairie.\nSeems weak, but does very high damage\nwhen at low health.");
-    this.addEntry(9, -1, "Minotaur", "Aglis", "Broken Islands", "");
+    this.addEntry(9, -1, null, "Aglis", "Broken Islands", "");
     this.addEntry(10, -1, null, "Mayfil", "Gloriano", "");
     this.addEntry(11, -1, null, "Flanvel Tower", "Mille Seseau", "");
     this.addEntry(12, -1, null, "Undersea Cavern", "Illisa Bay", "");
@@ -396,7 +403,7 @@ public class ArchiveBestiaryRenderer {
   }
 
   private void addEntry(final int charId, final int killCount, @Nullable final String name, final String map, final String region, final String lore) {
-    this.bestiaryEntries.add(new BestiaryEntry(charId, killCount, name, map, region, lore));
+    this.bestiaryEntries.add(new BestiaryEntry(this.bestiaryEntries.size() + 1, charId, killCount, name, map, region, lore));
   }
 
   public void loadCurrentEntry() {
@@ -480,7 +487,7 @@ public class ArchiveBestiaryRenderer {
         .texture(this.headerTexture); //Header
 
       //renderText(this.monster.name, 184, 10.5f, this.headerFont, 127);
-      renderText(this.monster.name + " [" + this.getCurrentRecord().charId + ']', 184, 10.5f, this.headerFont, 126);
+      renderText(this.monster.name + " [" + this.getCurrentEntry().charId + ']', 184, 10.5f, this.headerFont, 126);
       renderText(this.monster.location, 31, 206.5f, this.locationFont, 127);
     } else {
       renderText(QUESTION_MARK_5, 184, 10.5f, this.headerFont, 126);
@@ -551,7 +558,7 @@ public class ArchiveBestiaryRenderer {
   }
 
   private void renderRewards() {
-    final EnemyRewards08 rewards = enemyRewards_80112868[this.getCurrentRecord().charId];
+    final EnemyRewards08 rewards = enemyRewards_80112868[this.getCurrentEntry().charId];
     final float x = 200f;
     float y = 166f;
 
@@ -619,11 +626,11 @@ public class ArchiveBestiaryRenderer {
 
     float y = 32f;
     for(int i = 0; i < LIST_ITEM_COUNT; i++) {
-      final int recordIndex = this.listFirstVisibleItem + i;
-      final BestiaryEntry entry = this.bestiaryEntries.get(recordIndex);
-      final boolean highlighted = this.entryIndex == recordIndex;
+      final int entryIndex = this.listFirstVisibleItem + i;
+      final BestiaryEntry entry = this.bestiaryEntries.get(entryIndex);
+      final boolean highlighted = this.entryIndex == entryIndex;
       float charX = 6;
-      for(final char c : this.nf.format(recordIndex).toCharArray()) {
+      for(final char c : this.nf.format(entry.entryNumber).toCharArray()) {
         renderText(String.valueOf(c), x + charX, y, highlighted ? (entry.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
         charX += 3.7f;
       }
@@ -659,6 +666,8 @@ public class ArchiveBestiaryRenderer {
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.textures[6]); //Down Arrow
     }
+
+    renderText("< Sort: " + this.getSortName() + " >", x + 46.75f, 216f, this.sortFont, 123);
   }
 
   public boolean next(final int steps) {
@@ -693,10 +702,14 @@ public class ArchiveBestiaryRenderer {
     return b;
   }
 
-  public boolean jump(final int index) {
+  public boolean jump(final int index, final boolean fromSort) {
     if(index != this.entryIndex) {
       this.entryIndex = index;
       this.listFirstVisibleItem = Math.clamp(index, 0, this.bestiaryEntries.size() - LIST_ITEM_COUNT);
+      if(fromSort) { //Hack to center entry in the list
+        this.previous(10);
+        this.next(10);
+      }
       return true;
     }
     return false;
@@ -771,5 +784,65 @@ public class ArchiveBestiaryRenderer {
       }
     }
     this.bestiaryPerfect = totalAtMaxRank >= this.bestiaryEntries.size();
+  }
+
+  public void cycleSort(final int n) {
+    if(n > 0 && this.currentSort + n > 4) {
+      this.currentSort = 0;
+    } else if(n < 0 && this.currentSort + n < 0) {
+      this.currentSort = 4;
+    } else {
+      this.currentSort += n;
+    }
+    this.sortList();
+  }
+
+  private void sortList() {
+    final Comparator<BestiaryEntry> defeatedComparator = Comparator
+      .comparing((BestiaryEntry x) -> x.kill, Comparator.reverseOrder())
+      .thenComparing(x -> x.entryNumber);
+
+    this.bestiaryEntries = switch(this.currentSort) {
+      case 1 -> this.bestiaryEntries.stream()
+        .sorted(Comparator.comparingInt(o -> o.entryNumber))
+        .sorted((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.name, o2.name))
+        .collect(Collectors.toList());
+      case 2 -> this.bestiaryEntries.stream()
+        .sorted(Comparator.comparingInt(o -> o.entryNumber))
+        .sorted(Comparator.comparingInt(o -> o.stats.elementFlag_0f))
+        .collect(Collectors.toList());
+      case 3 -> this.bestiaryEntries.stream()
+        .sorted(Comparator.comparingInt(o -> o.entryNumber))
+        .sorted(Comparator.comparingInt(o -> o.rank))
+        .sorted(Comparator.comparing(o -> o.rank != 0))
+        .collect(Collectors.toList());
+      case 4 -> this.bestiaryEntries.stream()
+        .sorted(defeatedComparator)
+        .collect(Collectors.toList());
+      default -> this.bestiaryEntries.stream()
+        .sorted(Comparator.comparingInt(o -> o.entryNumber))
+        .collect(Collectors.toList());
+    };
+
+    this.jump(this.indexOfEntry(this.monster.entryNumber), true);
+  }
+
+  private int indexOfEntry(final int number) {
+    for(int i = 0; i < this.bestiaryEntries.size(); i++) {
+      if(this.bestiaryEntries.get(i).entryNumber == number) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private String getSortName() {
+    return switch(this.currentSort) {
+      case 1 -> "Alpha";
+      case 2 -> "Element";
+      case 3 -> "Completion";
+      case 4 -> "Defeated";
+      default -> "#";
+    };
   }
 }

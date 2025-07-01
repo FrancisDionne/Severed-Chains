@@ -98,7 +98,7 @@ public class ArchiveScreen extends MenuScreen {
     this.loadingStage = 100;
   }
 
-  private void menuNavigateLeft(final int steps) {
+  private void menuNavigateLeft(final int steps, final boolean alt) {
     switch(this.currentArchiveType) {
       case 0:
         if(this.statisticsRenderer.pageIndex > 0) {
@@ -107,15 +107,20 @@ public class ArchiveScreen extends MenuScreen {
         }
         break;
       case 1:
-        if(this.bestiaryRenderer.previous(steps)) {
+        if(this.bestiaryRenderer.isListVisible && !alt) {
           playMenuSound(1);
-          this.bestiaryRenderer.loadCurrentEntry();
+          this.bestiaryRenderer.cycleSort(-1);
+        } else {
+          if(this.bestiaryRenderer.previous(steps)) {
+            playMenuSound(1);
+            this.bestiaryRenderer.loadCurrentEntry();
+          }
         }
         break;
     }
   }
 
-  private void menuNavigateRight(final int steps) {
+  private void menuNavigateRight(final int steps, final boolean alt) {
     switch(this.currentArchiveType) {
       case 0:
         if(this.statisticsRenderer.pageIndex < this.statisticsRenderer.getPageCount() - 1) {
@@ -124,9 +129,14 @@ public class ArchiveScreen extends MenuScreen {
         }
         break;
       case 1:
-        if(this.bestiaryRenderer.next(steps)) {
+        if(this.bestiaryRenderer.isListVisible && !alt) {
           playMenuSound(1);
-          this.bestiaryRenderer.loadCurrentEntry();
+          this.bestiaryRenderer.cycleSort(1);
+        } else {
+          if(this.bestiaryRenderer.next(steps)) {
+            playMenuSound(1);
+            this.bestiaryRenderer.loadCurrentEntry();
+          }
         }
         break;
     }
@@ -142,6 +152,14 @@ public class ArchiveScreen extends MenuScreen {
           this.statisticsRenderer.highlightIndex = 11;
         }
         break;
+      case 1:
+        if(this.bestiaryRenderer.isListVisible) {
+          if(this.bestiaryRenderer.previous(1)) {
+            playMenuSound(1);
+            this.bestiaryRenderer.loadCurrentEntry();
+          }
+        }
+        break;
     }
   }
 
@@ -153,6 +171,14 @@ public class ArchiveScreen extends MenuScreen {
           this.statisticsRenderer.highlightIndex++;
         } else {
           this.statisticsRenderer.highlightIndex = 0;
+        }
+        break;
+      case 1:
+        if(this.bestiaryRenderer.isListVisible) {
+          if(this.bestiaryRenderer.next(1)) {
+            playMenuSound(1);
+            this.bestiaryRenderer.loadCurrentEntry();
+          }
         }
         break;
     }
@@ -179,61 +205,33 @@ public class ArchiveScreen extends MenuScreen {
     }
 
     if(action == INPUT_ACTION_MENU_PAGE_UP.get()) {
-      this.menuNavigateLeft(10);
+      this.menuNavigateLeft(10, true);
       return InputPropagation.HANDLED;
     }
 
     if(action == INPUT_ACTION_MENU_PAGE_DOWN.get()) {
-      this.menuNavigateRight(10);
+      this.menuNavigateRight(10, true);
       return InputPropagation.HANDLED;
     }
 
     if(action == INPUT_ACTION_MENU_LEFT.get()) {
-      if(this.currentArchiveType == 1) {
-        if(!this.bestiaryRenderer.isListVisible) {
-          this.menuNavigateLeft(1);
-          return InputPropagation.HANDLED;
-        }
-      } else {
-        this.menuNavigateLeft(1);
-        return InputPropagation.HANDLED;
-      }
+      this.menuNavigateLeft(1, false);
+      return InputPropagation.HANDLED;
     }
 
     if(action == INPUT_ACTION_MENU_RIGHT.get()) {
-      if(this.currentArchiveType == 1) {
-        if(!this.bestiaryRenderer.isListVisible) {
-          this.menuNavigateRight(1);
-          return InputPropagation.HANDLED;
-        }
-      } else {
-        this.menuNavigateRight(1);
-        return InputPropagation.HANDLED;
-      }
+      this.menuNavigateRight(1, false);
+      return InputPropagation.HANDLED;
     }
 
     if(action == INPUT_ACTION_MENU_DOWN.get()) {
-      if(this.currentArchiveType == 1) {
-        if(this.bestiaryRenderer.isListVisible) {
-          this.menuNavigateRight(1);
-          return InputPropagation.HANDLED;
-        }
-      } else {
         this.menuNavigateDown();
         return InputPropagation.HANDLED;
-      }
     }
 
     if(action == INPUT_ACTION_MENU_UP.get()) {
-      if(this.currentArchiveType == 1) {
-        if (this.bestiaryRenderer.isListVisible) {
-          this.menuNavigateLeft(1);
-          return InputPropagation.HANDLED;
-        }
-      } else {
-        this.menuNavigateUp();
-        return InputPropagation.HANDLED;
-      }
+      this.menuNavigateUp();
+      return InputPropagation.HANDLED;
     }
 
     if(action == INPUT_ACTION_MENU_HOME.get()) {
@@ -243,7 +241,7 @@ public class ArchiveScreen extends MenuScreen {
           this.statisticsRenderer.pageIndex = 0;
           break;
         case 1:
-          if(this.bestiaryRenderer.jump(0)) {
+          if(this.bestiaryRenderer.jump(0, false)) {
             playMenuSound(1);
             this.bestiaryRenderer.loadCurrentEntry();
           }
@@ -259,7 +257,7 @@ public class ArchiveScreen extends MenuScreen {
           this.statisticsRenderer.pageIndex = this.statisticsRenderer.getPageCount() - 1;
           break;
         case 1:
-          if(this.bestiaryRenderer.jump(this.bestiaryRenderer.getEntryCount() - 1)) {
+          if(this.bestiaryRenderer.jump(this.bestiaryRenderer.getEntryCount() - 1, false)) {
             playMenuSound(1);
             this.bestiaryRenderer.loadCurrentEntry();
           }
