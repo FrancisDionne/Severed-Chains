@@ -59,7 +59,7 @@ public class ArchiveBestiaryRenderer {
       this.maxKill = maxKill;
 
       final int[] elementRGB = ArchiveBestiaryRenderer.getElementBackgroundRGB(this.stats.elementFlag_0f);
-      this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.65f };
+      this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.8f};
 
       if(this.kill >= 10 || (this.maxKill > -1 && this.kill >= this.maxKill)) {
         this.rank = 3;
@@ -177,6 +177,7 @@ public class ArchiveBestiaryRenderer {
       Texture.png(Path.of("gfx", "ui", "arrow_blue_down.png")),  //6
       Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\list_underline.png")),   //7
       Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\white.png")),   //8
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics_frames.png")),   //9
     };
 
     this.entryIndex = 0;
@@ -445,12 +446,12 @@ public class ArchiveBestiaryRenderer {
       .texture(this.textures[0]);
 
     if(this.monster.rank > 0) {
-      this.m.translation(xOffset - 10, 0, 130);
-      this.m.scale(390, 240, 1);
+      this.m.translation(xOffset, 0f, 128);
+      this.m.scale(368f, 240f, 1);
 
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-        .texture(this.textures[8]) //White
+        .texture(this.textures[9]) //Frames
         .colour(this.monster.elementRGB[0], this.monster.elementRGB[1], this.monster.elementRGB[2])
         .alpha(this.monster.elementRGB[3])
         .translucency(Translucency.HALF_B_PLUS_HALF_F);
@@ -763,14 +764,14 @@ public class ArchiveBestiaryRenderer {
 
   private static int[] getElementBackgroundRGB(final int elementFlag) {
     return switch(elementFlag) {
-      case 1 -> new int[] { 0, 156, 255, 10 };    //Water
-      case 2 -> new int[] { 81, 55, 0, 20 };      //Earth
-      case 4 -> new int[] { 25, 0, 137, 10 };     //Dark
-      case 8 -> new int[] { 144, 144, 144, 18 };  //Divine
-      case 16 -> new int[] { 168, 0, 255, 8 };   //Thunder
-      case 32 -> new int[] { 230, 234, 130, 10 }; //Light
-      case 64 -> new int[] { 0, 211, 20, 5 };    //Wind
-      case 128 -> new int[] { 211, 20, 0, 10 };   //Fire
+      case 1 -> new int[] { 0, 196, 255, 35 };    //Water
+      case 2 -> new int[] { 81, 55, 0, 35 };      //Earth
+      case 4 -> new int[] { 0, 30, 255, 40 };     //Dark
+      case 8 -> new int[] { 200, 200, 200, 40 };  //Divine
+      case 16 -> new int[] { 97, 0, 196, 35 };   //Thunder
+      case 32 -> new int[] { 255, 255, 53, 40 }; //Light
+      case 64 -> new int[] { 0, 236, 94, 35 };    //Wind
+      case 128 -> new int[] { 255, 15, 0, 35 };   //Fire
       default -> new int[] { 0, 0, 0, 0 };
     };
   }
