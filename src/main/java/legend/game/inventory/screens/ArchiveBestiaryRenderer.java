@@ -444,16 +444,16 @@ public class ArchiveBestiaryRenderer {
   private void renderGraphics() {
     final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
 
-    this.m.translation(xOffset, 0f, 128);
-    this.m.scale(368f, 240f, 1);
+    this.m.translation(-0.5f - xOffset, 0, 128);
+    this.m.scale(369f, 241f, 1);
 
     RENDERER
       .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
       .texture(this.textures[0]);
 
     if(this.monster.rank > 0) {
-      this.m.translation(xOffset, 0f, 128);
-      this.m.scale(368f, 240f, 1);
+      this.m.translation(-0.5f - xOffset, 0, 128);
+      this.m.scale(369f, 241f, 1);
 
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
@@ -467,7 +467,7 @@ public class ArchiveBestiaryRenderer {
   private void renderModel() {
     final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
 
-    this.m.translation(-22f + xOffset, 27.8f, 129);
+    this.m.translation(-22f + xOffset, 27.8f, 126);
     this.m.scale(210f, 87.3f, 1);
 
     if(this.monster.rank >= 1) {
@@ -512,7 +512,7 @@ public class ArchiveBestiaryRenderer {
 //    u = (int)(tickCount_800bb0fc / 5 / (3.0f / vsyncMode_8007a3b8) % 3);
 //    this.modelAndAnimData_800c66a8.coolonPlaceMarker.render(u, 2, 21f, 206f, 127f);
 
-    renderText(this.nf.format(this.monster.entryNumber), 14.5f, 28.5f, this.headerNumberFont, 126);
+    renderText(this.nf.format(this.monster.entryNumber), 14.5f, 28.5f, this.headerNumberFont, 125);
     renderText("Defeated: " + (this.monster.maxKill > -1 ? Math.min(this.monster.maxKill, this.monster.kill) : this.monster.kill), 23, 123, this.statsFont, 127);
 
     if(this.monster.isPerfect()) {

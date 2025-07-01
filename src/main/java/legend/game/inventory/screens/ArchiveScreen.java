@@ -49,7 +49,7 @@ public class ArchiveScreen extends MenuScreen {
       case 1 -> {
         deallocateRenderables(0);
 
-        allocateUiElement(69, 69, 0, 1); // Background left
+        allocateUiElement(69, 69, 0, 1);   // Background left
         allocateUiElement(70, 70, 192, 1); // Background right
 
         this.renderArchive();
@@ -283,6 +283,7 @@ public class ArchiveScreen extends MenuScreen {
     }
 
     if(action == INPUT_ACTION_MENU_DELETE.get()) {
+      this.loadingStage = 0;
       playMenuSound(2);
       if(this.currentArchiveType + 1 > 1) {
         this.currentArchiveType = 0;
