@@ -59,7 +59,7 @@ public class ArchiveBestiaryRenderer {
       this.maxKill = maxKill;
 
       final int[] elementRGB = ArchiveBestiaryRenderer.getElementBackgroundRGB(this.stats.elementFlag_0f);
-      this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.8f};
+      this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.8f, elementRGB[4] / 255f, elementRGB[5] / 255f, elementRGB[6] / 255f, elementRGB[7] / 100f * 1f};
 
       if(this.kill >= 10 || (this.maxKill > -1 && this.kill >= this.maxKill)) {
         this.rank = 3;
@@ -81,7 +81,7 @@ public class ArchiveBestiaryRenderer {
     }
   }
 
-  public static final boolean devMode = true;
+  public static final boolean devMode = false;
   private static final int LIST_ITEM_COUNT = 24;
   private static final String QUESTION_MARK_5 = "?????";
   private static final String QUESTION_MARK_3 = "???";
@@ -118,8 +118,8 @@ public class ArchiveBestiaryRenderer {
   private final FontOptions listPerfectHighlightFont;
   private final FontOptions listTotalFont;
   private final FontOptions listTotalPerfectFont;
-  private final FontOptions completeFont;
   private final FontOptions sortFont;
+  private final FontOptions gemFont;
 
   private float currentBoxOffsetX;
   private int listFirstVisibleItem;
@@ -169,8 +169,8 @@ public class ArchiveBestiaryRenderer {
     this.listPerfectHighlightFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
     this.listTotalFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.DARKER_GREY).size(0.55f).horizontalAlign(HorizontalAlign.RIGHT);
     this.listTotalPerfectFont = new FontOptions().colour(TextColour.LIGHT_GOLD).shadowColour(TextColour.DARKER_GREY).size(0.55f).horizontalAlign(HorizontalAlign.RIGHT);
-    this.completeFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.7f).horizontalAlign(HorizontalAlign.RIGHT);
     this.sortFont = new FontOptions().colour(TextColour.YELLOW).shadowColour(TextColour.DARKER_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
+    this.gemFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.5f).horizontalAlign(HorizontalAlign.CENTRE);
 
     this.textures = new Texture[] {
       Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics.png")),  //0
@@ -182,7 +182,8 @@ public class ArchiveBestiaryRenderer {
       Texture.png(Path.of("gfx", "ui", "arrow_blue_down.png")),  //6
       Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\list_underline.png")),   //7
       Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\white.png")),   //8
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics_frames.png")),   //9
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics_frames.png")),  //9
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\rank_gem.png")),   //10
     };
 
     this.entryIndex = 0;
@@ -489,9 +490,9 @@ public class ArchiveBestiaryRenderer {
   }
 
   private void renderEnemyName() {
-    if(this.monster.rank >= 1) {
-      final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
+    final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
 
+    if(this.monster.rank >= 1) {
       this.m.translation(14.5f + xOffset, 8f, 127);
       this.m.scale(338.6f, 19.9f, 1);
 
@@ -519,8 +520,36 @@ public class ArchiveBestiaryRenderer {
     renderText(this.nf.format(this.monster.entryNumber), 15f, 28.5f, this.headerNumberFont, 125);
     renderText("Defeated: " + (this.monster.maxKill > -1 ? Math.min(this.monster.maxKill, this.monster.kill) : this.monster.kill), 23, 123, this.statsFont, 127);
 
-    if(this.monster.isPerfect()) {
-      renderText("COMPLETE", 180.5f, 122.5f, this.completeFont, 126);
+    if(this.monster.rank > 0) {
+      float x = 0;
+      for(int i = 0; i < 3; i++) {
+        this.m.translation(146.5f + x + xOffset, 121f, 127);
+        this.m.scale(10, 10, 1);
+
+        if(this.monster.maxKill < 0 || i == 2) {
+          if(this.monster.rank > i) {
+            RENDERER
+              .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
+              .texture(this.textures[10]) //Rank Gem
+              .colour(this.monster.elementRGB[4], this.monster.elementRGB[5], this.monster.elementRGB[6])
+              .alpha(this.monster.elementRGB[7])
+              .translucency(Translucency.HALF_B_PLUS_HALF_F);
+          } else {
+            RENDERER
+              .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
+              .texture(this.textures[10]) //Rank Gem
+              .colour(this.monster.elementRGB[4] * 0.35f, this.monster.elementRGB[5] * 0.35f, this.monster.elementRGB[6] * 0.35f)
+              .alpha(this.monster.elementRGB[7])
+              .translucency(Translucency.HALF_B_PLUS_HALF_F);
+          }
+
+          if(this.monster.rank <= i) {
+            renderText(i == 0 ? "1" : (i == 1 ? "5" : "10"), 151.25f + x, 124f, this.gemFont, 126);
+          }
+        }
+
+        x += 11.5f;
+      }
     }
   }
 
@@ -778,15 +807,15 @@ public class ArchiveBestiaryRenderer {
 
   private static int[] getElementBackgroundRGB(final int elementFlag) {
     return switch(elementFlag) {
-      case 1 -> new int[] { 0, 196, 255, 35 };    //Water
-      case 2 -> new int[] { 81, 55, 0, 35 };      //Earth
-      case 4 -> new int[] { 0, 30, 255, 40 };     //Dark
-      case 8 -> new int[] { 200, 200, 200, 40 };  //Divine
-      case 16 -> new int[] { 97, 0, 196, 35 };   //Thunder
-      case 32 -> new int[] { 255, 255, 53, 40 }; //Light
-      case 64 -> new int[] { 0, 236, 94, 35 };    //Wind
-      case 128 -> new int[] { 255, 15, 0, 35 };   //Fire
-      default -> new int[] { 0, 0, 0, 0 };
+      case 1 -> new int[] { 0, 196, 255, 35, 0, 144, 255, 80 };      //Water
+      case 2 -> new int[] { 81, 55, 0, 35, 159, 108, 0, 80 };          //Earth
+      case 4 -> new int[] { 0, 30, 255, 40, 40, 30, 227, 80 };        //Dark
+      case 8 -> new int[] { 200, 200, 200, 40, 230, 230, 230, 80 };  //Divine
+      case 16 -> new int[] { 97, 0, 196, 35, 129, 45, 255, 80 };       //Thunder
+      case 32 -> new int[] { 255, 255, 53, 40, 255, 246, 0, 80 };   //Light
+      case 64 -> new int[] { 0, 236, 94, 35, 0, 236, 94, 80 };       //Wind
+      case 128 -> new int[] { 255, 15, 0, 25, 225, 6, 0, 80 };      //Fire
+      default -> new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
     };
   }
 
