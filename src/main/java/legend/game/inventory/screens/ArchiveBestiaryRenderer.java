@@ -98,6 +98,7 @@ public class ArchiveBestiaryRenderer {
   private int bestiarySeenCount;
   private UiBox listBox;
   private final WMapModelAndAnimData258 modelAndAnimData_800c66a8;
+  private final NumberFormat nf = new DecimalFormat("000");
 
   private final FontOptions headerFont;
   private final FontOptions headerNumberFont;
@@ -120,13 +121,11 @@ public class ArchiveBestiaryRenderer {
   private final FontOptions completeFont;
   private final FontOptions sortFont;
 
-  public int entryIndex;
   private float currentBoxOffsetX;
-  public boolean isListVisible;
   private int listFirstVisibleItem;
   private int currentSort;
-
-  private final NumberFormat nf = new DecimalFormat("000");
+  public int entryIndex;
+  public boolean isListVisible;
 
   public int getEntryCount() {
     return this.bestiaryEntries.size();
@@ -444,16 +443,16 @@ public class ArchiveBestiaryRenderer {
   private void renderGraphics() {
     final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
 
-    this.m.translation(-0.5f - xOffset, 0, 128);
-    this.m.scale(369f, 241f, 1);
+    this.m.translation(xOffset, 0, 128);
+    this.m.scale(368f, 240f, 1);
 
     RENDERER
       .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-      .texture(this.textures[0]);
+      .texture(this.textures[0]); //Background+Frames
 
     if(this.monster.rank > 0) {
-      this.m.translation(-0.5f - xOffset, 0, 128);
-      this.m.scale(369f, 241f, 1);
+      this.m.translation(xOffset, 0, 128);
+      this.m.scale(368f, 240f, 1);
 
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
