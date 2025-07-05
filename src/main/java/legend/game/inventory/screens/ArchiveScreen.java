@@ -158,6 +158,11 @@ public class ArchiveScreen extends MenuScreen {
             playMenuSound(1);
             this.bestiaryRenderer.loadCurrentEntry();
           }
+        } else {
+          if(this.bestiaryRenderer.previousSub()) {
+            playMenuSound(1);
+            this.bestiaryRenderer.loadCurrentEntry();
+          }
         }
         break;
     }
@@ -176,6 +181,11 @@ public class ArchiveScreen extends MenuScreen {
       case 1:
         if(this.bestiaryRenderer.isListVisible) {
           if(this.bestiaryRenderer.next(1)) {
+            playMenuSound(1);
+            this.bestiaryRenderer.loadCurrentEntry();
+          }
+        } else {
+          if(this.bestiaryRenderer.nextSub()) {
             playMenuSound(1);
             this.bestiaryRenderer.loadCurrentEntry();
           }
