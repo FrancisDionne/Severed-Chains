@@ -117,7 +117,7 @@ public class BestiaryScreen extends MenuScreen {
     }
   }
 
-  private static final boolean devMode = true;
+  private static final boolean devMode = false;
   private static final int LIST_ITEM_COUNT = 24;
   private static final int SUB_ENTRY_ARROW_TICK_LENGTH = 92;
   private static final String QUESTION_MARK_5 = "?????";
@@ -257,12 +257,12 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(138, -1, -1, null, "Endiness", "Limestone Cave - Bale", "A rare bird seen only along the road between Limestone Cave and\nBale. \n\nLike all Rare creatures. it has a high chance of running away, but\ndrops great rewards if defeated.");
     this.addEntry(130, -1, -1, null, "Hoax", "Northern Serdio", "");
     this.addEntry(102, -1, 1, null, "Hoax", "Northern Serdio", "The first known human who can use innate magic. However, the Elite\nwas not born with it. Researchers at the black castle figured out a way\nto infuse a human with magical powers - possibly with the help\nof Emperor Diaz.\n\nThe Elite has a few physical attacks, but its signature moves are magical.\nThe first is a green flame that deals moderate AoE damage. \nThe second summons apparitions which take no damage.");
-    this.addEntry(265, -1, -1, null, "Hoax", "Northern Serdio", "Age: \nHeight: 250 cm / \n\nThe last of his species, Kongol is a towering giant with unmatched\nphysical prowess. He wields a large axe, but can fight without it.\n\nAs a child his hometown was raided by bandits. At the last moment he\nwas saved by Doel, who then raised him.");
+    this.addEntry(265, -1, 1, null, "Hoax", "Northern Serdio", "Age: \nHeight: 250 cm / \n\nThe last of his species, Kongol is a towering giant with unmatched\nphysical prowess. He wields a large axe, but can fight without it.\n\nAs a child his hometown was raided by bandits. At the last moment he\nwas saved by Doel, who then raised him.");
     this.addEntry(68, -1, -1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(22, -1, -1, null, "Marshland", "Northern Serdio", "An aquatic creature found in the Marshland. Although the basic attack\ndeals little damage, Mermen also have Water magic that is lethal to\nenemies with low defense or a Fire attribute.");
     this.addEntry(28, -1, -1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(4, -1, -1, null, "Marshland", "Northern Serdio", "");
-    this.addEntry(135, -1, -1, null, "Marshland", "Northern Serdio", "");
+    this.addEntry(135, -1, 1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(131, -1, -1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(132, -1, -1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(33, -1, -1, null, "Villude Volcano", "Southern Serdio", "");
@@ -273,7 +273,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(146, -1, -1, null, "Villude Volcano", "Southern Serdio", "Pending investigation");
     this.addEntry(92, -1, -1, null, "Villude Volcano", "Southern Serdio", "A large creature with its back constantly ablaze. The Salamander's\nbasic attack can stun enemies, which becomes dangerous when it\nattacks the same target multiple times.");
     this.addEntry(308, -1, 1, "Wounded Virage", "Villude Volcano", "Southern Serdio", "A relic of the Dragon Campaign, this Virage was seemingly petrified\nwithin the Volcano for millenia. It activates to attack Dart's party.\n\nThis Virage is not at full strength. It is clearly damaged:\nmissing one arm, both legs, and more. Despite this, it is still deadly.\nThis Virage can inflict an assortment of status ailments, and uses a\nstaggeringly powerful beam laser.");
-    this.addEntry(333, -1, 1, null, "Villude Volcano", "Southern Serdio", "");
+    this.addEntry(333, -1, 1, null, "Villude Volcano", "Southern Serdio", "An elemental creature that patrols the volcano. Fire Bird may pursue\npassersby who attempt to traverse the molten crags. \n\nMost of its abilities have an area of effect, and are of the Fire element.\n\nAlso known as Piton.");
     this.addEntry(19, -1, -1, null, "Dragon's Nest", "Southern Serdio", "");
     this.addEntry(88, -1, -1, "Man-Eating Bud", "Dragon's Nest", "Southern Serdio", "");
     this.addEntry(90, -1, -1, null, "Dragon's Nest", "Southern Serdio", "");
@@ -308,7 +308,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(103, -1, -1, null, "Black Castle", "Southern Serdio", "");
     this.addEntry(258, -1, 1, null, "Black Castle", "Southern Serdio", "Pending investigation");
     this.addEntry(273, -1, 1, null, "Black Castle", "Southern Serdio", "Pending investigation");
-    this.addEntry(266, -1, -1, "Kongol II", "Black Castle", "Southern Serdio", "");
+    this.addEntry(266, -1, 1, "Kongol II", "Black Castle", "Southern Serdio", "");
     this.addEntry(267, -1, 1, null, "Black Castle", "Southern Serdio", "");
     this.addEntry(268, -1, 1, "Doel (Dragoon)", "Black Castle", "Southern Serdio", "");
     this.addEntry(99, -1, -1, null, "Barrens", "Tiberoa", "");
@@ -446,14 +446,14 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(71, -1, -1, null, "Moon", "Gloriano", "");
     this.addEntry(93, -1, -1, null, "Moon", "Gloriano", "");
     this.addEntry(371, -1, 1, null, "Moon", "Gloriano", "");
-    this.addEntry(373, -1, -1, null, "Moon", "Gloriano", "");
-    this.addEntry(375, -1, -1, null, "Moon", "Gloriano", "");
+    this.addEntry(373, -1, 1, null, "Moon", "Gloriano", "");
+    this.addEntry(375, -1, 1, null, "Moon", "Gloriano", "");
     this.addEntry(378, -1, 1, null, "Moon", "Gloriano", "");
     this.addEntry(381, -1, 1, null, "Moon", "Gloriano", "");
     this.addEntry(382, -1, 1, null, "Moon", "Gloriano", "");
-    this.addEntry(320, -1, 1, "Super Virage", "Moon", "Gloriano", "");
-    this.addEntry(387, -1, 1, null, "Moon", "Gloriano", "");
-    this.addEntry(388, -1, 1, null, "Moon", "Gloriano", "");
+    this.addEntry(320, -1, 1, "Super Virage", "Moon", "Gloriano", "A relic of the Dragon Campaign, this Super Virage is the last natural line\nof defense for the primary Virage Embryo. Unlike the one found in the\nruins of Kadessa, this one won't self-detonate, and must be defeated.");
+    this.addEntry(387, -1, 1, null, "Moon", "Gloriano", "Age: 28\nHeight: 181 cm / 5'9\"\n\nZieg is a legendary warrior from the time of the Dragon Campaign.\nHe normally would have perished long ago, but in the final battle he\nwas petrified by Melbu Frahma for over 11,000 years. \n\nWhen the spell wore off, he tried to start a new life. However, as his\nhometown was attacked, he tried to save it. When he activated\nhis Dragoon Spirit, Melbu's spirit came out instead, possessing him. \n\nZieg was not himself for 18 years. Melbu would use his body to create\na new scheme to destroy the world, and remake it in his image.\n\nOn the Moon, Melbu (as ZIeg) swipes Dart's Dargoon Spirit and transforms.\nHe has his own style of Dart's Dragoon abilities, proving very powerful.\n\nAfter being defeated, Zieg is finally himself again, and gets to speak\nwith his fiancé Rose one last time.");
+    this.addEntry(388, -1, 1, null, "Moon", "Gloriano", "A Wingly dictator, Melbu Frahma was obsessed with power. He sees\nhimself as superior, both during the Dragon Campaign and now. \nHis magic was so strong that he needed a restraining device to keep\nit under control. Under his rule, many species were subjugated.\n\nAlthough defeated in the final battle of the Dragon Campaign, he would\npreserve himself within Zieg's Dragoon Spirit, biding his time.\n\nOnce ZIeg unwittingly released him, Melbu began a new plot to\nremake the world in his image. Eventually, Melbu would reach the Moon\nand stop the");
   }
 
   private void addEntry(final int charId, final int subEntryParentId, final int killCount, @Nullable final String name, final String map, final String region, final String lore) {

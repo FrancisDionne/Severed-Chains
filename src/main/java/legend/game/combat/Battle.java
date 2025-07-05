@@ -3776,7 +3776,7 @@ public class Battle extends EngineState {
           Statistics.incrementMonsterKill(data.combatant_144.charIndex_1a2);
 
           if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null && this.currentTurnBent_800c66c8.innerStruct_00.charId_272 != data.combatant_144.charIndex_1a2) {
-            Statistics.appendStat(this.currentTurnBent_800c66c8.innerStruct_00.charId_272, Statistics.Stats.TOTAL_KILL, 1);
+            Statistics.appendStat(this.currentTurnBent_800c66c8.innerStruct_00, Statistics.Stats.TOTAL_KILL, 1);
           }
 
           if((flags & FLAG_NO_LOOT) == 0) { // Hasn't already dropped loot
