@@ -6,9 +6,13 @@ import legend.core.gpu.Bpp;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
+import legend.core.platform.input.InputAction;
+import legend.core.platform.input.InputMod;
 import legend.game.characters.Element;
 import legend.game.combat.types.EnemyRewards08;
 import legend.game.combat.types.MonsterStats1c;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.combat.ui.UiBox;
 import legend.game.i18n.I18n;
 import legend.game.statistics.Statistics;
@@ -24,17 +28,33 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.FUN_801034cc;
+import static legend.game.SItem.allocateUiElement;
 import static legend.game.SItem.renderItemIcon;
+import static legend.game.Scus94491BpeSegment.startFadeEffect;
+import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
+import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.combat.Monsters.enemyRewards_80112868;
 import static legend.game.combat.Monsters.monsterNames_80112068;
 import static legend.game.combat.Monsters.monsterStats_8010ba98;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HOME;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_DOWN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
-public class ArchiveBestiaryRenderer {
+public class ArchiveBestiaryScreen extends MenuScreen {
 
   private static class BestiaryEntry {
     public int entryNumber;
@@ -50,7 +70,7 @@ public class ArchiveBestiaryRenderer {
     public List<BestiaryEntry> subEntries;
     public boolean isSubEntry;
 
-    public BestiaryEntry(final ArchiveBestiaryRenderer bestiary, final int charId, final int subEntryParentId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
+    public BestiaryEntry(final ArchiveBestiaryScreen bestiary, final int charId, final int subEntryParentId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
       this.charId = charId;
       this.stats = monsterStats_8010ba98[charId];
       this.lore = devMode ? lore : "";
@@ -58,7 +78,7 @@ public class ArchiveBestiaryRenderer {
       this.kill = Statistics.getMonsterKill(this.charId);
       this.maxKill = maxKill;
 
-      final int[] elementRGB = ArchiveBestiaryRenderer.getElementBackgroundRGB(this.stats.elementFlag_0f);
+      final int[] elementRGB = ArchiveBestiaryScreen.getElementBackgroundRGB(this.stats.elementFlag_0f);
       this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.8f, elementRGB[4] / 255f, elementRGB[5] / 255f, elementRGB[6] / 255f, elementRGB[7] / 100f * 1f};
 
       if(subEntryParentId > -1) {
@@ -97,13 +117,15 @@ public class ArchiveBestiaryRenderer {
     }
   }
 
-  public static final boolean devMode = true;
+  private static final boolean devMode = true;
   private static final int LIST_ITEM_COUNT = 24;
   private static final int SUB_ENTRY_ARROW_TICK_LENGTH = 92;
   private static final String QUESTION_MARK_5 = "?????";
   private static final String QUESTION_MARK_3 = "???";
   private static final String LORE_DEFAULT = "Lore coming one day to a QoL mod near you...";
 
+  private int loadingStage;
+  private final Runnable unload;
   private final Matrix4f m;
   private final Obj quad;
   private final Texture[] textures;
@@ -146,11 +168,9 @@ public class ArchiveBestiaryRenderer {
   public int subEntryIndex;
   public boolean isListVisible;
 
-  public int getEntryCount() {
-    return this.bestiaryEntries.size();
-  }
+  public ArchiveBestiaryScreen(final Runnable unload) {
+    this.unload = unload;
 
-  public ArchiveBestiaryRenderer() {
     this.m = new Matrix4f();
     this.quad = new QuadBuilder("Bestiary Quad")
       .rgb(1f, 1f, 1f)
@@ -460,7 +480,7 @@ public class ArchiveBestiaryRenderer {
     }
   }
 
-  public void render() {
+  public void renderAll() {
     this.renderGraphics();
     this.renderModel();
     this.renderEnemyName();
@@ -751,7 +771,7 @@ public class ArchiveBestiaryRenderer {
     if(parentEntry.subEntries != null && parentEntry.rank > 0) {
       final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
       final int ticks = Math.clamp(this.subEntryArrowTick, 0, SUB_ENTRY_ARROW_TICK_LENGTH);
-      final float yOffset = 0.5f * (ticks > -1 ? (float)Math.floor((ticks> SUB_ENTRY_ARROW_TICK_LENGTH * 0.5f ? SUB_ENTRY_ARROW_TICK_LENGTH - ticks : ticks) * 0.12f) : 1f);
+      final float yOffset = 0.49f * (ticks > -1 ? (float)Math.floor((ticks> SUB_ENTRY_ARROW_TICK_LENGTH * 0.5f ? SUB_ENTRY_ARROW_TICK_LENGTH - ticks : ticks) * 0.12f) : 1f);
 
       if(this.subEntryIndex > 0) {
         this.m.translation(xOffset + 177f, 32f + yOffset, 125);
@@ -988,5 +1008,201 @@ public class ArchiveBestiaryRenderer {
       }
     }
     return null;
+  }
+
+  @Override
+  protected void render() {
+    switch(this.loadingStage) {
+      case 0 -> {
+        startFadeEffect(2, 10);
+        deallocateRenderables(0xff);
+        this.loadingStage++;
+      }
+
+      case 1 -> {
+        deallocateRenderables(0);
+
+        allocateUiElement(69, 69, 0, 1);   // Background left
+        allocateUiElement(70, 70, 192, 1); // Background right
+
+        this.renderAll();
+        this.loadingStage++;
+      }
+
+      case 2 -> {
+        this.renderAll();
+      }
+
+      // Fade out
+      case 100 -> {
+        this.renderAll();
+        this.unload.run();
+      }
+    }
+    FooterActionsHud.renderActions(0, FooterActions.BACK, FooterActions.LIST, null, null, null);
+  }
+
+  @Override
+  protected InputPropagation mouseClick(final int x, final int y, final int button, final Set<InputMod> mods) {
+    if(super.mouseClick(x, y, button, mods) == InputPropagation.HANDLED) {
+      return InputPropagation.HANDLED;
+    }
+
+    if(this.loadingStage != 2 || !mods.isEmpty()) {
+      return InputPropagation.PROPAGATE;
+    }
+
+    return InputPropagation.PROPAGATE;
+  }
+
+  private void menuEscape() {
+    playMenuSound(3);
+    this.loadingStage = 100;
+  }
+
+  private void menuNavigateLeft(final int steps, final boolean alt) {
+    if(this.isListVisible && !alt) {
+      playMenuSound(2);
+      this.cycleSort(-1);
+    } else {
+      if(this.previous(steps)) {
+        playMenuSound(1);
+        this.loadCurrentEntry();
+      }
+    }
+  }
+
+  private void menuNavigateRight(final int steps, final boolean alt) {
+    if(this.isListVisible && !alt) {
+      playMenuSound(2);
+      this.cycleSort(1);
+    } else {
+      if(this.next(steps)) {
+        playMenuSound(1);
+        this.loadCurrentEntry();
+      }
+    }
+  }
+
+  private void menuNavigateUp() {
+    if(this.isListVisible) {
+      if(this.previous(1)) {
+        playMenuSound(1);
+        this.loadCurrentEntry();
+      }
+    } else {
+      if(this.previousSub()) {
+        playMenuSound(1);
+        this.loadCurrentEntry();
+      }
+    }
+  }
+
+  private void menuNavigateDown() {
+      if(this.isListVisible) {
+        if(this.next(1)) {
+          playMenuSound(1);
+          this.loadCurrentEntry();
+        }
+      } else {
+        if(this.nextSub()) {
+          playMenuSound(1);
+          this.loadCurrentEntry();
+        }
+      }
+  }
+
+  @Override
+  public InputPropagation inputActionPressed(final InputAction action, final boolean repeat) {
+    if(super.inputActionPressed(action, repeat) == InputPropagation.HANDLED) {
+      return InputPropagation.HANDLED;
+    }
+
+    if(this.loadingStage != 2) {
+      return InputPropagation.PROPAGATE;
+    }
+
+    if(action == INPUT_ACTION_MENU_BACK.get() && !repeat) {
+      if(this.isListVisible) {
+        playMenuSound(3);
+        this.isListVisible = false;
+      } else {
+        this.menuEscape();
+      }
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_CONFIRM.get()) {
+      if(this.isListVisible) {
+        playMenuSound(2);
+        this.isListVisible = !this.isListVisible;
+      }
+    }
+
+    if(action == INPUT_ACTION_MENU_PAGE_UP.get()) {
+      this.menuNavigateLeft(10, true);
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_PAGE_DOWN.get()) {
+      this.menuNavigateRight(10, true);
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_LEFT.get()) {
+      this.menuNavigateLeft(1, false);
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_RIGHT.get()) {
+      this.menuNavigateRight(1, false);
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_DOWN.get()) {
+      this.menuNavigateDown();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_UP.get()) {
+      this.menuNavigateUp();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_HOME.get()) {
+      if(this.jump(0, false)) {
+        playMenuSound(1);
+        this.loadCurrentEntry();
+      }
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_END.get()) {
+      if(this.jump(this.bestiaryEntries.size() - 1, false)) {
+        playMenuSound(1);
+        this.loadCurrentEntry();
+      }
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_SORT.get()) {
+      playMenuSound(2);
+      this.isListVisible = !this.isListVisible;
+    }
+
+    return InputPropagation.PROPAGATE;
+  }
+
+  @Override
+  public InputPropagation inputActionReleased(final InputAction action) {
+    if(super.inputActionReleased(action) == InputPropagation.HANDLED) {
+      return InputPropagation.HANDLED;
+    }
+
+    if(this.loadingStage != 2) {
+      return InputPropagation.PROPAGATE;
+    }
+
+    return InputPropagation.PROPAGATE;
   }
 }

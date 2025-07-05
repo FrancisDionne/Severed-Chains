@@ -61,8 +61,10 @@ public abstract class ControlHost implements Iterable<Control> {
   }
 
   public void removeControl(final Control control) {
-    this.controls.remove(control);
-    control.delete();
+    if(this.controls.contains(control)) {
+      this.controls.remove(control);
+      control.delete();
+    }
   }
 
   protected void delete() {

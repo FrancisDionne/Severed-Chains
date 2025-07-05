@@ -23,11 +23,17 @@ public class Button extends Control {
   private String text;
   private float textHeight;
   private final FontOptions fontOptions = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).horizontalAlign(HorizontalAlign.CENTRE);
+  private boolean forceHighlightStyle;
+
+  public boolean getForceHighlightStyle() {
+    return this.forceHighlightStyle;
+  }
 
   public Button(final String text) {
     this.hover = this.addControl(new Highlight());
     this.hover.setZ(this.getZ());
     this.hover.hide();
+    this.forceHighlightStyle = false;
 
     this.setSize(59, 14);
 
@@ -75,13 +81,17 @@ public class Button extends Control {
   @Override
   protected void hoverIn() {
     super.hoverIn();
-    this.hover.show();
+    if(!this.forceHighlightStyle) {
+      this.hover.show();
+    }
   }
 
   @Override
   protected void hoverOut() {
+    if(!this.forceHighlightStyle) {
+      this.hover.hide();
+    }
     super.hoverOut();
-    this.hover.hide();
   }
 
   @Override
@@ -127,6 +137,15 @@ public class Button extends Control {
 
   public void onPressed(final Pressed handler) {
     this.pressedHandler = handler;
+  }
+
+  public void setForceHighlightStyle(final boolean forceHighlightStyle) {
+    this.forceHighlightStyle = forceHighlightStyle;
+    if(this.forceHighlightStyle) {
+      this.hover.show();
+    } else {
+      this.hover.hide();
+    }
   }
 
   private Pressed pressedHandler;

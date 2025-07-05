@@ -5,6 +5,9 @@ import legend.core.gpu.Bpp;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
+import legend.core.platform.input.InputAction;
+import legend.core.platform.input.InputMod;
+import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.statistics.Statistics;
 import legend.game.types.Translucency;
@@ -15,13 +18,28 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.FUN_801034cc;
+import static legend.game.SItem.allocateUiElement;
+import static legend.game.Scus94491BpeSegment.startFadeEffect;
+import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
+import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HOME;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_DOWN;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
-public class ArchiveStatisticsRenderer {
+public class ArchiveStatisticsScreen extends MenuScreen {
 
   private static class StatisticPage {
     public List<StatisticRow> statRows;
@@ -44,6 +62,8 @@ public class ArchiveStatisticsRenderer {
     }
   }
 
+  private int loadingStage;
+  private final Runnable unload;
   private final Matrix4f m;
   private final Obj quad;
   private final Texture[] textures;
@@ -66,7 +86,8 @@ public class ArchiveStatisticsRenderer {
     return this.statisticPages.size();
   }
 
-  public ArchiveStatisticsRenderer() {
+  public ArchiveStatisticsScreen(final Runnable unload) {
+    this.unload = unload;
     this.m = new Matrix4f();
     this.quad = new QuadBuilder("Statistics Quad")
       .rgb(1f, 1f, 1f)
@@ -188,7 +209,7 @@ public class ArchiveStatisticsRenderer {
     return l;
   }
 
-  public void render() {
+  public void renderAll() {
     this.renderGraphics();
     this.renderStats();
     this.renderHighlight();
@@ -460,5 +481,169 @@ public class ArchiveStatisticsRenderer {
       hasValue = true;
     }
     return min;
+  }
+
+  @Override
+  protected void render() {
+    switch(this.loadingStage) {
+      case 0 -> {
+        startFadeEffect(2, 10);
+        deallocateRenderables(0xff);
+        this.loadingStage++;
+      }
+
+      case 1 -> {
+        deallocateRenderables(0);
+
+        allocateUiElement(69, 69, 0, 1);   // Background left
+        allocateUiElement(70, 70, 192, 1); // Background right
+
+        this.renderAll();
+        this.loadingStage++;
+      }
+
+      case 2 -> {
+        this.renderAll();
+      }
+
+      // Fade out
+      case 100 -> {
+        this.renderAll();
+        this.unload.run();
+      }
+    }
+    FooterActionsHud.renderActions(0, FooterActions.BACK, null, null, null, null);
+  }
+
+  @Override
+  protected InputPropagation mouseClick(final int x, final int y, final int button, final Set<InputMod> mods) {
+    if(super.mouseClick(x, y, button, mods) == InputPropagation.HANDLED) {
+      return InputPropagation.HANDLED;
+    }
+
+    if(this.loadingStage != 2 || !mods.isEmpty()) {
+      return InputPropagation.PROPAGATE;
+    }
+
+    return InputPropagation.PROPAGATE;
+  }
+
+  private void menuEscape() {
+    playMenuSound(3);
+    this.loadingStage = 100;
+  }
+
+  private void menuNavigateLeft(final int steps, final boolean alt) {
+    if(this.pageIndex > 0) {
+      playMenuSound(1);
+      this.pageIndex--;
+    }
+  }
+
+  private void menuNavigateRight(final int steps, final boolean alt) {
+    if(this.pageIndex < this.getPageCount() - 1) {
+      playMenuSound(1);
+      this.pageIndex++;
+    }
+  }
+
+  private void menuNavigateUp() {
+    playMenuSound(1);
+    if(this.highlightIndex > 0) {
+      this.highlightIndex--;
+    } else {
+      this.highlightIndex = 11;
+    }
+  }
+
+  private void menuNavigateDown() {
+    playMenuSound(1);
+    if(this.highlightIndex < 11) {
+      this.highlightIndex++;
+    } else {
+      this.highlightIndex = 0;
+    }
+  }
+
+  @Override
+  public InputPropagation inputActionPressed(final InputAction action, final boolean repeat) {
+    if(super.inputActionPressed(action, repeat) == InputPropagation.HANDLED) {
+      return InputPropagation.HANDLED;
+    }
+
+    if(this.loadingStage != 2) {
+      return InputPropagation.PROPAGATE;
+    }
+
+    if(action == INPUT_ACTION_MENU_BACK.get() && !repeat) {
+      this.menuEscape();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_PAGE_UP.get()) {
+      this.menuNavigateLeft(10, true);
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_PAGE_DOWN.get()) {
+      this.menuNavigateRight(10, true);
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_LEFT.get()) {
+      this.menuNavigateLeft(1, false);
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_RIGHT.get()) {
+      this.menuNavigateRight(1, false);
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_DOWN.get()) {
+      this.menuNavigateDown();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_UP.get()) {
+      this.menuNavigateUp();
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_HOME.get()) {
+      playMenuSound(1);
+      this.pageIndex = 0;
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_END.get()) {
+      playMenuSound(1);
+      this.pageIndex = this.getPageCount() - 1;
+      return InputPropagation.HANDLED;
+    }
+
+    if(action == INPUT_ACTION_MENU_SORT.get()) {
+      playMenuSound(2);
+      if(this.displayMode + 1 > 2) {
+        this.displayMode = 0;
+      } else {
+        this.displayMode++;
+      }
+    }
+
+    return InputPropagation.PROPAGATE;
+  }
+
+  @Override
+  public InputPropagation inputActionReleased(final InputAction action) {
+    if(super.inputActionReleased(action) == InputPropagation.HANDLED) {
+      return InputPropagation.HANDLED;
+    }
+
+    if(this.loadingStage != 2) {
+      return InputPropagation.PROPAGATE;
+    }
+
+    return InputPropagation.PROPAGATE;
   }
 }

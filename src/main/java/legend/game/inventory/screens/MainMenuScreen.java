@@ -2,7 +2,6 @@ package legend.game.inventory.screens;
 
 import legend.core.platform.input.InputAction;
 import legend.game.EngineStateEnum;
-import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
@@ -65,7 +64,6 @@ import static legend.game.Scus94491BpeSegment_800b.submapId_800bd808;
 import static legend.game.Scus94491BpeSegment_800b.textZ_800bdf00;
 import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
-import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
@@ -78,8 +76,24 @@ public class MainMenuScreen extends MenuScreen {
   private final CharacterCard[] charCards = new CharacterCard[3];
   private final List<Button> menuButtons = new ArrayList<>();
 
-  private final Button saveButton;
-  private final Button loadButton;
+  private Button useButton;
+  private Button equipButton;
+  private Button inventoryButton;
+  private Button archivesButton;
+  private Button digButton;
+  private Button quitButton;
+  private Button statusButton;
+  private Button additionButton;
+  private Button replaceButton;
+  private Button optionsButton;
+  private Button saveButton;
+  private Button loadButton;
+  private Button archivesHideButton;
+  private Button goodsButton;
+  private Button statsButton;
+  private Button bestiaryButton;
+
+  private int state;
 
   public MainMenuScreen(final Runnable unload) {
     this.unload = unload;
@@ -104,28 +118,7 @@ public class MainMenuScreen extends MenuScreen {
 
     this.addControl(new DragoonSpirits(gameState_800babc8.goods_19c[0])).setPos(40, 197); // Dragoon spirits
 
-    this.addButton("Use Item", this::showUseItemScreen);
-    this.addButton("Equipment", this::showEquipmentScreen);
-    this.addButton("Inventory", this::showItemListScreen);
-    this.addButton("Goods", this::showGoodsScreen);
-    this.addButton("Diiig", this::showDabasScreen);
-    this.addButton("", () -> { }).hide();
-    this.addButton("Quit", () -> menuStack.pushScreen(new MessageBoxScreen("Quit to main menu?", 2, result -> {
-      if(result.messageBoxResult == MessageBoxResult.YES) {
-        this.menuEscape();
-        whichMenu_800bdc38 = WhichMenu.QUIT;
-      }
-    })));
-    this.addButton("Status", this::showStatusScreen);
-    this.addButton("Addition", this::showAdditionsScreen);
-    this.addButton("Replace", this::showCharSwapScreen);
-    this.addButton("Options", this::showOptionsScreen);
-    this.addButton("", () -> { }).hide();
-    this.loadButton = this.addButton("Load", this::showLoadScreen);
-    this.saveButton = this.addButton("Save", this::showSaveScreen);
-
-    this.loadButton.setDisabled(gameState_800babc8.campaign.loadAllSaves().isEmpty());
-    this.saveButton.setDisabled(!canSave_8011dc88);
+    this.setState(0);
 
     for(int i = 0; i < 3; i++) {
       this.addCharCard(i);
@@ -134,8 +127,87 @@ public class MainMenuScreen extends MenuScreen {
     this.setFocus(this.menuButtons.getFirst());
   }
 
+  private void setState(final int state) {
+    switch(state) {
+      case 0:
+        this.useButton = this.addButton("Use Item", this::showUseItemScreen, 0);
+        this.equipButton = this.addButton("Equipment", this::showEquipmentScreen, 1);
+        this.inventoryButton = this.addButton("Inventory", this::showItemListScreen, 2);
+        this.archivesButton = this.addButton("Archives", this::showArchives, 3);
+        this.digButton = this.addButton("Diiig", this::showDabasScreen, 4);
+        this.addButton("hide_1", () -> { }, 5).hide();
+        this.quitButton = this.addButton("Quit", () -> menuStack.pushScreen(new MessageBoxScreen("Quit to main menu?", 2, result -> {
+          if(result.messageBoxResult == MessageBoxResult.YES) {
+            this.menuEscape();
+            whichMenu_800bdc38 = WhichMenu.QUIT;
+          }
+        })), 6);
+        this.statusButton = this.addButton("Status", this::showStatusScreen, 7);
+        this.additionButton = this.addButton("Addition", this::showAdditionsScreen, 8);
+        this.replaceButton = this.addButton("Replace", this::showCharSwapScreen, 9);
+        this.optionsButton = this.addButton("Options", this::showOptionsScreen, 10);
+        this.addButton("hide_2", () -> { }, 11).hide();
+        this.loadButton = this.addButton("Load", this::showLoadScreen, 12);
+        this.saveButton = this.addButton("Save", this::showSaveScreen, 13);
+
+        this.useButton.setDisabled(false);
+        this.equipButton.setDisabled(false);
+        this.inventoryButton.setDisabled(false);
+        this.digButton.setDisabled(false);
+        this.quitButton.setDisabled(false);
+        this.loadButton.setDisabled(gameState_800babc8.campaign.loadAllSaves().isEmpty());
+        this.saveButton.setDisabled(!canSave_8011dc88);
+
+        //------ State 1 ------
+        this.archivesButton.setForceHighlightStyle(false);
+        this.removeButton(this.archivesHideButton);
+        this.removeButton(this.goodsButton);
+        this.removeButton(this.statsButton);
+        this.removeButton(this.bestiaryButton);
+        //---------------------
+        break;
+      case 1:
+        this.archivesButton.setForceHighlightStyle(true);
+
+        this.useButton.setDisabled(true);
+        this.equipButton.setDisabled(true);
+        this.inventoryButton.setDisabled(true);
+        this.digButton.setDisabled(true);
+        this.quitButton.setDisabled(true);
+        this.loadButton.setDisabled(true);
+        this.saveButton.setDisabled(true);
+
+        this.removeButton(this.statusButton);
+        this.removeButton(this.additionButton);
+        this.removeButton(this.replaceButton);
+        this.removeButton(this.optionsButton);
+
+        this.archivesHideButton = this.addButton("hide_archives_1", () -> { }, 7);
+        this.archivesHideButton.hide();
+        this.goodsButton = this.addButton("Goods", this::showGoodsScreen, 8);
+        this.statsButton = this.addButton("Statistics", this::showStatisticsScreen, 9);
+        this.bestiaryButton = this.addButton("Bestiary", this::showBestiaryScreen, 10);
+        break;
+    }
+
+    if(this.state == 1) {
+      this.setFocus(this.archivesButton);
+    }
+
+    this.state = state;
+  }
+
   private Button addButton(final String text, final Runnable onClick) {
-    final int index = this.menuButtons.size();
+    return this.addButton(text, onClick, -1);
+  }
+
+  private Button addButton(final String text, final Runnable onClick, final int addIndex) {
+    final Button tempButton = this.containsButton(text);
+    if(tempButton != null) {
+      return tempButton;
+    }
+
+    final int index = addIndex > -1 ? addIndex : this.menuButtons.size();
 
     final Button button = this.addControl(new Button(text));
     button.setPos(21 + index / 7 * 74, 79 + (index % 7) * 13);
@@ -235,7 +307,12 @@ public class MainMenuScreen extends MenuScreen {
       return InputPropagation.PROPAGATE;
     });
 
-    this.menuButtons.add(button);
+    if(addIndex > -1) {
+      this.menuButtons.add(addIndex, button);
+    } else {
+      this.menuButtons.add(button);
+    }
+
     return button;
   }
 
@@ -243,6 +320,20 @@ public class MainMenuScreen extends MenuScreen {
     final int id = gameState_800babc8.charIds_88[slot];
     this.charCards[slot] = this.addControl(new CharacterCard(id));
     this.charCards[slot].setPos(186, 16 + slot * 72);
+  }
+
+  private Button containsButton(final String buttonName) {
+    for(final Button button : this.menuButtons) {
+      if(button.getText().equals(buttonName)) {
+        return button;
+      }
+    }
+    return null;
+  }
+
+  public void removeButton(final Button button) {
+    this.removeControl(button);
+    this.menuButtons.remove(button);
   }
 
   @Override
@@ -293,7 +384,7 @@ public class MainMenuScreen extends MenuScreen {
       }
     }
 
-    FooterActionsHud.renderMenuActions(FooterActions.ARCHIVE, null, null);
+    FooterActionsHud.renderMenuActions();
   }
 
   private void renderInventoryMenu(final long a2) {
@@ -374,7 +465,11 @@ public class MainMenuScreen extends MenuScreen {
   }
 
   private void showStatisticsScreen() {
-    this.showScreen(ArchiveScreen::new);
+    this.showScreen(ArchiveStatisticsScreen::new);
+  }
+
+  private void showBestiaryScreen() {
+    this.showScreen(ArchiveBestiaryScreen::new);
   }
 
   private void showCharSwapScreen() {
@@ -459,6 +554,15 @@ public class MainMenuScreen extends MenuScreen {
     this.showScreen(DabasScreen::new);
   }
 
+  private void showArchives() {
+    if(this.state != 1) {
+      this.setState(1);
+      this.setFocus(this.goodsButton);
+    } else {
+      this.setState(0);
+    }
+  }
+
   private void showScreen(final Function<Runnable, MenuScreen> screen) {
     menuStack.pushScreen(screen.apply(() -> {
       menuStack.popScreen();
@@ -474,13 +578,12 @@ public class MainMenuScreen extends MenuScreen {
 
     if(this.loadingStage == 2) {
       if(action == INPUT_ACTION_MENU_BACK.get() && !repeat) {
-        this.menuEscape();
-        return InputPropagation.HANDLED;
-      }
-
-      if(action == INPUT_ACTION_MENU_DELETE.get() && !repeat) {
-        playMenuSound(2);
-        this.showStatisticsScreen();
+        if(this.state != 0) {
+          playMenuSound(2);
+          this.setState(0);
+        } else {
+          this.menuEscape();
+        }
         return InputPropagation.HANDLED;
       }
     }
