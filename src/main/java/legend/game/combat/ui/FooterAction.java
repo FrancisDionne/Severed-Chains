@@ -7,6 +7,7 @@ public class FooterAction {
   public FooterActions action;
   public InputAction input;
   public Texture secondaryTexture;
+  public String secondaryText;
   public FooterAction(final FooterActions action, final InputAction input) {
     this.action = action;
     this.input = input;

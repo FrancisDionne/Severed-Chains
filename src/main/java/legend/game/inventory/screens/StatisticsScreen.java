@@ -75,7 +75,6 @@ public class StatisticsScreen extends MenuScreen {
   private final FontOptions lowNumberFont;
   private final FontOptions totalFont;
   private final FontOptions notApplicableFont;
-  private final FontOptions displayModeFont;
 
   public int pageIndex;
   public int highlightIndex;
@@ -103,7 +102,6 @@ public class StatisticsScreen extends MenuScreen {
     this.lowNumberFont = new FontOptions().colour(TextColour.FOOTER_RED).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
     this.totalFont = new FontOptions().colour(TextColour.STATS_YELLOW).shadowColour(TextColour.DARK_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
     this.notApplicableFont = new FontOptions().colour(TextColour.GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
-    this.displayModeFont = new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.MIDDLE_BROWN).size(0.4f).horizontalAlign(HorizontalAlign.LEFT);
 
     this.textures = new Texture[] {
       Texture.png(Path.of("gfx", "portraits", "dart.png")),    //0
@@ -141,6 +139,9 @@ public class StatisticsScreen extends MenuScreen {
     this.displayMode = 0;
 
     this.loadPages();
+
+    FooterActionsHud.setFooterActions(0, FooterActions.BACK, FooterActions.DISPLAY_MODE, null, null, null);
+    FooterActionsHud.setSecondaryText(1, ": " + this.getDisplayModeName());
   }
 
   private void loadPages() {
@@ -412,16 +413,8 @@ public class StatisticsScreen extends MenuScreen {
         .texture(this.textures[20]); //Left
     }
 
-    this.m.translation(10 + xOffset, 215, 120);
-    this.m.scale(6, 6, 120);
-
-    RENDERER
-      .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-      .texture(FooterActionsHud.getTexture(INPUT_ACTION_MENU_SORT.get()));
-
     renderText(this.statisticPages.get(this.pageIndex).name, 70, 25, this.labelFont, 120);
     renderText("Total", 354.8f, 26, this.labelFont, 120);
-    renderText("Display Mode: " + this.getDisplayModeName(), 17, 216.2f, this.displayModeFont, 120);
   }
 
   private void renderHighlight() {
@@ -512,7 +505,8 @@ public class StatisticsScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    FooterActionsHud.renderActions(0, FooterActions.BACK, null, null, null, null);
+
+    FooterActionsHud.renderActions();
   }
 
   @Override
@@ -629,6 +623,7 @@ public class StatisticsScreen extends MenuScreen {
       } else {
         this.displayMode++;
       }
+      FooterActionsHud.setSecondaryText(1, ": " + this.getDisplayModeName());
     }
 
     return InputPropagation.PROPAGATE;

@@ -98,6 +98,7 @@ public final class FooterActionsHud {
       case FooterActions.ARCHIVE_BESTIARY -> "Bestiary";
       case FooterActions.ARCHIVE_STATS -> "Statistics";
       case FooterActions.LIST -> "List";
+      case FooterActions.DISPLAY_MODE -> "Display Mode";
     };
   }
 
@@ -175,6 +176,11 @@ public final class FooterActionsHud {
           }
 
           text = getText(footAction.action);
+
+          if(footAction.secondaryText != null) {
+            text += footAction.secondaryText;
+          }
+
           textWidth = textWidth(text);
           x -= textWidth;
 
@@ -200,7 +206,7 @@ public final class FooterActionsHud {
     final InputAction input = switch(action) {
       case FooterActions.BACK -> INPUT_ACTION_MENU_BACK.get();
       case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD, FooterActions.ARCHIVE, FooterActions.TURN_ORDER, FooterActions.ARCHIVE_BESTIARY, FooterActions.ARCHIVE_STATS -> INPUT_ACTION_MENU_DELETE.get();
-      case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS, FooterActions.LIST -> INPUT_ACTION_MENU_SORT.get();
+      case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS, FooterActions.LIST, FooterActions.DISPLAY_MODE -> INPUT_ACTION_MENU_SORT.get();
       case FooterActions.SELECT -> INPUT_ACTION_MENU_CONFIRM.get();
     };
     return new FooterAction(action, input);
@@ -221,6 +227,10 @@ public final class FooterActionsHud {
     if(!compareFooterActions(action1, action2, action3, action4, action5)) {
       setFooterActions(style, action1, action2, action3, action4, action5);
     }
+    renderActions();
+  }
+
+  public static void renderActions() {
     render();
   }
 
@@ -248,9 +258,15 @@ public final class FooterActionsHud {
     renderActions(1, FooterActions.SELECT, FooterActions.BACK, FooterActions.ADDITIONS, FooterActions.TURN_ORDER, null);
   }
 
-  public static void setSecondaryText(final int actionIndex, final Texture texture) {
+  public static void setSecondaryTexture(final int actionIndex, @Nullable final Texture texture) {
     if(actions[actionIndex] != null) {
       actions[actionIndex].secondaryTexture = texture;
+    }
+  }
+
+  public static void setSecondaryText(final int actionIndex, @Nullable final String text) {
+    if(actions[actionIndex] != null) {
+      actions[actionIndex].secondaryText = text;
     }
   }
 

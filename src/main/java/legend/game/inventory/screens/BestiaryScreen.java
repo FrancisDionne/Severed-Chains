@@ -621,35 +621,71 @@ public class BestiaryScreen extends MenuScreen {
     x = 272;
     y = 45.4f - 11.45f;
 
-    if(this.monster.stats.elementalImmunityFlag_10 > 0) {
-      y += 11.45f;
-      this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 100, false);
-    } else if(this.monster.stats.elementFlag_0f != 8) {
-      y += 11.45f;
-      this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 50, false);
+    if((this.monster.stats.specialEffectFlag_0d & 0x4) == 0) { //Check for no Magical Resist
+      if(this.monster.stats.elementalImmunityFlag_10 > 0) {
+        y += 11.45f;
+        this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 100, false);
+      } else if(this.monster.stats.elementFlag_0f != 8) {
+        y += 11.45f;
+        this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 50, false);
+      }
+
+      final int counterElement = this.getCounterElement(this.monster.stats.elementFlag_0f);
+      if(counterElement != 0) {
+        y += 11.45f;
+        this.renderElementMultipliers(counterElement, x, y, xOffset, 50, true);
+      }
     }
 
-    final int counterElement = this.getCounterElement(this.monster.stats.elementFlag_0f);
-    if(counterElement != 0) {
+    if((this.monster.stats.specialEffectFlag_0d & 0x8) != 0) { //Physical Resist
       y += 11.45f;
-      this.renderElementMultipliers(counterElement, x, y, xOffset, 50, true);
+      this.renderStatus("Physical", x, y, xOffset, 100, false);
+    }
+
+    if((this.monster.stats.specialEffectFlag_0d & 0x4) != 0) { //Magical Resist
+      y += 11.45f;
+      this.renderStatus("Magical", x, y, xOffset, 100, false);
+    }
+
+    if((this.monster.stats.statusResistFlag_11 & 0x4) != 0) { //Confusion Resist
+      y += 11.45f;
+      this.renderStatus("Confusion", x, y, xOffset, 999, false);
+    }
+
+    if((this.monster.stats.statusResistFlag_11 & 0x8) != 0) { //Fear Resist
+      y += 11.45f;
+      this.renderStatus("Fear", x, y, xOffset, 999, false);
+    }
+
+    if((this.monster.stats.statusResistFlag_11 & 0x10) != 0) { //Stun Resist
+      y += 11.45f;
+      this.renderStatus("Stun", x, y, xOffset, 999, false);
+    }
+
+    if((this.monster.stats.statusResistFlag_11 & 0x80) != 0) { //Poison Resist
+      y += 11.45f;
+      this.renderStatus("Poison", x, y, xOffset, 999, false);
     }
   }
 
   private void renderElementMultipliers(final int elementFlag, final float x, final float y, final float xOffset, final int defPercent, final boolean counter) {
+    this.renderStatus(I18n.translate(this.getElement(elementFlag).getTranslationKey()), x, y, xOffset, defPercent, counter);
+  }
+
+  private void renderStatus(final String status, final float x, final float y, final float xOffset, final int defPercent, final boolean counter) {
     final String guardSign = counter ? "-" : "+";
 
-    renderText(this.monster.rank >= 2 ? I18n.translate(this.getElement(elementFlag).getTranslationKey()) : QUESTION_MARK_5, x, y, this.statsFont, 127);
+    renderText(this.monster.rank >= 2 ? status : QUESTION_MARK_5, x, y, this.statsFont, 127);
 
     if(this.monster.rank >= 2) {
-      this.m.translation(x + 51.5f + xOffset, y - 1f, 124f);
+      this.m.translation(x + 50.5f + xOffset, y - 1f, 125f);
       this.m.scale(8, 8, 1);
 
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.textures[2]); //Guard
 
-      renderText(guardSign + defPercent + '%', x + 60f, y + 2f, this.resistNumberFont, 127);
+      renderText(defPercent != 999 ? guardSign + defPercent + '%' : "Resist", x + 59f, y + 2f, this.resistNumberFont, 127);
     }
   }
 
