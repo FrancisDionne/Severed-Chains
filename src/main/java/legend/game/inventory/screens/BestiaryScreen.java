@@ -54,7 +54,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
-public class ArchiveBestiaryScreen extends MenuScreen {
+public class BestiaryScreen extends MenuScreen {
 
   private static class BestiaryEntry {
     public int entryNumber;
@@ -70,7 +70,7 @@ public class ArchiveBestiaryScreen extends MenuScreen {
     public List<BestiaryEntry> subEntries;
     public boolean isSubEntry;
 
-    public BestiaryEntry(final ArchiveBestiaryScreen bestiary, final int charId, final int subEntryParentId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
+    public BestiaryEntry(final BestiaryScreen bestiary, final int charId, final int subEntryParentId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
       this.charId = charId;
       this.stats = monsterStats_8010ba98[charId];
       this.lore = devMode ? lore : "";
@@ -78,7 +78,7 @@ public class ArchiveBestiaryScreen extends MenuScreen {
       this.kill = Statistics.getMonsterKill(this.charId);
       this.maxKill = maxKill;
 
-      final int[] elementRGB = ArchiveBestiaryScreen.getElementBackgroundRGB(this.stats.elementFlag_0f);
+      final int[] elementRGB = BestiaryScreen.getElementBackgroundRGB(this.stats.elementFlag_0f);
       this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.8f, elementRGB[4] / 255f, elementRGB[5] / 255f, elementRGB[6] / 255f, elementRGB[7] / 100f * 1f};
 
       if(subEntryParentId > -1) {
@@ -168,7 +168,7 @@ public class ArchiveBestiaryScreen extends MenuScreen {
   public int subEntryIndex;
   public boolean isListVisible;
 
-  public ArchiveBestiaryScreen(final Runnable unload) {
+  public BestiaryScreen(final Runnable unload) {
     this.unload = unload;
 
     this.m = new Matrix4f();

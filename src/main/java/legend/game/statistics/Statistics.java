@@ -70,6 +70,7 @@ public final class Statistics {
     TOTAL_EXP(-260, "Exp. Gained"),
     TOTAL_ENCOUNTER(-270, "Encounters"),
     TOTAL_ESCAPE(-280, "Escape"),
+    TOTAL_KILL(-290, "Enemies Defeated"),
 
     GOLD(10000, "Gold Earned"),
     CHEST(10001, "Chests Opened"),
@@ -364,6 +365,16 @@ public final class Statistics {
     MERU_ESCAPE(287),
     KONGOL_ESCAPE(288),
     MIRANDA_ESCAPE(289),
+
+    DART_KILL(291),
+    LAVITZ_KILL(292),
+    SHANA_KILL(293),
+    ROSE_KILL(294),
+    HASCHEL_KILL(295),
+    ALBERT_KILL(296),
+    MERU_KILL(297),
+    KONGOL_KILL(298),
+    MIRANDA_KILL(299),
     ;
 
     private final int stat;

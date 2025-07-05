@@ -465,11 +465,11 @@ public class MainMenuScreen extends MenuScreen {
   }
 
   private void showStatisticsScreen() {
-    this.showScreen(ArchiveStatisticsScreen::new);
+    this.showScreen(StatisticsScreen::new);
   }
 
   private void showBestiaryScreen() {
-    this.showScreen(ArchiveBestiaryScreen::new);
+    this.showScreen(BestiaryScreen::new);
   }
 
   private void showCharSwapScreen() {

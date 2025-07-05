@@ -28,7 +28,6 @@ import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
-import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HOME;
@@ -39,7 +38,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
-public class ArchiveStatisticsScreen extends MenuScreen {
+public class StatisticsScreen extends MenuScreen {
 
   private static class StatisticPage {
     public List<StatisticRow> statRows;
@@ -86,7 +85,7 @@ public class ArchiveStatisticsScreen extends MenuScreen {
     return this.statisticPages.size();
   }
 
-  public ArchiveStatisticsScreen(final Runnable unload) {
+  public StatisticsScreen(final Runnable unload) {
     this.unload = unload;
     this.m = new Matrix4f();
     this.quad = new QuadBuilder("Statistics Quad")
@@ -180,6 +179,7 @@ public class ArchiveStatisticsScreen extends MenuScreen {
     l.add(new StatisticRow(Statistics.Stats.TOTAL_SP_RECOVER));
     l.add(new StatisticRow(Statistics.Stats.TOTAL_ESCAPE));
     l.add(new StatisticRow(Statistics.Stats.TOTAL_DEATH));
+    l.add(new StatisticRow(Statistics.Stats.TOTAL_KILL));
     //l.add(new StatisticRow(Statistics.Stats.TOTAL_REVIVE));
     //l.add(new StatisticRow(Statistics.Stats.TOTAL_REVIVED));
     l.add(new StatisticRow(Statistics.Stats.TOTAL_EXP));
