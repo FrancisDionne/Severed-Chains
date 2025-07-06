@@ -317,7 +317,6 @@ public class OptionsScreen extends VerticalLayoutScreen {
         break;
     }
 
-    BattleDifficultyConfigEntry.reloadMonsters();
     this.reloadControls();
   }
 
