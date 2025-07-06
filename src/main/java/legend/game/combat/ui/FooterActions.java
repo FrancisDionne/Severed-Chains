@@ -16,5 +16,5 @@ public enum FooterActions {
   ARCHIVE_BESTIARY,
   LIST,
   DISPLAY_MODE,
-  RECOMMENDED
+  PRESETS
 }

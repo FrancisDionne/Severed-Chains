@@ -5,17 +5,33 @@ import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputButton;
 import legend.core.platform.input.InputKey;
 import legend.core.platform.input.InputMod;
+import legend.game.combat.AdditionButtonMode;
+import legend.game.combat.AdditionCounterDifficulty;
+import legend.game.combat.AdditionDifficulty;
+import legend.game.combat.AdditionMode;
+import legend.game.combat.AdditionTimingMode;
+import legend.game.combat.BattleDifficulty;
+import legend.game.combat.BattleTransitionMode;
+import legend.game.combat.DragoonAdditionDifficulty;
+import legend.game.combat.DragoonAdditionMode;
+import legend.game.combat.MashMode;
 import legend.game.combat.PreferredBattleCameraAngle;
+import legend.game.combat.effects.TransformationMode;
+import legend.game.combat.ui.AdditionOverlayMode;
+import legend.game.combat.ui.FooterActionColor;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
+import legend.game.inventory.IconSet;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Label;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigCollection;
 import legend.game.saves.ConfigEntry;
 import legend.game.saves.ConfigStorageLocation;
+import legend.game.submap.EncounterRateMode;
 import legend.game.types.MessageBoxResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,13 +67,15 @@ public class OptionsScreen extends VerticalLayoutScreen {
   private MessageBoxResults recommendedMessageBoxResult;
 
   private final String[] recommendedMessageBoxTexts = {
-    "Normal", "Original difficulty + Quality of life",
-    "Veteran", "Challenging difficulty + Quality of life",
-    "Zealous", "Hardcore difficulty + Quality of life",
-    "Casual", "Easier difficulty + Quality of life"
+    "Normal", "Original Gameplay + Quality of Life",
+    "Veteran", "Challenging Gameplay + Quality of Life",
+    "Zealous", "Hardcore Gameplay + Quality of Life",
+    "Nostalgia", "Original Everything",
+    "Casual", "Easier Gameplay + Quality of Life"
   };
 
   private final FontOptions[] recommendedMessageBoxFonts = {
+    new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.7f),
     new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.7f),
     new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.7f),
     new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.7f),
@@ -211,17 +229,95 @@ public class OptionsScreen extends VerticalLayoutScreen {
   }
 
   private void setRecommendedOptions(final int recommendId) {
+
+    if(recommendId != 3) { //if not Nostalgia preset
+      //Common/Default Options
+      CONFIG.setConfig(CoreMod.PREFERRED_BATTLE_CAMERA_ANGLE.get(), PreferredBattleCameraAngle.PLAYER);
+      CONFIG.setConfig(CoreMod.BATTLE_TRANSITION_MODE_CONFIG.get(), BattleTransitionMode.INSTANT);
+      CONFIG.setConfig(CoreMod.MASH_MODE_CONFIG.get(), MashMode.MASH);
+      CONFIG.setConfig(CoreMod.DISABLE_STATUS_EFFECTS_CONFIG.get(), false);
+      CONFIG.setConfig(CoreMod.TRANSFORMATION_MODE_CONFIG.get(), TransformationMode.SHORT);
+      CONFIG.setConfig(CoreMod.ENCOUNTER_RATE_CONFIG.get(), EncounterRateMode.AVERAGE);
+      CONFIG.setConfig(CoreMod.ENEMY_HP_BARS_CONFIG.get(), false);
+      CONFIG.setConfig(CoreMod.SECONDARY_CHARACTER_XP_MULTIPLIER_CONFIG.get(), 0.50f);
+      CONFIG.setConfig(CoreMod.FOOTER_ACTION_COLOR_CONFIG.get(), FooterActionColor.FOOTER_WHITE);
+      CONFIG.setConfig(CoreMod.ICON_SET.get(), IconSet.ENHANCED);
+      CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 50);
+      CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
+      CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), true);
+
+      CONFIG.setConfig(CoreMod.ADDITION_MODE_CONFIG.get(), AdditionMode.NORMAL);
+      CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.NORMAL);
+      CONFIG.setConfig(CoreMod.ADDITION_TIMING_MODE_CONFIG.get(), AdditionTimingMode.ADJUSTED);
+      CONFIG.setConfig(CoreMod.ADDITION_BUTTON_MODE_CONFIG.get(), AdditionButtonMode.FEEDBACK);
+      CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_CONFIG.get(), AdditionOverlayMode.FULL);
+      CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_SIZE_CONFIG.get(), 1f);
+      CONFIG.setConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get(), AdditionCounterDifficulty.NORMAL);
+      CONFIG.setConfig(CoreMod.ADDITION_GAMEPLAY_ENHANCE_CONFIG.get(), true);
+      CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_MODE_CONFIG.get(), DragoonAdditionMode.NORMAL);
+      CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.NORMAL);
+    }
+
     switch(recommendId) {
+      case 3:  //Nostalgia
+        CONFIG.setConfig(CoreMod.BATTLE_DIFFICULTY.get(), BattleDifficulty.NORMAL);
+        CONFIG.setConfig(CoreMod.PREFERRED_BATTLE_CAMERA_ANGLE.get(), PreferredBattleCameraAngle.NORMAL);
+        CONFIG.setConfig(CoreMod.BATTLE_TRANSITION_MODE_CONFIG.get(), BattleTransitionMode.NORMAL);
+        CONFIG.setConfig(CoreMod.MASH_MODE_CONFIG.get(), MashMode.MASH);
+        CONFIG.setConfig(CoreMod.DISABLE_STATUS_EFFECTS_CONFIG.get(), false);
+        CONFIG.setConfig(CoreMod.TRANSFORMATION_MODE_CONFIG.get(), TransformationMode.NORMAL);
+        CONFIG.setConfig(CoreMod.ENCOUNTER_RATE_CONFIG.get(), EncounterRateMode.RETAIL);
+        CONFIG.setConfig(CoreMod.ENEMY_HP_BARS_CONFIG.get(), false);
+        CONFIG.setConfig(CoreMod.SECONDARY_CHARACTER_XP_MULTIPLIER_CONFIG.get(), 0.50f);
+        CONFIG.setConfig(CoreMod.FOOTER_ACTION_COLOR_CONFIG.get(), FooterActionColor.FOOTER_HIDDEN);
+        CONFIG.setConfig(CoreMod.ICON_SET.get(), IconSet.RETAIL);
+        CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 50);
+        CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), false);
+        CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), false);
+
+        CONFIG.setConfig(CoreMod.ADDITION_MODE_CONFIG.get(), AdditionMode.NORMAL);
+        CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.NORMAL);
+        CONFIG.setConfig(CoreMod.ADDITION_TIMING_MODE_CONFIG.get(), AdditionTimingMode.RETAIL);
+        CONFIG.setConfig(CoreMod.ADDITION_BUTTON_MODE_CONFIG.get(), AdditionButtonMode.RETAIL);
+        CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_CONFIG.get(), AdditionOverlayMode.FULL);
+        CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_SIZE_CONFIG.get(), 1f);
+        CONFIG.setConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get(), AdditionCounterDifficulty.NORMAL);
+        CONFIG.setConfig(CoreMod.ADDITION_GAMEPLAY_ENHANCE_CONFIG.get(), false);
+        CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_MODE_CONFIG.get(), DragoonAdditionMode.NORMAL);
+        CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.NORMAL);
+      case 4:  //Casual
+        CONFIG.setConfig(CoreMod.BATTLE_DIFFICULTY.get(), BattleDifficulty.EASY);
+        CONFIG.setConfig(CoreMod.MASH_MODE_CONFIG.get(), MashMode.HOLD);
+        CONFIG.setConfig(CoreMod.DISABLE_STATUS_EFFECTS_CONFIG.get(), true);
+        CONFIG.setConfig(CoreMod.ENEMY_HP_BARS_CONFIG.get(), true);
+        CONFIG.setConfig(CoreMod.SECONDARY_CHARACTER_XP_MULTIPLIER_CONFIG.get(), 1f);
+        CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 100);
+
+        CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.EASY);
+        CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_SIZE_CONFIG.get(), 1.2f);
+        CONFIG.setConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get(), AdditionCounterDifficulty.EASIER);
+        CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.EASY);
+        break;
+      case 0: //Normal
+        CONFIG.setConfig(CoreMod.BATTLE_DIFFICULTY.get(), BattleDifficulty.NORMAL);
+        break;
       case 1:  //Veteran
-        CONFIG.setConfig(CoreMod.PREFERRED_BATTLE_CAMERA_ANGLE.get(), PreferredBattleCameraAngle.PLAYER);
+        CONFIG.setConfig(CoreMod.BATTLE_DIFFICULTY.get(), BattleDifficulty.HARD);
+        CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.HARD);
         break;
-      case 2:  //Zealot
-        break;
-      case 3:  //Casual
-        break;
-      default: //Normal
+      case 2:  //Zealous
+        CONFIG.setConfig(CoreMod.BATTLE_DIFFICULTY.get(), BattleDifficulty.HARDER);
+        CONFIG.setConfig(CoreMod.SECONDARY_CHARACTER_XP_MULTIPLIER_CONFIG.get(), 0.25f);
+        CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 30);
+        CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), false);
+
+        CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_CONFIG.get(), AdditionOverlayMode.OFF);
+        CONFIG.setConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get(), true);
+        CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.HARD);
         break;
     }
+
+    BattleDifficultyConfigEntry.reloadMonsters();
     this.reloadControls();
   }
 
@@ -240,7 +336,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
   protected void renderControls(final int parentX, final int parentY) {
     try {
       super.renderControls(parentX, parentY);
-      FooterActionsHud.renderMenuActions(FooterActions.HELP, FooterActions.RECOMMENDED, null);
+      FooterActionsHud.renderMenuActions(FooterActions.HELP, FooterActions.PRESETS, null);
     } catch(final Throwable ex) {
       this.replaceControlWithErrorLabel("Error on renderControls", ex);
     }

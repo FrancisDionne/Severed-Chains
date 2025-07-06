@@ -1,0 +1,53 @@
+package legend.game.modding.coremod.config;
+
+import legend.game.combat.BattleDifficulty;
+import legend.game.combat.Monsters;
+import legend.game.combat.types.MonsterStats1c;
+import legend.game.modding.coremod.CoreMod;
+import legend.game.saves.ConfigCategory;
+import legend.game.saves.ConfigStorageLocation;
+import legend.game.saves.EnumConfigEntry;
+
+import static legend.core.GameEngine.CONFIG;
+
+public class BattleDifficultyConfigEntry extends EnumConfigEntry<BattleDifficulty> {
+  public BattleDifficultyConfigEntry() {
+    super(BattleDifficulty.class, BattleDifficulty.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001, BattleDifficultyConfigEntry::reloadMonsters);
+  }
+
+  public static void adjustMonsterStats(final MonsterStats1c monster) {
+    switch(CONFIG.getConfig(CoreMod.BATTLE_DIFFICULTY.get())) {
+      case BattleDifficulty.EASY:
+        monster.hp_00 = Math.round(monster.hp_00 * 0.8f);
+        monster.attack_04 = Math.round(monster.attack_04 * 0.8f);
+        monster.magicAttack_06 = Math.round(monster.magicAttack_06 * 0.8f);
+        monster.defence_09 = Math.round(monster.defence_09 * 0.9f);
+        monster.magicDefence_0a = Math.round(monster.magicDefence_0a * 0.9f);
+        monster.attackAvoid_0b = Math.round(monster.attackAvoid_0b * 0.9f);
+        monster.magicAvoid_0c = Math.round(monster.magicAvoid_0c * 0.9f);
+        break;
+      case BattleDifficulty.HARD:
+        monster.hp_00 = Math.round(monster.hp_00 * 1.25f);
+        monster.attack_04 = Math.round(monster.attack_04 * 1.15f);
+        monster.magicAttack_06 = Math.round(monster.magicAttack_06 * 1.15f);
+        monster.defence_09 = Math.round(monster.defence_09 * 1.1f);
+        monster.magicDefence_0a = Math.round(monster.magicDefence_0a * 1.1f);
+        monster.attackAvoid_0b = Math.round(monster.attackAvoid_0b * 1.1f);
+        monster.magicAvoid_0c = Math.round(monster.magicAvoid_0c * 1.1f);
+        break;
+      case BattleDifficulty.HARDER:
+        monster.hp_00 = Math.round(monster.hp_00 * 1.5f);
+        monster.attack_04 = Math.round(monster.attack_04 * 1.25f);
+        monster.magicAttack_06 = Math.round(monster.magicAttack_06 * 1.25f);
+        monster.defence_09 = Math.round(monster.defence_09 * 1.15f);
+        monster.magicDefence_0a = Math.round(monster.magicDefence_0a * 1.15f);
+        monster.attackAvoid_0b = Math.round(monster.attackAvoid_0b * 1.25f);
+        monster.magicAvoid_0c = Math.round(monster.magicAvoid_0c * 1.25f);
+        break;
+    }
+  }
+
+  public static void reloadMonsters() {
+    Monsters.loadMonsters();
+  }
+}

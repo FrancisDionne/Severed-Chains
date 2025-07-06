@@ -9,6 +9,7 @@ import legend.core.opengl.Texture;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
 import legend.game.characters.Element;
+import legend.game.combat.Monsters;
 import legend.game.combat.types.EnemyRewards08;
 import legend.game.combat.types.MonsterStats1c;
 import legend.game.combat.ui.FooterActions;
@@ -41,7 +42,6 @@ import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.combat.Monsters.enemyRewards_80112868;
 import static legend.game.combat.Monsters.monsterNames_80112068;
-import static legend.game.combat.Monsters.monsterStats_8010ba98;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
@@ -72,7 +72,7 @@ public class BestiaryScreen extends MenuScreen {
 
     public BestiaryEntry(final BestiaryScreen bestiary, final int charId, final int subEntryParentId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
       this.charId = charId;
-      this.stats = monsterStats_8010ba98[charId];
+      this.stats = Monsters.getMonsterStats_8010ba98()[charId];
       this.lore = devMode ? lore : "";
       this.name = name == null ? monsterNames_80112068[this.charId] : name;
       this.kill = Statistics.getMonsterKill(this.charId);

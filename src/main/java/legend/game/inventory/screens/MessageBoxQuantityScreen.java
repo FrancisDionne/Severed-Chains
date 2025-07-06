@@ -6,6 +6,7 @@ import legend.core.platform.input.InputMod;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import static legend.game.SItem.setMessageBoxFontOptions;
 import static legend.game.SItem.setMessageBoxText;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
@@ -15,10 +16,16 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 public class MessageBoxQuantityScreen extends MessageBoxScreen {
   /** Allows list wrapping, but only on new input */
 
+  private static final int ARROWS_MAX_TICKS = 90;
+
   private final String messageText;
   private final int minQuantity;
   private final int maxQuantity;
   private int currentQuantity;
+  private int arrowsTick;
+
+  private final FontOptions titleFont = new FontOptions().colour(TextColour.BROWN).shadowColour(TextColour.MIDDLE_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.95f);
+  private final FontOptions quantityFont = new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.85f);
 
   public MessageBoxQuantityScreen(final String text, final int minQuantity, final int maxQuantity, final int type, final Consumer<MessageBoxResults> onResult) {
     this(text, "Yes", "No", minQuantity, maxQuantity, type, onResult);
@@ -30,24 +37,46 @@ public class MessageBoxQuantityScreen extends MessageBoxScreen {
     this.minQuantity = minQuantity;
     this.maxQuantity = maxQuantity;
     this.currentQuantity = 1;
-    this.setQuantityText();
+    this.arrowsTick = 0;
+    this.setText();
   }
 
   private void menuNavigateLeft() {
     playMenuSound(1);
     this.currentQuantity = this.currentQuantity - 1 < this.minQuantity ? this.maxQuantity : this.currentQuantity - 1;
-    this.setQuantityText();
+    this.arrowsTick = 0;
+    this.setText();
   }
 
   private void menuNavigateRight() {
     playMenuSound(1);
     this.currentQuantity = this.currentQuantity + 1 > this.maxQuantity ? this.minQuantity : this.currentQuantity + 1;
-    this.setQuantityText();
+    this.arrowsTick = 0;
+    this.setText();
   }
 
-  private void setQuantityText() {
-    final String newText = this.messageText.replace("[#]", Integer.toString(this.currentQuantity));
-    setMessageBoxText(this.messageBox, newText);
+  private void setText() {
+    setMessageBoxText(this.messageBox, this.getText());
+    setMessageBoxFontOptions(this.messageBox, 0, this.titleFont);
+    setMessageBoxFontOptions(this.messageBox, 1, this.quantityFont);
+  }
+
+  private String getText() {
+    final boolean b = this.arrowsTick < (ARROWS_MAX_TICKS / 2);
+    return this.messageText + '\n' + (b ? "< " : "<< ") + "\u011d" + this.currentQuantity + (b ? " >" : " >>");
+  }
+
+  @Override
+  protected void render() {
+    super.render();
+
+    this.arrowsTick++;
+    if(this.arrowsTick > ARROWS_MAX_TICKS) {
+      this.arrowsTick = 0;
+      this.setText();
+    } else if(this.arrowsTick == ARROWS_MAX_TICKS / 2) {
+      this.setText();
+    }
   }
 
   @Override

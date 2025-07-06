@@ -2,10 +2,9 @@ package legend.game.modding.events.battle;
 
 import legend.game.characters.Element;
 import legend.game.characters.ElementSet;
+import legend.game.combat.Monsters;
 import legend.game.combat.types.MonsterStats1c;
 import org.legendofdragoon.modloader.events.Event;
-
-import static legend.game.combat.Monsters.monsterStats_8010ba98;
 
 public class MonsterStatsEvent extends Event {
   public final int enemyId;
@@ -33,7 +32,7 @@ public class MonsterStatsEvent extends Event {
   public MonsterStatsEvent(final int enemyId) {
     this.enemyId = enemyId;
 
-    final MonsterStats1c monsterStats = monsterStats_8010ba98[enemyId];
+    final MonsterStats1c monsterStats = Monsters.getMonsterStats_8010ba98()[enemyId];
     this.hp = monsterStats.hp_00;
     this.maxHp = monsterStats.hp_00;
     this.specialEffectFlag = monsterStats.specialEffectFlag_0d;

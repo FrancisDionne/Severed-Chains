@@ -99,7 +99,7 @@ public final class FooterActionsHud {
       case FooterActions.ARCHIVE_STATS -> "Statistics";
       case FooterActions.LIST -> "List";
       case FooterActions.DISPLAY_MODE -> "Display Mode";
-      case FooterActions.RECOMMENDED -> "Recommended";
+      case FooterActions.PRESETS -> "Presets";
     };
   }
 
@@ -206,7 +206,7 @@ public final class FooterActionsHud {
     }
     final InputAction input = switch(action) {
       case FooterActions.BACK -> INPUT_ACTION_MENU_BACK.get();
-      case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD, FooterActions.ARCHIVE, FooterActions.TURN_ORDER, FooterActions.ARCHIVE_BESTIARY, FooterActions.ARCHIVE_STATS, FooterActions.RECOMMENDED -> INPUT_ACTION_MENU_DELETE.get();
+      case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD, FooterActions.ARCHIVE, FooterActions.TURN_ORDER, FooterActions.ARCHIVE_BESTIARY, FooterActions.ARCHIVE_STATS, FooterActions.PRESETS -> INPUT_ACTION_MENU_DELETE.get();
       case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS, FooterActions.LIST, FooterActions.DISPLAY_MODE -> INPUT_ACTION_MENU_SORT.get();
       case FooterActions.SELECT -> INPUT_ACTION_MENU_CONFIRM.get();
     };
