@@ -16,6 +16,7 @@ import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
 import legend.game.inventory.IconSetConfigEntry;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
+import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionGameplayEnhanceConfig;
 import legend.game.modding.coremod.config.AdditionGroupConfigEntry;
@@ -163,6 +164,7 @@ public class CoreMod {
   public static final RegistryDelegate<AdditionTimingOffsetConfigEntry> ADDITION_TIMING_OFFSET_CONFIG = register("addition_timing_offset", AdditionTimingOffsetConfigEntry::new);
   public static final RegistryDelegate<AdditionButtonModeConfigEntry> ADDITION_BUTTON_MODE_CONFIG = register("addition_button_mode", AdditionButtonModeConfigEntry::new);
   public static final RegistryDelegate<AdditionRandomModeConfig> ADDITION_RANDOM_MODE_CONFIG = CONFIG_REGISTRAR.register("addition_random_mode", AdditionRandomModeConfig::new);
+  public static final RegistryDelegate<AdditionCounterDifficultyConfigEntry> ADDITION_COUNTER_DIFFICULTY_CONFIG = register("addition_counter_difficulty", AdditionCounterDifficultyConfigEntry::new);
   public static final RegistryDelegate<AdditionGameplayEnhanceConfig> ADDITION_GAMEPLAY_ENHANCE_CONFIG = CONFIG_REGISTRAR.register("addition_gameplay_enhance", AdditionGameplayEnhanceConfig::new);
   public static final RegistryDelegate<AdditionOverlaySizeConfigEntry> ADDITION_OVERLAY_SIZE_CONFIG = CONFIG_REGISTRAR.register("addition_overlay_size", AdditionOverlaySizeConfigEntry::new);
 

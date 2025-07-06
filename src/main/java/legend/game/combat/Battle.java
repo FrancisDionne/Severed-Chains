@@ -105,6 +105,7 @@ import legend.game.inventory.Item;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.PostBattleScreen;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.events.battle.BattleEndedEvent;
 import legend.game.modding.events.battle.BattleEntityTurnEvent;
 import legend.game.modding.events.battle.BattleStartedEvent;
@@ -8424,7 +8425,7 @@ public class Battle extends EngineState {
     monster.equipment_1a_48 = 0;
     monster.equipmentOnHitStatus_4a = 0;
     monster.targetArrowPos_78.set(monsterStats.targetArrowX_12, monsterStats.targetArrowY_13, monsterStats.targetArrowZ_14);
-    monster.hitCounterFrameThreshold_7e = monsterStats.hitCounterFrameThreshold_15;
+    monster.hitCounterFrameThreshold_7e = AdditionCounterDifficultyConfigEntry.adjustHitCounterFrameThreshold(monsterStats.hitCounterFrameThreshold_15);
     monster._80 = monsterStats._16;
     monster._82 = monsterStats._17;
     monster.middleOffsetX_84 = monsterStats.middleOffsetX_18;
