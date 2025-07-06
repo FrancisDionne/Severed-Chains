@@ -89,9 +89,12 @@ public class OptionsScreen extends VerticalLayoutScreen {
   }
 
   private void reloadControls() {
+    final int highlight = this.highlightedRow;
     this.deleteControls();
     this.addControl(new Background());
     this.loadControls();
+    this.highlightedRow = highlight;
+    this.redrawHighlightRow();
   }
 
   private void loadControls() {

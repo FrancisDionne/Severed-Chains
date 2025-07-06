@@ -26,7 +26,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class VerticalLayoutScreen extends MenuScreen {
   private final Brackets highlight;
-  private int highlightedRow = -1;
+  public int highlightedRow = -1;
 
   private int scroll;
   /** Allows list wrapping, but only on new input */
@@ -94,14 +94,23 @@ public class VerticalLayoutScreen extends MenuScreen {
     this.rows.clear();
     this.configControls.clear();
     this.clearControls();
+    this.addControl(this.highlight);
   }
 
   public Label getHighlightedRow() {
     return this.rows.get(this.highlightedRow);
   }
 
+  public void redrawHighlightRow() {
+    this.highlightRow(this.highlightedRow, true);
+  }
+
   private void highlightRow(final int index) {
-    if(this.highlightedRow != index) {
+    this.highlightRow(index, false);
+  }
+
+  private void highlightRow(final int index, final boolean redraw) {
+    if(this.highlightedRow != index || (index > -1 && redraw)) {
       if(this.highlightedRow != -1 && this.configControls.get(this.highlightedRow) != null && this.configControls.get(this.highlightedRow).isHovered()) {
         this.configControls.get(this.highlightedRow).hoverOut();
       }
