@@ -1,8 +1,8 @@
 package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
-import legend.game.combat.ui.FooterActionsHud;
 import legend.core.platform.input.InputAction;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.inventory.screens.controls.Brackets;
 import legend.game.inventory.screens.controls.Button;
 import legend.game.inventory.screens.controls.Glyph;
@@ -87,6 +87,13 @@ public class VerticalLayoutScreen extends MenuScreen {
 
     this.updateEntries();
     return label;
+  }
+
+  protected void deleteControls() {
+    this.highlightedRow = -1;
+    this.rows.clear();
+    this.configControls.clear();
+    this.clearControls();
   }
 
   public Label getHighlightedRow() {

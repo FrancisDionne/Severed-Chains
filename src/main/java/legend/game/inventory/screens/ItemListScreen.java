@@ -167,7 +167,7 @@ public class ItemListScreen extends MenuScreen {
     if(result.messageBoxResult == MessageBoxResult.YES) {
       final RegistryEntry entry = (RegistryEntry)list.getSelectedItem().item_00;
 
-      for (int i = 0; i < result.quantity; i++) {
+      for (int i = 0; i < result.intValue; i++) {
         final int index = getFirstIndexOfInventoryEntry(entry);
         inv.remove(index);
       }

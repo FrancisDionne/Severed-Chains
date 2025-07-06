@@ -1,10 +1,7 @@
 package legend.game.inventory.screens;
 
-import legend.core.MathHelper;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
-import legend.game.types.MessageBox20;
-import legend.game.types.MessageBoxResult;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -21,7 +18,7 @@ public class MessageBoxQuantityScreen extends MessageBoxScreen {
   private final String messageText;
   private final int minQuantity;
   private final int maxQuantity;
-  public int currentQuantity;
+  private int currentQuantity;
 
   public MessageBoxQuantityScreen(final String text, final int minQuantity, final int maxQuantity, final int type, final Consumer<MessageBoxResults> onResult) {
     this(text, "Yes", "No", minQuantity, maxQuantity, type, onResult);

@@ -5,15 +5,18 @@ import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputButton;
 import legend.core.platform.input.InputKey;
 import legend.core.platform.input.InputMod;
+import legend.game.combat.PreferredBattleCameraAngle;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Label;
+import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigCollection;
 import legend.game.saves.ConfigEntry;
 import legend.game.saves.ConfigStorageLocation;
+import legend.game.types.MessageBoxResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.legendofdragoon.modloader.registries.RegistryId;
@@ -24,11 +27,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static legend.core.GameEngine.CONFIG;
+import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HELP;
 
 public class OptionsScreen extends VerticalLayoutScreen {
@@ -38,17 +44,62 @@ public class OptionsScreen extends VerticalLayoutScreen {
   private final Map<Control, Label> helpLabels = new HashMap<>();
   private final Map<Control, ConfigEntry<?>> helpEntries = new HashMap<>();
 
+  private final ConfigCollection config;
+  private final Set<ConfigStorageLocation> validLocations;
+  private final ConfigCategory category;
+
+  private MessageBoxResults recommendedMessageBoxResult;
+
+  private final String[] recommendedMessageBoxTexts = {
+    "Normal", "Original difficulty + Quality of life",
+    "Veteran", "Challenging difficulty + Quality of life",
+    "Zealous", "Hardcore difficulty + Quality of life",
+    "Casual", "Easier difficulty + Quality of life"
+  };
+
+  private final FontOptions[] recommendedMessageBoxFonts = {
+    new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.7f),
+    new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.7f),
+    new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.7f),
+    new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.7f),
+  };
+
+  private final FontOptions recommendMessageBoxConfirmFont = new FontOptions().colour(TextColour.DARK_GREY).shadowColour(TextColour.LIGHT_BROWN).horizontalAlign(HorizontalAlign.CENTRE).size(0.7f);
+
   public OptionsScreen(final ConfigCollection config, final Set<ConfigStorageLocation> validLocations, final ConfigCategory category, final Runnable unload) {
     deallocateRenderables(0xff);
 
     this.unload = unload;
     this.init();
 
+    this.config = config;
+    this.validLocations = validLocations;
+    this.category = category;
+
+    this.loadControls();
+
+    this.addHotkey(I18n.translate("lod_core.ui.options.help"), INPUT_ACTION_MENU_HELP, this::help);
+    this.addHotkey(I18n.translate("lod_core.ui.options.back"), INPUT_ACTION_MENU_BACK, this::back);
+    this.addHotkey(I18n.translate("lod_core.ui.options.delete"), INPUT_ACTION_MENU_DELETE, this::recommended);
+  }
+
+  protected void init() {
+    startFadeEffect(2, 10);
+    this.reloadControls();
+  }
+
+  private void reloadControls() {
+    this.deleteControls();
+    this.addControl(new Background());
+    this.loadControls();
+  }
+
+  private void loadControls() {
     final Map<ConfigEntry<?>, SettingEntry> translations = new HashMap<>();
 
     for(final RegistryId configId : GameEngine.REGISTRIES.config) {
       final ConfigEntry<?> entry = GameEngine.REGISTRIES.config.getEntry(configId).get();
-      if(entry.category == category) {
+      if(entry.category == this.category) {
         translations.put(entry, new SettingEntry(I18n.translate(entry.getLabelTranslationKey()), entry.order));
       }
     }
@@ -61,14 +112,14 @@ public class OptionsScreen extends VerticalLayoutScreen {
         final ConfigEntry configEntry = entry.getKey();
         final String text = entry.getValue().label;
 
-        if(validLocations.contains(configEntry.storageLocation) && (configEntry.hasEditControl()|| configEntry.header) && (!this.hideNonBattleEntries() || configEntry.availableInBattle())) {
+        if(this.validLocations.contains(configEntry.storageLocation) && (configEntry.hasEditControl()|| configEntry.header) && (!this.hideNonBattleEntries() || configEntry.availableInBattle())) {
           Control editControl = null;
           boolean error = false;
 
           if(!configEntry.header) {
             try {
               //noinspection unchecked
-              editControl = configEntry.makeEditControl(config.getConfig(configEntry), config);
+              editControl = configEntry.makeEditControl(this.config.getConfig(configEntry), this.config);
             } catch(final Throwable ex) {
               editControl = this.createErrorLabel("Error creating control", ex, false);
               error = true;
@@ -94,15 +145,6 @@ public class OptionsScreen extends VerticalLayoutScreen {
           }
         }
       });
-
-    FooterActionsHud.setMenuActions(FooterActions.HELP, null, null);
-    this.addHotkey(I18n.translate("lod_core.ui.options.help"), INPUT_ACTION_MENU_HELP, this::help);
-    this.addHotkey(I18n.translate("lod_core.ui.options.back"), INPUT_ACTION_MENU_BACK, this::back);
-  }
-
-  protected void init() {
-    startFadeEffect(2, 10);
-    this.addControl(new Background());
   }
 
   protected boolean hideNonBattleEntries() {
@@ -136,6 +178,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
 
   private void back() {
     playMenuSound(3);
+    FooterActionsHud.setMenuActions(null, null, null);
     this.unload.run();
   }
 
@@ -146,6 +189,37 @@ public class OptionsScreen extends VerticalLayoutScreen {
       final Label helpLabel = this.helpLabels.get(this.getHighlightedRow());
       this.getStack().pushScreen(new TooltipScreen(I18n.translate(configEntry.getHelpTranslationKey()), helpLabel.calculateTotalX() + helpLabel.getWidth() / 2, helpLabel.calculateTotalY() + helpLabel.getHeight() / 2));
     }
+  }
+
+  private void recommended() {
+    menuStack.pushScreen(new MessageBoxCycleScreen(this.recommendedMessageBoxTexts, this.recommendedMessageBoxFonts, "Set", "Cancel", 2, result1 -> {
+      if(result1.messageBoxResult == MessageBoxResult.YES) {
+        this.recommendedMessageBoxResult = result1;
+        if(this.recommendedMessageBoxResult.intValue > -1) {
+          menuStack.pushScreen(new MessageBoxScreen("Use '" + this.recommendedMessageBoxTexts[this.recommendedMessageBoxResult.intValue * 2] + "' preset?\nSeveral options will be changed", 2, this.recommendMessageBoxConfirmFont, result2 -> {
+            if(result2.messageBoxResult == MessageBoxResult.YES) {
+              this.setRecommendedOptions(this.recommendedMessageBoxResult.intValue);
+              this.recommendedMessageBoxResult = null;
+            }
+          }));
+        }
+      }
+    }));
+  }
+
+  private void setRecommendedOptions(final int recommendId) {
+    switch(recommendId) {
+      case 1:  //Veteran
+        CONFIG.setConfig(CoreMod.PREFERRED_BATTLE_CAMERA_ANGLE.get(), PreferredBattleCameraAngle.PLAYER);
+        break;
+      case 2:  //Zealot
+        break;
+      case 3:  //Casual
+        break;
+      default: //Normal
+        break;
+    }
+    this.reloadControls();
   }
 
   @Override
@@ -163,6 +237,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
   protected void renderControls(final int parentX, final int parentY) {
     try {
       super.renderControls(parentX, parentY);
+      FooterActionsHud.renderMenuActions(FooterActions.HELP, FooterActions.RECOMMENDED, null);
     } catch(final Throwable ex) {
       this.replaceControlWithErrorLabel("Error on renderControls", ex);
     }

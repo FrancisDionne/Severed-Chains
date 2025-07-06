@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 import static legend.game.SItem.menuStack;
 import static legend.game.SItem.messageBox;
+import static legend.game.SItem.setMessageBoxFontOptions;
 import static legend.game.SItem.setMessageBoxOptions;
 import static legend.game.SItem.setMessageBoxText;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
@@ -31,10 +32,21 @@ public class MessageBoxScreen extends MenuScreen {
     this(text, "Yes", "No", type, onResult);
   }
 
+  public MessageBoxScreen(final String text, final int type, final FontOptions font, final Consumer<MessageBoxResults> onResult) {
+    this(text, "Yes", "No", type, font, onResult);
+  }
+
   public MessageBoxScreen(final String text, final String yes, final String no, final int type, final Consumer<MessageBoxResults> onResult) {
     setMessageBoxText(this.messageBox, text, type);
     setMessageBoxOptions(this.messageBox, yes, no);
     this.onResult = onResult;
+  }
+
+  public MessageBoxScreen(final String text, final String yes, final String no, final int type, final FontOptions font, final Consumer<MessageBoxResults> onResult) {
+    this(text, yes, no, type, onResult);
+    for(int i = 0; i < this.messageBox.text_00.length; i++) {
+      setMessageBoxFontOptions(this.messageBox, i, font);
+    }
   }
 
   public MessageBoxScreen(final String text, final String ok, final int type, @Nullable final Consumer<MessageBoxResults> onResult) {
@@ -106,7 +118,7 @@ public class MessageBoxScreen extends MenuScreen {
     return this.mouseClick(x, y, button, mods, 0);
   }
 
-  protected InputPropagation mouseClick(final int x, final int y, final int button, final Set<InputMod> mods, final int quantity) {
+  protected InputPropagation mouseClick(final int x, final int y, final int button, final Set<InputMod> mods, final int intValue) {
     if(super.mouseClick(x, y, button, mods) == InputPropagation.HANDLED) {
       return InputPropagation.HANDLED;
     }
@@ -117,7 +129,7 @@ public class MessageBoxScreen extends MenuScreen {
 
     if(this.messageBox.type_15 == 0) {
       playMenuSound(2);
-      this.result = new MessageBoxResults(MessageBoxResult.YES, quantity);
+      this.result = new MessageBoxResults(MessageBoxResult.YES, intValue);
       this.messageBox.state_0c = 4;
     } else if(this.messageBox.type_15 == 2) {
       // Yes/no
@@ -131,7 +143,7 @@ public class MessageBoxScreen extends MenuScreen {
           this.messageBox.highlightRenderable_04.y_44 = selectionY - 2;
         }
 
-        this.result = new MessageBoxResults(MessageBoxResult.YES, quantity);
+        this.result = new MessageBoxResults(MessageBoxResult.YES, intValue);
         this.messageBox.state_0c = 4;
       } else if(MathHelper.inBox(x, y, this.messageBox.x_1c + 4, selectionY + 14, 112, 14)) {
         playMenuSound(2);
@@ -141,7 +153,7 @@ public class MessageBoxScreen extends MenuScreen {
           this.messageBox.highlightRenderable_04.y_44 = selectionY + 12;
         }
 
-        this.result = new MessageBoxResults(MessageBoxResult.NO, quantity);
+        this.result = new MessageBoxResults(MessageBoxResult.NO, intValue);
         this.messageBox.state_0c = 4;
       }
     }
@@ -185,13 +197,13 @@ public class MessageBoxScreen extends MenuScreen {
     this.menuSelect(0);
   }
 
-  protected void menuSelect(final int quantity) {
+  protected void menuSelect(final int intValue) {
     playMenuSound(2);
 
     if(this.messageBox.menuIndex_18 == 0) {
-      this.result = new MessageBoxResults(MessageBoxResult.YES, quantity);
+      this.result = new MessageBoxResults(MessageBoxResult.YES, intValue);
     } else {
-      this.result = new MessageBoxResults(MessageBoxResult.NO, quantity);
+      this.result = new MessageBoxResults(MessageBoxResult.NO, intValue);
     }
 
     this.messageBox.state_0c = 4;
