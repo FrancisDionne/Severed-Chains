@@ -8300,8 +8300,11 @@ public class Battle extends EngineState {
       if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 instanceof final PlayerBattleEntity player) {
         //Addition Frenzy Mode - Changes addition to a random one every time the player attacks
         if(!player.isDragoon() && CONFIG.getConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get())) {
-          final int additionIndex = new Random().nextInt(AdditionListMenu.getAdditions(player.charId_272).size());
-          AdditionListMenu.setAddition(player, additionIndex, this.hud);
+          final int additionCount = AdditionListMenu.getAdditions(player.charId_272).size();
+          if(additionCount > 0) {
+            final int additionIndex = new Random().nextInt(AdditionListMenu.getAdditions(player.charId_272).size());
+            AdditionListMenu.setAddition(player, additionIndex, this.hud);
+          }
         }
         Statistics.appendStat(player, player.isDragoon() ? Statistics.Stats.TOTAL_DRAGOON_PHYSICAL_ATTACK : Statistics.Stats.TOTAL_PHYSICAL_ATTACK, 1);
       }
