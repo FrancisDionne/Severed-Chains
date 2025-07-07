@@ -157,7 +157,7 @@ public class ItemListScreen extends MenuScreen {
       final int quantity = getInventoryEntryQuantity(isItem ? (Item)entry : (Equipment)entry);
       final String itemText = I18n.translate(entry.getNameTranslationKey());
 
-      menuStack.pushScreen(new MessageBoxQuantityScreen("Discard " + itemText + " \u011d[#]?", 1, quantity, 2, result -> {
+      menuStack.pushScreen(new MessageBoxQuantityScreen("Discard " + itemText + '?', 1, quantity, 2, result -> {
         this.discard(result, list, inv);
       }));
     }
@@ -167,7 +167,7 @@ public class ItemListScreen extends MenuScreen {
     if(result.messageBoxResult == MessageBoxResult.YES) {
       final RegistryEntry entry = (RegistryEntry)list.getSelectedItem().item_00;
 
-      for (int i = 0; i < result.quantity; i++) {
+      for (int i = 0; i < result.intValue; i++) {
         final int index = getFirstIndexOfInventoryEntry(entry);
         inv.remove(index);
       }

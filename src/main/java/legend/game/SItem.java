@@ -53,6 +53,7 @@ import org.legendofdragoon.modloader.registries.RegistryId;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -1791,8 +1792,8 @@ public final class SItem {
         if(messageBox.text_00 != null) {
           y -= messageBox.text_00.length * 12 / 2;
 
-          for(final String line : messageBox.text_00) {
-            renderText(line, x, y, UI_TEXT_CENTERED);
+          for(int i = 0; i < messageBox.text_00.length; i ++) {
+            renderText(messageBox.text_00[i], x, y, messageBox.fonts[i]);
             y += 12;
           }
 
@@ -1887,8 +1888,16 @@ public final class SItem {
   public static void setMessageBoxText(final MessageBox20 messageBox, @Nullable final String text) {
     if(text != null) {
       messageBox.text_00 = text.split("\n");
+      messageBox.fonts = new FontOptions[messageBox.text_00.length];
+      Arrays.fill(messageBox.fonts, UI_TEXT_CENTERED);
     } else {
       messageBox.text_00 = null;
+    }
+  }
+
+  public static void setMessageBoxFontOptions(final MessageBox20 messageBox, final int lineIndex, final FontOptions font) {
+    if(lineIndex < messageBox.text_00.length) {
+      messageBox.fonts[lineIndex] = font;
     }
   }
 

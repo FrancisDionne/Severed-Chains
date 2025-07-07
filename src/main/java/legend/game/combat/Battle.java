@@ -267,8 +267,8 @@ import static legend.game.Scus94491BpeSegment_800c.lightColourMatrix_800c3508;
 import static legend.game.Scus94491BpeSegment_800c.lightDirectionMatrix_800c34e8;
 import static legend.game.Scus94491BpeSegment_800c.sequenceData_800c4ac8;
 import static legend.game.combat.Monsters.enemyRewards_80112868;
+import static legend.game.combat.Monsters.getMonsterStats_8010ba98;
 import static legend.game.combat.Monsters.monsterNames_80112068;
-import static legend.game.combat.Monsters.monsterStats_8010ba98;
 import static legend.game.combat.SBtld._8011517c;
 import static legend.game.combat.SBtld.loadAdditions;
 import static legend.game.combat.SEffe.addGenericAttachment;
@@ -8395,7 +8395,7 @@ public class Battle extends EngineState {
     this.monsterCount_800c6b9c++;
 
     //LAB_800eefcc
-    final MonsterStats1c monsterStats = monsterStats_8010ba98[monster.charId_272];
+    final MonsterStats1c monsterStats = getMonsterStats_8010ba98()[monster.charId_272];
 
     final MonsterStatsEvent statsEvent = EVENTS.postEvent(new MonsterStatsEvent(monster.charId_272));
 

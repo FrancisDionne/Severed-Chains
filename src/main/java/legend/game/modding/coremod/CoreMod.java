@@ -30,6 +30,7 @@ import legend.game.modding.coremod.config.AdditionOverlaySizeConfigEntry;
 import legend.game.modding.coremod.config.AllowWidescreenConfigEntry;
 import legend.game.modding.coremod.config.AudioDeviceConfig;
 import legend.game.modding.coremod.config.AutoTextDelayConfigEntry;
+import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.modding.coremod.config.BattleGroupConfigEntry;
 import legend.game.modding.coremod.config.BattleTransitionModeConfigEntry;
 import legend.game.modding.coremod.config.ControllerKeybindsConfigEntry;
@@ -147,6 +148,7 @@ public class CoreMod {
   public static final RegistryDelegate<SecondaryCharacterXpMultiplierConfigEntry> SECONDARY_CHARACTER_XP_MULTIPLIER_CONFIG = register("secondary_character_xp_multiplier", SecondaryCharacterXpMultiplierConfigEntry::new);
   public static final RegistryDelegate<BattleTransitionModeConfigEntry> BATTLE_TRANSITION_MODE_CONFIG = register("battle_transition_mode", BattleTransitionModeConfigEntry::new);
   public static final RegistryDelegate<PreferredBattleCameraAngleConfigEntry> PREFERRED_BATTLE_CAMERA_ANGLE = register("preferred_battle_camera_angle", PreferredBattleCameraAngleConfigEntry::new);
+  public static final RegistryDelegate<BattleDifficultyConfigEntry> BATTLE_DIFFICULTY = register("battle_difficulty", BattleDifficultyConfigEntry::new);
   public static final RegistryDelegate<FooterActionColorConfigEntry> FOOTER_ACTION_COLOR_CONFIG = CONFIG_REGISTRAR.register("footer_action_color", FooterActionColorConfigEntry::new);
   public static final RegistryDelegate<TurboToggleConfig> TURBO_TOGGLE_CONFIG = CONFIG_REGISTRAR.register("turbo_toggle", TurboToggleConfig::new);
   public static final RegistryDelegate<IconSetConfigEntry> ICON_SET = CONFIG_REGISTRAR.register("icon_set", IconSetConfigEntry::new);

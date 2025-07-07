@@ -18,7 +18,7 @@ public final class DiscordRichPresence {
   public DiscordRichPresence() {
     this.activity = new Activity();
     this.activity.timestamps().setStart(Instant.now());
-    this.activity.assets().setLargeImage("https://legendofdragoon.org/discord-int/disco.png");
+    this.activity.assets().setLargeImage("https://s14.gifyu.com/images/bK2ck.png");
   }
 
   public void tick() {

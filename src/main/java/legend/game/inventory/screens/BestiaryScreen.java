@@ -10,11 +10,12 @@ import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
 import legend.game.characters.Element;
 import legend.game.combat.types.EnemyRewards08;
-import legend.game.combat.types.MonsterStats1c;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.combat.ui.UiBox;
 import legend.game.i18n.I18n;
+import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.events.battle.MonsterStatsEvent;
 import legend.game.statistics.Statistics;
 import legend.game.types.Translucency;
 import legend.game.wmap.MapMarker;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.FUN_801034cc;
 import static legend.game.SItem.allocateUiElement;
@@ -41,7 +43,6 @@ import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.combat.Monsters.enemyRewards_80112868;
 import static legend.game.combat.Monsters.monsterNames_80112068;
-import static legend.game.combat.Monsters.monsterStats_8010ba98;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
@@ -60,7 +61,7 @@ public class BestiaryScreen extends MenuScreen {
     public int entryNumber;
     public int charId;
     public String location;
-    public MonsterStats1c stats;
+    public MonsterStatsEvent stats;
     public String lore;
     public int kill;
     public int rank;
@@ -72,13 +73,13 @@ public class BestiaryScreen extends MenuScreen {
 
     public BestiaryEntry(final BestiaryScreen bestiary, final int charId, final int subEntryParentId, final int maxKill, @Nullable final String name, final String map, final String region, final String lore) {
       this.charId = charId;
-      this.stats = monsterStats_8010ba98[charId];
+      this.stats = new MonsterStatsEvent(charId);
       this.lore = devMode ? lore : "";
       this.name = name == null ? monsterNames_80112068[this.charId] : name;
       this.kill = Statistics.getMonsterKill(this.charId);
       this.maxKill = maxKill;
 
-      final int[] elementRGB = BestiaryScreen.getElementBackgroundRGB(this.stats.elementFlag_0f);
+      final int[] elementRGB = BestiaryScreen.getElementBackgroundRGB(this.stats.elementFlag.flag);
       this.elementRGB = new float[] { elementRGB[0] / 255f, elementRGB[1] / 255f, elementRGB[2] / 255f, elementRGB[3] / 100f * 0.8f, elementRGB[4] / 255f, elementRGB[5] / 255f, elementRGB[6] / 255f, elementRGB[7] / 100f * 1f};
 
       if(subEntryParentId > -1) {
@@ -138,6 +139,7 @@ public class BestiaryScreen extends MenuScreen {
   private UiBox listBox;
   private final WMapModelAndAnimData258 modelAndAnimData_800c66a8;
   private final NumberFormat nf = new DecimalFormat("000");
+  private final String battleDifficulty = I18n.translate("lod_core.config." + CoreMod.BATTLE_DIFFICULTY.getId().entryId() + '.' + CONFIG.getConfig(CoreMod.BATTLE_DIFFICULTY.get()).name());
 
   private final FontOptions headerFont;
   private final FontOptions headerNumberFont;
@@ -159,6 +161,7 @@ public class BestiaryScreen extends MenuScreen {
   private final FontOptions listTotalPerfectFont;
   private final FontOptions sortFont;
   private final FontOptions gemFont;
+  private final FontOptions difficultyFont;
 
   private int subEntryArrowTick;
   private float currentBoxOffsetX;
@@ -206,21 +209,22 @@ public class BestiaryScreen extends MenuScreen {
     this.listTotalPerfectFont = new FontOptions().colour(TextColour.LIGHT_GOLD).shadowColour(TextColour.DARKER_GREY).size(0.55f).horizontalAlign(HorizontalAlign.RIGHT);
     this.sortFont = new FontOptions().colour(TextColour.YELLOW).shadowColour(TextColour.DARKER_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
     this.gemFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.5f).horizontalAlign(HorizontalAlign.CENTRE);
+    this.difficultyFont = new FontOptions().colour(TextColour.LIGHTER_GREY).shadowColour(TextColour.DARKER_GREY).size(0.4f).horizontalAlign(HorizontalAlign.LEFT);
 
     this.textures = new Texture[] {
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics.png")),  //0
-      Texture.png(Path.of("gfx", "ui", "action_attack.png")),  //1
-      Texture.png(Path.of("gfx", "ui", "action_guard.png")),   //2
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\black.png")),   //3
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\highlight.png")),   //4
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics.png")), //0
+      Texture.png(Path.of("gfx", "ui", "action_attack.png")), //1
+      Texture.png(Path.of("gfx", "ui", "action_guard.png")),  //2
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\black.png")),     //3
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\highlight.png")), //4
       Texture.png(Path.of("gfx", "ui", "arrow_blue_up.png")),    //5
       Texture.png(Path.of("gfx", "ui", "arrow_blue_down.png")),  //6
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\list_underline.png")),   //7
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\white.png")),   //8
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics_frames.png")),  //9
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\rank_gem.png")),   //10
-      Texture.png(Path.of("gfx", "ui", "arrow_up.png")),    //11
-      Texture.png(Path.of("gfx", "ui", "arrow_down.png")),  //12
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\list_underline.png")), //7
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\white.png")), //8
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics_frames.png")), //9
+      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\rank_gem.png")), //10
+      Texture.png(Path.of("gfx", "ui", "arrow_up.png")),   //11
+      Texture.png(Path.of("gfx", "ui", "arrow_down.png")), //12
     };
 
     this.entryIndex = 0;
@@ -471,7 +475,7 @@ public class BestiaryScreen extends MenuScreen {
       this.monster = monster;
     }
 
-    this.headerTexture = Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\header_element_" + this.getElement(this.monster.stats.elementFlag_0f).getRegistryId().entryId() + ".png"));
+    this.headerTexture = Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\header_element_" + this.getElement(this.monster.stats.elementFlag.flag).getRegistryId().entryId() + ".png"));
 
     try {
       this.modelTexture = Texture.png(Path.of("gfx", "models", this.monster.charId + ".png"));
@@ -517,6 +521,8 @@ public class BestiaryScreen extends MenuScreen {
         .alpha(this.monster.elementRGB[3])
         .translucency(Translucency.HALF_B_PLUS_HALF_F);
     }
+
+    renderText("Difficulty: " + this.battleDifficulty, 0.5f, 235f, this.difficultyFont, 127);
   }
 
   private void renderModel() {
@@ -621,48 +627,50 @@ public class BestiaryScreen extends MenuScreen {
     x = 272;
     y = 45.4f - 11.45f;
 
-    if((this.monster.stats.specialEffectFlag_0d & 0x4) == 0) { //Check for no Magical Resist
-      if(this.monster.stats.elementalImmunityFlag_10 > 0) {
+    if((this.monster.stats.specialEffectFlag & 0x4) == 0) { //Check for no Magical Resist
+      for (final Element e : this.monster.stats.elementalImmunityFlag) {
         y += 11.45f;
-        this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 100, false);
-      } else if(this.monster.stats.elementFlag_0f != 8) {
-        y += 11.45f;
-        this.renderElementMultipliers(this.monster.stats.elementFlag_0f, x, y, xOffset, 50, false);
+        this.renderElementMultipliers(e.flag, x, y, xOffset, 100, false);
       }
 
-      final int counterElement = this.getCounterElement(this.monster.stats.elementFlag_0f);
+      if(this.monster.stats.elementFlag.flag != 8 && !this.monster.stats.elementalImmunityFlag.contains(this.monster.stats.elementFlag)) {
+        y += 11.45f;
+        this.renderElementMultipliers(this.monster.stats.elementFlag.flag, x, y, xOffset, 50, false);
+      }
+
+      final int counterElement = this.getCounterElement(this.monster.stats.elementFlag.flag);
       if(counterElement != 0) {
         y += 11.45f;
         this.renderElementMultipliers(counterElement, x, y, xOffset, 50, true);
       }
     }
 
-    if((this.monster.stats.specialEffectFlag_0d & 0x8) != 0) { //Physical Resist
+    if((this.monster.stats.specialEffectFlag & 0x8) != 0) { //Physical Resist
       y += 11.45f;
       this.renderStatus("Physical", x, y, xOffset, 100, false);
     }
 
-    if((this.monster.stats.specialEffectFlag_0d & 0x4) != 0) { //Magical Resist
+    if((this.monster.stats.specialEffectFlag & 0x4) != 0) { //Magical Resist
       y += 11.45f;
       this.renderStatus("Magical", x, y, xOffset, 100, false);
     }
 
-    if((this.monster.stats.statusResistFlag_11 & 0x4) != 0) { //Confusion Resist
+    if((this.monster.stats.statusResistFlag & 0x4) != 0) { //Confusion Resist
       y += 11.45f;
       this.renderStatus("Confusion", x, y, xOffset, 999, false);
     }
 
-    if((this.monster.stats.statusResistFlag_11 & 0x8) != 0) { //Fear Resist
+    if((this.monster.stats.statusResistFlag & 0x8) != 0) { //Fear Resist
       y += 11.45f;
       this.renderStatus("Fear", x, y, xOffset, 999, false);
     }
 
-    if((this.monster.stats.statusResistFlag_11 & 0x10) != 0) { //Stun Resist
+    if((this.monster.stats.statusResistFlag & 0x10) != 0) { //Stun Resist
       y += 11.45f;
       this.renderStatus("Stun", x, y, xOffset, 999, false);
     }
 
-    if((this.monster.stats.statusResistFlag_11 & 0x80) != 0) { //Poison Resist
+    if((this.monster.stats.statusResistFlag & 0x80) != 0) { //Poison Resist
       y += 11.45f;
       this.renderStatus("Poison", x, y, xOffset, 999, false);
     }
@@ -908,14 +916,14 @@ public class BestiaryScreen extends MenuScreen {
 
   private int getStat(final int statIndex) {
     return switch(statIndex) {
-      case 0 -> this.monster.stats.hp_00;
-      case 1 -> this.monster.stats.attack_04;
-      case 2 -> this.monster.stats.defence_09;
-      case 3 -> this.monster.stats.magicAttack_06;
-      case 4 -> this.monster.stats.magicDefence_0a;
-      case 5 -> this.monster.stats.speed_08;
-      case 6 -> this.monster.stats.attackAvoid_0b;
-      case 7 -> this.monster.stats.magicAvoid_0c;
+      case 0 -> this.monster.stats.hp;
+      case 1 -> this.monster.stats.attack;
+      case 2 -> this.monster.stats.defence;
+      case 3 -> this.monster.stats.magicAttack;
+      case 4 -> this.monster.stats.magicDefence;
+      case 5 -> this.monster.stats.speed;
+      case 6 -> this.monster.stats.attackAvoid;
+      case 7 -> this.monster.stats.magicAvoid;
       default -> 0;
     };
   }
@@ -1000,7 +1008,7 @@ public class BestiaryScreen extends MenuScreen {
         .collect(Collectors.toList());
       case 2 -> this.bestiaryEntries.stream()
         .sorted(Comparator.comparingInt(o -> o.entryNumber))
-        .sorted(Comparator.comparingInt(o -> o.stats.elementFlag_0f))
+        .sorted(Comparator.comparingInt(o -> o.stats.elementFlag.flag))
         .collect(Collectors.toList());
       case 3 -> this.bestiaryEntries.stream()
         .sorted(Comparator.comparingInt(o -> o.entryNumber))

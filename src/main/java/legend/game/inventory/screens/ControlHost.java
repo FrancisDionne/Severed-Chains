@@ -73,6 +73,11 @@ public abstract class ControlHost implements Iterable<Control> {
     }
   }
 
+  protected void clearControls() {
+    this.delete();
+    this.controls.clear();
+  }
+
   public <T extends Control> Optional<T> findControl(final Class<T> type, final Predicate<T> predicate) {
     return this.controls.stream()
       .filter(type::isInstance)

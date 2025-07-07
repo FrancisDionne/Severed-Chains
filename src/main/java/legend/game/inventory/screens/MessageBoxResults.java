@@ -4,7 +4,7 @@ import legend.game.types.MessageBoxResult;
 
 public class MessageBoxResults {
   public MessageBoxResult messageBoxResult;
-  public int quantity;
+  public int intValue;
 
   MessageBoxResults(final MessageBoxResult result) {
     this.messageBoxResult = result;
@@ -12,6 +12,6 @@ public class MessageBoxResults {
 
   MessageBoxResults(final MessageBoxResult result, final int quantity) {
     this.messageBoxResult = result;
-    this.quantity = quantity;
+    this.intValue = quantity;
   }
 }

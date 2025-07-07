@@ -1,5 +1,6 @@
 package legend.game.modding.coremod.config;
 
+import legend.game.combat.BattleDifficulty;
 import legend.game.combat.PreferredBattleCameraAngle;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigStorageLocation;
