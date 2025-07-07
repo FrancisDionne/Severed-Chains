@@ -24,12 +24,12 @@ public class AdditionRandomModeConfig extends BoolConfigEntry {
     int additionIndex = -1;
 
     if(!additions.isEmpty()) {
-      List<RandomAdditionBag> bag = new ArrayList<>();
+      List<RandomAdditionBagEntry> bag = new ArrayList<>();
       final CharacterData2c charData = gameState_800babc8.charData_32c[charId];
       int highestXp = 0;
 
       for(final int additionSlot : additions.keySet()) {
-        bag.add(new RandomAdditionBag(additionSlot, charData.additionXp_22[additionSlot]));
+        bag.add(new RandomAdditionBagEntry(additionSlot, charData.additionXp_22[additionSlot]));
         highestXp = Math.max(highestXp, charData.additionXp_22[additionSlot]);
       }
 
@@ -40,37 +40,37 @@ public class AdditionRandomModeConfig extends BoolConfigEntry {
       int lastWeight = 0;
       int currentWeight = 0;
       for(int i = bag.size() - 1; i >= 0; i--) {
-        final RandomAdditionBag addition = bag.get(i);
-        if(addition.weight != lastXp) {
-          lastXp = addition.weight;
+        final RandomAdditionBagEntry entry = bag.get(i);
+        if(entry.weight != lastXp) {
+          lastXp = entry.weight;
           currentWeight++;
           final float modifier = (1 + (float)(additions.size() - i) / additions.size()) * 0.75f;
-          addition.weight = Math.max(1, Math.round(currentWeight * modifier));
+          entry.weight = Math.max(1, Math.round(currentWeight * modifier));
         } else {
-          addition.weight = lastWeight;
+          entry.weight = lastWeight;
         }
-        lastWeight = addition.weight;
-        sum += addition.weight;
+        lastWeight = entry.weight;
+        sum += entry.weight;
       }
 
       final int randomAddition = new Random().nextInt(sum);
       currentWeight = 0;
-      for(final RandomAdditionBag addition : bag) {
-        if(randomAddition < currentWeight + addition.weight) {
-          additionIndex = addition.additionSlot;
+      for(final RandomAdditionBagEntry entry : bag) {
+        if(randomAddition < currentWeight + entry.weight) {
+          additionIndex = entry.additionSlot;
           break;
         }
-        currentWeight += addition.weight;
+        currentWeight += entry.weight;
       }
     }
 
     return additionIndex;
   }
 
-  private static class RandomAdditionBag {
+  private static class RandomAdditionBagEntry {
     public final int additionSlot;
     public int weight;
-    private RandomAdditionBag(final int additionSlot, final int weight) {
+    private RandomAdditionBagEntry(final int additionSlot, final int weight) {
       this.additionSlot = additionSlot;
       this.weight = weight;
     }
