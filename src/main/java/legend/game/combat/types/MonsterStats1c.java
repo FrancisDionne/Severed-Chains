@@ -56,5 +56,7 @@ public class MonsterStats1c {
     this.middleOffsetY_19 = middleOffsetY;
     this._1a = _1a;
     this._1b = _1b;
+
+    BattleDifficultyConfigEntry.adjustMonsterStats(this);
   }
 }

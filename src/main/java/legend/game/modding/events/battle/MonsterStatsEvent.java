@@ -2,12 +2,10 @@ package legend.game.modding.events.battle;
 
 import legend.game.characters.Element;
 import legend.game.characters.ElementSet;
-import legend.game.combat.Monsters;
 import legend.game.combat.types.MonsterStats1c;
-import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import org.legendofdragoon.modloader.events.Event;
 
-import static legend.game.combat.Monsters.monsterStats_8010ba98;
+import static legend.game.combat.Monsters.getMonsterStats_8010ba98;
 
 public class MonsterStatsEvent extends Event {
   public final int enemyId;
@@ -35,8 +33,9 @@ public class MonsterStatsEvent extends Event {
   public MonsterStatsEvent(final int enemyId) {
     this.enemyId = enemyId;
 
-    final MonsterStats1c monsterStats = monsterStats_8010ba98[enemyId];
+    final MonsterStats1c monsterStats = getMonsterStats_8010ba98()[enemyId];
     this.hp = monsterStats.hp_00;
+    this.maxHp = monsterStats.hp_00;
     this.specialEffectFlag = monsterStats.specialEffectFlag_0d;
     this.elementFlag = Element.fromFlag(monsterStats.elementFlag_0f).get();
     this.elementalImmunityFlag.unpack(monsterStats.elementalImmunityFlag_10);
@@ -48,9 +47,5 @@ public class MonsterStatsEvent extends Event {
     this.magicDefence = monsterStats.magicDefence_0a;
     this.attackAvoid = monsterStats.attackAvoid_0b;
     this.magicAvoid = monsterStats.magicAvoid_0c;
-
-    BattleDifficultyConfigEntry.adjustMonsterStats(this);
-
-    this.maxHp = monsterStats.hp_00;
   }
 }

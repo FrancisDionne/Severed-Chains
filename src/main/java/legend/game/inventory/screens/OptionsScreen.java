@@ -15,6 +15,7 @@ import legend.game.combat.BattleTransitionMode;
 import legend.game.combat.DragoonAdditionDifficulty;
 import legend.game.combat.DragoonAdditionMode;
 import legend.game.combat.MashMode;
+import legend.game.combat.Monsters;
 import legend.game.combat.PreferredBattleCameraAngle;
 import legend.game.combat.effects.TransformationMode;
 import legend.game.combat.ui.AdditionOverlayMode;
@@ -317,6 +318,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
         break;
     }
 
+    Monsters.loadMonsters();
     this.reloadControls();
   }
 
