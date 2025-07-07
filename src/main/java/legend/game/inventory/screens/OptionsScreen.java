@@ -246,7 +246,6 @@ public class OptionsScreen extends VerticalLayoutScreen {
       CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 50);
       CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
       CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), true);
-      CONFIG.setConfig(CoreMod.TURBO_TOGGLE_CONFIG.get(), false);
 
       CONFIG.setConfig(CoreMod.ADDITION_MODE_CONFIG.get(), AdditionMode.NORMAL);
       CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.NORMAL);
