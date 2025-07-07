@@ -23,7 +23,7 @@ public class AdditionRandomModeConfig extends BoolConfigEntry {
     final HashMap<Integer, String> additions = AdditionListMenu.getAdditions(charId);
     int additionIndex = -1;
 
-    if(!additions.isEmpty()) {
+    if(additions.size() > 1) {
       List<RandomAdditionBagEntry> bag = new ArrayList<>();
       final CharacterData2c charData = gameState_800babc8.charData_32c[charId];
       int highestXp = 0;
