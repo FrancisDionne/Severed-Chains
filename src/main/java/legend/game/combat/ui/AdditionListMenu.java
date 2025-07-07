@@ -1,7 +1,6 @@
 package legend.game.combat.ui;
 
 import legend.core.Config;
-import legend.core.Random;
 import legend.game.combat.AdditionConfigs;
 import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.inventory.screens.FontOptions;
@@ -15,6 +14,7 @@ import legend.game.types.MenuAdditionInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static legend.game.SItem.additions_80114070;
@@ -115,11 +115,11 @@ public class AdditionListMenu extends ListMenu {
   private void prepareAdditionList(final int charId) {
     //LAB_800f83dc
     this.additions.clear();
-    this.additions.addAll(getAdditions(charId));
+    this.additions.addAll(getAdditions(charId).values());
   }
 
-  public static List<String> getAdditions(final int charId){
-    final ArrayList<String> additions = new ArrayList<>();
+  public static HashMap<Integer, String> getAdditions(final int charId){
+    final HashMap<Integer, String> additions = new HashMap<>();
     for(int additionSlot = 0; additionSlot < additionCounts_8004f5c0[charId]; additionSlot++) {
       final int additionOffset = additionOffsets_8004f5ac[charId];
 
@@ -127,10 +127,10 @@ public class AdditionListMenu extends ListMenu {
 
       if(level == -1 && (gameState_800babc8.charData_32c[charId].partyFlags_04 & 0x40) != 0) {
         final String additionName = AdditionConfigs.additionNames_800fa8d4[additionOffset + additionSlot];
-        additions.add(additionName);
+        additions.put(additionSlot, additionName);
       } else if(level > 0 && level <= gameState_800babc8.charData_32c[charId].level_12) {
         final String additionName = AdditionConfigs.additionNames_800fa8d4[additionOffset + additionSlot];
-        additions.add(additionName);
+        additions.put(additionSlot, additionName);
 
         if(gameState_800babc8.charData_32c[charId].additionLevels_1a[additionSlot] == 0) {
           gameState_800babc8.charData_32c[charId].additionLevels_1a[additionSlot] = 1;

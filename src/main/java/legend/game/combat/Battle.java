@@ -106,6 +106,7 @@ import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.PostBattleScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
+import legend.game.modding.coremod.config.AdditionRandomModeConfig;
 import legend.game.modding.events.battle.BattleEndedEvent;
 import legend.game.modding.events.battle.BattleEntityTurnEvent;
 import legend.game.modding.events.battle.BattleStartedEvent;
@@ -8300,9 +8301,8 @@ public class Battle extends EngineState {
       if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 instanceof final PlayerBattleEntity player) {
         //Addition Frenzy Mode - Changes addition to a random one every time the player attacks
         if(!player.isDragoon() && CONFIG.getConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get())) {
-          final int additionCount = AdditionListMenu.getAdditions(player.charId_272).size();
-          if(additionCount > 0) {
-            final int additionIndex = new Random().nextInt(AdditionListMenu.getAdditions(player.charId_272).size());
+          final int additionIndex = AdditionRandomModeConfig.getRandomAddition(player.charId_272);
+          if(additionIndex > -1) {
             AdditionListMenu.setAddition(player, additionIndex, this.hud);
           }
         }
