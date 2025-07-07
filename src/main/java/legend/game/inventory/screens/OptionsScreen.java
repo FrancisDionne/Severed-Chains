@@ -27,7 +27,6 @@ import legend.game.inventory.IconSet;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Label;
 import legend.game.modding.coremod.CoreMod;
-import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigCollection;
 import legend.game.saves.ConfigEntry;
@@ -305,6 +304,8 @@ public class OptionsScreen extends VerticalLayoutScreen {
         break;
       case 1:  //Veteran
         CONFIG.setConfig(CoreMod.BATTLE_DIFFICULTY.get(), BattleDifficulty.HARD);
+
+        CONFIG.setConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get(), AdditionCounterDifficulty.HARD);
         CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.HARD);
         break;
       case 2:  //Zealous
@@ -315,6 +316,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
         CONFIG.setConfig(CoreMod.TURBO_TOGGLE_CONFIG.get(), true);
 
         CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_CONFIG.get(), AdditionOverlayMode.OFF);
+        CONFIG.setConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get(), AdditionCounterDifficulty.HARD);
         CONFIG.setConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get(), true);
         CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.HARD);
         break;
