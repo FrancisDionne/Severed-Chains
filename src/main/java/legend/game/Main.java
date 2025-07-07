@@ -72,7 +72,7 @@ public final class Main {
         LOGGER.error("We have attempted to generate a recovery save. You can load it next time you run Severed Chains.");
       }
 
-      LOGGER.error("Please copy this crash log and send it to Senerio in the modding Quality of Life Improvements channel in the Legend of Dragoon Discord server.");
+      LOGGER.error("Please copy this crash log and send it to @Senerio in the modding 'Quality of Life+ Build/Mod' channel in the Legend of Dragoon Discord server.");
       LOGGER.error("https://discord.gg/legendofdragoon");
 
       for(final String message : messages) {
@@ -82,7 +82,7 @@ public final class Main {
       LOGGER.error("----------------------------------------------------------------------------");
       LOGGER.error("Stack trace:", e);
 
-      LOGGER.error("Please copy this crash log and send it to Senerio in the modding Quality of Life Improvements channel in the Legend of Dragoon Discord server.");
+      LOGGER.error("Please copy this crash log and send it to @Senerio in the modding 'Quality of Life+ Build/Mod' channel in the Legend of Dragoon Discord server.");
       LOGGER.error("https://discord.gg/legendofdragoon");
 
       LogManager.shutdown();
