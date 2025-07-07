@@ -246,6 +246,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
       CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 50);
       CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
       CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), true);
+      CONFIG.setConfig(CoreMod.TURBO_TOGGLE_CONFIG.get(), false);
 
       CONFIG.setConfig(CoreMod.ADDITION_MODE_CONFIG.get(), AdditionMode.NORMAL);
       CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.NORMAL);
@@ -275,6 +276,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
         CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 50);
         CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), false);
         CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), false);
+        CONFIG.setConfig(CoreMod.TURBO_TOGGLE_CONFIG.get(), false);
 
         CONFIG.setConfig(CoreMod.ADDITION_MODE_CONFIG.get(), AdditionMode.NORMAL);
         CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.NORMAL);
@@ -311,6 +313,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
         CONFIG.setConfig(CoreMod.SECONDARY_CHARACTER_XP_MULTIPLIER_CONFIG.get(), 0.25f);
         CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 30);
         CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), false);
+        CONFIG.setConfig(CoreMod.TURBO_TOGGLE_CONFIG.get(), true);
 
         CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_CONFIG.get(), AdditionOverlayMode.OFF);
         CONFIG.setConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get(), true);
