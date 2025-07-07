@@ -14,6 +14,7 @@ import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.combat.ui.UiBox;
 import legend.game.i18n.I18n;
+import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.battle.MonsterStatsEvent;
 import legend.game.statistics.Statistics;
 import legend.game.types.Translucency;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.FUN_801034cc;
 import static legend.game.SItem.allocateUiElement;
@@ -137,6 +139,7 @@ public class BestiaryScreen extends MenuScreen {
   private UiBox listBox;
   private final WMapModelAndAnimData258 modelAndAnimData_800c66a8;
   private final NumberFormat nf = new DecimalFormat("000");
+  private final String battleDifficulty = I18n.translate("lod_core.config." + CoreMod.BATTLE_DIFFICULTY.getId().entryId() + '.' + CONFIG.getConfig(CoreMod.BATTLE_DIFFICULTY.get()).name());
 
   private final FontOptions headerFont;
   private final FontOptions headerNumberFont;
@@ -158,6 +161,7 @@ public class BestiaryScreen extends MenuScreen {
   private final FontOptions listTotalPerfectFont;
   private final FontOptions sortFont;
   private final FontOptions gemFont;
+  private final FontOptions difficultyFont;
 
   private int subEntryArrowTick;
   private float currentBoxOffsetX;
@@ -205,6 +209,7 @@ public class BestiaryScreen extends MenuScreen {
     this.listTotalPerfectFont = new FontOptions().colour(TextColour.LIGHT_GOLD).shadowColour(TextColour.DARKER_GREY).size(0.55f).horizontalAlign(HorizontalAlign.RIGHT);
     this.sortFont = new FontOptions().colour(TextColour.YELLOW).shadowColour(TextColour.DARKER_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
     this.gemFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.5f).horizontalAlign(HorizontalAlign.CENTRE);
+    this.difficultyFont = new FontOptions().colour(TextColour.LIGHTER_GREY).shadowColour(TextColour.DARKER_GREY).size(0.4f).horizontalAlign(HorizontalAlign.LEFT);
 
     this.textures = new Texture[] {
       Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics.png")), //0
@@ -516,6 +521,8 @@ public class BestiaryScreen extends MenuScreen {
         .alpha(this.monster.elementRGB[3])
         .translucency(Translucency.HALF_B_PLUS_HALF_F);
     }
+
+    renderText("Difficulty: " + this.battleDifficulty, 0.5f, 235f, this.difficultyFont, 127);
   }
 
   private void renderModel() {
