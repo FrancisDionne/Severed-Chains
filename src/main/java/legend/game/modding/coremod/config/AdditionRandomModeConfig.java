@@ -26,6 +26,7 @@ public class AdditionRandomModeConfig extends BoolConfigEntry {
     if(additions.size() > 1) {
       List<RandomAdditionBagEntry> bag = new ArrayList<>();
       final CharacterData2c charData = gameState_800babc8.charData_32c[charId];
+      final boolean balancedOdds = new Random().nextInt(100) < 70;
       int highestXp = 0;
 
       for(final int additionSlot : additions.keySet()) {
@@ -41,29 +42,32 @@ public class AdditionRandomModeConfig extends BoolConfigEntry {
       int currentWeight = 0;
       for(int i = bag.size() - 1; i >= 0; i--) {
         final RandomAdditionBagEntry entry = bag.get(i);
-        if(entry.weight != lastXp) {
-          lastXp = entry.weight;
-          currentWeight++;
-          final float modifier = (1 + (float)(additions.size() - i) / additions.size()) * 0.75f;
-          entry.weight = Math.max(1, Math.round(currentWeight * modifier));
+        if(balancedOdds) {
+          if(entry.weight != lastXp) {
+            lastXp = entry.weight;
+            currentWeight++;
+            final float modifier = (1 + (float)(additions.size() - i) / additions.size()) * 0.75f;
+            entry.weight = Math.max(1, Math.round(currentWeight * modifier));
+          } else {
+            entry.weight = lastWeight;
+          }
+          lastWeight = entry.weight;
         } else {
-          entry.weight = lastWeight;
+          entry.weight = 1;
         }
-        lastWeight = entry.weight;
         sum += entry.weight;
       }
 
-      final int randomAddition = new Random().nextInt(sum);
+      final int randomValue = new Random().nextInt(sum);
       currentWeight = 0;
       for(final RandomAdditionBagEntry entry : bag) {
-        if(randomAddition < currentWeight + entry.weight) {
+        if(randomValue < currentWeight + entry.weight) {
           additionIndex = entry.additionSlot;
           break;
         }
         currentWeight += entry.weight;
       }
     }
-
     return additionIndex;
   }
 
