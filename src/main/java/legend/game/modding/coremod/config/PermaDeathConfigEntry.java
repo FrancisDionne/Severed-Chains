@@ -29,7 +29,7 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
 
       //Load characters who haven't died and are available to put in party slots
       for(int i = 0; i < gameState_800babc8.charData_32c.length; i++) {
-        if(isAvailable(i) && !hasDied(i)) {
+        if(isAvailable(i, true) && !hasDied(i, true)) {
           validCharacters.add(i);
         }
       }
@@ -102,14 +102,22 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
   }
 
   public static boolean hasDied(final int charId) {
-    if(charId != -1 && CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
+    return hasDied(charId, CONFIG.getConfig(CoreMod.PERMA_DEATH.get()));
+  }
+
+  public static boolean hasDied(final int charId, final boolean permaDeathEnabled) {
+    if(permaDeathEnabled && charId != -1) {
       return Statistics.getStat(Math.abs(Statistics.Stats.TOTAL_DEATH.asInt()) + charId + 1) > 0;
     }
     return false;
   }
 
   public static boolean isAvailable(final int charId) {
-    if(CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
+    return isAvailable(charId, CONFIG.getConfig(CoreMod.PERMA_DEATH.get()));
+  }
+
+  public static boolean isAvailable(final int charId, final boolean permaDeathEnabled) {
+    if(permaDeathEnabled) {
       return gameState_800babc8.charData_32c[charId].partyFlags_04 != 0;
     }
     return true;
