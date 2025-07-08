@@ -6,6 +6,7 @@ import legend.game.combat.ui.FooterActionsHud;
 import legend.core.platform.input.InputMod;
 import legend.core.platform.input.InputAction;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.Renderable58;
 
@@ -52,6 +53,7 @@ public class CharSwapScreen extends MenuScreen {
 
   public CharSwapScreen(final Runnable unload) {
     this.unload = unload;
+    PermaDeathConfigEntry.assessParty();
   }
 
   @Override
@@ -199,7 +201,7 @@ public class CharSwapScreen extends MenuScreen {
       final ActiveStatsa0 stats = stats_800be5f8[charIndex];
       renderFourDigitNumber(x + 25, y + 57, stats.level_0e);
       renderFourDigitNumber(x + 25, y + 68, stats.dlevel_0f);
-      renderFourDigitHp(x + 25, y + 79, stats.hp_04, stats.maxHp_66);
+      renderFourDigitHp(x + 25, y + 79, PermaDeathConfigEntry.hasDied(charIndex) ? 0 : stats.hp_04, stats.maxHp_66);
       renderFourDigitNumber(x + 25, y + 90, stats.mp_06);
     }
   }
@@ -414,26 +416,30 @@ public class CharSwapScreen extends MenuScreen {
   }
 
   private void menuStage3Select() {
-    this.secondaryCharHighlight.x_40 = this.getSecondaryCharX(this.secondaryCharIndex);
-    this.secondaryCharHighlight.y_44 = this.getSecondaryCharY(this.secondaryCharIndex);
-
-    int charCount = 0;
-    for(int charSlot = 0; charSlot < 3; charSlot++) {
-      if(gameState_800babc8.charIds_88[charSlot] != -1) {
-        charCount++;
-      }
-    }
-
     final int secondaryCharIndex = secondaryCharIds_800bdbf8[this.secondaryCharIndex];
 
-    if((CONFIG.getConfig(CoreMod.UNLOCK_PARTY_CONFIG.get()) && charCount >= 2) || secondaryCharIndex != -1 && (gameState_800babc8.charData_32c[secondaryCharIndex].partyFlags_04 & 0x2) != 0) {
-      playMenuSound(2);
-      final int charIndex = gameState_800babc8.charIds_88[this.primaryCharIndex];
-      gameState_800babc8.charIds_88[this.primaryCharIndex] = secondaryCharIndex;
-      secondaryCharIds_800bdbf8[this.secondaryCharIndex] = charIndex;
-      this.loadingStage = 1;
-    } else {
+    if(PermaDeathConfigEntry.hasDied(secondaryCharIndex)) {
       playMenuSound(40);
+    } else {
+      this.secondaryCharHighlight.x_40 = this.getSecondaryCharX(this.secondaryCharIndex);
+      this.secondaryCharHighlight.y_44 = this.getSecondaryCharY(this.secondaryCharIndex);
+
+      int charCount = 0;
+      for(int charSlot = 0; charSlot < 3; charSlot++) {
+        if(gameState_800babc8.charIds_88[charSlot] != -1) {
+          charCount++;
+        }
+      }
+
+      if((CONFIG.getConfig(CoreMod.UNLOCK_PARTY_CONFIG.get()) && charCount >= 2) || secondaryCharIndex != -1 && (gameState_800babc8.charData_32c[secondaryCharIndex].partyFlags_04 & 0x2) != 0) {
+        playMenuSound(2);
+        final int charIndex = gameState_800babc8.charIds_88[this.primaryCharIndex];
+        gameState_800babc8.charIds_88[this.primaryCharIndex] = secondaryCharIndex;
+        secondaryCharIds_800bdbf8[this.secondaryCharIndex] = charIndex;
+        this.loadingStage = 1;
+      } else {
+        playMenuSound(40);
+      }
     }
   }
 

@@ -107,6 +107,7 @@ import legend.game.inventory.screens.PostBattleScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionRandomModeConfig;
+import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.modding.events.battle.BattleEndedEvent;
 import legend.game.modding.events.battle.BattleEntityTurnEvent;
 import legend.game.modding.events.battle.BattleStartedEvent;
@@ -1487,6 +1488,8 @@ public class Battle extends EngineState {
 
   @Method(0x800c772cL)
   public void battleInitiateAndPreload_800c772c() {
+    PermaDeathConfigEntry.assessParty();
+
     this.FUN_800c8e48();
 
     battleLoaded_800bc94c = true;
@@ -1817,6 +1820,8 @@ public class Battle extends EngineState {
       //LAB_800c7d30
       postBattleAction_800bc974 = 4;
     }
+
+    PermaDeathConfigEntry.assessParty();
   }
 
   @Method(0x800c7da8L)
