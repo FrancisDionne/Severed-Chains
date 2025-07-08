@@ -5,7 +5,6 @@ import legend.game.saves.BoolConfigEntry;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigStorageLocation;
 import legend.game.statistics.Statistics;
-import legend.game.types.CharacterData2c;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,21 +25,19 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
 
   public static boolean assessParty() {
     if(CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
-      final List<CharacterPermaDeathStatus> validCharacters = new ArrayList<>();
+      final List<Integer> validCharacters = new ArrayList<>();
 
       //Load characters who haven't died and are available to put in party slots
       for(int i = 0; i < gameState_800babc8.charData_32c.length; i++) {
-        final CharacterPermaDeathStatus character = new CharacterPermaDeathStatus(i);
-        if(character.isAvailable && !character.hasDied) {
-          validCharacters.add(character);
+        if(isAvailable(i) && !hasDied(i)) {
+          validCharacters.add(i);
         }
       }
 
       //Go through the party slots to find out who died and should be removed
       for(int i = 0; i < gameState_800babc8.charIds_88.length; i++) {
         final int charId = gameState_800babc8.charIds_88[i];
-        final CharacterPermaDeathStatus character = find(validCharacters, charId);
-        if(character == null) {
+        if(!validCharacters.contains(charId)) {
           gameState_800babc8.charIds_88[i] = -1; //Remove from party slot if died
         }
       }
@@ -80,7 +77,7 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
 
       //Check that the 1st slot in fact has a character, if not slot in the first valid character
       if(gameState_800babc8.charIds_88[0] == -1 && !validCharacters.isEmpty()) {
-        gameState_800babc8.charIds_88[0] = validCharacters.getFirst().charId;
+        gameState_800babc8.charIds_88[0] = validCharacters.getFirst();
       }
 
       return checkCharIds(true);
@@ -88,30 +85,10 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
     return true;
   }
 
-  private static class CharacterPermaDeathStatus{
-    public int charId;
-    public boolean isAvailable;
-    public boolean hasDied;
-    public CharacterPermaDeathStatus(final int charId) {
-      this.charId = charId;
-      this.isAvailable = gameState_800babc8.charData_32c[charId].partyFlags_04 != 0;
-      this.hasDied = Statistics.getStat(Math.abs(Statistics.Stats.TOTAL_DEATH.asInt()) + charId + 1) > 0;
-    }
-  }
-
-  private static CharacterPermaDeathStatus find(final List<CharacterPermaDeathStatus> list, final int charId) {
-    for(final CharacterPermaDeathStatus character : list) {
-      if(character.charId == charId) {
-        return character;
-      }
-    }
-    return null;
-  }
-
-  private static void remove(final List<CharacterPermaDeathStatus> list, final int charId) {
-    final CharacterPermaDeathStatus character = find(list, charId);
-    if(character != null) {
-      list.remove(character);
+  private static void remove(final List<Integer> list, final int charId) {
+    final int index = list.indexOf(charId);
+    if(index > -1) {
+      list.remove(index);
     }
   }
 
@@ -126,9 +103,15 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
 
   public static boolean hasDied(final int charId) {
     if(charId != -1 && CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
-      final CharacterPermaDeathStatus character = new CharacterPermaDeathStatus(charId);
-      return character.hasDied;
+      return Statistics.getStat(Math.abs(Statistics.Stats.TOTAL_DEATH.asInt()) + charId + 1) > 0;
     }
     return false;
+  }
+
+  public static boolean isAvailable(final int charId) {
+    if(CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
+      return gameState_800babc8.charData_32c[charId].partyFlags_04 != 0;
+    }
+    return true;
   }
 }
