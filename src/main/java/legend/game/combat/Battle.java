@@ -294,8 +294,8 @@ import static legend.game.combat.bent.BattleEntity27c.FLAG_TAKE_FORCED_TURN;
 import static legend.game.combat.environment.Ambiance.stageAmbiance_801134fc;
 import static legend.game.combat.environment.BattleCamera.UPDATE_REFPOINT;
 import static legend.game.combat.environment.BattleCamera.UPDATE_VIEWPOINT;
-import static legend.game.modding.coremod.CoreMod.ADDITION_BUTTON_MODE_CONFIG;
 import static legend.game.combat.environment.StageData.getEncounterStageData;
+import static legend.game.modding.coremod.CoreMod.ADDITION_BUTTON_MODE_CONFIG;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.REDUCE_MOTION_FLASHING_CONFIG;
@@ -3694,10 +3694,18 @@ public class Battle extends EngineState {
   public FlowControl scriptSetBentRawStat(final RunningScript<?> script) {
     final BattleEntity27c bent = (BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00;
     final BattleEntityStat stat = BattleEntityStat.fromLegacy(Math.max(0, script.params_20[2].get()));
+    final int[] storage44 = scriptStatePtrArr_800bc1c0[script.params_20[0].get()].storage_44;
+    final int value = script.params_20[1].get();
+
+    //Disables revive in combat if perma death on
+    if(PermaDeathConfigEntry.isBlockRevive(stat, bent, value, (storage44[7] & FLAG_DEAD) != 0)) {
+      storage44[7] |= FLAG_DEAD;
+      return FlowControl.CONTINUE;
+    }
 
     switch(stat) {
       case ITEM_ID -> bent.item_d4 = REGISTRIES.items.getEntry(script.params_20[1].getRegistryId()).get();
-      default -> bent.setStat(stat, script.params_20[1].get());
+      default -> bent.setStat(stat, value);
     }
 
     return FlowControl.CONTINUE;

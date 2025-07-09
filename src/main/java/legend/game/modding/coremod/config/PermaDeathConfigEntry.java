@@ -1,5 +1,8 @@
 package legend.game.modding.coremod.config;
 
+import legend.game.combat.bent.BattleEntity27c;
+import legend.game.combat.bent.BattleEntityStat;
+import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.inventory.screens.OptionsScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.BoolConfigEntry;
@@ -138,5 +141,9 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
 
   public static boolean hasNotDiedOrIsInUse(final int charId) {
     return !hasDied(charId) || isUsed(charId);
+  }
+
+  public static boolean isBlockRevive(final BattleEntityStat stat, final BattleEntity27c bent, final int value, final boolean dead) {
+    return stat == BattleEntityStat.CURRENT_HP && value != 0 && !dead && bent instanceof PlayerBattleEntity && bent.getStat(BattleEntityStat.CURRENT_HP) <= 0 && CONFIG.getConfig(CoreMod.PERMA_DEATH.get());
   }
 }
