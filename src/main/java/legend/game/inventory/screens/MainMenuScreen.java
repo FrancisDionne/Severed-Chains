@@ -1,5 +1,9 @@
 package legend.game.inventory.screens;
 
+import legend.core.QueuedModelStandard;
+import legend.core.gpu.Bpp;
+import legend.core.opengl.Obj;
+import legend.core.opengl.QuadBuilder;
 import legend.core.platform.input.InputAction;
 import legend.game.EngineStateEnum;
 import legend.game.combat.ui.FooterActionsHud;
@@ -9,7 +13,9 @@ import legend.game.inventory.screens.controls.Button;
 import legend.game.inventory.screens.controls.CharacterCard;
 import legend.game.inventory.screens.controls.DragoonSpirits;
 import legend.game.inventory.screens.controls.Glyph;
+import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
@@ -70,6 +76,14 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class MainMenuScreen extends MenuScreen {
+  private static final Matrix4f m = new Matrix4f();
+  private static final Obj quad = new QuadBuilder("MainMenuScreen Quad")
+    .size(1.0f, 1.0f)
+    .uv(0.0f, 0.0f)
+    .uvSize(1.0f, 1.0f)
+    .bpp(Bpp.BITS_24)
+    .build();
+
   private int loadingStage;
   private final Runnable unload;
 
@@ -420,6 +434,16 @@ public class MainMenuScreen extends MenuScreen {
     }
 
     renderText(name, 90, 38, UI_TEXT_CENTERED);
+
+    if(CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
+      final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+      m.translation(6 + xOffset, 215, 120);
+      m.scale(13, 12, 1);
+
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(PermaDeathConfigEntry.textures[0]);
+    }
   }
 
   private void menuEscape() {
@@ -489,10 +513,10 @@ public class MainMenuScreen extends MenuScreen {
   }
 
   private void showLoadScreen() {
-    menuStack.pushScreen(new LoadGameScreen(save -> {
+    menuStack.pushScreen(new LoadGameScreen(data -> {
       menuStack.reset();
 
-      final GameLoadedEvent event = EVENTS.postEvent(new GameLoadedEvent(save.state));
+      final GameLoadedEvent event = EVENTS.postEvent(new GameLoadedEvent(data.saveGame.state));
       _800bd7ac = true;
 
       gameState_800babc8 = event.gameState;
@@ -517,12 +541,12 @@ public class MainMenuScreen extends MenuScreen {
 
       currentEngineState_8004dd04.loadGameFromMenu(gameState_800babc8);
 
-      Statistics.load(gameState_800babc8.campaign.path, save.fileName);
+      Statistics.load(gameState_800babc8.campaign.path, data.saveGame.fileName);
     }, () -> {
       menuStack.popScreen();
       this.fadeOutArrows();
       this.loadingStage = 0;
-    }, gameState_800babc8.campaign));
+    }, new SaveCardData(gameState_800babc8.campaign, null)));
   }
 
   private void showSaveScreen() {

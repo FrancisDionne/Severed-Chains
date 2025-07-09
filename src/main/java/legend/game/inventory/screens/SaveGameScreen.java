@@ -7,6 +7,7 @@ import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.BigList;
 import legend.game.inventory.screens.controls.Glyph;
 import legend.game.inventory.screens.controls.SaveCard;
+import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.saves.SaveFailedException;
 import legend.game.saves.SavedGame;
 import legend.game.types.MessageBoxResult;
@@ -36,7 +37,7 @@ public class SaveGameScreen extends MenuScreen {
 
   private static final String Overwrite_save_8011c9e8 = "Overwrite save?";
 
-  private final BigList<SavedGame> saveList;
+  private final BigList<SaveCardData> saveList;
   private final List<SavedGame> saves;
 
   private final Runnable unload;
@@ -56,18 +57,18 @@ public class SaveGameScreen extends MenuScreen {
     final SaveCard saveCard = this.addControl(new SaveCard());
     saveCard.setPos(16, 160);
 
-    this.saveList = this.addControl(new BigList<>(savedGame -> savedGame != null ? savedGame.saveName : "<new save>"));
+    this.saveList = this.addControl(new BigList<>(data -> data.saveGame != null ? data.saveGame.saveName : "<new save>"));
     this.saveList.setPos(16, 16);
     this.saveList.setSize(360, 144);
     this.saveList.onHighlight(saveCard::setSaveData);
     this.saveList.onSelection(this::onSelection);
     this.setFocus(this.saveList);
 
-    this.saveList.addEntry(null);
+    this.saveList.addEntry(new SaveCardData(gameState_800babc8.campaign, null));
 
     this.saves = gameState_800babc8.campaign.loadAllSaves();
     for(final SavedGame save : this.saves) {
-      this.saveList.addEntry(save);
+      this.saveList.addEntry(new SaveCardData(gameState_800babc8.campaign, save));
     }
 
     this.addHotkey(I18n.translate("lod_core.ui.save_game.delete"), INPUT_ACTION_MENU_DELETE, this::menuDelete);
@@ -85,13 +86,13 @@ public class SaveGameScreen extends MenuScreen {
     FooterActionsHud.renderMenuActions(FooterActions.DELETE, null, null);
   }
 
-  private void onSelection(@Nullable final SavedGame save) {
+  private void onSelection(@Nullable final SaveCardData data) {
     playMenuSound(2);
 
-    if(save == null) {
+    if(data == null) {
       menuStack.pushScreen(new InputBoxScreen("Save name:", SAVES.generateSaveName(this.saves, gameState_800babc8), this::onNewSaveResult));
     } else {
-      menuStack.pushScreen(new MessageBoxScreen(Overwrite_save_8011c9e8, 2, result -> this.onOverwriteResult(result.messageBoxResult, save)));
+      menuStack.pushScreen(new MessageBoxScreen(Overwrite_save_8011c9e8, 2, result -> this.onOverwriteResult(result.messageBoxResult, data.saveGame)));
     }
   }
 
@@ -142,8 +143,8 @@ public class SaveGameScreen extends MenuScreen {
       menuStack.pushScreen(new MessageBoxScreen("Are you sure you want to\ndelete this save?", 2, result -> {
         if(result.messageBoxResult == MessageBoxResult.YES) {
           try {
-            this.saveList.getSelected().state.campaign.deleteSave(this.saveList.getSelected().fileName);
-            this.saves.removeIf(save -> save.fileName.equals(this.saveList.getSelected().fileName));
+            this.saveList.getSelected().saveGame.state.campaign.deleteSave(this.saveList.getSelected().saveGame.fileName);
+            this.saves.removeIf(save -> save.fileName.equals(this.saveList.getSelected().saveGame.fileName));
             this.saveList.removeEntry(this.saveList.getSelected());
           } catch(final IOException e) {
             LOGGER.error("Failed to delete save", e);

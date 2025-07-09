@@ -53,7 +53,7 @@ public class CharSwapScreen extends MenuScreen {
 
   public CharSwapScreen(final Runnable unload) {
     this.unload = unload;
-    PermaDeathConfigEntry.assessParty();
+    PermaDeathConfigEntry.evaluateParty();
   }
 
   @Override

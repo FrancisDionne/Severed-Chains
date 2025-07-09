@@ -1488,7 +1488,7 @@ public class Battle extends EngineState {
 
   @Method(0x800c772cL)
   public void battleInitiateAndPreload_800c772c() {
-    PermaDeathConfigEntry.assessParty();
+    PermaDeathConfigEntry.evaluateParty();
 
     this.FUN_800c8e48();
 
@@ -1821,7 +1821,7 @@ public class Battle extends EngineState {
       postBattleAction_800bc974 = 4;
     }
 
-    PermaDeathConfigEntry.assessParty();
+    PermaDeathConfigEntry.evaluateParty();
   }
 
   @Method(0x800c7da8L)
