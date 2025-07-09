@@ -131,6 +131,7 @@ public class StatisticsScreen extends MenuScreen {
       Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\group-center.png")),  //24
       Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\group-top.png")),     //25
       Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\group-bottom.png")),  //26
+      Texture.png(Path.of("gfx", "portraits", "lavitz_dead.png")),  //27
     };
 
     this.statisticPages = new HashMap<>();
@@ -319,7 +320,7 @@ public class StatisticsScreen extends MenuScreen {
     }
 
     for(int charIndex = 0; charIndex < 9; charIndex++) {
-      final Texture portrait = this.textures[charIndex];
+      final Texture portrait = charIndex == 1 && this.isCharacterUnlocked(5) ? this.textures[27] : this.textures[charIndex];
 
       x = 28 * charIndex + 76;
 
