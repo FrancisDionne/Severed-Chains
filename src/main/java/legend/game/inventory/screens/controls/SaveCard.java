@@ -4,16 +4,18 @@ import legend.core.QueuedModelStandard;
 import legend.core.gpu.Bpp;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
+import legend.core.opengl.Texture;
 import legend.game.inventory.screens.Control;
 import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.modding.coremod.CoreMod;
-import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.saves.ConfigCollection;
 import legend.game.saves.SavedGame;
 import legend.game.types.CharacterData2c;
 import legend.game.types.GameState52c;
 import legend.game.types.Renderable58;
 import org.joml.Matrix4f;
+
+import java.nio.file.Path;
 
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.UI_TEXT_CENTERED;
@@ -40,6 +42,10 @@ public class SaveCard extends Control {
   private ConfigCollection config;
 
   private final Label invalidSave;
+
+  public static Texture[] textures = {
+    Texture.png(Path.of("gfx", "ui", "skull_icon.png")), //0
+  };
 
   public SaveCard() {
     this.addControl(Glyph.uiElement(76, 76)).setPos(0, 0);
@@ -136,7 +142,7 @@ public class SaveCard extends Control {
 
           RENDERER
             .queueOrthoModel(quad, m, QueuedModelStandard.class)
-            .texture(PermaDeathConfigEntry.textures[0]);
+            .texture(textures[0]);
         }
       }
     }

@@ -1,6 +1,5 @@
 package legend.game.modding.coremod.config;
 
-import legend.core.opengl.Texture;
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.bent.BattleEntityStat;
 import legend.game.combat.bent.PlayerBattleEntity;
@@ -11,7 +10,6 @@ import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigStorageLocation;
 import legend.game.statistics.Statistics;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +17,6 @@ import static legend.core.GameEngine.CONFIG;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 
 public class PermaDeathConfigEntry extends BoolConfigEntry {
-  public static Texture[] textures = {
-    Texture.png(Path.of("gfx", "ui", "skull_icon.png")), //0
-  };
-
   public PermaDeathConfigEntry() {
     super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001, PermaDeathConfigEntry::callback);
   }

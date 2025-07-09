@@ -13,9 +13,9 @@ import legend.game.inventory.screens.controls.Button;
 import legend.game.inventory.screens.controls.CharacterCard;
 import legend.game.inventory.screens.controls.DragoonSpirits;
 import legend.game.inventory.screens.controls.Glyph;
+import legend.game.inventory.screens.controls.SaveCard;
 import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.modding.coremod.CoreMod;
-import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
@@ -442,7 +442,7 @@ public class MainMenuScreen extends MenuScreen {
 
       RENDERER
         .queueOrthoModel(quad, m, QueuedModelStandard.class)
-        .texture(PermaDeathConfigEntry.textures[0]);
+        .texture(SaveCard.textures[0]);
     }
   }
 
