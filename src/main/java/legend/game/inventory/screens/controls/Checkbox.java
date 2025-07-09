@@ -61,7 +61,7 @@ public class Checkbox extends Control {
     return this.verticalAlign;
   }
 
-  public void setChecked(final boolean checked) {
+  public void setChecked(final boolean checked, final boolean silent) {
     this.checked = checked;
 
     if(checked) {
@@ -74,7 +74,7 @@ public class Checkbox extends Control {
       }
     }
 
-    if(this.toggledHandler != null) {
+    if(this.toggledHandler != null && !silent) {
       this.toggledHandler.accept(checked);
     }
   }
@@ -119,7 +119,7 @@ public class Checkbox extends Control {
 
     if(button == PLATFORM.getMouseButton(0)) {
       playMenuSound(2);
-      this.setChecked(!this.isChecked());
+      this.setChecked(!this.isChecked(), false);
       return InputPropagation.HANDLED;
     }
 
@@ -134,7 +134,7 @@ public class Checkbox extends Control {
 
     if(action == INPUT_ACTION_MENU_CONFIRM.get() && !repeat) {
       playMenuSound(2);
-      this.setChecked(!this.isChecked());
+      this.setChecked(!this.isChecked(), false);
       return InputPropagation.HANDLED;
     }
 

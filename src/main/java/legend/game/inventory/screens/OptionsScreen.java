@@ -57,6 +57,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
   private static final Logger LOGGER = LogManager.getFormatterLogger(OptionsScreen.class);
   private final Runnable unload;
 
+  public static boolean refreshFlag;
   private final Map<Control, Label> helpLabels = new HashMap<>();
   private final Map<Control, ConfigEntry<?>> helpEntries = new HashMap<>();
 
@@ -245,6 +246,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
       CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 50);
       CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
       CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), true);
+      CONFIG.setConfig(CoreMod.PERMA_DEATH.get(), false);
 
       CONFIG.setConfig(CoreMod.ADDITION_MODE_CONFIG.get(), AdditionMode.NORMAL);
       CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.NORMAL);
@@ -275,6 +277,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
         CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), false);
         CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), false);
         CONFIG.setConfig(CoreMod.TURBO_TOGGLE_CONFIG.get(), false);
+        CONFIG.setConfig(CoreMod.PERMA_DEATH.get(), false);
 
         CONFIG.setConfig(CoreMod.ADDITION_MODE_CONFIG.get(), AdditionMode.NORMAL);
         CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.NORMAL);
@@ -314,7 +317,6 @@ public class OptionsScreen extends VerticalLayoutScreen {
         CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 30);
         CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), false);
         CONFIG.setConfig(CoreMod.TURBO_TOGGLE_CONFIG.get(), true);
-        CONFIG.setConfig(CoreMod.PERMA_DEATH.get(), true);
         CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
 
         CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_CONFIG.get(), AdditionOverlayMode.OFF);
@@ -342,6 +344,10 @@ public class OptionsScreen extends VerticalLayoutScreen {
   @Override
   protected void renderControls(final int parentX, final int parentY) {
     try {
+      if(refreshFlag) {
+        refreshFlag = false;
+        this.reloadControls();
+      }
       super.renderControls(parentX, parentY);
       FooterActionsHud.renderMenuActions(FooterActions.HELP, FooterActions.PRESETS, null);
     } catch(final Throwable ex) {

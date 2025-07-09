@@ -9,6 +9,7 @@ import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.Item;
 import legend.game.inventory.UseItemResponse;
+import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
@@ -212,7 +213,7 @@ public class UseItemScreen extends MenuScreen {
 
         //LAB_80108544
 
-        renderFourDigitHp(x + 25, y + 57, stats.hp_04, stats.maxHp_66);
+        renderFourDigitHp(x + 25, y + 57, PermaDeathConfigEntry.hasNotDiedOrIsInUse(charIndex) ? stats.hp_04 : 0, stats.maxHp_66);
         renderFourDigitNumber(x + 25, y + 68, stats.maxHp_66);
         renderFourDigitNumber(x + 25, y + 79, stats.mp_06);
         renderFourDigitNumber(x + 25, y + 90, stats.maxMp_6e);
@@ -537,9 +538,11 @@ public class UseItemScreen extends MenuScreen {
     }
 
     if(this.itemTargetAll) {
-      for(int i = 0; i < 7; i++) {
-        this._8011d718[i] = allocateUiElement(0x7e, 0x7e, this.getCharacterPortraitX(i) - 3, 110);
-        FUN_80104b60(this._8011d718[i]);
+      for(int i = 0; i < 7 && i < characterCount_8011d7c4; i++) {
+        if(Item.characterCanUseItemInMenu(i, item)) {
+          this._8011d718[i] = allocateUiElement(0x7e, 0x7e, this.getCharacterPortraitX(i) - 3, 110);
+          FUN_80104b60(this._8011d718[i]);
+        }
       }
     } else {
       this.charHighlight = allocateUiElement(0x7e, 0x7e, this.getCharacterPortraitX(this.charSlot) - 3, 110);
@@ -554,8 +557,11 @@ public class UseItemScreen extends MenuScreen {
     if(!this.itemTargetAll) {
       unloadRenderable(this.charHighlight);
     } else {
-      for(int i = 0; i < 7; i++) {
-        unloadRenderable(this._8011d718[i]);
+      for(int i = 0; i < 7 && i < characterCount_8011d7c4; i++) {
+        final Item item = this.menuItems.get(this.selectedSlot + this.slotScroll).item_00;
+        if(Item.characterCanUseItemInMenu(i, item)) {
+          unloadRenderable(this._8011d718[i]);
+        }
       }
     }
 

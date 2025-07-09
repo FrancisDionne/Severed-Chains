@@ -19,7 +19,7 @@ public class UnlockPartyConfig extends BoolConfigEntry {
 
   private static void callback() {
     if(CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
-      CONFIG.setConfig(CoreMod.PERMA_DEATH.get(), true);
+      CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
     }
   }
 }

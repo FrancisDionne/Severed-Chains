@@ -38,6 +38,12 @@ public class CharmPotionItem extends BattleItem {
 
   @Override
   public void useInMenu(final UseItemResponse response, final int charId) {
+    if(!characterCanUseItemInMenu(charId, this)) {
+      response._00 = 0;
+      response.value_04 = -2;
+      return;
+    }
+
     if(currentEngineState_8004dd04 instanceof final WMap wmap) {
       //LAB_80022e40
       response._00 = 8;

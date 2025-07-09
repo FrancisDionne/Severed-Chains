@@ -18,6 +18,7 @@ import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.inventory.screens.MenuStack;
 import legend.game.inventory.screens.TextColour;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.modding.events.characters.AdditionHitMultiplierEvent;
 import legend.game.modding.events.characters.AdditionUnlockEvent;
 import legend.game.modding.events.characters.CharacterStatsEvent;
@@ -1522,7 +1523,7 @@ public final class SItem {
         renderTwoDigitNumber(x + 154, y + 6, stats.level_0e);
         renderTwoDigitNumber(x + 112, y + 17, stats.dlevel_0f);
         renderThreeDigitNumber(x + 148, y + 17, stats.sp_08);
-        renderFourDigitHp(x + 100, y + 28, stats.hp_04, stats.maxHp_66);
+        renderFourDigitHp(x + 100, y + 28, PermaDeathConfigEntry.hasNotDiedOrIsInUse(charId) ? stats.hp_04 : 0, stats.maxHp_66);
         renderCharacter(x + 124, y + 28, 11);
         renderFourDigitNumber(x + 142, y + 28, stats.maxHp_66);
         renderThreeDigitNumber(x + 106, y + 39, stats.mp_06);

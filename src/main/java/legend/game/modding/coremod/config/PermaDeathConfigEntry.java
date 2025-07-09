@@ -1,5 +1,6 @@
 package legend.game.modding.coremod.config;
 
+import legend.game.inventory.screens.OptionsScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.BoolConfigEntry;
 import legend.game.saves.ConfigCategory;
@@ -19,7 +20,10 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
 
   private static void callback() {
     if(CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
-      CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
+      if(!CONFIG.getConfig(CoreMod.UNLOCK_PARTY_CONFIG.get())) {
+        CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
+        OptionsScreen.refreshFlag = true;
+      }
     }
   }
 
@@ -121,5 +125,18 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
       return gameState_800babc8.charData_32c[charId].partyFlags_04 != 0;
     }
     return true;
+  }
+
+  public static boolean isUsed(final int charId) {
+    for(int i = 0; i < gameState_800babc8.charIds_88.length; i++) {
+      if(gameState_800babc8.charIds_88[i] == charId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean hasNotDiedOrIsInUse(final int charId) {
+    return !hasDied(charId) || isUsed(charId);
   }
 }
