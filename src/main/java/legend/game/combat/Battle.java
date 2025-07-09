@@ -3698,7 +3698,7 @@ public class Battle extends EngineState {
     final int value = script.params_20[1].get();
 
     //Disables revive in combat if perma death on
-    if(PermaDeathConfigEntry.isBlockRevive(stat, bent, value, (storage44[7] & FLAG_DEAD) != 0)) {
+    if(PermaDeathConfigEntry.isBlockRevive(stat, bent, this.currentTurnBent_800c66c8, value, (storage44[7] & FLAG_DEAD) != 0)) {
       storage44[7] |= FLAG_DEAD;
       return FlowControl.CONTINUE;
     }

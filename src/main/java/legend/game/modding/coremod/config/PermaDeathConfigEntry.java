@@ -2,12 +2,14 @@ package legend.game.modding.coremod.config;
 
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.bent.BattleEntityStat;
+import legend.game.combat.bent.MonsterBattleEntity;
 import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.inventory.screens.OptionsScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.BoolConfigEntry;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigStorageLocation;
+import legend.game.scripting.ScriptState;
 import legend.game.statistics.Statistics;
 
 import java.util.ArrayList;
@@ -143,7 +145,13 @@ public class PermaDeathConfigEntry extends BoolConfigEntry {
     return !hasDied(charId) || isUsed(charId);
   }
 
-  public static boolean isBlockRevive(final BattleEntityStat stat, final BattleEntity27c bent, final int value, final boolean dead) {
-    return stat == BattleEntityStat.CURRENT_HP && value != 0 && !dead && bent instanceof PlayerBattleEntity && bent.getStat(BattleEntityStat.CURRENT_HP) <= 0 && CONFIG.getConfig(CoreMod.PERMA_DEATH.get());
+  public static boolean isBlockRevive(final BattleEntityStat stat, final BattleEntity27c bent, final ScriptState<? extends BattleEntity27c> currentTurnBent, final int value, final boolean dead) {
+    if(stat == BattleEntityStat.CURRENT_HP && value != 0 && !dead && bent instanceof PlayerBattleEntity && bent.getStat(BattleEntityStat.CURRENT_HP) <= 0 && CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
+      if(bent.charId_272 == currentTurnBent.innerStruct_00.charId_272 || currentTurnBent.innerStruct_00 instanceof MonsterBattleEntity) {
+        return false; // For auto revive with Angel Robe
+      }
+      return true;
+    }
+    return false;
   }
 }
