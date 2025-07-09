@@ -824,10 +824,10 @@ public final class SItem {
         }
 
         if(Statistics.getStat(Statistics.Stats.DART_UNLOCKED, slot) < 1) {
+          Statistics.appendStat(Statistics.Stats.DART_UNLOCKED, 1, slot);
           if(slot == 5) { //Albert Unlock
             Statistics.appendStat(1, Statistics.Stats.TOTAL_DEATH, 1); //Increase Lavitz death :(
           }
-          Statistics.appendStat(Statistics.Stats.DART_UNLOCKED, 1, slot);
         }
       }
 
