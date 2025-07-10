@@ -26,6 +26,7 @@ import legend.game.inventory.screens.controls.Button;
 import legend.game.inventory.screens.controls.Label;
 import legend.game.inventory.screens.controls.Textbox;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.modding.events.gamestate.NewGameEvent;
 import legend.game.saves.Campaign;
@@ -315,5 +316,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
         CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.HARD);
         break;
     }
+
+    BattleDifficultyConfigEntry.reloadMonsters();
   }
 }

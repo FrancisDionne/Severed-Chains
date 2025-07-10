@@ -4,7 +4,6 @@ import legend.game.combat.BattleDifficulty;
 import legend.game.combat.Monsters;
 import legend.game.combat.types.MonsterStats1c;
 import legend.game.modding.coremod.CoreMod;
-import legend.game.modding.events.battle.MonsterStatsEvent;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigStorageLocation;
 import legend.game.saves.EnumConfigEntry;
@@ -49,8 +48,6 @@ public class BattleDifficultyConfigEntry extends EnumConfigEntry<BattleDifficult
         monster.speed_08 = Math.round(monster.speed_08 * 1.1f);
         break;
     }
-
-    reloadMonsters();
   }
 
   public static void reloadMonsters() {
