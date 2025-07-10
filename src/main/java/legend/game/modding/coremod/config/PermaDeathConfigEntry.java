@@ -19,7 +19,7 @@ import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 
 public class PermaDeathConfigEntry extends BoolConfigEntry {
   public PermaDeathConfigEntry() {
-    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 0, PermaDeathConfigEntry::callback);
+    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 1, PermaDeathConfigEntry::callback);
   }
 
   private static void callback() {

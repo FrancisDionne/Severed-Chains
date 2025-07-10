@@ -13,7 +13,7 @@ import static legend.core.GameEngine.CONFIG;
 
 public class BattleDifficultyConfigEntry extends EnumConfigEntry<BattleDifficulty> {
   public BattleDifficultyConfigEntry() {
-    super(BattleDifficulty.class, BattleDifficulty.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001, BattleDifficultyConfigEntry::reloadMonsters);
+    super(BattleDifficulty.class, BattleDifficulty.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 0, BattleDifficultyConfigEntry::reloadMonsters);
   }
 
   public static void adjustMonsterStats(final MonsterStats1c monster) {

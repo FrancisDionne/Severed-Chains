@@ -199,7 +199,7 @@ public class CampaingChallengesScreen extends VerticalLayoutScreen {
         this.reloadControls();
       }
       super.renderControls(parentX, parentY);
-      FooterActionsHud.renderMenuActions(FooterActions.HELP, FooterActions.PRESETS, null);
+      FooterActionsHud.renderMenuActions(FooterActions.HELP, null, null);
     } catch(final Throwable ex) {
       this.replaceControlWithErrorLabel("Error on renderControls", ex);
     }
