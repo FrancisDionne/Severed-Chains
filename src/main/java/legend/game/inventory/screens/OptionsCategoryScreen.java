@@ -31,7 +31,7 @@ public class OptionsCategoryScreen extends VerticalLayoutScreen {
     this.init();
 
     for(final ConfigCategory category : ConfigCategory.values()) {
-      if (category == ConfigCategory.ADDITIONS) {
+      if (category == ConfigCategory.ADDITIONS || category == ConfigCategory.CHALLENGES) {
         continue;
       }
 

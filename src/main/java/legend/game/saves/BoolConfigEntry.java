@@ -3,13 +3,23 @@ package legend.game.saves;
 import legend.game.inventory.screens.controls.Checkbox;
 import legend.game.inventory.screens.HorizontalAlign;
 
+import javax.annotation.Nullable;
+
 /** Convenience class for simple enum-backed configs */
 public class BoolConfigEntry extends ConfigEntry<Boolean> {
   public BoolConfigEntry(final boolean defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category) {
-    this(defaultValue, storageLocation, category, 0);
+    this(defaultValue, storageLocation, category, 0, null);
   }
 
   public BoolConfigEntry(final boolean defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final double order) {
+    this(defaultValue, storageLocation, category, order, null);
+  }
+
+  public BoolConfigEntry(final boolean defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Runnable callback) {
+    this(defaultValue, storageLocation, category, 0, callback);
+  }
+
+  public BoolConfigEntry(final boolean defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final double order, @Nullable final Runnable callback) {
     super(
       defaultValue,
       storageLocation,
@@ -22,8 +32,14 @@ public class BoolConfigEntry extends ConfigEntry<Boolean> {
     this.setEditControl((current, gameState) -> {
       final Checkbox checkbox = new Checkbox();
       checkbox.setHorizontalAlign(HorizontalAlign.RIGHT);
-      checkbox.setChecked(current);
-      checkbox.onToggled(val -> gameState.setConfig(this, val));
+      checkbox.setChecked(current, false);
+      checkbox.onToggled(val -> {
+        gameState.setConfig(this, val);
+        if(callback != null) {
+          callback.run();
+          checkbox.setChecked(gameState.getConfig(this), true);
+        }
+      });
       return checkbox;
     });
   }

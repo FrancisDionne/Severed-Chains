@@ -46,6 +46,12 @@ public class RecoverStatusItem extends BattleItem {
   @Override
   @Method(0x80022d88L)
   public void useInMenu(final UseItemResponse response, final int charId) {
+    if(!characterCanUseItemInMenu(charId, this)) {
+      response._00 = 0;
+      response.value_04 = -2;
+      return;
+    }
+
     final int status = gameState_800babc8.charData_32c[charId].status_10;
 
     if((this.status & status) != 0) {

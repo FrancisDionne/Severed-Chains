@@ -1,14 +1,24 @@
 package legend.game.inventory.screens.controls;
 
+import legend.core.QueuedModelStandard;
+import legend.core.gpu.Bpp;
+import legend.core.opengl.Obj;
+import legend.core.opengl.QuadBuilder;
+import legend.core.opengl.Texture;
 import legend.game.inventory.screens.Control;
 import legend.game.inventory.screens.HorizontalAlign;
+import legend.game.modding.coremod.CoreMod;
+import legend.game.saves.ConfigCollection;
 import legend.game.saves.SavedGame;
 import legend.game.types.CharacterData2c;
 import legend.game.types.GameState52c;
 import legend.game.types.Renderable58;
+import org.joml.Matrix4f;
 
-import javax.annotation.Nullable;
+import java.nio.file.Path;
 
+import static legend.core.GameEngine.CONFIG;
+import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.chapterNames_80114248;
 import static legend.game.SItem.renderFourDigitHp;
@@ -18,12 +28,26 @@ import static legend.game.Scus94491BpeSegment_8002.getTimestampPart;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 
 public class SaveCard extends Control {
+  private static final Matrix4f m = new Matrix4f();
+  private static final Obj quad = new QuadBuilder("SaveCard Quad")
+    .size(1.0f, 1.0f)
+    .uv(0.0f, 0.0f)
+    .uvSize(1.0f, 1.0f)
+    .bpp(Bpp.BITS_24)
+    .build();
+
   final CharacterPortrait[] portraits = new CharacterPortrait[3];
   final DragoonSpirits dragoonSpirits;
 
   private SavedGame saveData;
+  private ConfigCollection config;
 
   private final Label invalidSave;
+
+  public static Texture[] textures = {
+    Texture.png(Path.of("gfx", "ui", "skull_icon.png")),  //0
+    Texture.png(Path.of("gfx", "ui", "icon-helmet.png")), //1
+  };
 
   public SaveCard() {
     this.addControl(Glyph.uiElement(76, 76)).setPos(0, 0);
@@ -43,18 +67,19 @@ public class SaveCard extends Control {
     this.invalidSave.getFontOptions().horizontalAlign(HorizontalAlign.CENTRE);
   }
 
-  public void setSaveData(@Nullable final SavedGame saveData) {
-    this.saveData = saveData;
+  public void setSaveData(final SaveCardData data) {
+    this.saveData = data.saveGame;
+    this.config = CONFIG;
 
-    if(saveData != null && saveData.isValid()) {
+    if(this.saveData != null && this.saveData.isValid()) {
       this.invalidSave.setVisibility(false);
-      this.dragoonSpirits.setSpirits(saveData.state.goods_19c[0]);
+      this.dragoonSpirits.setSpirits(this.saveData.state.goods_19c[0]);
 
       for(int i = 0; i < 3; i++) {
-        this.portraits[i].setCharId(saveData.state.charIds_88[i]);
+        this.portraits[i].setCharId(this.saveData.state.charIds_88[i]);
       }
     } else {
-      this.invalidSave.setVisibility(saveData != null);
+      this.invalidSave.setVisibility(this.saveData != null);
 
       this.dragoonSpirits.setSpirits(0);
 
@@ -109,6 +134,31 @@ public class SaveCard extends Control {
         this.renderCharacter(342, y + 17, 10); // Minute-second colon
         this.renderNumber(348, y + 17, getTimestampPart(state.timestamp_a0, 2), 2, 0x1); // Time played second
         this.renderNumber(344, y + 34, state.stardust_9c, 2); // Stardust
+
+        float iconY = 0;
+        if(this.config.getConfig(CoreMod.PERMA_DEATH.get())) {
+          final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+          m.translation(x - 2 + xOffset, y + 47, 120);
+          m.scale(13, 12, 1);
+
+          RENDERER
+            .queueOrthoModel(quad, m, QueuedModelStandard.class)
+            .texture(textures[0]);
+
+          iconY += 13;
+        }
+
+        if(this.config.getConfig(CoreMod.IRONMAN_MODE.get())) {
+          final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+          m.translation(x - 2 + xOffset, y + 47 - iconY, 120);
+          m.scale(13, 12, 1);
+
+          RENDERER
+            .queueOrthoModel(quad, m, QueuedModelStandard.class)
+            .texture(textures[1]);
+
+          iconY += 13;
+        }
       }
     }
   }

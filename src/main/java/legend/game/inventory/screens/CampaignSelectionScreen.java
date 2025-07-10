@@ -9,6 +9,7 @@ import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.BigList;
 import legend.game.inventory.screens.controls.Label;
 import legend.game.inventory.screens.controls.SaveCard;
+import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.saves.Campaign;
@@ -48,7 +49,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_MODS;
 public class CampaignSelectionScreen extends MenuScreen {
   private static final Logger LOGGER = LogManager.getFormatterLogger(MenuScreen.class);
 
-  private final BigList<Campaign> campaignList;
+  private final BigList<SaveCardData> campaignList;
 
   public CampaignSelectionScreen() {
     deallocateRenderables(0xff);
@@ -64,15 +65,15 @@ public class CampaignSelectionScreen extends MenuScreen {
     final SaveCard saveCard = this.addControl(new SaveCard());
     saveCard.setPos(16, 160);
 
-    this.campaignList = this.addControl(new BigList<>(c -> c.name));
+    this.campaignList = this.addControl(new BigList<>(c -> c.campaign.name));
     this.campaignList.setPos(16, 16);
     this.campaignList.setSize(360, 144);
-    this.campaignList.onHighlight(campaign -> saveCard.setSaveData(campaign.latestSave));
+    this.campaignList.onHighlight(saveCard::setSaveData);
     this.campaignList.onSelection(this::onSelection);
     this.setFocus(this.campaignList);
 
     for(final Campaign campaign : SAVES.loadAllCampaigns()) {
-      this.campaignList.addEntry(campaign);
+      this.campaignList.addEntry(new SaveCardData(campaign, campaign.latestSave));
     }
 
     this.addHotkey(I18n.translate("lod_core.ui.campaign_selection.mods"), INPUT_ACTION_MENU_MODS, this::menuMods);
@@ -80,11 +81,11 @@ public class CampaignSelectionScreen extends MenuScreen {
     this.addHotkey(I18n.translate("lod_core.ui.campaign_selection.back"), INPUT_ACTION_MENU_BACK, this::menuEscape);
   }
 
-  private void onSelection(final Campaign campaign) {
+  private void onSelection(final SaveCardData saveData) {
     playMenuSound(2);
 
     CONFIG.clearConfig(ConfigStorageLocation.CAMPAIGN);
-    campaign.loadConfigInto(CONFIG);
+    saveData.campaign.loadConfigInto(CONFIG);
 
     final Set<String> missingMods;
     if(CONFIG.hasConfig(CoreMod.ENABLED_MODS_CONFIG.get())) {
@@ -94,15 +95,15 @@ public class CampaignSelectionScreen extends MenuScreen {
       missingMods = bootMods(MODS.getAllModIds());
     }
 
-    final Runnable loadGameScreen = () -> menuStack.pushScreen(new LoadGameScreen(save -> {
+    final Runnable loadGameScreen = () -> menuStack.pushScreen(new LoadGameScreen(data -> {
       menuStack.reset();
 
       CONFIG.clearConfig(ConfigStorageLocation.SAVE);
-      CONFIG.copyConfigFrom(save.config);
+      CONFIG.copyConfigFrom(data.saveGame.config);
 
       GameEngine.bootRegistries();
 
-      final GameLoadedEvent event = EVENTS.postEvent(new GameLoadedEvent(save.state));
+      final GameLoadedEvent event = EVENTS.postEvent(new GameLoadedEvent(data.saveGame.state));
 
       gameState_800babc8 = event.gameState;
       gameState_800babc8.syncIds();
@@ -119,12 +120,12 @@ public class CampaignSelectionScreen extends MenuScreen {
         submapScene_80052c34 = 53;
       }
 
-      Statistics.load(gameState_800babc8.campaign.path, save.fileName);
+      Statistics.load(gameState_800babc8.campaign.path, data.saveGame.fileName);
     }, () -> {
       menuStack.popScreen();
       startFadeEffect(2, 10);
       bootMods(MODS.getAllModIds());
-    }, campaign));
+    }, saveData));
 
     if(missingMods.isEmpty()) {
       loadGameScreen.run();
@@ -148,7 +149,7 @@ public class CampaignSelectionScreen extends MenuScreen {
   }
 
   private void menuMods() {
-    final Campaign campaign = this.campaignList.getSelected();
+    final Campaign campaign = this.campaignList.getSelected().campaign;
 
     if(campaign == null) {
       playMenuSound(40);
@@ -184,7 +185,7 @@ public class CampaignSelectionScreen extends MenuScreen {
       menuStack.pushScreen(new MessageBoxScreen(I18n.translate("lod_core.ui.campaign_selection.delete_campaign_confirm"), 2, result -> {
         if(result.messageBoxResult == MessageBoxResult.YES) {
           try {
-            this.campaignList.getSelected().delete();
+            this.campaignList.getSelected().campaign.delete();
             this.campaignList.removeEntry(this.campaignList.getSelected());
           } catch(final IOException e) {
             LOGGER.error(I18n.translate("lod_core.ui.campaign_selection.failed_to_delete_campaign"), e);

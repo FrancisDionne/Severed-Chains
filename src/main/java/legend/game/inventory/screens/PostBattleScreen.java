@@ -10,6 +10,7 @@ import legend.core.opengl.QuadBuilder;
 import legend.game.combat.types.EnemyDrop;
 import legend.game.inventory.WhichMenu;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.statistics.Statistics;
 import legend.game.types.Renderable58;
 import legend.game.types.Translucency;
@@ -150,7 +151,8 @@ public class PostBattleScreen extends MenuScreen {
             final int secondaryCharIndex = secondaryCharIds_800bdbf8[secondaryCharSlot];
 
             if(secondaryCharIndex != -1) {
-              this.pendingXp_8011e180[secondaryCharIndex] = (int)(MathHelper.safeDiv(totalXpFromCombat_800bc95c, xpDivisor) * secondaryCharXpMultiplier);
+              final int xp = PermaDeathConfigEntry.hasDied(secondaryCharIndex) ? 0 : (int)(MathHelper.safeDiv(totalXpFromCombat_800bc95c, xpDivisor) * secondaryCharXpMultiplier);
+              this.pendingXp_8011e180[secondaryCharIndex] = xp;
               Statistics.appendStat(secondaryCharIndex, Statistics.Stats.TOTAL_EXP, this.pendingXp_8011e180[secondaryCharIndex]);
             }
 

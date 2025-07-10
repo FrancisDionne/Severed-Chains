@@ -10,10 +10,14 @@ import legend.core.opengl.Obj;
 import legend.game.EngineState;
 import legend.game.EngineStateEnum;
 import legend.game.Scus94491BpeSegment_8002;
+import legend.game.modding.coremod.CoreMod;
 import legend.game.types.McqHeader;
 import legend.game.unpacker.FileData;
 import legend.game.unpacker.Loader;
 
+import java.io.IOException;
+
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
@@ -26,6 +30,7 @@ import static legend.game.Scus94491BpeSegment_8004.engineStateOnceLoaded_8004dd2
 import static legend.game.Scus94491BpeSegment_8007.vsyncMode_8007a3b8;
 import static legend.game.Scus94491BpeSegment_800b.fullScreenEffect_800bb140;
 import static legend.game.Scus94491BpeSegment_800b.gameOverMcq_800bdc3c;
+import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 
@@ -47,6 +52,14 @@ public class GameOver extends EngineState {
     final Rect4i rect = new Rect4i(640, 0, mcq.vramWidth_08, mcq.vramHeight_0a);
     gameOverMcq_800bdc3c = mcq;
     GPU.uploadData15(rect, mcq.imageData);
+
+    if(CONFIG.getConfig(CoreMod.IRONMAN_MODE.get())) {
+      try {
+        gameState_800babc8.campaign.delete();
+      } catch(final IOException ignored) {
+      }
+    }
+
     this.loadingStage = 3;
   }
 

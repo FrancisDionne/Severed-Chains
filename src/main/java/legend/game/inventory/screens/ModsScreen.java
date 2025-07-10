@@ -43,7 +43,7 @@ public class ModsScreen extends VerticalLayoutScreen {
     for(final String modId : modIds) {
       if(!MODS.getRequiredModIds().contains(modId)) {
         final Checkbox checkbox = new Checkbox();
-        checkbox.setChecked(enabledMods.contains(modId));
+        checkbox.setChecked(enabledMods.contains(modId), false);
         checkbox.setHorizontalAlign(HorizontalAlign.RIGHT);
 
         checkbox.onChecked(() -> enabledMods.add(modId));

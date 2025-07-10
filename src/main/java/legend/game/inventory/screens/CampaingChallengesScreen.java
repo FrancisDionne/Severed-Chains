@@ -31,8 +31,8 @@ import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HELP;
 
-public class OptionsScreen extends VerticalLayoutScreen {
-  private static final Logger LOGGER = LogManager.getFormatterLogger(OptionsScreen.class);
+public class CampaingChallengesScreen extends VerticalLayoutScreen {
+  private static final Logger LOGGER = LogManager.getFormatterLogger(CampaingChallengesScreen.class);
   private final Runnable unload;
 
   public static boolean refreshFlag;
@@ -43,7 +43,17 @@ public class OptionsScreen extends VerticalLayoutScreen {
   private final Set<ConfigStorageLocation> validLocations;
   private final ConfigCategory category;
 
-  public OptionsScreen(final ConfigCollection config, final Set<ConfigStorageLocation> validLocations, final ConfigCategory category, final Runnable unload) {
+  private MessageBoxResults recommendedMessageBoxResult;
+
+  private final String[] recommendedMessageBoxTexts = {
+    "Normal", "Original Gameplay + Quality of Life",
+    "Veteran", "Challenging Gameplay + Quality of Life",
+    "Zealous", "Hardcore Gameplay + Quality of Life",
+    "Nostalgia", "Original Everything",
+    "Casual", "Easier Gameplay + Quality of Life"
+  };
+
+  public CampaingChallengesScreen(final ConfigCollection config, final Set<ConfigStorageLocation> validLocations, final Runnable unload) {
     deallocateRenderables(0xff);
 
     this.unload = unload;
@@ -51,7 +61,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
 
     this.config = config;
     this.validLocations = validLocations;
-    this.category = category;
+    this.category = ConfigCategory.CHALLENGES;
 
     this.loadControls();
 

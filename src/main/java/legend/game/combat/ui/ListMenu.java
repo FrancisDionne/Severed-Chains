@@ -8,9 +8,12 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.combat.environment.BattleMenuBackgroundUvMetrics04;
+import legend.game.modding.coremod.CoreMod;
 import legend.game.scripting.RunningScript;
 import legend.game.types.Translucency;
+import legend.lodmod.items.AngelsPrayerItem;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
@@ -109,6 +112,9 @@ public abstract class ListMenu {
   public abstract void getTargetingInfo(final RunningScript<?> script);
 
   protected boolean canUse() {
+    if(this.player_08.item_d4 instanceof AngelsPrayerItem && CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
+      return false;
+    }
     return true;
   };
 

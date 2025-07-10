@@ -16,7 +16,7 @@ import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 
 public class AdditionRandomModeConfig extends BoolConfigEntry {
   public AdditionRandomModeConfig() {
-    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS, 8);
+    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 3);
   }
 
   public static int getRandomAddition(final int charId) {

@@ -50,6 +50,7 @@ import legend.game.modding.coremod.config.IgnoreSteamInputModeConfigEntry;
 import legend.game.modding.coremod.config.IndicatorModeConfigEntry;
 import legend.game.modding.coremod.config.InventoryGroupConfigEntry;
 import legend.game.modding.coremod.config.InventorySizeConfigEntry;
+import legend.game.modding.coremod.config.IronmanModeConfigEntry;
 import legend.game.modding.coremod.config.LegacyWidescreenModeConfig;
 import legend.game.modding.coremod.config.MashModeConfigEntry;
 import legend.game.modding.coremod.config.MasterVolumeConfigEntry;
@@ -60,6 +61,7 @@ import legend.game.modding.coremod.config.MusicInterpolationPrecisionConfigEntry
 import legend.game.modding.coremod.config.MusicPitchResolutionConfigEntry;
 import legend.game.modding.coremod.config.MusicSampleRateConfigEntry;
 import legend.game.modding.coremod.config.MusicVolumeConfigEntry;
+import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.modding.coremod.config.PreferredBattleCameraAngleConfigEntry;
 import legend.game.modding.coremod.config.ReduceMotionFlashingConfigEntry;
 import legend.game.modding.coremod.config.ResolutionConfig;
@@ -133,6 +135,11 @@ public class CoreMod {
   public static final RegistryDelegate<RunByDefaultConfig> RUN_BY_DEFAULT = CONFIG_REGISTRAR.register("run_by_default", RunByDefaultConfig::new);
   public static final RegistryDelegate<EnabledModsConfigEntry> ENABLED_MODS_CONFIG = CONFIG_REGISTRAR.register("enabled_mods", EnabledModsConfigEntry::new);
 
+  public static final RegistryDelegate<BattleDifficultyConfigEntry> BATTLE_DIFFICULTY = register("battle_difficulty", BattleDifficultyConfigEntry::new);
+  public static final RegistryDelegate<PermaDeathConfigEntry> PERMA_DEATH = register("perma_death", PermaDeathConfigEntry::new);
+  public static final RegistryDelegate<IronmanModeConfigEntry> IRONMAN_MODE = register("ironman_mode", IronmanModeConfigEntry::new);
+  public static final RegistryDelegate<AdditionRandomModeConfig> ADDITION_RANDOM_MODE_CONFIG = CONFIG_REGISTRAR.register("addition_random_mode", AdditionRandomModeConfig::new);
+
   public static final RegistryDelegate<ConfigEntry<Void>> BATTLE_GROUP_CONFIG = register("battle_group", BattleGroupConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> INVENTORY_GROUP_CONFIG = register("inventory_group", InventoryGroupConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> TEXT_GROUP_CONFIG = register("text_group", TextGroupConfigEntry::new);
@@ -148,7 +155,6 @@ public class CoreMod {
   public static final RegistryDelegate<SecondaryCharacterXpMultiplierConfigEntry> SECONDARY_CHARACTER_XP_MULTIPLIER_CONFIG = register("secondary_character_xp_multiplier", SecondaryCharacterXpMultiplierConfigEntry::new);
   public static final RegistryDelegate<BattleTransitionModeConfigEntry> BATTLE_TRANSITION_MODE_CONFIG = register("battle_transition_mode", BattleTransitionModeConfigEntry::new);
   public static final RegistryDelegate<PreferredBattleCameraAngleConfigEntry> PREFERRED_BATTLE_CAMERA_ANGLE = register("preferred_battle_camera_angle", PreferredBattleCameraAngleConfigEntry::new);
-  public static final RegistryDelegate<BattleDifficultyConfigEntry> BATTLE_DIFFICULTY = register("battle_difficulty", BattleDifficultyConfigEntry::new);
   public static final RegistryDelegate<FooterActionColorConfigEntry> FOOTER_ACTION_COLOR_CONFIG = CONFIG_REGISTRAR.register("footer_action_color", FooterActionColorConfigEntry::new);
   public static final RegistryDelegate<TurboToggleConfig> TURBO_TOGGLE_CONFIG = CONFIG_REGISTRAR.register("turbo_toggle", TurboToggleConfig::new);
   public static final RegistryDelegate<IconSetConfigEntry> ICON_SET = CONFIG_REGISTRAR.register("icon_set", IconSetConfigEntry::new);
@@ -165,7 +171,6 @@ public class CoreMod {
   public static final RegistryDelegate<AdditionTimingModeConfigEntry> ADDITION_TIMING_MODE_CONFIG = register("addition_timing_mode", AdditionTimingModeConfigEntry::new);
   public static final RegistryDelegate<AdditionTimingOffsetConfigEntry> ADDITION_TIMING_OFFSET_CONFIG = register("addition_timing_offset", AdditionTimingOffsetConfigEntry::new);
   public static final RegistryDelegate<AdditionButtonModeConfigEntry> ADDITION_BUTTON_MODE_CONFIG = register("addition_button_mode", AdditionButtonModeConfigEntry::new);
-  public static final RegistryDelegate<AdditionRandomModeConfig> ADDITION_RANDOM_MODE_CONFIG = CONFIG_REGISTRAR.register("addition_random_mode", AdditionRandomModeConfig::new);
   public static final RegistryDelegate<AdditionCounterDifficultyConfigEntry> ADDITION_COUNTER_DIFFICULTY_CONFIG = register("addition_counter_difficulty", AdditionCounterDifficultyConfigEntry::new);
   public static final RegistryDelegate<AdditionGameplayEnhanceConfig> ADDITION_GAMEPLAY_ENHANCE_CONFIG = CONFIG_REGISTRAR.register("addition_gameplay_enhance", AdditionGameplayEnhanceConfig::new);
   public static final RegistryDelegate<AdditionOverlaySizeConfigEntry> ADDITION_OVERLAY_SIZE_CONFIG = CONFIG_REGISTRAR.register("addition_overlay_size", AdditionOverlaySizeConfigEntry::new);

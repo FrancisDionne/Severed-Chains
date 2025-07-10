@@ -3,9 +3,13 @@ package legend.game.inventory;
 import legend.core.memory.Method;
 import legend.game.characters.Element;
 import legend.game.combat.bent.BattleEntity27c;
+import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.scripting.FlowControl;
 import legend.game.scripting.ScriptState;
 import org.legendofdragoon.modloader.registries.RegistryEntry;
+
+import static legend.core.GameEngine.CONFIG;
 
 public abstract class Item extends RegistryEntry implements InventoryEntry {
   private final ItemIcon icon;
@@ -67,6 +71,13 @@ public abstract class Item extends RegistryEntry implements InventoryEntry {
     }
 
     throw new RuntimeException(this + " usage in menu has yet been implemented");
+  }
+
+  public static boolean characterCanUseItemInMenu(final int charId, final Item item) {
+    if(CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
+      return PermaDeathConfigEntry.hasNotDiedOrIsInUse(charId);
+    }
+    return true;
   }
 
   public FlowControl useInBattle(final ScriptState<BattleEntity27c> user, final int targetBentIndex) {

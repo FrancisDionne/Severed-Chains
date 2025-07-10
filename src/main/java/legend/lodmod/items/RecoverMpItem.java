@@ -47,6 +47,12 @@ public class RecoverMpItem extends BattleItem {
   @Override
   @Method(0x80022d88L)
   public void useInMenu(final UseItemResponse response, final int charId) {
+    if(!characterCanUseItemInMenu(charId, this)) {
+      response._00 = 0;
+      response.value_04 = -2;
+      return;
+    }
+
     final int amount;
     if(this.percentage == 100) {
       amount = -1;
