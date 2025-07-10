@@ -49,6 +49,8 @@ public class BattleDifficultyConfigEntry extends EnumConfigEntry<BattleDifficult
         monster.speed_08 = Math.round(monster.speed_08 * 1.1f);
         break;
     }
+
+    reloadMonsters();
   }
 
   public static void reloadMonsters() {
