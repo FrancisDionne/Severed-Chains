@@ -8,6 +8,7 @@ import legend.game.inventory.screens.controls.BigList;
 import legend.game.inventory.screens.controls.Glyph;
 import legend.game.inventory.screens.controls.SaveCard;
 import legend.game.inventory.screens.controls.SaveCardData;
+import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.SaveFailedException;
 import legend.game.saves.SavedGame;
 import legend.game.types.MessageBoxResult;
@@ -18,6 +19,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.SAVES;
 import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.menuStack;
@@ -64,9 +66,11 @@ public class SaveGameScreen extends MenuScreen {
     this.saveList.onSelection(this::onSelection);
     this.setFocus(this.saveList);
 
-    this.saveList.addEntry(new SaveCardData(gameState_800babc8.campaign, null));
-
     this.saves = gameState_800babc8.campaign.loadAllSaves();
+    if(this.saves.isEmpty() || !CONFIG.getConfig(CoreMod.IRONMAN_MODE.get())) {
+      this.saveList.addEntry(new SaveCardData(gameState_800babc8.campaign, null));
+    }
+
     for(final SavedGame save : this.saves) {
       this.saveList.addEntry(new SaveCardData(gameState_800babc8.campaign, save));
     }
@@ -86,10 +90,10 @@ public class SaveGameScreen extends MenuScreen {
     FooterActionsHud.renderMenuActions(FooterActions.DELETE, null, null);
   }
 
-  private void onSelection(@Nullable final SaveCardData data) {
+  private void onSelection(final SaveCardData data) {
     playMenuSound(2);
 
-    if(data == null) {
+    if(data.saveGame == null) {
       menuStack.pushScreen(new InputBoxScreen("Save name:", SAVES.generateSaveName(this.saves, gameState_800babc8), this::onNewSaveResult));
     } else {
       menuStack.pushScreen(new MessageBoxScreen(Overwrite_save_8011c9e8, 2, result -> this.onOverwriteResult(result.messageBoxResult, data.saveGame)));

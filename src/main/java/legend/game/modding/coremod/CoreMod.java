@@ -50,6 +50,7 @@ import legend.game.modding.coremod.config.IgnoreSteamInputModeConfigEntry;
 import legend.game.modding.coremod.config.IndicatorModeConfigEntry;
 import legend.game.modding.coremod.config.InventoryGroupConfigEntry;
 import legend.game.modding.coremod.config.InventorySizeConfigEntry;
+import legend.game.modding.coremod.config.IronmanModeConfigEntry;
 import legend.game.modding.coremod.config.LegacyWidescreenModeConfig;
 import legend.game.modding.coremod.config.MashModeConfigEntry;
 import legend.game.modding.coremod.config.MasterVolumeConfigEntry;
@@ -151,6 +152,7 @@ public class CoreMod {
   public static final RegistryDelegate<PreferredBattleCameraAngleConfigEntry> PREFERRED_BATTLE_CAMERA_ANGLE = register("preferred_battle_camera_angle", PreferredBattleCameraAngleConfigEntry::new);
   public static final RegistryDelegate<BattleDifficultyConfigEntry> BATTLE_DIFFICULTY = register("battle_difficulty", BattleDifficultyConfigEntry::new);
   public static final RegistryDelegate<PermaDeathConfigEntry> PERMA_DEATH = register("perma_death", PermaDeathConfigEntry::new);
+  public static final RegistryDelegate<IronmanModeConfigEntry> IRONMAN_MODE = register("ironman_mode", IronmanModeConfigEntry::new);
   public static final RegistryDelegate<FooterActionColorConfigEntry> FOOTER_ACTION_COLOR_CONFIG = CONFIG_REGISTRAR.register("footer_action_color", FooterActionColorConfigEntry::new);
   public static final RegistryDelegate<TurboToggleConfig> TURBO_TOGGLE_CONFIG = CONFIG_REGISTRAR.register("turbo_toggle", TurboToggleConfig::new);
   public static final RegistryDelegate<IconSetConfigEntry> ICON_SET = CONFIG_REGISTRAR.register("icon_set", IconSetConfigEntry::new);
