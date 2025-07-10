@@ -58,6 +58,18 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
     this.campaignName.setZ(35);
     this.addRow("Campaign name", this.campaignName);
 
+    final Button challenges = new Button("Challenges");
+    this.addRow("", challenges);
+    challenges.onPressed(() ->
+      this.getStack().pushScreen(new CampaingChallengesScreen(CONFIG, EnumSet.allOf(ConfigStorageLocation.class), () -> {
+        startFadeEffect(2, 10);
+        this.getStack().popScreen();
+
+        // Update global config but don't save campaign config until an actual save file is made so we don't end up with orphan campaigns
+        ConfigStorage.saveConfig(CONFIG, ConfigStorageLocation.GLOBAL, Path.of("config.dcnf"));
+      }))
+    );
+
     final Button options = new Button("Options");
     this.addRow("", options);
     options.onPressed(() ->

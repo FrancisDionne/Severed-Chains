@@ -435,6 +435,7 @@ public class MainMenuScreen extends MenuScreen {
 
     renderText(name, 90, 38, UI_TEXT_CENTERED);
 
+    float iconY = 0;
     if(CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
       final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
       m.translation(6 + xOffset, 215, 120);
@@ -443,6 +444,20 @@ public class MainMenuScreen extends MenuScreen {
       RENDERER
         .queueOrthoModel(quad, m, QueuedModelStandard.class)
         .texture(SaveCard.textures[0]);
+
+      iconY += 13;
+    }
+
+    if(CONFIG.getConfig(CoreMod.IRONMAN_MODE.get())) {
+      final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+      m.translation(6 + xOffset, 215 - iconY, 120);
+      m.scale(13, 12, 1);
+
+      RENDERER
+        .queueOrthoModel(quad, m, QueuedModelStandard.class)
+        .texture(SaveCard.textures[1]);
+
+      iconY += 13;
     }
   }
 

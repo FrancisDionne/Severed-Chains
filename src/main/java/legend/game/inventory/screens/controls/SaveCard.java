@@ -17,6 +17,7 @@ import org.joml.Matrix4f;
 
 import java.nio.file.Path;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.chapterNames_80114248;
@@ -44,7 +45,8 @@ public class SaveCard extends Control {
   private final Label invalidSave;
 
   public static Texture[] textures = {
-    Texture.png(Path.of("gfx", "ui", "skull_icon.png")), //0
+    Texture.png(Path.of("gfx", "ui", "skull_icon.png")),  //0
+    Texture.png(Path.of("gfx", "ui", "icon-helmet.png")), //1
   };
 
   public SaveCard() {
@@ -67,9 +69,7 @@ public class SaveCard extends Control {
 
   public void setSaveData(final SaveCardData data) {
     this.saveData = data.saveGame;
-
-    this.config = new ConfigCollection();
-    data.campaign.loadConfigInto(this.config);
+    this.config = CONFIG;
 
     if(this.saveData != null && this.saveData.isValid()) {
       this.invalidSave.setVisibility(false);
@@ -135,6 +135,7 @@ public class SaveCard extends Control {
         this.renderNumber(348, y + 17, getTimestampPart(state.timestamp_a0, 2), 2, 0x1); // Time played second
         this.renderNumber(344, y + 34, state.stardust_9c, 2); // Stardust
 
+        float iconY = 0;
         if(this.config.getConfig(CoreMod.PERMA_DEATH.get())) {
           final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
           m.translation(x - 2 + xOffset, y + 47, 120);
@@ -143,6 +144,20 @@ public class SaveCard extends Control {
           RENDERER
             .queueOrthoModel(quad, m, QueuedModelStandard.class)
             .texture(textures[0]);
+
+          iconY += 13;
+        }
+
+        if(this.config.getConfig(CoreMod.IRONMAN_MODE.get())) {
+          final int xOffset = (int)RENDERER.getWidescreenOrthoOffsetX();
+          m.translation(x - 2 + xOffset, y + 47 - iconY, 120);
+          m.scale(13, 12, 1);
+
+          RENDERER
+            .queueOrthoModel(quad, m, QueuedModelStandard.class)
+            .texture(textures[1]);
+
+          iconY += 13;
         }
       }
     }

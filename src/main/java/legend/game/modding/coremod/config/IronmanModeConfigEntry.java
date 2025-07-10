@@ -6,6 +6,6 @@ import legend.game.saves.ConfigStorageLocation;
 
 public class IronmanModeConfigEntry extends BoolConfigEntry {
   public IronmanModeConfigEntry() {
-    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001);
+    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 0);
   }
 }

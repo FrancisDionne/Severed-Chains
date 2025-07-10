@@ -135,6 +135,9 @@ public class CoreMod {
   public static final RegistryDelegate<RunByDefaultConfig> RUN_BY_DEFAULT = CONFIG_REGISTRAR.register("run_by_default", RunByDefaultConfig::new);
   public static final RegistryDelegate<EnabledModsConfigEntry> ENABLED_MODS_CONFIG = CONFIG_REGISTRAR.register("enabled_mods", EnabledModsConfigEntry::new);
 
+  public static final RegistryDelegate<PermaDeathConfigEntry> PERMA_DEATH = register("perma_death", PermaDeathConfigEntry::new);
+  public static final RegistryDelegate<IronmanModeConfigEntry> IRONMAN_MODE = register("ironman_mode", IronmanModeConfigEntry::new);
+
   public static final RegistryDelegate<ConfigEntry<Void>> BATTLE_GROUP_CONFIG = register("battle_group", BattleGroupConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> INVENTORY_GROUP_CONFIG = register("inventory_group", InventoryGroupConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> TEXT_GROUP_CONFIG = register("text_group", TextGroupConfigEntry::new);
@@ -151,8 +154,6 @@ public class CoreMod {
   public static final RegistryDelegate<BattleTransitionModeConfigEntry> BATTLE_TRANSITION_MODE_CONFIG = register("battle_transition_mode", BattleTransitionModeConfigEntry::new);
   public static final RegistryDelegate<PreferredBattleCameraAngleConfigEntry> PREFERRED_BATTLE_CAMERA_ANGLE = register("preferred_battle_camera_angle", PreferredBattleCameraAngleConfigEntry::new);
   public static final RegistryDelegate<BattleDifficultyConfigEntry> BATTLE_DIFFICULTY = register("battle_difficulty", BattleDifficultyConfigEntry::new);
-  public static final RegistryDelegate<PermaDeathConfigEntry> PERMA_DEATH = register("perma_death", PermaDeathConfigEntry::new);
-  public static final RegistryDelegate<IronmanModeConfigEntry> IRONMAN_MODE = register("ironman_mode", IronmanModeConfigEntry::new);
   public static final RegistryDelegate<FooterActionColorConfigEntry> FOOTER_ACTION_COLOR_CONFIG = CONFIG_REGISTRAR.register("footer_action_color", FooterActionColorConfigEntry::new);
   public static final RegistryDelegate<TurboToggleConfig> TURBO_TOGGLE_CONFIG = CONFIG_REGISTRAR.register("turbo_toggle", TurboToggleConfig::new);
   public static final RegistryDelegate<IconSetConfigEntry> ICON_SET = CONFIG_REGISTRAR.register("icon_set", IconSetConfigEntry::new);

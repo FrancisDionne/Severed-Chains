@@ -4,7 +4,6 @@ import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.bent.BattleEntityStat;
 import legend.game.combat.bent.MonsterBattleEntity;
 import legend.game.combat.bent.PlayerBattleEntity;
-import legend.game.inventory.screens.OptionsScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.BoolConfigEntry;
 import legend.game.saves.ConfigCategory;
@@ -20,14 +19,13 @@ import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 
 public class PermaDeathConfigEntry extends BoolConfigEntry {
   public PermaDeathConfigEntry() {
-    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001, PermaDeathConfigEntry::callback);
+    super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 0, PermaDeathConfigEntry::callback);
   }
 
   private static void callback() {
     if(CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
       if(!CONFIG.getConfig(CoreMod.UNLOCK_PARTY_CONFIG.get())) {
         CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
-        OptionsScreen.refreshFlag = true;
       }
     }
   }
