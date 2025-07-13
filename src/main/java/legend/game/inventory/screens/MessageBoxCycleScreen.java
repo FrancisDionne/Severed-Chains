@@ -17,7 +17,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 public class MessageBoxCycleScreen extends MessageBoxScreen {
   /** Allows list wrapping, but only on new input */
 
-  private static final int ARROWS_MAX_TICKS = 90;
+  private static final int ARROWS_MAX_TICKS = 45;
 
   private final String[] texts;
   private final FontOptions[] fonts;
