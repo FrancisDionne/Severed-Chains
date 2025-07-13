@@ -199,8 +199,8 @@ public class MainMenuScreen extends MenuScreen {
         this.archivesHideButton = this.addButton("hide_archives_1", () -> { }, 7);
         this.archivesHideButton.hide();
         this.goodsButton = this.addButton("Goods", this::showGoodsScreen, 8);
-        this.statsButton = this.addButton("Statistics", this::showStatisticsScreen, 9);
-        this.bestiaryButton = this.addButton("Bestiary", this::showBestiaryScreen, 10);
+        this.bestiaryButton = this.addButton("Bestiary", this::showBestiaryScreen, 9);
+        this.statsButton = this.addButton("Statistics", this::showStatisticsScreen, 10);
         break;
     }
 
@@ -596,7 +596,7 @@ public class MainMenuScreen extends MenuScreen {
   private void showArchives() {
     if(this.state != 1) {
       this.setState(1);
-      this.setFocus(this.goodsButton);
+      this.setFocus(this.bestiaryButton);
     } else {
       this.setState(0);
     }

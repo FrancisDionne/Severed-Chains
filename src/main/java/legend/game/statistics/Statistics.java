@@ -533,8 +533,8 @@ public final class Statistics {
     }
   }
 
-  public static void incrementMonsterKill(final int monsterId) {
-    appendStat(100000 + monsterId, 1);
+  public static void incrementMonsterKill(final int monsterId, final int value) {
+    appendStat(100000 + monsterId, value);
   }
 
   public static int getMonsterKill(final int monsterId) {

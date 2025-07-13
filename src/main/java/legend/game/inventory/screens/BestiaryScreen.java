@@ -104,6 +104,8 @@ public class BestiaryScreen extends MenuScreen {
         this.rank = 2;
       } else if(this.kill >= 1 || this.isSubEntry) {
         this.rank = 1;
+      } else if (this.kill == -1) {
+        this.rank = -1;
       } else {
         this.rank = 0;
       }
@@ -239,16 +241,16 @@ public class BestiaryScreen extends MenuScreen {
 
   private void loadEntries() {
     this.bestiaryEntries = new ArrayList<>();
-    this.addEntry(257, -1, -1, null, "Seles", "Southern Serdio", "A rank-and-file knight in the service of Sandora.\nUses a combination of ranged knives and sword attacks.");
+    this.addEntry(257, -1, 4, null, "Seles", "Southern Serdio", "A rank-and-file knight in the service of Sandora.\nUses a combination of ranged knives and sword attacks.");
     this.addEntry(256, -1, 1, null, "Seles", "Southern Serdio", "Commander lingering near Seles after it was raided by Sandora.\nHas a basic attack, combo slash, and items at their disposal.");
     this.addEntry(21, -1, -1, null, "Forest", "Southern Serdio", "A cocky bird. Will slash with talons and crow at its enemies.");
     this.addEntry(24, -1, -1, null, "Forest", "Southern Serdio", "A crazed rodent in the Forest. Will often bite.\nAlso has a strange \"Chisel\" attack.");
     this.addEntry(8, -1, -1, null, "Forest", "Southern Serdio", "Strong fighter in the Prairie.\nSeems weak, but does very high damage\nwhen at low health.");
     this.addEntry(38, -1, -1, null, "Forest", "Southern Serdio", "The most durable creature in the Forest. High physical defense.\nWill snap its branches to attack, as well as Pellet.");
-    this.addEntry(134, -1, -1, null, "Hellena Prison", "Southern Serdio", "");
+    this.addEntry(134, -1, -1, null, "Hellena Prison", "Southern Serdio", "The standard-issue guards of Hellena Prison. They use a long mace in\ncombat, and also carry magical attack items. Their job is to patrol\nthe prison and keep it secure, ensuring no-one escapes.");
     this.addEntry(261, -1, 1, null, "Hellena Prison", "Southern Serdio", "Age: 48\nHeight: 190 cm / 6'3\"\n\nHated by his own country, Fruegel is relegated to lording\nover Hellena Prison. A vain pleasure-seeker adorned with decorations. \nHis pets Guftas and Rodriguez are his only friends.\n\nCombat: club bash, body slam, boulder throw, call allies.");
-    this.addEntry(259, -1, -1, null, "Hellena Prison", "Southern Serdio", "The standard-issue guards of Hellena Prison. They use a long mace in\ncombat, and also carry magical attack items. Their job is to patrol\nthe prison and keep it secure, ensuring no-one escapes.");
-    this.addEntry(260, -1, -1, null, "Hellena Prison", "Southern Serdio", "The Senior Warden is stronger and more deadly. They wield\ndouble-edged spears and carry magic attack items. \n\nThe Senior Warden also has access to Power Up. This makes them\nharder to defeat, but it can also make their magical attack deadly.");
+    this.addEntry(259, 261, 1, null, "Hellena Prison", "Southern Serdio", "The standard-issue guards of Hellena Prison. They use a long mace in\ncombat, and also carry magical attack items. Their job is to patrol\nthe prison and keep it secure, ensuring no-one escapes.");
+    this.addEntry(260, 261, 1, null, "Hellena Prison", "Southern Serdio", "The Senior Warden is stronger and more deadly. They wield\ndouble-edged spears and carry magic attack items. \n\nThe Senior Warden also has access to Power Up. This makes them\nharder to defeat, but it can also make their magical attack deadly.");
     this.addEntry(59, -1, -1, null, "Prairie", "Southern Serdio", "bzzzzzt!");
     this.addEntry(0, -1, -1, null, "Prairie", "Southern Serdio", "A strong creature,featuring high physical stats\nand Power Up. Weaker to magic.");
     this.addEntry(45, -1, -1, null, "Prairie", "Southern Serdio", "");
@@ -257,7 +259,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(94, -1, -1, null, "Limestone Cave", "Northern Serdio", "");
     this.addEntry(46, -1, -1, null, "Limestone Cave", "Northern Serdio", "A common bat residing in the Limestone Cave. Although very weak,\nits special ability can confuse people into attacking themselves\nor their friends.");
     this.addEntry(104, -1, -1, null, "Limestone Cave", "Northern Serdio", "A living ooze, the Slime's standard attack can render enemies unable to\nattack in return. Its special ability deals increased damage.");
-    this.addEntry(148, -1, -1, null, "Dragon's Nest", "Southern Serdio", "Unknown variant - pending investigation");
+    //this.addEntry(148, -1, -1, null, "Dragon's Nest", "Southern Serdio", "Unknown variant - pending investigation");
     this.addEntry(64, -1, -1, null, "Limestone Cave", "Northern Serdio", "The Ugly Balloon is a creature of the Limestone Cave. It can fly at high\nspeeds. Though it has low defense and attack, it can poison its enemies\nfor high damage over time.");
     this.addEntry(332, -1, 1, null, "Limestone Cave", "Northern Serdio", "A large snake-like creature, Urobolus is the guardian of Limestone Cave.\nIt has strong physical attacks and can inflict poison frequently. \nPeriodically it will retreat to a high place, avoiding melee attacks.");
     this.addEntry(138, -1, -1, null, "Endiness", "Limestone Cave - Bale", "A rare bird seen only along the road between Limestone Cave and\nBale. \n\nLike all Rare creatures. it has a high chance of running away, but\ndrops great rewards if defeated.");
@@ -280,6 +282,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(92, -1, -1, null, "Villude Volcano", "Southern Serdio", "A large creature with its back constantly ablaze. The Salamander's\nbasic attack can stun enemies, which becomes dangerous when it\nattacks the same target multiple times.");
     this.addEntry(308, -1, 1, "Wounded Virage", "Villude Volcano", "Southern Serdio", "A relic of the Dragon Campaign, this Virage was seemingly petrified\nwithin the Volcano for millenia. It activates to attack Dart's party.\n\nThis Virage is not at full strength. It is clearly damaged:\nmissing one arm, both legs, and more. Despite this, it is still deadly.\nThis Virage can inflict an assortment of status ailments, and uses a\nstaggeringly powerful beam laser.");
     this.addEntry(333, -1, 1, null, "Villude Volcano", "Southern Serdio", "An elemental creature that patrols the volcano. Fire Bird may pursue\npassersby who attempt to traverse the molten crags. \n\nMost of its abilities have an area of effect, and are of the Fire element.\n\nAlso known as Piton.");
+    this.addEntry(334, 333, 1, null, "Villude Volcano", "Southern Serdio", "An elemental creature that patrols the volcano. Fire Bird may pursue\npassersby who attempt to traverse the molten crags. \n\nMost of its abilities have an area of effect, and are of the Fire element.\n\nAlso known as Piton.");
     this.addEntry(19, -1, -1, null, "Dragon's Nest", "Southern Serdio", "");
     this.addEntry(88, -1, -1, "Man-Eating Bud", "Dragon's Nest", "Southern Serdio", "");
     this.addEntry(90, -1, -1, null, "Dragon's Nest", "Southern Serdio", "");
@@ -533,7 +536,7 @@ public class BestiaryScreen extends MenuScreen {
     this.m.translation(-22f + xOffset, 27.8f, 126);
     this.m.scale(210f, 87.3f, 1);
 
-    if(this.monster.rank >= 1) {
+    if(this.monster.rank > 0) {
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.modelTexture); //Model
@@ -550,22 +553,28 @@ public class BestiaryScreen extends MenuScreen {
   private void renderEnemyName() {
     final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
 
-    if(this.monster.rank >= 1) {
+    if(this.monster.rank > 0) {
       this.m.translation(14.5f + xOffset, 8f, 127);
       this.m.scale(338.6f, 19.9f, 1);
 
       RENDERER
         .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
         .texture(this.headerTexture); //Header
+    }
 
+    if(this.monster.rank > 0 || this.monster.rank == -1) {
       if(devMode) {
         renderText(this.monster.name + " [" + this.monster.charId + ']', 184, 10.5f, this.headerFont, 126);
       } else {
         renderText(this.monster.name, 184, 10.5f, this.headerFont, 126);
       }
-      renderText(this.monster.location, 31, 206.5f, this.locationFont, 127);
     } else {
       renderText(QUESTION_MARK_5, 184, 10.5f, this.headerFont, 126);
+    }
+
+    if(this.monster.rank > 0 || this.monster.rank == -1) {
+      renderText(this.monster.location, 31, 206.5f, this.locationFont, 127);
+    } else {
       renderText(QUESTION_MARK_5, 31, 206.5f, this.locationFont, 126);
     }
 
@@ -576,9 +585,9 @@ public class BestiaryScreen extends MenuScreen {
 //    this.modelAndAnimData_800c66a8.coolonPlaceMarker.render(u, 2, 21f, 206f, 127f);
 
     renderText(this.nf.format(this.monster.entryNumber), 15f, 28.5f, this.headerNumberFont, 125);
-    renderText("Defeated: " + (this.monster.maxKill > -1 ? Math.min(this.monster.maxKill, this.monster.kill) : this.monster.kill), 23, 123, this.statsFont, 127);
+    renderText("Defeated: " + Math.max(0, this.monster.maxKill > -1 ? Math.min(this.monster.maxKill, this.monster.kill) : this.monster.kill), 23, 123, this.statsFont, 127);
 
-    if(this.monster.rank > 0) {
+    if(this.monster.rank > 0 || this.monster.rank == -1) {
       float x = 0;
       for(int i = 0; i < 3; i++) {
         this.m.translation(146.5f + x + xOffset, 121f, 127);
@@ -777,7 +786,7 @@ public class BestiaryScreen extends MenuScreen {
         charX += 3.7f;
       }
       renderText(":", x + 16f, y, highlighted ? (entry.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
-      renderText(entry.rank > 0 ? entry.name : QUESTION_MARK_5, x + 19f, y, highlighted ? (entry.isPerfect() ? this.listPerfectHighlightFont : this.listHighlightFont) : (entry.isPerfect() ? this.listPerfectFont : this.listFont), 123);
+      renderText(entry.rank > 0 || entry.rank == -1 ? entry.name : QUESTION_MARK_5, x + 19f, y, highlighted ? (entry.isPerfect() ? this.listPerfectHighlightFont : this.listHighlightFont) : (entry.isPerfect() ? this.listPerfectFont : this.listFont), 123);
 
       if(highlighted) {
         this.m.translation(xOffset - x + 14.5f , y - 1.5f, 124);

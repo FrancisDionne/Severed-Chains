@@ -2425,6 +2425,10 @@ public class Battle extends EngineState {
     } else {
       //LAB_800c9664
       initModel(model, tmd, anim);
+
+      if(Statistics.getMonsterKill(combatant.charIndex_1a2) == 0) {
+        Statistics.incrementMonsterKill(combatant.charIndex_1a2, -1);
+      }
     }
 
     TmdObjLoader.fromModel("CombatantModel (index " + combatant.charSlot_19c + ')', model);
@@ -3788,7 +3792,7 @@ public class Battle extends EngineState {
           totalXpFromCombat_800bc95c += enemyCombatant.xp_194;
 
           Statistics.appendStat(Statistics.Stats.GOLD, goldGainedFromCombat_800bc920);
-          Statistics.incrementMonsterKill(data.combatant_144.charIndex_1a2);
+          Statistics.incrementMonsterKill(data.combatant_144.charIndex_1a2, Statistics.getMonsterKill(data.combatant_144.charIndex_1a2) == -1 ? 2 : 1);
 
           if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null && this.currentTurnBent_800c66c8.innerStruct_00.charId_272 != data.combatant_144.charIndex_1a2) {
             Statistics.appendStat(this.currentTurnBent_800c66c8.innerStruct_00, Statistics.Stats.TOTAL_KILL, 1);
