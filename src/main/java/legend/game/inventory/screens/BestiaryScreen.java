@@ -98,9 +98,9 @@ public class BestiaryScreen extends MenuScreen {
         this.location = map + (region.isEmpty() ? "" : " - " + region);
       }
 
-      if(this.kill >= 10 || (this.maxKill > -1 && this.kill >= this.maxKill)) {
+      if(this.kill >= RANK_3 || (this.maxKill > -1 && this.kill >= this.maxKill)) {
         this.rank = 3;
-      } else if(this.kill >= 5) {
+      } else if(this.kill >= RANK_2) {
         this.rank = 2;
       } else if(this.kill >= 1 || this.isSubEntry) {
         this.rank = 1;
@@ -121,6 +121,8 @@ public class BestiaryScreen extends MenuScreen {
   private static final boolean devMode = true;
   private static final int LIST_ITEM_COUNT = 24;
   private static final int SUB_ENTRY_ARROW_TICK_LENGTH = 92;
+  private static final int RANK_2 = 3;
+  private static final int RANK_3 = 5;
   private static final String QUESTION_MARK_5 = "?????";
   private static final String QUESTION_MARK_3 = "???";
   private static final String LORE_DEFAULT = "Lore coming one day to a QoL mod near you...";
@@ -457,7 +459,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(382, -1, 1, null, "Moon", "Gloriano", "");
     this.addEntry(320, -1, 1, "Super Virage", "Moon", "Gloriano", "A relic of the Dragon Campaign, this Super Virage is the last natural line\nof defense for the primary Virage Embryo. Unlike the one found in the\nruins of Kadessa, this one won't self-detonate, and must be defeated.");
     this.addEntry(387, -1, 1, null, "Moon", "Gloriano", "Age: 28\nHeight: 181 cm / 5'9\"\n\nZieg is a legendary warrior from the time of the Dragon Campaign.\nHe normally would have perished long ago, but in the final battle he\nwas petrified by Melbu Frahma for over 11,000 years. \n\nWhen the spell wore off, he tried to start a new life. However, as his\nhometown was attacked, he tried to save it. When he activated\nhis Dragoon Spirit, Melbu's spirit came out instead, possessing him. \n\nZieg was not himself for 18 years. Melbu would use his body to create\na new scheme to destroy the world, and remake it in his image.\n\nOn the Moon, Melbu (as ZIeg) swipes Dart's Dargoon Spirit and transforms.\nHe has his own style of Dart's Dragoon abilities, proving very powerful.\n\nAfter being defeated, Zieg is finally himself again, and gets to speak\nwith his fiancé Rose one last time.");
-    this.addEntry(388, -1, 1, null, "Moon", "Gloriano", "A Wingly dictator, Melbu Frahma was obsessed with power. He sees\nhimself as superior, both during the Dragon Campaign and now. \nHis magic was so strong that he needed a restraining device to keep\nit under control. Under his rule, many species were subjugated.\n\nAlthough defeated in the final battle of the Dragon Campaign, he would\npreserve himself within Zieg's Dragoon Spirit, biding his time.\n\nOnce ZIeg unwittingly released him, Melbu began a new plot to\nremake the world in his image. Eventually, Melbu would reach the Moon\nand stop the");
+    //this.addEntry(388, -1, 1, null, "Moon", "Gloriano", "A Wingly dictator, Melbu Frahma was obsessed with power. He sees\nhimself as superior, both during the Dragon Campaign and now. \nHis magic was so strong that he needed a restraining device to keep\nit under control. Under his rule, many species were subjugated.\n\nAlthough defeated in the final battle of the Dragon Campaign, he would\npreserve himself within Zieg's Dragoon Spirit, biding his time.\n\nOnce ZIeg unwittingly released him, Melbu began a new plot to\nremake the world in his image. Eventually, Melbu would reach the Moon\nand stop the");
   }
 
   private void addEntry(final int charId, final int subEntryParentId, final int killCount, @Nullable final String name, final String map, final String region, final String lore) {
@@ -600,7 +602,7 @@ public class BestiaryScreen extends MenuScreen {
           }
 
           if(this.monster.rank <= i) {
-            renderText(i == 0 ? "1" : (i == 1 ? "5" : "10"), 151.25f + x, 124f, this.gemFont, 126);
+            renderText(i == 0 ? "1" : String.valueOf(i == 1 ? RANK_2 : RANK_3), 151.25f + x, 124f, this.gemFont, 126);
           }
         }
 
