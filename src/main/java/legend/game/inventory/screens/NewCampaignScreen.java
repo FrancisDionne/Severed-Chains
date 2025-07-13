@@ -304,7 +304,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
         CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.HARD);
         break;
       case 2:  //Zealous
-        CONFIG.setConfig(CoreMod.BATTLE_DIFFICULTY.get(), BattleDifficulty.HARDER);
+        CONFIG.setConfig(CoreMod.BATTLE_DIFFICULTY.get(), BattleDifficulty.EXTREME);
         CONFIG.setConfig(CoreMod.SECONDARY_CHARACTER_XP_MULTIPLIER_CONFIG.get(), 0.25f);
         CONFIG.setConfig(CoreMod.INVENTORY_SIZE_CONFIG.get(), 30);
         CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), false);

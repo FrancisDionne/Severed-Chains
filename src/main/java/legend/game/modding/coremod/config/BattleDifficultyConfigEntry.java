@@ -37,7 +37,7 @@ public class BattleDifficultyConfigEntry extends EnumConfigEntry<BattleDifficult
         monster.magicAvoid_0c = Math.round(monster.magicAvoid_0c * 1.1f);
         monster.speed_08 = Math.round(monster.speed_08 * 1.1f);
         break;
-      case BattleDifficulty.HARDER:
+      case BattleDifficulty.EXTREME:
         monster.hp_00 = Math.round(monster.hp_00 * 2f);
         monster.attack_04 = Math.round(monster.attack_04 * 1.20f);
         monster.magicAttack_06 = Math.round(monster.magicAttack_06 * 1.14f);

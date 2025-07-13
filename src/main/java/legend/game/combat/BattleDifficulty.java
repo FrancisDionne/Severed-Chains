@@ -4,5 +4,5 @@ public enum BattleDifficulty {
   EASY(),
   NORMAL(),
   HARD(),
-  HARDER()
+  EXTREME()
 }
