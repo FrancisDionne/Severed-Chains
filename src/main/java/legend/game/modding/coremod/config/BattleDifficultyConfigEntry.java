@@ -29,23 +29,23 @@ public class BattleDifficultyConfigEntry extends EnumConfigEntry<BattleDifficult
         break;
       case BattleDifficulty.HARD:
         monster.hp_00 = Math.round(monster.hp_00 * 1.5f);
-        monster.attack_04 = Math.round(monster.attack_04 * 1.1f);
-        monster.magicAttack_06 = Math.round(monster.magicAttack_06 * 1.05f);
+        monster.attack_04 = Math.round(monster.attack_04 * 1.12f);
+        monster.magicAttack_06 = Math.round(monster.magicAttack_06 * 1.06f);
         monster.defence_09 = Math.round(monster.defence_09 * 1.05f);
         monster.magicDefence_0a = Math.round(monster.magicDefence_0a * 1.05f);
         monster.attackAvoid_0b = Math.round(monster.attackAvoid_0b * 1.1f);
         monster.magicAvoid_0c = Math.round(monster.magicAvoid_0c * 1.1f);
-        monster.speed_08 = Math.round(monster.speed_08 * 1.05f);
+        monster.speed_08 = Math.round(monster.speed_08 * 1.1f);
         break;
       case BattleDifficulty.HARDER:
         monster.hp_00 = Math.round(monster.hp_00 * 2f);
-        monster.attack_04 = Math.round(monster.attack_04 * 1.17f);
-        monster.magicAttack_06 = Math.round(monster.magicAttack_06 * 1.12f);
+        monster.attack_04 = Math.round(monster.attack_04 * 1.20f);
+        monster.magicAttack_06 = Math.round(monster.magicAttack_06 * 1.14f);
         monster.defence_09 = Math.round(monster.defence_09 * 1.1f);
         monster.magicDefence_0a = Math.round(monster.magicDefence_0a * 1.1f);
         monster.attackAvoid_0b = Math.round(monster.attackAvoid_0b * 1.15f);
         monster.magicAvoid_0c = Math.round(monster.magicAvoid_0c * 1.15f);
-        monster.speed_08 = Math.round(monster.speed_08 * 1.1f);
+        monster.speed_08 = Math.round(monster.speed_08 * 1.15f);
         break;
     }
   }

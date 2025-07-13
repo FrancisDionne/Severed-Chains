@@ -611,7 +611,7 @@ public class BestiaryScreen extends MenuScreen {
           }
 
           if(this.monster.rank <= i) {
-            renderText(i == 0 ? "1" : String.valueOf(i == 1 ? RANK_2 : RANK_3), 151.25f + x, 124f, this.gemFont, 126);
+            renderText(i == 0 ? "1" : String.valueOf(Math.min(this.monster.maxKill, i == 1 ? RANK_2 : RANK_3)), 151.25f + x, 124f, this.gemFont, 126);
           }
         }
 

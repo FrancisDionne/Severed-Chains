@@ -221,7 +221,6 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
   }
 
   private void setRecommendedOptions(final int recommendId) {
-
     if(recommendId != 3) { //if not Nostalgia preset
       //Common/Default Options
       CONFIG.setConfig(CoreMod.PREFERRED_BATTLE_CAMERA_ANGLE.get(), PreferredBattleCameraAngle.PLAYER);
@@ -238,6 +237,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
       CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
       CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), true);
       CONFIG.setConfig(CoreMod.PERMA_DEATH.get(), false);
+      CONFIG.setConfig(CoreMod.QUICK_TEXT_CONFIG.get(), false);
 
       CONFIG.setConfig(CoreMod.ADDITION_MODE_CONFIG.get(), AdditionMode.NORMAL);
       CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.NORMAL);
@@ -269,6 +269,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
         CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), false);
         CONFIG.setConfig(CoreMod.TURBO_TOGGLE_CONFIG.get(), false);
         CONFIG.setConfig(CoreMod.PERMA_DEATH.get(), false);
+        CONFIG.setConfig(CoreMod.QUICK_TEXT_CONFIG.get(), false);
 
         CONFIG.setConfig(CoreMod.ADDITION_MODE_CONFIG.get(), AdditionMode.NORMAL);
         CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.NORMAL);
@@ -309,6 +310,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
         CONFIG.setConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get(), false);
         CONFIG.setConfig(CoreMod.TURBO_TOGGLE_CONFIG.get(), true);
         CONFIG.setConfig(CoreMod.UNLOCK_PARTY_CONFIG.get(), true);
+        CONFIG.setConfig(CoreMod.QUICK_TEXT_CONFIG.get(), true);
 
         CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_CONFIG.get(), AdditionOverlayMode.OFF);
         CONFIG.setConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get(), AdditionCounterDifficulty.HARD);
