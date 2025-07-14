@@ -182,11 +182,11 @@ public class BattleUIColourScreen extends VerticalLayoutScreen {
       Config.setBattleRgb(rgb);
 
       this.currentBoxOffsetX = xOffset;
-      this.listBox = new UiBox("Battle UI Colour Screen List", 368 * 0.1f, 100f, 368 * 0.8f, 80f, 0.7f);
+      this.listBox = new UiBox("Battle UI Colour Screen List", 368 * 0.09f, 100f, 368 * 0.82f, 80f, 0.7f);
       dirty = false;
     }
 
     this.listBox.render(Config.changeBattleRgb() ? Config.getBattleRgb() : Config.defaultUiColour, 150);
-    renderText("Adjust the numbers to change the color", 368 * 0.5f, 133f, this.font, 149);
+    renderText("Adjust the numbers to change the colour", 368 * 0.5f, 133f, this.font, 149);
   }
 }
