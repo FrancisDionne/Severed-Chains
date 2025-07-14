@@ -107,6 +107,10 @@ public final class Config {
     properties.setProperty("battle_ui_colour_change", String.valueOf(!changeBattleRgb()));
   }
 
+  public static void setChangeBattleUiColour(final boolean value) {
+    properties.setProperty("battle_ui_colour_change", String.valueOf(value));
+  }
+
   public static boolean changeAdditionOverlayRgb() {
     return readBool("addition_overlay_colour_change", false);
   }

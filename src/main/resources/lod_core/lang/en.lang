@@ -212,6 +212,12 @@ lod_core.config.icon_set.RETAIL=Retail
 lod_core.config.addition_settings.label=Additions
 lod_core.config.addition_settings.configure=Configure...
 
+lod_core.config.battle_ui_colour_settings.label=Battle UI Colour
+lod_core.config.battle_ui_colour_settings.configure=Configure...
+lod_core.config.battle_ui_colour_red.label=Red
+lod_core.config.battle_ui_colour_green.label=Green
+lod_core.config.battle_ui_colour_blue.label=Blue
+
 lod_core.config.addition_group.label=[--- Additions ---]
 lod_core.config.addition_mode.label=Input
 lod_core.config.addition_mode.help=Setting for the input mode for regular additions\n[Manual] Additions have to be manually\n[Automatic] Additions will be performed automatically

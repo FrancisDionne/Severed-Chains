@@ -135,8 +135,16 @@ public class UiBox {
     this.render(colour.x, colour.y, colour.z);
   }
 
+  public void render(final Vector3f colour, final float z) {
+    this.render(colour.x, colour.y, colour.z, z);
+  }
+
   public void render(final float r, final float g, final float b) {
-    this.transforms.transfer.set(0.0f, 0.0f, 125.0f);
+    this.render(r, g, b, 125f);
+  }
+
+  public void render(final float r, final float g, final float b, final float z) {
+    this.transforms.transfer.set(0.0f, 0.0f, z);
 
     if(this.backgroundAlpha > -1) {
       RENDERER.queueOrthoModel(this.hudBackgroundButDarkerObj, this.transforms, QueuedModelStandard.class)

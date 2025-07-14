@@ -4,6 +4,7 @@ import legend.game.i18n.I18n;
 import legend.game.inventory.screens.Control;
 import org.legendofdragoon.modloader.registries.RegistryEntry;
 
+import javax.annotation.Nullable;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -15,6 +16,7 @@ public class ConfigEntry<T> extends RegistryEntry {
   public final Function<byte[], T> deserializer;
   public final double order;
   public final boolean header;
+  public final Runnable callback;
 
   private BiFunction<T, ConfigCollection, Control> editControl;
 
@@ -22,11 +24,19 @@ public class ConfigEntry<T> extends RegistryEntry {
     this(defaultValue, storageLocation, category, serializer, deserializer, 0);
   }
 
-  public ConfigEntry(final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Function<T, byte[]> serializer, final Function<byte[], T> deserializer, final double order) {
-    this(defaultValue, storageLocation, category, serializer, deserializer, order, false);
+  public ConfigEntry(@Nullable final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Function<T, byte[]> serializer, final Function<byte[], T> deserializer, final double order) {
+    this(defaultValue, storageLocation, category, serializer, deserializer, order, false, null);
   }
 
-  public ConfigEntry(final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Function<T, byte[]> serializer, final Function<byte[], T> deserializer, final double order, final boolean header) {
+  public ConfigEntry(@Nullable final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Function<T, byte[]> serializer, final Function<byte[], T> deserializer, final double order, @Nullable final Runnable callback) {
+    this(defaultValue, storageLocation, category, serializer, deserializer, order, false, callback);
+  }
+
+  public ConfigEntry(@Nullable final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Function<T, byte[]> serializer, final Function<byte[], T> deserializer, final double order, final boolean header) {
+    this(defaultValue, storageLocation, category, serializer, deserializer, order, header, null);
+  }
+
+  public ConfigEntry(@Nullable final T defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final Function<T, byte[]> serializer, final Function<byte[], T> deserializer, final double order, final boolean header, @Nullable final Runnable callback) {
     this.defaultValue = defaultValue;
     this.storageLocation = storageLocation;
     this.category = category;
@@ -34,6 +44,7 @@ public class ConfigEntry<T> extends RegistryEntry {
     this.deserializer = deserializer;
     this.order = order;
     this.header = header;
+    this.callback = callback;
   }
 
   protected void setEditControl(final BiFunction<T, ConfigCollection, Control> editControl) {
@@ -70,6 +81,8 @@ public class ConfigEntry<T> extends RegistryEntry {
   }
 
   public void onChange(final ConfigCollection configCollection, final T oldValue, final T newValue) {
-
+    if(this.callback != null) {
+      this.callback.run();
+    }
   }
 }

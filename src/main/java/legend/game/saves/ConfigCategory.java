@@ -7,5 +7,6 @@ public enum ConfigCategory {
   CONTROLS,
   OTHER,
   ADDITIONS,
-  CHALLENGES
+  CHALLENGES,
+  BATTLE_UI_COLOR
 }

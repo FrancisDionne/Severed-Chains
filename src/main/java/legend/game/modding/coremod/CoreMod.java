@@ -33,6 +33,10 @@ import legend.game.modding.coremod.config.AutoTextDelayConfigEntry;
 import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.modding.coremod.config.BattleGroupConfigEntry;
 import legend.game.modding.coremod.config.BattleTransitionModeConfigEntry;
+import legend.game.modding.coremod.config.BattleUIColourBlueConfigEntry;
+import legend.game.modding.coremod.config.BattleUIColourGreenConfigEntry;
+import legend.game.modding.coremod.config.BattleUIColourRedConfigEntry;
+import legend.game.modding.coremod.config.BattleUIColourSettingsConfigEntry;
 import legend.game.modding.coremod.config.ControllerKeybindsConfigEntry;
 import legend.game.modding.coremod.config.ControllerStyleConfigEntry;
 import legend.game.modding.coremod.config.CreateCrashSaveConfigEntry;
@@ -130,6 +134,7 @@ public class CoreMod {
   /** Config isn't actually used, but adds a button to the options screen to open the keybinds screen */
   public static final RegistryDelegate<ConfigEntry<Void>> CONTROLLER_KEYBINDS_CONFIG = register("controller_keybinds", ControllerKeybindsConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_SETTINGS_CONFIG = register("addition_settings", AdditionSettingsConfigEntry::new);
+  public static final RegistryDelegate<ConfigEntry<Void>> BATTLE_UI_COLOUR_SETTINGS_CONFIG = register("battle_ui_colour_settings", BattleUIColourSettingsConfigEntry::new);
   public static final RegistryDelegate<ControllerStyleConfigEntry> CONTROLLER_STYLE_CONFIG = CONFIG_REGISTRAR.register("controller_style", ControllerStyleConfigEntry::new);
 
   // Per-campaign config
@@ -165,6 +170,9 @@ public class CoreMod {
   public static final RegistryDelegate<EncounterRateConfigEntry> ENCOUNTER_RATE_CONFIG = CONFIG_REGISTRAR.register("encounter_rate", EncounterRateConfigEntry::new);
   public static final RegistryDelegate<AutoTextDelayConfigEntry> AUTO_TEXT_DELAY_CONFIG = CONFIG_REGISTRAR.register("auto_text_delay", AutoTextDelayConfigEntry::new);
   public static final RegistryDelegate<UnlockPartyConfig> UNLOCK_PARTY_CONFIG = CONFIG_REGISTRAR.register("unlock_party", UnlockPartyConfig::new);
+  public static final RegistryDelegate<BattleUIColourRedConfigEntry> BATTLE_UI_COLOUR_RED_CONFIG = CONFIG_REGISTRAR.register("battle_ui_colour_red", BattleUIColourRedConfigEntry::new);
+  public static final RegistryDelegate<BattleUIColourGreenConfigEntry> BATTLE_UI_COLOUR_GREEN_CONFIG = CONFIG_REGISTRAR.register("battle_ui_colour_green", BattleUIColourGreenConfigEntry::new);
+  public static final RegistryDelegate<BattleUIColourBlueConfigEntry> BATTLE_UI_COLOUR_BLUE_CONFIG = CONFIG_REGISTRAR.register("battle_ui_colour_blue", BattleUIColourBlueConfigEntry::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_GROUP_CONFIG = register("addition_group", AdditionGroupConfigEntry::new);
   public static final RegistryDelegate<AdditionModeConfigEntry> ADDITION_MODE_CONFIG = register("addition_mode", AdditionModeConfigEntry::new);
