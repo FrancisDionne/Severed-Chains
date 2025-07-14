@@ -521,15 +521,17 @@ public final class Statistics {
     appendStat(Stats.asStat(stat.asInt() + statOffset), value);
   }
 
-  public static void appendRecoverStat(final BattleEntity27c bent, final int amount, final int colour) {
-    final Stats stat = switch(colour) {
-      case 3, 7 -> Stats.TOTAL_HP_RECOVER;
-      case 10, 12 -> Stats.TOTAL_MP_RECOVER;
-      case 11, 13 -> Stats.TOTAL_SP_RECOVER;
-      default -> null;
-    };
-    if(stat != null) {
-      appendStat(bent, stat, amount);
+  public static void appendRecoverStat(@Nullable final BattleEntity27c bent, final int amount, final int colour) {
+    if(bent != null) {
+      final Stats stat = switch(colour) {
+        case 3, 7 -> Stats.TOTAL_HP_RECOVER;
+        case 10, 12 -> Stats.TOTAL_MP_RECOVER;
+        case 11, 13 -> Stats.TOTAL_SP_RECOVER;
+        default -> null;
+      };
+      if(stat != null) {
+        appendStat(bent, stat, amount);
+      }
     }
   }
 

@@ -46,6 +46,7 @@ import legend.game.modding.coremod.config.EncounterRateConfigEntry;
 import legend.game.modding.coremod.config.FmvVolumeConfigEntry;
 import legend.game.modding.coremod.config.FooterActionColorConfigEntry;
 import legend.game.modding.coremod.config.FullscreenConfigEntry;
+import legend.game.modding.coremod.config.GameplayBalanceConfigEntry;
 import legend.game.modding.coremod.config.IgnoreSteamInputModeConfigEntry;
 import legend.game.modding.coremod.config.IndicatorModeConfigEntry;
 import legend.game.modding.coremod.config.InventoryGroupConfigEntry;
@@ -139,6 +140,7 @@ public class CoreMod {
   public static final RegistryDelegate<PermaDeathConfigEntry> PERMA_DEATH = register("perma_death", PermaDeathConfigEntry::new);
   public static final RegistryDelegate<IronmanModeConfigEntry> IRONMAN_MODE = register("ironman_mode", IronmanModeConfigEntry::new);
   public static final RegistryDelegate<AdditionRandomModeConfig> ADDITION_RANDOM_MODE_CONFIG = CONFIG_REGISTRAR.register("addition_random_mode", AdditionRandomModeConfig::new);
+  public static final RegistryDelegate<GameplayBalanceConfigEntry> GAMEPLAY_BALANCE_CONFIG = CONFIG_REGISTRAR.register("gameplay_balance", GameplayBalanceConfigEntry::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> BATTLE_GROUP_CONFIG = register("battle_group", BattleGroupConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> INVENTORY_GROUP_CONFIG = register("inventory_group", InventoryGroupConfigEntry::new);

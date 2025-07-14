@@ -14,9 +14,13 @@ public final class I18n {
 
   private static final Logger LOGGER = LogManager.getFormatterLogger(I18n.class);
 
+  public static String finalizeTranslate(final String translation) {
+    return translation.replace("{P}", "%");
+  }
+
   public static String translate(final String key) {
     try {
-      return LANG.getTranslation(key);
+      return finalizeTranslate(LANG.getTranslation(key));
     } catch(final IllegalFormatException e) {
       LOGGER.error("Invalid String.format string %s", key);
       return key;
@@ -25,7 +29,7 @@ public final class I18n {
 
   public static String translate(final String key, final Object... args) {
     try {
-      return LANG.getTranslation(key, args);
+      return finalizeTranslate(LANG.getTranslation(key, args));
     } catch(final IllegalFormatException e) {
       LOGGER.error("Invalid String.format string %s", key);
       return key;
@@ -34,7 +38,7 @@ public final class I18n {
 
   public static String translate(final RegistryEntry key) {
     try {
-      return LANG.getTranslation(key.getTranslationKey());
+      return finalizeTranslate(LANG.getTranslation(key.getTranslationKey()));
     } catch(final IllegalFormatException e) {
       LOGGER.error("Invalid String.format string %s", key.getTranslationKey());
       return key.getTranslationKey();
@@ -43,7 +47,7 @@ public final class I18n {
 
   public static String translate(final RegistryEntry key, final Object... args) {
     try {
-      return LANG.getTranslation(key.getTranslationKey(), args);
+      return finalizeTranslate(LANG.getTranslation(key.getTranslationKey(), args));
     } catch(final IllegalFormatException e) {
       LOGGER.error("Invalid String.format string %s", key.getTranslationKey());
       return key.getTranslationKey();
@@ -52,7 +56,7 @@ public final class I18n {
 
   public static String translate(final RegistryDelegate<?> key) {
     try {
-      return LANG.getTranslation(key.getTranslationKey());
+      return finalizeTranslate(LANG.getTranslation(key.getTranslationKey()));
     } catch(final IllegalFormatException e) {
       LOGGER.error("Invalid String.format string %s", key.getTranslationKey());
       return key.getTranslationKey();
@@ -61,7 +65,7 @@ public final class I18n {
 
   public static String translate(final RegistryDelegate<?> key, final Object... args) {
     try {
-      return LANG.getTranslation(key.getTranslationKey(), args);
+      return finalizeTranslate(LANG.getTranslation(key.getTranslationKey(), args));
     } catch(final IllegalFormatException e) {
       LOGGER.error("Invalid String.format string %s", key.getTranslationKey());
       return key.getTranslationKey();

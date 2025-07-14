@@ -8,9 +8,4 @@ public class AdditionGameplayEnhanceConfig extends BoolConfigEntry {
   public AdditionGameplayEnhanceConfig() {
     super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.ADDITIONS, 7);
   }
-
-  @Override
-  public boolean hasHelp() {
-    return true;
-  }
 }

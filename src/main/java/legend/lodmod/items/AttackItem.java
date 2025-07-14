@@ -52,4 +52,8 @@ public class AttackItem extends BattleItem {
     user.storage_44[28] = targetBentIndex;
     user.storage_44[30] = user.index;
   }
+
+  public boolean isTargetAll() {
+    return this.targetAll;
+  }
 }

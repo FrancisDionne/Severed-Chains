@@ -107,6 +107,7 @@ import legend.game.inventory.screens.PostBattleScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionRandomModeConfig;
+import legend.game.modding.coremod.config.GameplayBalanceConfigEntry;
 import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.modding.events.battle.BattleEndedEvent;
 import legend.game.modding.events.battle.BattleEntityTurnEvent;
@@ -161,6 +162,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
@@ -468,6 +470,8 @@ public class Battle extends EngineState {
   public final List<Item> usedRepeatItems_800c6c3c = new ArrayList<>();
 
   public int countCombatUiFilesLoaded_800c6cf4;
+
+  public static HashMap<Integer, int[]> playerLastActions;
 
   public static final Vector2i[] combatUiElementRectDimensions_800c6e48 = {
     new Vector2i(16, 16),
@@ -1581,6 +1585,12 @@ public class Battle extends EngineState {
       combatantIndices[charSlot] = this.addCombatant(0x200 + gameState_800babc8.charIds_88[charSlot] * 2, charSlot);
     }
 
+    if(playerLastActions == null) {
+      playerLastActions = new HashMap<>();
+    } else {
+      playerLastActions.clear();
+    }
+
     //LAB_800fbe4c
     //LAB_800fbe70
     for(int charSlot = 0; charSlot < charCount; charSlot++) {
@@ -1600,6 +1610,7 @@ public class Battle extends EngineState {
       bent.model_148.coord2_14.coord.transfer.z = 0x800 * ((charSlot + 1) / 2) * (charSlot % 2 * 2 - 1) + (charCount % 2 - 1) * 0x400;
       bent.model_148.coord2_14.transforms.rotate.zero();
       battleState_8006e398.addPlayer(state);
+      playerLastActions.put(charIndex, new int[] { -1, 0 });
     }
 
     this.initPlayerBattleEntityStats();
@@ -3571,14 +3582,25 @@ public class Battle extends EngineState {
     //LAB_800ccaec
     this.hud.toggleHighlight(true);
 
-    final int selectedAction = this.hud.tickAndRender();
+    int selectedAction = this.hud.tickAndRender();
     if(selectedAction == 0) {
       //LAB_800ccb24
       return FlowControl.PAUSE_AND_REWIND;
     }
 
     this.hud.toggleHighlight(false);
-    script.params_20[2].set(selectedAction - 1);
+    selectedAction = selectedAction - 1;
+    script.params_20[2].set(selectedAction);
+
+    if(this.currentTurnBent_800c66c8.innerStruct_00 != null) {
+      final int[] lastAction = playerLastActions.get(this.currentTurnBent_800c66c8.innerStruct_00.charId_272);
+      if(lastAction[0] == selectedAction) {
+        lastAction[1]++;
+      } else {
+        lastAction[0] = selectedAction;
+        lastAction[1] = 1;
+      }
+    }
 
     //LAB_800ccb28
     return FlowControl.CONTINUE;
@@ -3699,12 +3721,16 @@ public class Battle extends EngineState {
     final BattleEntity27c bent = (BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00;
     final BattleEntityStat stat = BattleEntityStat.fromLegacy(Math.max(0, script.params_20[2].get()));
     final int[] storage44 = scriptStatePtrArr_800bc1c0[script.params_20[0].get()].storage_44;
-    final int value = script.params_20[1].get();
+    int value = script.params_20[1].get();
 
-    //Disables revive in combat if perma death on
-    if(PermaDeathConfigEntry.isBlockRevive(stat, bent, this.currentTurnBent_800c66c8, value, (storage44[7] & FLAG_DEAD) != 0)) {
-      storage44[7] |= FLAG_DEAD;
-      return FlowControl.CONTINUE;
+    if(this.currentTurnBent_800c66c8.innerStruct_00 != null) {
+      //Disables revive in combat if perma death on
+      if(PermaDeathConfigEntry.isBlockRevive(stat, bent, this.currentTurnBent_800c66c8, value, (storage44[7] & FLAG_DEAD) != 0)) {
+        storage44[7] |= FLAG_DEAD;
+        return FlowControl.CONTINUE;
+      }
+
+      value = GameplayBalanceConfigEntry.adjustValue(this.currentTurnBent_800c66c8.innerStruct_00, bent.charId_272, this.lastSelectedAction, playerLastActions, value, true);
     }
 
     switch(stat) {
@@ -8628,8 +8654,11 @@ public class Battle extends EngineState {
   @ScriptParam(direction = ScriptParam.Direction.IN, type = ScriptParam.Type.INT, name = "colourIndex", description = "Which colour to use (indices are unknown)")
   @Method(0x800f984cL)
   public FlowControl scriptRenderRecover(final RunningScript<?> script) {
-    this.hud.addFloatingNumberForBent(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[0].get(), script.params_20[1].get(), script.params_20[2].get());
-    Statistics.appendRecoverStat(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[1].get(), script.params_20[2].get());
+    final BattleEntity27c currentTurnBent = this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null;
+    final BattleEntity27c bent = (BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00;
+    final int value = GameplayBalanceConfigEntry.adjustValue(currentTurnBent, bent.charId_272, this.lastSelectedAction, playerLastActions, script.params_20[1].get(), false);
+    this.hud.addFloatingNumberForBent(currentTurnBent, script.params_20[0].get(), value, script.params_20[2].get());
+    Statistics.appendRecoverStat(currentTurnBent, value, script.params_20[2].get());
     return FlowControl.CONTINUE;
   }
 

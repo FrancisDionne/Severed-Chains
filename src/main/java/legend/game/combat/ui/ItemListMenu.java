@@ -11,9 +11,25 @@ import legend.game.inventory.screens.TextColour;
 import legend.game.modding.events.inventory.RepeatItemReturnEvent;
 import legend.game.scripting.RunningScript;
 import legend.game.statistics.Statistics;
+import legend.lodmod.items.AngelsPrayerItem;
+import legend.lodmod.items.AttackItem;
+import legend.lodmod.items.BattleItem;
+import legend.lodmod.items.BuffItem;
+import legend.lodmod.items.CauseStatusItem;
+import legend.lodmod.items.CharmPotionItem;
+import legend.lodmod.items.PandemoniumItem;
+import legend.lodmod.items.RecoverHpItem;
+import legend.lodmod.items.RecoverMpItem;
+import legend.lodmod.items.RecoverSpItem;
+import legend.lodmod.items.RecoverStatusItem;
+import legend.lodmod.items.SachetItem;
+import legend.lodmod.items.SignetStoneItem;
+import legend.lodmod.items.TotalVanishingItem;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static legend.core.GameEngine.EVENTS;
 import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
@@ -26,7 +42,7 @@ public class ItemListMenu extends ListMenu {
 
   private UiBox description;
 
-  private final List<CombatItem02> combatItems_800c6988 = new ArrayList<>();
+  private List<CombatItem02> combatItems_800c6988 = new ArrayList<>();
 
   public ItemListMenu(final BattleHud hud, final PlayerBattleEntity activePlayer, final ListPosition lastPosition, final Runnable onClose) {
     super(hud, activePlayer, 186, lastPosition, onClose);
@@ -42,13 +58,21 @@ public class ItemListMenu extends ListMenu {
 
   @Override
   protected void drawListEntry(final int index, final int x, final int y, final int trim) {
-    this.fontOptions.trim(trim);
-    this.fontOptions.horizontalAlign(HorizontalAlign.LEFT);
-    renderText(I18n.translate(this.combatItems_800c6988.get(index).item), x, y, this.fontOptions);
+    final Item item = this.combatItems_800c6988.get(index).item;
+    this.fontOptions.trim(trim).horizontalAlign(HorizontalAlign.LEFT);
+
+    if(item.isRepeat()) {
+      this.fontOptions.colour(TextColour.STATS_YELLOW);
+    }
+
+    renderText(I18n.translate(item), x, y, this.fontOptions);
+
+    this.fontOptions.colour(TextColour.WHITE);
+
     renderText("\u011d", x + 143, y, this.fontOptions);
 
     this.fontOptions.horizontalAlign(HorizontalAlign.RIGHT);
-    renderText(String.valueOf(getInventoryEntryQuantity(this.combatItems_800c6988.get(index).item)), x + 168, y, this.fontOptions);
+    renderText(String.valueOf(getInventoryEntryQuantity(item)), x + 168, y, this.fontOptions);
   }
 
   @Override
@@ -75,7 +99,6 @@ public class ItemListMenu extends ListMenu {
 
   @Override
   protected void onClose() {
-
   }
 
   @Override
@@ -126,6 +149,26 @@ public class ItemListMenu extends ListMenu {
         this.combatItems_800c6988.add(new CombatItem02(item));
       }
     }
+
+    final Comparator<CombatItem02> comparator = Comparator
+      .comparing((CombatItem02 x) -> x.item instanceof RecoverHpItem)
+      .thenComparing(x -> x.item instanceof AngelsPrayerItem)
+      .thenComparing(x -> x.item instanceof RecoverMpItem)
+      .thenComparing(x -> x.item instanceof RecoverSpItem)
+      .thenComparing(x -> x.item instanceof RecoverStatusItem)
+      .thenComparing(x -> x.item instanceof final AttackItem attackItem && !attackItem.isTargetAll())
+      .thenComparing(x -> x.item instanceof final AttackItem attackItem && attackItem.isTargetAll())
+      .thenComparing(x -> x.item instanceof CauseStatusItem)
+      .thenComparing(x -> x.item instanceof final BattleItem battleItem && battleItem.isRepeat())
+      .thenComparing(x -> x.item instanceof BuffItem)
+      .thenComparing(x -> x.item instanceof SachetItem)
+      .thenComparing(x -> x.item instanceof SignetStoneItem)
+      .thenComparing(x -> x.item instanceof PandemoniumItem)
+      .thenComparing(x -> x.item instanceof TotalVanishingItem)
+      .thenComparing(x -> x.item instanceof CharmPotionItem).reversed()
+      .thenComparing(x -> I18n.translate(x.item.getNameTranslationKey()));
+
+    this.combatItems_800c6988 = this.combatItems_800c6988.stream().sorted(comparator).collect(Collectors.toList());
   }
 
   @Override
