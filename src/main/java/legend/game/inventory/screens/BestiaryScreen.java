@@ -120,7 +120,7 @@ public class BestiaryScreen extends MenuScreen {
     }
   }
 
-  private static final boolean devMode = true;
+  private static final boolean devMode = false;
   private static final int LIST_ITEM_COUNT = 24;
   private static final int SUB_ENTRY_ARROW_TICK_LENGTH = 92;
   private static final int RANK_2 = 3;
