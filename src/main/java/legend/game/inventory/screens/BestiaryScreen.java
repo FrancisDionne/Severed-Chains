@@ -589,11 +589,25 @@ public class BestiaryScreen extends MenuScreen {
 
     if(this.monster.rank > 0 || this.monster.rank == -1) {
       float x = 0;
-      for(int i = 0; i < 3; i++) {
-        this.m.translation(146.5f + x + xOffset, 121f, 127);
+      for(int i = 2; i >= 0; i--) {
+        this.m.translation(169.5f + x + xOffset, 121f, 127);
         this.m.scale(10, 10, 1);
 
-        if((this.monster.maxKill < 0 || i == 2) && (!this.monster.isSubEntry || i == 2)) {
+        final int rankValue = switch(i) {
+          case 1 -> RANK_2;
+          case 2 -> RANK_3;
+          default -> 1;
+        };
+
+        final int lastRankValue = switch(i) {
+          case 1 -> 1;
+          case 2 -> RANK_2;
+          default -> 0;
+        };
+
+        final int value = this.monster.maxKill > 0 ? this.monster.maxKill : rankValue;
+
+        if(value > lastRankValue) {
           if(this.monster.rank > i) {
             RENDERER
               .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
@@ -611,11 +625,11 @@ public class BestiaryScreen extends MenuScreen {
           }
 
           if(this.monster.rank <= i) {
-            renderText(i == 0 ? "1" : String.valueOf(Math.min(this.monster.maxKill, i == 1 ? RANK_2 : RANK_3)), 151.25f + x, 124f, this.gemFont, 126);
+            renderText(String.valueOf(Math.min(value, rankValue)), 174.25f + x, 124f, this.gemFont, 126);
           }
-        }
 
-        x += 11.5f;
+          x -= 11.5f;
+        }
       }
     }
   }
