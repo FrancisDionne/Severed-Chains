@@ -262,7 +262,7 @@ public class BestiaryScreen extends MenuScreen {
     //this.addEntry(148, -1, -1, null, "Dragon's Nest", "Southern Serdio", "Unknown variant - pending investigation");
     this.addEntry(64, -1, -1, null, "Limestone Cave", "Northern Serdio", "The Ugly Balloon is a creature of the Limestone Cave. It can fly at high\nspeeds. Though it has low defense and attack, it can poison its enemies\nfor high damage over time.");
     this.addEntry(332, -1, 1, null, "Limestone Cave", "Northern Serdio", "A large snake-like creature, Urobolus is the guardian of Limestone Cave.\nIt has strong physical attacks and can inflict poison frequently. \nPeriodically it will retreat to a high place, avoiding melee attacks.");
-    this.addEntry(138, -1, -1, null, "Endiness", "Limestone Cave - Bale", "A rare bird seen only along the road between Limestone Cave and\nBale. \n\nLike all Rare creatures. it has a high chance of running away, but\ndrops great rewards if defeated.");
+    this.addEntry(138, -1, 1, null, "Endiness", "Limestone Cave <-> Bale", "A rare bird seen only along the road between Limestone Cave and\nBale. \n\nLike all Rare creatures, it has a high chance of running away, but\ndrops great rewards if defeated.");
     this.addEntry(130, -1, -1, null, "Hoax", "Northern Serdio", "");
     this.addEntry(102, -1, 1, null, "Hoax", "Northern Serdio", "The first known human who can use innate magic. However, the Elite\nwas not born with it. Researchers at the black castle figured out a way\nto infuse a human with magical powers - possibly with the help\nof Emperor Diaz.\n\nThe Elite has a few physical attacks, but its signature moves are magical.\nThe first is a green flame that deals moderate AoE damage. \nThe second summons apparitions which take no damage.");
     this.addEntry(265, -1, 1, null, "Hoax", "Northern Serdio", "Age: \nHeight: 250 cm / \n\nThe last of his species, Kongol is a towering giant with unmatched\nphysical prowess. He wields a large axe, but can fight without it.\n\nAs a child his hometown was raided by bandits. At the last moment he\nwas saved by Doel, who then raised him.");
@@ -290,7 +290,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(115, -1, -1, null, "Dragon's Nest", "Southern Serdio", "");
     this.addEntry(275, -1, 1, null, "Dragon's Nest", "Southern Serdio", "");
     this.addEntry(287, -1, 1, null, "Dragon's Nest", "Southern Serdio", "");
-    this.addEntry(87, -1, -1, null, "Endiness", "Dragon's Nest - Lohan", "");
+    this.addEntry(87, -1, 1, null, "Endiness", "Dragon's Nest <-> Lohan", "");
     this.addEntry(302, -1, 1, null, "Lohan", "Southern Serdio", "");
     this.addEntry(303, -1, 1, null, "Lohan", "Southern Serdio", "");
     this.addEntry(304, -1, 1, null, "Lohan", "Southern Serdio", "");
@@ -312,7 +312,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(262, -1, 1, "Fruegel II", "Hellena Prison", "Southern Serdio", "");
     this.addEntry(264, -1, 1, null, "Hellena Prison", "Southern Serdio", "");
     this.addEntry(263, -1, 1, null, "Hellena Prison", "Southern Serdio", "");
-    this.addEntry(42, -1, -1, null, "Endiness / Moon", "Road Near Kazas", "");
+    this.addEntry(42, -1, 1, null, "Endiness / Moon", "Road Near Kazas", "");
     this.addEntry(17, -1, -1, null, "Black Castle", "Southern Serdio", "");
     this.addEntry(103, -1, -1, null, "Black Castle", "Southern Serdio", "");
     this.addEntry(258, -1, 1, null, "Black Castle", "Southern Serdio", "Pending investigation");
@@ -327,7 +327,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(108, -1, -1, null, "Barrens", "Tiberoa", "");
     this.addEntry(299, -1, 1, null, "Barrens", "Tiberoa", "");
     this.addEntry(274, -1, -1, null, "Barrens", "Tiberoa", "");
-    this.addEntry(136, -1, -1, null, "Endiness", "Barrens - Home of Gigantos", "");
+    this.addEntry(136, -1, 1, null, "Endiness", "Barrens <-> Home of Gigantos", "");
     this.addEntry(16, -1, -1, null, "Valley of Corrupted Gravity", "Tiberoa", "");
     this.addEntry(52, -1, -1, null, "Valley of Corrupted Gravity", "Tiberoa", "");
     this.addEntry(106, -1, -1, null, "Valley of Corrupted Gravity", "Tiberoa", "");
@@ -358,8 +358,8 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(110, -1, -1, null, "Undersea Cavern", "Illisa Bay", "");
     this.addEntry(294, -1, 1, "Lenus (Dragoon)", "Undersea Cavern", "Illisa Bay", "");
     this.addEntry(279, -1, 1, null, "Undersea Cavern", "Illisa Bay", "");
-    this.addEntry(124, -1, -1, null, "Endiness", "Undersea Cavern - Fueno", "");
-    this.addEntry(137, -1, -1, null, "Endiness", "Furni - Deningrad", "");
+    this.addEntry(124, -1, 1, null, "Endiness", "Undersea Cavern <-> Fueno", "");
+    this.addEntry(137, -1, 1, null, "Endiness", "Furni <-> Deningrad", "");
     this.addEntry(95, -1, -1, null, "Evergreen Forest", "Mille Seseau", "");
     this.addEntry(53, -1, -1, null, "Evergreen Forest", "Mille Seseau", "");
     this.addEntry(73, -1, -1, null, "Evergreen Forest", "Mille Seseau", "");
@@ -408,8 +408,8 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(3, -1, -1, null, "Death Frontier", "Death Frontier", "Physical attacker often accompanied by other\ncreatures. Has a special sand attack.");
     this.addEntry(119, -1, -1, null, "Death Frontier", "Death Frontier", "");
     this.addEntry(61, -1, -1, null, "Death Frontier", "Death Frontier", "");
-    this.addEntry(139, -1, -1, null, "Endiness", "Death Frontier - Ulara", "");
-    this.addEntry(54, -1, -1, null, "Endiness", "Fletz - Rouge", "");
+    this.addEntry(139, -1, 1, null, "Endiness", "Death Frontier <-> Ulara", "");
+    this.addEntry(54, -1, 1, null, "Endiness", "Fletz <-> Rouge", "");
     this.addEntry(121, -1, -1, null, "Aglis", "Broken Islands", "");
     this.addEntry(60, -1, -1, null, "Aglis", "Broken Islands", "");
     this.addEntry(9, -1, -1, null, "Aglis", "Broken Islands", "");

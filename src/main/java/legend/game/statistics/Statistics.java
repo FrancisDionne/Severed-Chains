@@ -535,7 +535,11 @@ public final class Statistics {
     }
   }
 
-  public static void incrementMonsterKill(final int monsterId, final int value) {
+  public static void incrementMonsterKill(int monsterId, final int value) {
+    monsterId = switch(monsterId) {
+      case 148 -> 104;
+      default -> monsterId;
+    };
     appendStat(100000 + monsterId, value);
   }
 

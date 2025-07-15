@@ -508,6 +508,10 @@ public abstract class ListMenu {
 
   private void pressEnd() {
     final int count = this.getListCount();
+    if(this.listScroll_1e + this.listIndex_24 + 1 >= count) {
+      return;
+    }
+
     this.listScroll_1e = count - (count % 7);
     this.listOffsetY_20 = this.listStartY_1a - (98 * (this.listScroll_1e / 7));
     this.listIndex_24 = Math.min((count % 7) - 1, 6);
