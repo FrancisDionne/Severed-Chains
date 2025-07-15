@@ -45,6 +45,7 @@ import static legend.game.combat.Monsters.enemyRewards_80112868;
 import static legend.game.combat.Monsters.monsterNames_80112068;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HOME;
@@ -115,7 +116,7 @@ public class BestiaryScreen extends MenuScreen {
       }
     }
 
-    public boolean isPerfect() {
+    public boolean isComplete() {
       return this.rank >= 3;
     }
   }
@@ -128,6 +129,8 @@ public class BestiaryScreen extends MenuScreen {
   private static final String QUESTION_MARK_5 = "?????";
   private static final String QUESTION_MARK_3 = "???";
   private static final String LORE_DEFAULT = "Lore coming one day to a QoL mod near you...";
+  private static int lastEntryIndex;
+  private static int lastSort;
 
   private int loadingStage;
   private final Runnable unload;
@@ -231,11 +234,19 @@ public class BestiaryScreen extends MenuScreen {
       Texture.png(Path.of("gfx", "ui", "arrow_down.png")), //12
     };
 
-    this.entryIndex = 0;
-    this.subEntryIndex = 0;
-
     this.loadEntries();
     this.setBestiaryStatus();
+
+    this.entryIndex = 0;
+    this.subEntryIndex = 0;
+    this.currentSort = lastSort;
+
+    this.sortList(false);
+
+    if(lastEntryIndex > -1 && lastEntryIndex < this.bestiaryEntries.size()) {
+      this.jump(lastEntryIndex, true);
+    }
+
     this.loadCurrentEntry();
   }
 
@@ -478,6 +489,7 @@ public class BestiaryScreen extends MenuScreen {
       this.monster = monster.subEntries.get(this.subEntryIndex - 1);
     } else {
       this.monster = monster;
+      lastEntryIndex = this.entryIndex;
     }
 
     this.headerTexture = Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\header_element_" + this.getElement(this.monster.stats.elementFlag.flag).getRegistryId().entryId() + ".png"));
@@ -730,21 +742,21 @@ public class BestiaryScreen extends MenuScreen {
     renderText("Battle Rewards", x + 74, 150f, this.titleFont, 127);
 
     if(rewards.xp_00 > 0) {
-      renderText(this.monster.isPerfect() ? "Exp." : QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
-      renderText(this.monster.isPerfect() ? String.valueOf(rewards.xp_00) : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? "Exp." : QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? String.valueOf(rewards.xp_00) : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
       y += 13.5f;
     }
 
     if(rewards.gold_02 > 0) {
-      renderText(this.monster.isPerfect() ? "Gold" : QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
-      renderText(this.monster.isPerfect() ? String.valueOf(rewards.gold_02) : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? "Gold" : QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? String.valueOf(rewards.gold_02) : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
       y += 13.5f;
     }
 
     if(rewards.itemDrop_05 != null) {
-      renderText(this.monster.isPerfect() ? I18n.translate(rewards.itemDrop_05.get().getNameTranslationKey()) + " (" + rewards.itemChance_04 + "%)" : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? I18n.translate(rewards.itemDrop_05.get().getNameTranslationKey()) + " (" + rewards.itemChance_04 + "%)" : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
 
-      if(this.monster.isPerfect()) {
+      if(this.monster.isComplete()) {
         renderItemIcon(rewards.itemDrop_05.get().getIcon(), x + 10f, y - 5f, 32, 0.9f, 0.9f, 0x8);
       } else {
         renderText(QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
@@ -796,11 +808,11 @@ public class BestiaryScreen extends MenuScreen {
       final boolean highlighted = this.entryIndex == entryIndex;
       float charX = 6;
       for(final char c : this.nf.format(entry.entryNumber).toCharArray()) {
-        renderText(String.valueOf(c), x + charX, y, highlighted ? (entry.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
+        renderText(String.valueOf(c), x + charX, y, highlighted ? (entry.isComplete() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
         charX += 3.7f;
       }
-      renderText(":", x + 16f, y, highlighted ? (entry.isPerfect() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
-      renderText(entry.rank > 0 || entry.rank == -1 ? entry.name : QUESTION_MARK_5, x + 19f, y, highlighted ? (entry.isPerfect() ? this.listPerfectHighlightFont : this.listHighlightFont) : (entry.isPerfect() ? this.listPerfectFont : this.listFont), 123);
+      renderText(":", x + 16f, y, highlighted ? (entry.isComplete() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
+      renderText(entry.rank > 0 || entry.rank == -1 ? entry.name : QUESTION_MARK_5, x + 19f, y, highlighted ? (entry.isComplete() ? this.listPerfectHighlightFont : this.listHighlightFont) : (entry.isComplete() ? this.listPerfectFont : this.listFont), 123);
 
       if(highlighted) {
         this.m.translation(xOffset - x + 14.5f , y - 1.5f, 124);
@@ -900,12 +912,12 @@ public class BestiaryScreen extends MenuScreen {
     return b;
   }
 
-  public boolean jump(final int index, final boolean fromSort) {
+  public boolean jump(final int index, final boolean centerItemInList) {
     if(index != this.entryIndex) {
       this.entryIndex = index;
       this.subEntryIndex = 0;
       this.listFirstVisibleItem = Math.clamp(index, 0, this.bestiaryEntries.size() - LIST_ITEM_COUNT);
-      if(fromSort) { //Hack to center entry in the list
+      if(centerItemInList) { //Hack to center entry in the list
         this.previous(10);
         this.next(10);
       }
@@ -1002,7 +1014,7 @@ public class BestiaryScreen extends MenuScreen {
     for(final BestiaryEntry r : this.bestiaryEntries) {
       if(r.kill > 0) {
         this.bestiarySeenCount++;
-        if(r.isPerfect()) {
+        if(r.isComplete()) {
           totalAtMaxRank++;
         }
       }
@@ -1018,10 +1030,11 @@ public class BestiaryScreen extends MenuScreen {
     } else {
       this.currentSort += n;
     }
-    this.sortList();
+    lastSort = this.currentSort;
+    this.sortList(true);
   }
 
-  private void sortList() {
+  private void sortList(final boolean jumpToEntry) {
     final Comparator<BestiaryEntry> defeatedComparator = Comparator
       .comparing((BestiaryEntry x) -> x.kill, Comparator.reverseOrder())
       .thenComparing(x -> x.entryNumber);
@@ -1048,7 +1061,9 @@ public class BestiaryScreen extends MenuScreen {
         .collect(Collectors.toList());
     };
 
-    this.jump(this.indexOfEntry(this.monster.entryNumber), true);
+    if(jumpToEntry) {
+      this.jump(this.indexOfEntry(this.monster.entryNumber), true);
+    }
   }
 
   private int indexOfEntry(final int number) {
@@ -1108,7 +1123,7 @@ public class BestiaryScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    FooterActionsHud.renderActions(0, FooterActions.BACK, FooterActions.LIST, null, null, null);
+    FooterActionsHud.renderActions(0, FooterActions.BACK, FooterActions.LIST, FooterActions.JUMP, null, null);
   }
 
   @Override
@@ -1179,6 +1194,29 @@ public class BestiaryScreen extends MenuScreen {
           this.loadCurrentEntry();
         }
       }
+  }
+
+  private void goToNextIncomplete() {
+    if(this.entryIndex < this.bestiaryEntries.size()) {
+      for(int i = this.entryIndex + 1; i < this.bestiaryEntries.size(); i++) {
+        if(!this.bestiaryEntries.get(i).isComplete()) {
+          if(this.jump(i, true)) {
+            playMenuSound(1);
+            this.loadCurrentEntry();
+            return;
+          }
+        }
+      }
+    }
+    for(int i = 0; i < this.bestiaryEntries.size(); i++) {
+      if(!this.bestiaryEntries.get(i).isComplete()) {
+        if(this.jump(i, true)) {
+          playMenuSound(1);
+          this.loadCurrentEntry();
+          return;
+        }
+      }
+    }
   }
 
   @Override
@@ -1257,6 +1295,10 @@ public class BestiaryScreen extends MenuScreen {
     if(action == INPUT_ACTION_MENU_SORT.get()) {
       playMenuSound(2);
       this.isListVisible = !this.isListVisible;
+    }
+
+    if(action == INPUT_ACTION_MENU_DELETE.get()) {
+      this.goToNextIncomplete();
     }
 
     return InputPropagation.PROPAGATE;

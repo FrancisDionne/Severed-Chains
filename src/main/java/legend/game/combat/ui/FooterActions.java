@@ -12,10 +12,9 @@ public enum FooterActions {
   MODS,
   ARCHIVE,
   TURN_ORDER,
-  ARCHIVE_STATS,
-  ARCHIVE_BESTIARY,
   LIST,
   DISPLAY_MODE,
   PRESETS,
   DEFAULT,
+  JUMP,
 }
