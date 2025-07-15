@@ -1217,6 +1217,7 @@ public class BestiaryScreen extends MenuScreen {
         }
       }
     }
+    playMenuSound(40);
   }
 
   @Override
