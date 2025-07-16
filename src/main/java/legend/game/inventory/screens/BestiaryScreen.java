@@ -274,8 +274,9 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(64, -1, -1, null, "Limestone Cave", "Northern Serdio", "The Ugly Balloon is a creature of the Limestone Cave. It can fly at high\nspeeds. Though it has low defense and attack, it can poison its enemies\nfor high damage over time.");
     this.addEntry(332, -1, 1, null, "Limestone Cave", "Northern Serdio", "A large snake-like creature, Urobolus is the guardian of Limestone Cave.\nIt has strong physical attacks and can inflict poison frequently. \nPeriodically it will retreat to a high place, avoiding melee attacks.");
     this.addEntry(138, -1, 1, null, "Endiness", "Limestone Cave <-> Bale", "A rare bird seen only along the road between Limestone Cave and\nBale. \n\nLike all Rare creatures, it has a high chance of running away, but\ndrops great rewards if defeated.");
-    this.addEntry(130, -1, -1, null, "Hoax", "Northern Serdio", "");
-    this.addEntry(102, -1, 1, null, "Hoax", "Northern Serdio", "The first known human who can use innate magic. However, the Elite\nwas not born with it. Researchers at the black castle figured out a way\nto infuse a human with magical powers - possibly with the help\nof Emperor Diaz.\n\nThe Elite has a few physical attacks, but its signature moves are magical.\nThe first is a green flame that deals moderate AoE damage. \nThe second summons apparitions which take no damage.");
+    this.addEntry(130, -1, 1, null, "Hoax", "Northern Serdio", "");
+    this.addEntry(258, -1, 1, null, "Hoax", "Northern Serdio", "The first known human who can use innate magic. However, the Elite\nwas not born with it. Researchers at the black castle figured out a way\nto infuse a human with magical powers - possibly with the help\nof Emperor Diaz.\n\nThe Elite has a few physical attacks, but its signature moves are magical.\nThe first is a green flame that deals moderate AoE damage. \nThe second summons apparitions which take no damage.");
+    this.addEntry(273, 258, 1, "Sandora Elite Clone", "Black Castle", "Southern Serdio", "Pending investigation");
     this.addEntry(265, -1, 1, null, "Hoax", "Northern Serdio", "Age: \nHeight: 250 cm / \n\nThe last of his species, Kongol is a towering giant with unmatched\nphysical prowess. He wields a large axe, but can fight without it.\n\nAs a child his hometown was raided by bandits. At the last moment he\nwas saved by Doel, who then raised him.");
     this.addEntry(68, -1, -1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(22, -1, -1, null, "Marshland", "Northern Serdio", "An aquatic creature found in the Marshland. Although the basic attack\ndeals little damage, Mermen also have Water magic that is lethal to\nenemies with low defense or a Fire attribute.");
@@ -326,8 +327,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(42, -1, 1, null, "Endiness / Moon", "Road Near Kazas", "");
     this.addEntry(17, -1, -1, null, "Black Castle", "Southern Serdio", "");
     this.addEntry(103, -1, -1, null, "Black Castle", "Southern Serdio", "");
-    this.addEntry(258, -1, 1, null, "Black Castle", "Southern Serdio", "Pending investigation");
-    this.addEntry(273, -1, 1, null, "Black Castle", "Southern Serdio", "Pending investigation");
+    this.addEntry(102, -1, 1, null, "Black Castle", "Southern Serdio", "");
     this.addEntry(266, -1, 1, "Kongol II", "Black Castle", "Southern Serdio", "");
     this.addEntry(267, -1, 1, null, "Black Castle", "Southern Serdio", "");
     this.addEntry(268, -1, 1, "Doel (Dragoon)", "Black Castle", "Southern Serdio", "");
