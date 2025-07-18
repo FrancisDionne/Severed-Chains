@@ -113,24 +113,24 @@ public class StatisticsScreen extends MenuScreen {
       Texture.png(Path.of("gfx", "portraits", "meru.png")),    //6
       Texture.png(Path.of("gfx", "portraits", "kongol.png")),  //7
       Texture.png(Path.of("gfx", "portraits", "miranda.png")), //8
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\background-lines.png")),  //9
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\column-line.png")),       //10
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\highlight_center.png")),  //11
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\highlight_left.png")),    //12
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\highlight_right.png")),   //13
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\box-top-left.png")),    //14
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\box-top.png")),         //15
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\box-top-right.png")),   //16
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\box-right.png")),       //17
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\box-bottom.png")),      //18
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\box-bottom-left.png")), //19
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\box-left.png")),        //20
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\box-separator.png")),   //21
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\portrait-separator.png")),   //22
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\header-background.png")),    //23
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\group-center.png")),  //24
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\group-top.png")),     //25
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\stats\\group-bottom.png")),  //26
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "background-lines.png")),  //9
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "column-line.png")),       //10
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "highlight_center.png")),  //11
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "highlight_left.png")),    //12
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "highlight_right.png")),   //13
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "box-top-left.png")),    //14
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "box-top.png")),         //15
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "box-top-right.png")),   //16
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "box-right.png")),       //17
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "box-bottom.png")),      //18
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "box-bottom-left.png")), //19
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "box-left.png")),        //20
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "box-separator.png")),   //21
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "portrait-separator.png")),   //22
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "header-background.png")),    //23
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "group-center.png")),  //24
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "group-top.png")),     //25
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "stats", "group-bottom.png")),  //26
       Texture.png(Path.of("gfx", "portraits", "lavitz_dead.png")),  //27
     };
 

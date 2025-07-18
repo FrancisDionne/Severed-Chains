@@ -219,17 +219,17 @@ public class BestiaryScreen extends MenuScreen {
     this.difficultyFont = new FontOptions().colour(TextColour.LIGHTER_GREY).shadowColour(TextColour.DARKER_GREY).size(0.4f).horizontalAlign(HorizontalAlign.LEFT);
 
     this.textures = new Texture[] {
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics.png")), //0
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "bestiary_graphics.png")), //0
       Texture.png(Path.of("gfx", "ui", "action_attack.png")), //1
       Texture.png(Path.of("gfx", "ui", "action_guard.png")),  //2
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\black.png")),     //3
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\highlight.png")), //4
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "black.png")),     //3
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "highlight.png")), //4
       Texture.png(Path.of("gfx", "ui", "arrow_blue_up.png")),    //5
       Texture.png(Path.of("gfx", "ui", "arrow_blue_down.png")),  //6
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\list_underline.png")), //7
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\white.png")), //8
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\bestiary_graphics_frames.png")), //9
-      Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\rank_gem.png")), //10
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "list_underline.png")), //7
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "white.png")), //8
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "bestiary_graphics_frames.png")), //9
+      Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "rank_gem.png")), //10
       Texture.png(Path.of("gfx", "ui", "arrow_up.png")),   //11
       Texture.png(Path.of("gfx", "ui", "arrow_down.png")), //12
     };
@@ -492,7 +492,7 @@ public class BestiaryScreen extends MenuScreen {
       lastEntryIndex = this.entryIndex;
     }
 
-    this.headerTexture = Texture.png(Path.of("gfx", "ui", "archive_screen\\bestiary\\header_element_" + this.getElement(this.monster.stats.elementFlag.flag).getRegistryId().entryId() + ".png"));
+    this.headerTexture = Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "header_element_" + this.getElement(this.monster.stats.elementFlag.flag).getRegistryId().entryId() + ".png"));
 
     try {
       this.modelTexture = Texture.png(Path.of("gfx", "models", this.monster.charId + ".png"));
