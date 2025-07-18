@@ -469,20 +469,23 @@ public final class Statistics {
   }
 
   private static String getStatsString() {
-    final StringBuilder text = new StringBuilder();
-    for(final Stats stat : Stats.values()) {
-      final int i = stat.asInt();
-      if(i > 0) {
-        text.append(i).append('=').append(statistics.getOrDefault(i, 0f)).append('\n');
+    if(statistics != null) {
+      final StringBuilder text = new StringBuilder();
+      for(final Stats stat : Stats.values()) {
+        final int i = stat.asInt();
+        if(i > 0) {
+          text.append(i).append('=').append(statistics.getOrDefault(i, 0f)).append('\n');
+        }
       }
-    }
-    for(int i = 0; i < monsterNames_80112068.length; i++) {
-      final int enemyStatId = i + 100000;
-      if(statistics.containsKey(enemyStatId)) {
-        text.append(enemyStatId).append('=').append(statistics.get(enemyStatId)).append('\n');
+      for(int i = 0; i < monsterNames_80112068.length; i++) {
+        final int enemyStatId = i + 100000;
+        if(statistics.containsKey(enemyStatId)) {
+          text.append(enemyStatId).append('=').append(statistics.get(enemyStatId)).append('\n');
+        }
       }
+      return text.toString();
     }
-    return text.toString();
+    return "";
   }
 
   public static void appendStat(final Stats stat, final float value) {

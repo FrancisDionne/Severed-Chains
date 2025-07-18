@@ -470,8 +470,6 @@ public class Ttle extends EngineState {
       } else {
         whichMenu_800bdc38 = WhichMenu.UNLOAD;
       }
-
-      whichMenu_800bdc38 = WhichMenu.UNLOAD;
     }), () -> false);
   }
 
