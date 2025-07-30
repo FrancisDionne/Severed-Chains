@@ -3818,7 +3818,9 @@ public class Battle extends EngineState {
           totalXpFromCombat_800bc95c += enemyCombatant.xp_194;
 
           Statistics.appendStat(Statistics.Stats.GOLD, goldGainedFromCombat_800bc920);
-          Statistics.incrementMonsterKill(data.combatant_144.charIndex_1a2, Statistics.getMonsterKill(data.combatant_144.charIndex_1a2) == -1 ? 2 : 1);
+          if(data.combatant_144.charIndex_1a2 > -1) {
+            Statistics.incrementMonsterKill(data.combatant_144.charIndex_1a2, Statistics.getMonsterKill(data.combatant_144.charIndex_1a2) == -1 ? 2 : 1);
+          }
 
           if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null && this.currentTurnBent_800c66c8.innerStruct_00.charId_272 != data.combatant_144.charIndex_1a2) {
             Statistics.appendStat(this.currentTurnBent_800c66c8.innerStruct_00, Statistics.Stats.TOTAL_KILL, 1);

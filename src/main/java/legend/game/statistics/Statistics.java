@@ -538,12 +538,22 @@ public final class Statistics {
     }
   }
 
-  public static void incrementMonsterKill(int monsterId, final int value) {
-    monsterId = switch(monsterId) {
-      case 148 -> 104;
-      default -> monsterId;
-    };
-    appendStat(100000 + monsterId, value);
+  public static void incrementMonsterKill(final int monsterId, int value) {
+    int[] ids = null;
+    if(value > -1) {
+      ids = switch(monsterId) {
+        case 148 -> new int[] { 148, 104 }; //Slime
+        case 264 -> new int[] { 264, 262 }; //Fruegel II
+        default -> null;
+      };
+    }
+    if(ids == null) {
+      appendStat(100000 + monsterId, value);
+    } else {
+      for(final int id : ids) {
+        appendStat(100000 + id, value);
+      }
+    }
   }
 
   public static int getMonsterKill(final int monsterId) {

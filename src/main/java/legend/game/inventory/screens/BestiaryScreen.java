@@ -99,7 +99,7 @@ public class BestiaryScreen extends MenuScreen {
         this.location = map + (region.isEmpty() ? "" : " - " + region);
       }
 
-      if(this.kill >= RANK_3 || (this.maxKill > -1 && this.kill >= this.maxKill)) {
+      if(this.kill >= RANK_3 || (this.maxKill > -1 && this.kill >= this.maxKill) || (this.maxKill == -2 && this.kill == -1)) {
         this.rank = 3;
       } else if(this.kill >= RANK_2) {
         this.rank = 2;
@@ -282,9 +282,9 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(22, -1, -1, null, "Marshland", "Northern Serdio", "An aquatic creature found in the Marshland. Although the basic attack\ndeals little damage, Mermen also have Water magic that is lethal to\nenemies with low defense or a Fire attribute.");
     this.addEntry(28, -1, -1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(4, -1, -1, null, "Marshland", "Northern Serdio", "");
-    this.addEntry(135, -1, 1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(131, -1, -1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(132, -1, -1, null, "Marshland", "Northern Serdio", "");
+    this.addEntry(135, -1, 1, null, "Marshland", "Northern Serdio", "");
     this.addEntry(33, -1, -1, null, "Villude Volcano", "Southern Serdio", "");
     this.addEntry(150, -1, -1, null, "Villude Volcano", "Southern Serdio", "");
     this.addEntry(74, -1, -1, null, "Villude Volcano", "Southern Serdio", "Pending investigation");
@@ -307,7 +307,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(303, -1, 1, null, "Lohan", "Southern Serdio", "");
     this.addEntry(304, -1, 1, null, "Lohan", "Southern Serdio", "");
     this.addEntry(305, -1, 1, null, "Lohan", "Southern Serdio", "");
-    this.addEntry(269, -1, 1, null, "Lohan", "Southern Serdio", "");
+    this.addEntry(269, -1, -2, null, "Lohan", "Southern Serdio", "");
     this.addEntry(66, -1, -1, null, "Shirley's Shrine", "Southern Serdio", "");
     this.addEntry(58, -1, -1, null, "Shirley's Shrine", "Southern Serdio", "");
     this.addEntry(55, -1, -1, null, "Shirley's Shrine", "Southern Serdio", "");
@@ -317,13 +317,13 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(326, 325, -1, null, "Shirley's Shrine", "Southern Serdio", "");
     this.addEntry(327, 325, -1, null, "Shirley's Shrine", "Southern Serdio", "");
     this.addEntry(288, -1, 1, null, "Shirley's Shrine", "Southern Serdio", "");
-    this.addEntry(105, -1, -1, null, "Hellena Prison", "Southern Serdio", "");
+    this.addEntry(105, -1, 4, null, "Hellena Prison", "Southern Serdio", "");
     this.addEntry(129, -1, -1, null, "Hellena Prison", "Southern Serdio", "");
     this.addEntry(133, -1, -1, null, "Hellena Prison", "Southern Serdio", "");
     this.addEntry(329, -1, 1, null, "Hellena Prison", "Southern Serdio", "");
     this.addEntry(262, -1, 1, "Fruegel II", "Hellena Prison", "Southern Serdio", "");
-    this.addEntry(264, -1, 1, null, "Hellena Prison", "Southern Serdio", "");
-    this.addEntry(263, -1, 1, null, "Hellena Prison", "Southern Serdio", "");
+    this.addEntry(264, 262, 1, null, "Hellena Prison", "Southern Serdio", "");
+    this.addEntry(263, 262, 1, null, "Hellena Prison", "Southern Serdio", "");
     this.addEntry(42, -1, 1, null, "Endiness / Moon", "Road Near Kazas", "");
     this.addEntry(17, -1, -1, null, "Black Castle", "Southern Serdio", "");
     this.addEntry(103, -1, -1, null, "Black Castle", "Southern Serdio", "");
@@ -337,7 +337,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(1, -1, -1, null, "Barrens", "Tiberoa", "Decent physical attacker with good defense.\nWeaker to magic.");
     this.addEntry(108, -1, -1, null, "Barrens", "Tiberoa", "");
     this.addEntry(299, -1, 1, null, "Barrens", "Tiberoa", "");
-    this.addEntry(274, -1, -1, null, "Barrens", "Tiberoa", "");
+    this.addEntry(274, 299, -1, null, "Barrens", "Tiberoa", "");
     this.addEntry(136, -1, 1, null, "Endiness", "Barrens <-> Home of Gigantos", "");
     this.addEntry(16, -1, -1, null, "Valley of Corrupted Gravity", "Tiberoa", "");
     this.addEntry(52, -1, -1, null, "Valley of Corrupted Gravity", "Tiberoa", "");
@@ -605,38 +605,36 @@ public class BestiaryScreen extends MenuScreen {
         this.m.translation(169.5f + x + xOffset, 121f, 127);
         this.m.scale(10, 10, 1);
 
-        final int rankValue = switch(i) {
+        int rankValue = switch(i) {
           case 1 -> RANK_2;
           case 2 -> RANK_3;
           default -> 1;
         };
 
-        final int lastRankValue = switch(i) {
+        int lastRankValue = switch(i) {
           case 1 -> 1;
           case 2 -> RANK_2;
           default -> 0;
         };
 
+        if(this.monster.maxKill == -2 || this.monster.isSubEntry) {
+          rankValue = i == 2 ? 1 : 0;
+          lastRankValue = 0;
+        }
+
         final int value = this.monster.maxKill > 0 ? this.monster.maxKill : rankValue;
 
         if(value > lastRankValue) {
-          if(this.monster.rank > i) {
-            RENDERER
-              .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-              .texture(this.textures[10]) //Rank Gem
-              .colour(this.monster.elementRGB[4], this.monster.elementRGB[5], this.monster.elementRGB[6])
-              .alpha(this.monster.elementRGB[7])
-              .translucency(Translucency.HALF_B_PLUS_HALF_F);
-          } else {
-            RENDERER
-              .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
-              .texture(this.textures[10]) //Rank Gem
-              .colour(this.monster.elementRGB[4] * 0.35f, this.monster.elementRGB[5] * 0.35f, this.monster.elementRGB[6] * 0.35f)
-              .alpha(this.monster.elementRGB[7])
-              .translucency(Translucency.HALF_B_PLUS_HALF_F);
-          }
+          final float colorMultiplier = this.monster.rank > i || this.monster.isSubEntry ? 1 : 0.35f;
 
-          if(this.monster.rank <= i) {
+          RENDERER
+            .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
+            .texture(this.textures[10]) //Rank Gem
+            .colour(this.monster.elementRGB[4] * colorMultiplier, this.monster.elementRGB[5] * colorMultiplier, this.monster.elementRGB[6] * colorMultiplier)
+            .alpha(this.monster.elementRGB[7])
+            .translucency(Translucency.HALF_B_PLUS_HALF_F);
+
+          if(this.monster.rank <= i && !this.monster.isSubEntry) {
             renderText(String.valueOf(Math.min(value, rankValue)), 174.25f + x, 124f, this.gemFont, 126);
           }
 
