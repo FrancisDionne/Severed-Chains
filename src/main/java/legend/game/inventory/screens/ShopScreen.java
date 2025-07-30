@@ -658,7 +658,8 @@ public class ShopScreen extends MenuScreen {
           this.equipCharIndex = i;
           this.charHighlight.x_40 = this.FUN_8010a818(this.equipCharIndex);
 
-          final Equipment equipment = (Equipment)this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).item;
+          final ShopEntry<? extends InventoryEntry> inv = this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0);
+          final Equipment equipment = (Equipment)inv.item;
           final String itemText = I18n.translate(equipment.getNameTranslationKey());
           menuStack.pushScreen(new MessageBoxScreen("Buy " + itemText + '?', 2, result -> {
             if(result.messageBoxResult == MessageBoxResult.YES) {
@@ -670,7 +671,7 @@ public class ShopScreen extends MenuScreen {
                     if(equipResult.previousEquipment != null) {
                       if(equipResult.success) {
                         if(giveEquipment(equipResult.previousEquipment)) {
-                          gameState_800babc8.gold_94 -= equipment.price;
+                          gameState_800babc8.gold_94 -= inv.price;
                         } else {
                           equipItem(equipResult.previousEquipment, characterIndices_800bdbb8[this.equipCharIndex]);
                           menuStack.pushScreen(new MessageBoxScreen("Cannot carry any more", 0, onResult -> {}));
@@ -681,7 +682,7 @@ public class ShopScreen extends MenuScreen {
                       }
                     }
                   } else {
-                    this.giveUnequipped(this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0));
+                    this.giveUnequipped(inv);
                   }
 
                   this.menuState = MenuState.BUY_4;
@@ -689,7 +690,7 @@ public class ShopScreen extends MenuScreen {
                   this.charHighlight = null;
                 }));
               } else {
-                this.giveUnequipped(this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0));
+                this.giveUnequipped(inv);
                 this.menuState = MenuState.BUY_4;
                 unloadRenderable(this.charHighlight);
                 this.charHighlight = null;
@@ -1067,7 +1068,8 @@ public class ShopScreen extends MenuScreen {
   private void menuSelectChar5Select() {
     playMenuSound(2);
 
-    final Equipment equipment = (Equipment)this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0).item;
+    final ShopEntry<? extends InventoryEntry> inv = this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0);
+    final Equipment equipment = (Equipment)inv.item;
     final String itemText = I18n.translate(equipment.getNameTranslationKey());
     menuStack.pushScreen(new MessageBoxScreen("Buy " + itemText + '?', 2, result -> {
       if(result.messageBoxResult == MessageBoxResult.YES) {
@@ -1079,7 +1081,7 @@ public class ShopScreen extends MenuScreen {
               if(equipResult.previousEquipment != null) {
                 if(equipResult.success) {
                   if(giveEquipment(equipResult.previousEquipment)) {
-                    gameState_800babc8.gold_94 -= equipment.price;
+                    gameState_800babc8.gold_94 -= inv.price;
                   } else {
                     equipItem(equipResult.previousEquipment, characterIndices_800bdbb8[this.equipCharIndex]);
                     this.deferAction(() -> menuStack.pushScreen(new MessageBoxScreen("Cannot carry any more", 0, onResult -> {})));
@@ -1090,7 +1092,7 @@ public class ShopScreen extends MenuScreen {
                 }
               }
             } else {
-              this.giveUnequipped(this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0));
+              this.giveUnequipped(inv);
             }
 
             this.menuState = MenuState.BUY_4;
@@ -1098,7 +1100,7 @@ public class ShopScreen extends MenuScreen {
             this.charHighlight = null;
           }));
         } else {
-          this.giveUnequipped(this.inv.get(this.invScroll_8011e0e4 + this.invIndex_8011e0e0));
+          this.giveUnequipped(inv);
           this.menuState = MenuState.BUY_4;
           unloadRenderable(this.charHighlight);
           this.charHighlight = null;
