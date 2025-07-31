@@ -544,6 +544,12 @@ public final class Statistics {
       ids = switch(monsterId) {
         case 148 -> new int[] { 148, 104 }; //Slime
         case 264 -> new int[] { 264, 262 }; //Fruegel II
+        case 154 -> new int[] { 154, 86 }; //Will-o'-wisp
+        case 155 -> new int[] { 155, 86 }; //Will-o'-wisp
+        case 101 -> new int[] { 101, 152 }; //Specter
+        case 144 -> new int[] { 144, 56 }; //Madman
+        case 157 -> new int[] { 157, 74 }; //Magma Fish
+        case 146 -> new int[] { 146, 100 }; //Red Hot
         default -> null;
       };
     }
