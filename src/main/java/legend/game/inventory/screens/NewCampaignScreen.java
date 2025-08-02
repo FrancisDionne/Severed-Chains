@@ -143,6 +143,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
       if(SAVES.campaignExists(this.campaignName.getText())) {
         this.deferAction(() -> this.getStack().pushScreen(new MessageBoxScreen("Campaign name already\nin use", 0, result1 -> { })));
       } else {
+        BattleDifficultyConfigEntry.reloadMonsters();
         this.unload = true;
       }
     });

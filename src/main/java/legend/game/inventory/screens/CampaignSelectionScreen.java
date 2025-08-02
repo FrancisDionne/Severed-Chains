@@ -1,6 +1,7 @@
 package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
+import legend.game.combat.BattleDifficulty;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
@@ -11,6 +12,7 @@ import legend.game.inventory.screens.controls.Label;
 import legend.game.inventory.screens.controls.SaveCard;
 import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.saves.Campaign;
 import legend.game.saves.ConfigStorage;
@@ -120,6 +122,7 @@ public class CampaignSelectionScreen extends MenuScreen {
         submapScene_80052c34 = 53;
       }
 
+      BattleDifficultyConfigEntry.reloadMonsters();
       Statistics.load(gameState_800babc8.campaign.path, data.saveGame.fileName);
     }, () -> {
       menuStack.popScreen();

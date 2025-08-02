@@ -251,7 +251,7 @@ public class BestiaryScreen extends MenuScreen {
   }
 
   private void loadEntries() {
-    this.bestiaryEntries = new ArrayList<>();
+    this.bestiaryEntries = new ArrayList<>(); //https://docs.google.com/spreadsheets/d/111ZSCvhnfoxKxtmLeLXeHuviHhM3ZNt2vBxFww9pO_g/
     this.addEntry(257, -1, 4, null, "Seles", "Southern Serdio", "A rank-and-file knight in the service of Sandora.\nUses a combination of ranged knives and sword attacks.");
     this.addEntry(256, -1, 1, null, "Seles", "Southern Serdio", "Commander lingering near Seles after it was raided by Sandora.\nHas a basic attack, combo slash, and items at their disposal.");
     this.addEntry(21, -1, -1, null, "Forest", "Southern Serdio", "A cocky bird. Will slash with talons and crow at its enemies.");
