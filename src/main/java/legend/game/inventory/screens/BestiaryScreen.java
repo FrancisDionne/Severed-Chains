@@ -354,8 +354,6 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(293, -1, 1, null, "Fletz", "Tiberoa", "");
     this.addEntry(18, -1, -1, null, "Phantom Ship", "Illisa Bay", "");
     this.addEntry(85, -1, -1, null, "Phantom Ship", "Illisa Bay", "");
-    //this.addEntry(101, -1, -1, null, "Phantom Ship", "Illisa Bay", "");
-    this.addEntry(152, -1, -1, null, "Phantom Ship", "Illisa Bay", "");
     this.addEntry(86, -1, -1, null, "Phantom Ship", "Illisa Bay", "");
     //this.addEntry(154, -1, -1, null, "Phantom Ship", "Illisa Bay", "");
     //this.addEntry(155, -1, -1, null, "Phantom Ship", "Illisa Bay", "");
@@ -399,8 +397,8 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(270, -1, 1, "Lloyd (Wingly Armor)", "Flanvel Tower", "Mille Seseau", "");
     this.addEntry(11, -1, -1, null, "Flanvel Tower", "Mille Seseau", "");
     this.addEntry(25, -1, -1, null, "Flanvel Tower", "Mille Seseau", "");
-    //this.addEntry(56, -1, -1, null, "Flanvel Tower", "Mille Seseau", "");
-    this.addEntry(144, -1, -1, null, "Flanvel Tower", "Mille Seseau", "");
+    this.addEntry(56, -1, -1, null, "Flanvel Tower", "Mille Seseau", "");
+    //this.addEntry(144, -1, -1, null, "Flanvel Tower", "Mille Seseau", "");
     this.addEntry(49, -1, -1, null, "Flanvel Tower", "Mille Seseau", "");
     this.addEntry(344, -1, 1, null, "Flanvel Tower", "Mille Seseau", "");
     this.addEntry(31, -1, -1, null, "Snowfield", "Gloriano", "");
@@ -440,6 +438,8 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(295, -1, 1, null, "Vellweb", "Gloriano", "");
     this.addEntry(298, -1, 1, null, "Vellweb", "Gloriano", "");
     this.addEntry(296, -1, 1, null, "Vellweb", "Gloriano", "");
+    //this.addEntry(101, -1, -1, null, "Mayfil", "Gloriano", "");
+    this.addEntry(152, -1, -1, null, "Mayfil", "Gloriano", "");
     this.addEntry(125, -1, -1, null, "Mayfil", "Gloriano", "");
     this.addEntry(10, -1, -1, null, "Mayfil", "Gloriano", "");
     this.addEntry(78, -1, -1, null, "Mayfil", "Gloriano", "");
