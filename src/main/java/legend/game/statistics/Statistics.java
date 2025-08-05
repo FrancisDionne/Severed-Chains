@@ -549,6 +549,7 @@ public final class Statistics {
         case 144 -> new int[] { monsterId, 56 }; //Madman
         case 157 -> new int[] { monsterId, 74 }; //Magma Fish
         case 146 -> new int[] { monsterId, 100 }; //Red Hot
+        case 150 -> new int[] { monsterId, 33 }; //Fire Spirit
         default -> null;
       };
     }
