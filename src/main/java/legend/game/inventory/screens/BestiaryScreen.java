@@ -292,7 +292,9 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(100, -1, -1, null, "Villude Volcano", "Southern Serdio", "");
     //this.addEntry(146, -1, -1, null, "Villude Volcano", "Southern Serdio", "");
     this.addEntry(92, -1, -1, null, "Villude Volcano", "Southern Serdio", "A large creature with its back constantly ablaze. The Salamander's\nbasic attack can stun enemies, which becomes dangerous when it\nattacks the same target multiple times.");
-    this.addEntry(308, -1, 1, "Wounded Virage", "Villude Volcano", "Southern Serdio", "A relic of the Dragon Campaign, this Virage was seemingly petrified\nwithin the Volcano for millenia. It activates to attack Dart's party.\n\nThis Virage is not at full strength. It is clearly damaged:\nmissing one arm, both legs, and more. Despite this, it is still deadly.\nThis Virage can inflict an assortment of status ailments, and uses a\nstaggeringly powerful beam laser.");
+    this.addEntry(308, -1, 1, "Wounded Virage (Head)", "Villude Volcano", "Southern Serdio", "A relic of the Dragon Campaign, this Virage was seemingly petrified\nwithin the Volcano for millenia. It activates to attack Dart's party.\n\nThis Virage is not at full strength. It is clearly damaged:\nmissing one arm, both legs, and more. Despite this, it is still deadly.\nThis Virage can inflict an assortment of status ailments, and uses a\nstaggeringly powerful beam laser.");
+    this.addEntry(309, 308, 1, "Wounded Virage (Body)", "Villude Volcano", "Southern Serdio", "");
+    this.addEntry(310, 308, 1, "Wounded Virage (Arm)", "Villude Volcano", "Southern Serdio", "");
     this.addEntry(333, -1, 1, null, "Villude Volcano", "Southern Serdio", "An elemental creature that patrols the volcano. Fire Bird may pursue\npassersby who attempt to traverse the molten crags. \n\nMost of its abilities have an area of effect, and are of the Fire element.\n\nAlso known as Piton.");
     this.addEntry(334, 333, 1, null, "Villude Volcano", "Southern Serdio", "An elemental creature that patrols the volcano. Fire Bird may pursue\npassersby who attempt to traverse the molten crags. \n\nMost of its abilities have an area of effect, and are of the Fire element.\n\nAlso known as Piton.");
     this.addEntry(19, -1, -1, null, "Dragon's Nest", "Southern Serdio", "");
@@ -493,12 +495,7 @@ public class BestiaryScreen extends MenuScreen {
     }
 
     this.headerTexture = Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "header_element_" + this.getElement(this.monster.stats.elementFlag.flag).getRegistryId().entryId() + ".png"));
-
-    try {
-      this.modelTexture = Texture.png(Path.of("gfx", "models", this.monster.charId + ".png"));
-    } catch(final Exception e) {
-      this.modelTexture = Texture.png(Path.of("gfx", "models", "-1.png"));
-    }
+    this.modelTexture = this.getModelTexture();
   }
 
   public void renderAll() {
@@ -814,7 +811,7 @@ public class BestiaryScreen extends MenuScreen {
 
       if(highlighted) {
         this.m.translation(xOffset - x + 14.5f , y - 1.5f, 124);
-        this.m.scale(83f, 7.5f, 1);
+        this.m.scale(84f, 7.5f, 1);
 
         RENDERER
           .queueOrthoModel(this.quad, this.m, QueuedModelStandard.class)
@@ -1090,6 +1087,24 @@ public class BestiaryScreen extends MenuScreen {
       }
     }
     return null;
+  }
+
+  private Texture getModelTexture() {
+    Texture texture = null;
+    try {
+      texture = Texture.png(Path.of("gfx", "models", this.monster.charId + ".png"));
+    } catch(final Exception e1) {
+      try {
+        if(this.monster.isSubEntry) {
+          texture = Texture.png(Path.of("gfx", "models", this.getEntryParent(this.monster).charId + ".png"));
+        }
+      } catch(final Exception ignored) {
+      }
+    }
+    if(texture == null) {
+      texture = Texture.png(Path.of("gfx", "models", "-1.png"));
+    }
+    return texture;
   }
 
   @Override
