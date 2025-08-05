@@ -278,7 +278,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(138, -1, 1, null, null, "Endiness", "Limestone Cave <-> Bale", "A rare bird seen only along the road between Limestone Cave and\nBale. \n\nLike all Rare creatures, it has a high chance of running away, but\ndrops great rewards if defeated.");
     this.addEntry(130, -1, 1, null, null, "Hoax", "Northern Serdio", "");
     this.addEntry(258, -1, 1, null, null, "Hoax", "Northern Serdio", "The first known human who can use innate magic. However, the Elite\nwas not born with it. Researchers at the black castle figured out a way\nto infuse a human with magical powers - possibly with the help\nof Emperor Diaz.\n\nThe Elite has a few physical attacks, but its signature moves are magical.\nThe first is a green flame that deals moderate AoE damage. \nThe second summons apparitions which take no damage.");
-    this.addEntry(273, 258, -1, "Sandora Elite Clone", null, "Black Castle", "Southern Serdio", "Pending investigation");
+    this.addEntry(273, 258, -1, "Sandora Elite Clone", null, "Black Castle", "Southern Serdio", "");
     this.addEntry(265, -1, 1, null, null, "Hoax", "Northern Serdio", "Age: \nHeight: 250 cm / \n\nThe last of his species, Kongol is a towering giant with unmatched\nphysical prowess. He wields a large axe, but can fight without it.\n\nAs a child his hometown was raided by bandits. At the last moment he\nwas saved by Doel, who then raised him.");
     this.addEntry(68, -1, -1, null, null, "Marshland", "Northern Serdio", "");
     this.addEntry(22, -1, -1, null, null, "Marshland", "Northern Serdio", "An aquatic creature found in the Marshland. Although the basic attack\ndeals little damage, Mermen also have Water magic that is lethal to\nenemies with low defense or a Fire attribute.");
@@ -326,8 +326,8 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(133, -1, -1, null, null, "Hellena Prison", "Southern Serdio", "");
     this.addEntry(329, -1, 1, null, null, "Hellena Prison", "Southern Serdio", "");
     this.addEntry(262, -1, 1, "Fruegel II", null, "Hellena Prison", "Southern Serdio", "");
-    this.addEntry(264, 262, -1, null, null, "Hellena Prison", "Southern Serdio", "");
-    this.addEntry(263, 262, -1, null, null, "Hellena Prison", "Southern Serdio", "");
+    this.addEntry(264, -1, 1, null, null, "Hellena Prison", "Southern Serdio", "");
+    this.addEntry(263, -1, 1, null, null, "Hellena Prison", "Southern Serdio", "");
     this.addEntry(42, -1, 1, null, null, "Endiness / Moon", "Road Near Kazas", "");
     this.addEntry(17, -1, -1, null, null, "Black Castle", "Southern Serdio", "");
     this.addEntry(103, -1, -1, null, null, "Black Castle", "Southern Serdio", "");
@@ -356,7 +356,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(82, -1, -1, null, null, "Giganto Home", "Tiberoa", "");
     this.addEntry(109, -1, -1, null, null, "Giganto Home", "Tiberoa", "");
     this.addEntry(301, -1, 1, null, null, "Giganto Home", "Tiberoa", "");
-    this.addEntry(300, 301, -1, null, null, "Giganto Home", "Tiberoa", "");
+    this.addEntry(300, -1, 1, null, null, "Giganto Home", "Tiberoa", "");
     this.addEntry(293, -1, 1, null, null, "Fletz", "Tiberoa", "");
     this.addEntry(18, -1, -1, null, null, "Phantom Ship", "Illisa Bay", "");
     this.addEntry(85, -1, -1, null, null, "Phantom Ship", "Illisa Bay", "");
@@ -446,8 +446,8 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(80, -1, -1, null, null, "Zenebatos", "Gloriano", "");
     this.addEntry(122, -1, -1, null, null, "Zenebatos", "Gloriano", "");
     this.addEntry(360, -1, 1, null, null, "Zenebatos", "Gloriano", "");
-    this.addEntry(362, 360, -1, null, null, "Zenebatos", "Gloriano", "");
-    this.addEntry(361, 360, -1, null, null, "Zenebatos", "Gloriano", "");
+    this.addEntry(362, -1, 1, null, null, "Zenebatos", "Gloriano", "");
+    this.addEntry(361, -1, 1, null, null, "Zenebatos", "Gloriano", "");
     this.addEntry(297, -1, 1, null, null, "Vellweb", "Gloriano", "");
     this.addEntry(295, -1, 1, null, null, "Vellweb", "Gloriano", "");
     this.addEntry(298, -1, 1, null, null, "Vellweb", "Gloriano", "");
