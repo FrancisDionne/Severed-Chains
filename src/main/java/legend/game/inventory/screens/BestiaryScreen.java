@@ -101,11 +101,11 @@ public class BestiaryScreen extends MenuScreen {
         this.location = map + (region.isEmpty() ? "" : " - " + region);
       }
 
-      if(this.kill >= RANK_3 || (this.maxKill > -1 && this.kill >= this.maxKill) || (this.maxKill == -2 && this.kill == -1)) {
+      if(this.kill >= RANK_3 || (this.maxKill > -1 && this.kill >= this.maxKill) || (this.maxKill == -2 && this.kill == -1) || this.isSubEntry) {
         this.rank = 3;
       } else if(this.kill >= RANK_2) {
         this.rank = 2;
-      } else if(this.kill >= 1 || this.isSubEntry) {
+      } else if(this.kill >= 1) {
         this.rank = 1;
       } else if (this.kill == -1) {
         this.rank = -1;
@@ -418,9 +418,9 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(20, -1, -1, null, null, "Snowfield", "Gloriano", "");
     this.addEntry(57, -1, -1, null, null, "Snowfield", "Gloriano", "");
     this.addEntry(50, -1, -1, null, null, "Snowfield", "Gloriano", "");
-    this.addEntry(350, -1, 1, "Polter Armor", null, "Snowfield", "Gloriano", "");
-    this.addEntry(349, 350, -1, "Polter Helm", null, "Snowfield", "Gloriano", "");
-    this.addEntry(351, 350, -1, "Polter Sword", null, "Snowfield", "Gloriano", "");
+    this.addEntry(350, -1, 1, null, null, "Snowfield", "Gloriano", "");
+    this.addEntry(349, 350, -1, null, null, "Snowfield", "Gloriano", "");
+    this.addEntry(351, 350, -1, null, null, "Snowfield", "Gloriano", "");
     this.addEntry(65, -1, -1, null, null, "Vellweb", "Gloriano", "");
     this.addEntry(47, -1, -1, null, null, "Vellweb", "Gloriano", "");
     this.addEntry(39, -1, -1, null, null, "Vellweb", "Gloriano", "");
@@ -483,6 +483,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(373, -1, 1, null, null, "Moon", "Gloriano", "");
     this.addEntry(375, -1, 1, null, null, "Moon", "Gloriano", "");
     this.addEntry(378, -1, 1, null, null, "Moon", "Gloriano", "");
+    this.addEntry(380, 378, -1, "Michael (Core)", null, "Moon", "Gloriano", "");
     this.addEntry(381, -1, 1, null, null, "Moon", "Gloriano", "");
     this.addEntry(376, 381, -1, null, null, "Moon", "Gloriano", "");
     this.addEntry(377, 381, -1, null, null, "Moon", "Gloriano", "");
