@@ -404,7 +404,7 @@ public class BestiaryScreen extends MenuScreen {
     this.addEntry(48, -1, -1, null, null, "Kashua Glacier", "Mille Seseau", "");
     this.addEntry(67, -1, -1, null, null, "Kashua Glacier", "Mille Seseau", "");
     this.addEntry(346, -1, 1, null, null, "Kashua Glacier", "Mille Seseau", "");
-    this.addEntry(348, 346, -1, null, null, "Kashua Glacier", "Mille Seseau", "");
+    this.addEntry(348, 346, -1, "Windigo (Heart)", null, "Kashua Glacier", "Mille Seseau", "");
     this.addEntry(347, 346, -1, null, null, "Kashua Glacier", "Mille Seseau", "");
     this.addEntry(270, -1, 1, "Lloyd (Wingly Armor)", null, "Flanvel Tower", "Mille Seseau", "");
     this.addEntry(11, -1, -1, null, null, "Flanvel Tower", "Mille Seseau", "");
