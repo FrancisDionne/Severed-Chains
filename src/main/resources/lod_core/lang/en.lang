@@ -265,6 +265,8 @@ lod_core.config.gameplay_balance.label=Gameplay Balance (Beta)
 lod_core.config.gameplay_balance.help=Setting to enable gameplay balance in various areas\n\n[Battle]\n- Guard: each consecutive use decreases the HP restored by 25{P}. Resets on any other action.
 lod_core.config.addition_random_mode.label=Addition Frenzy Mode
 lod_core.config.addition_random_mode.help=A random unlocked addition is chosen each time you attack
+lod_core.config.character_random_mode.label=Party Frenzy Mode
+lod_core.config.character_random_mode.help=A random party is formed with available characters before each battle
 lod_core.config.addition_gameplay_enhance.label=Gameplay Enhancements
 lod_core.config.addition_gameplay_enhance.help=Completing additions flawlessly will reward you with more damage and faster mastery\n(Recommended to set Button Behavior to Feedback)
 

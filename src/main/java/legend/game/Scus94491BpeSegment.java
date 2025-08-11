@@ -24,6 +24,8 @@ import legend.game.combat.environment.BattlePreloadedEntities_18cb0;
 import legend.game.combat.environment.EncounterData38;
 import legend.game.combat.environment.StageData2c;
 import legend.game.inventory.WhichMenu;
+import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.CharacterRandomModeConfig;
 import legend.game.modding.events.RenderEvent;
 import legend.game.modding.events.battle.BattleMusicEvent;
 import legend.game.modding.events.characters.DivineDragoonEvent;
@@ -1900,6 +1902,10 @@ public final class Scus94491BpeSegment {
         battleStartDelayTicks_8004f6ec = 1;
         setBattleDissolveDarkeningMetrics(true, 300 / vsyncMode_8007a3b8 / speedDivisor);
         startFadeEffect(1, 1);
+
+        if(CONFIG.getConfig(CoreMod.CHARACTER_RANDOM_MODE_CONFIG.get())) {
+          CharacterRandomModeConfig.setRandomParty();
+        }
 
         for(final int charId : gameState_800babc8.charIds_88) {
           if(charId > -1) {

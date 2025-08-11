@@ -37,6 +37,7 @@ import legend.game.modding.coremod.config.BattleUIColourBlueConfigEntry;
 import legend.game.modding.coremod.config.BattleUIColourGreenConfigEntry;
 import legend.game.modding.coremod.config.BattleUIColourRedConfigEntry;
 import legend.game.modding.coremod.config.BattleUIColourSettingsConfigEntry;
+import legend.game.modding.coremod.config.CharacterRandomModeConfig;
 import legend.game.modding.coremod.config.ControllerKeybindsConfigEntry;
 import legend.game.modding.coremod.config.ControllerStyleConfigEntry;
 import legend.game.modding.coremod.config.CreateCrashSaveConfigEntry;
@@ -145,6 +146,7 @@ public class CoreMod {
   public static final RegistryDelegate<PermaDeathConfigEntry> PERMA_DEATH = register("perma_death", PermaDeathConfigEntry::new);
   public static final RegistryDelegate<IronmanModeConfigEntry> IRONMAN_MODE = register("ironman_mode", IronmanModeConfigEntry::new);
   public static final RegistryDelegate<AdditionRandomModeConfig> ADDITION_RANDOM_MODE_CONFIG = CONFIG_REGISTRAR.register("addition_random_mode", AdditionRandomModeConfig::new);
+  public static final RegistryDelegate<CharacterRandomModeConfig> CHARACTER_RANDOM_MODE_CONFIG = CONFIG_REGISTRAR.register("character_random_mode", CharacterRandomModeConfig::new);
   public static final RegistryDelegate<GameplayBalanceConfigEntry> GAMEPLAY_BALANCE_CONFIG = CONFIG_REGISTRAR.register("gameplay_balance", GameplayBalanceConfigEntry::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> BATTLE_GROUP_CONFIG = register("battle_group", BattleGroupConfigEntry::new);
