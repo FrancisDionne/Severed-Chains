@@ -107,6 +107,7 @@ import legend.game.inventory.screens.PostBattleScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionRandomModeConfig;
+import legend.game.modding.coremod.config.CharacterRandomModeConfig;
 import legend.game.modding.coremod.config.GameplayBalanceConfigEntry;
 import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.modding.events.battle.BattleEndedEvent;
@@ -1441,6 +1442,10 @@ public class Battle extends EngineState {
     itemOverflow.clear();
     equipmentOverflow.clear();
 
+    if(CONFIG.getConfig(CoreMod.CHARACTER_RANDOM_MODE_CONFIG.get())) {
+      CharacterRandomModeConfig.setRandomParty();
+    }
+
     int charIndex = gameState_800babc8.charIds_88[1];
     if(charIndex < 0) {
       gameState_800babc8.charIds_88[1] = gameState_800babc8.charIds_88[2];
@@ -1464,6 +1469,12 @@ public class Battle extends EngineState {
     //LAB_800c760c
     this.allocateStageDarkeningStorage();
     loadEncounterSoundsAndMusic();
+
+    for(final int charId : gameState_800babc8.charIds_88) {
+      if(charId > -1) {
+        Statistics.appendStat(charId, Statistics.Stats.TOTAL_ENCOUNTER, 1);
+      }
+    }
 
     pregameLoadingStage_800bb10c++;
   }
