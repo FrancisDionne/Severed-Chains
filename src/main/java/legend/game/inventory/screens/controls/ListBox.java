@@ -521,19 +521,11 @@ public class ListBox<T> extends Control {
 
     @Override
     protected void render(final int x, final int y) {
+      boolean drawQuantity = true;
       final int oldZ = textZ_800bdf00;
       textZ_800bdf00 = this.getZ() - 1;
       renderText(this.string, x + 28, y + 3, this.fontOptions);
       textZ_800bdf00 = oldZ;
-
-      if(ListBox.this.entryToQuantity != null) {
-        final String quantity = ListBox.this.entryToQuantity.apply(this.data);
-        if (!quantity.equals("0")) {
-          final String quantityText = '(' + quantity + ')';
-          final int w = textWidth(quantityText);
-          renderText(quantityText, x + 140 + (19 - w), y + 3, this.fontOptions);
-        }
-      }
 
       if(ListBox.this.entryToIcon != null) {
         renderItemIcon(ListBox.this.entryToIcon.apply(this.data), x + 13, y + 1, 0x8);
@@ -544,6 +536,16 @@ public class ListBox<T> extends Control {
 
         if(icon != -1) {
           renderCharacterPortrait(icon, x + this.getWidth() - 20, y + 1, 0x8).clut_30 = (500 + icon & 0x1ff) << 6 | 0x2b;
+          drawQuantity = false;
+        }
+      }
+
+      if(drawQuantity && ListBox.this.entryToQuantity != null) {
+        final String quantity = ListBox.this.entryToQuantity.apply(this.data);
+        if (!quantity.equals("0")) {
+          final String quantityText = '(' + quantity + ')';
+          final int w = textWidth(quantityText);
+          renderText(quantityText, x + 140 + (19 - w), y + 3, this.fontOptions);
         }
       }
     }
