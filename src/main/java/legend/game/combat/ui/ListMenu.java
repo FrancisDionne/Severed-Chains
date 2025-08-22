@@ -12,6 +12,10 @@ import legend.game.modding.coremod.CoreMod;
 import legend.game.scripting.RunningScript;
 import legend.game.types.Translucency;
 import legend.lodmod.items.AngelsPrayerItem;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.PLATFORM;
@@ -28,6 +32,9 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public abstract class ListMenu {
+  private static final Logger LOGGER = LogManager.getFormatterLogger(ListMenu.class);
+  private static final Marker BATTLE = MarkerManager.getMarker("BATTLE");
+
   private static final BattleMenuBackgroundUvMetrics04 battleItemMenuScrollArrowUvMetrics_800c7190 = new BattleMenuBackgroundUvMetrics04(224, 8, 16, 8);
 
   protected int menuState_00;
@@ -283,6 +290,7 @@ public abstract class ListMenu {
         //LAB_800f5410
         final int ret = this.handleTargeting();
         if(ret == 1) { // Pressed X
+          LOGGER.info(BATTLE, "Player selected index %d", this.listScroll_1e + this.listIndex_24);
           this.onUse(this.listScroll_1e + this.listIndex_24);
 
           //LAB_800f5488
@@ -290,10 +298,12 @@ public abstract class ListMenu {
           this.selectionState_a0 = 1;
           this.menuState_00 = 9;
         } else if(ret == 2) { // Instant confirm, no sound
+          LOGGER.info(BATTLE, "Player selected index %d", this.listScroll_1e + this.listIndex_24);
           this.onUse(this.listScroll_1e + this.listIndex_24);
           this.selectionState_a0 = 1;
           this.menuState_00 = 9;
         } else if(ret == -1) { // Pressed O
+          LOGGER.info(BATTLE, "Player cancelled menu");
           //LAB_800f54b4
           playMenuSound(0);
           playMenuSound(4);

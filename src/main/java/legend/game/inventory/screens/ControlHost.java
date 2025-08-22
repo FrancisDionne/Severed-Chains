@@ -1,6 +1,8 @@
 package legend.game.inventory.screens;
 
 import legend.core.platform.input.InputAction;
+import legend.core.platform.input.InputAxis;
+import legend.core.platform.input.InputAxisDirection;
 import legend.core.platform.input.InputButton;
 import legend.core.platform.input.InputKey;
 import legend.core.platform.input.InputMod;
@@ -203,6 +205,10 @@ public abstract class ControlHost implements Iterable<Control> {
   }
 
   protected InputPropagation buttonRelease(final InputButton button) {
+    return InputPropagation.PROPAGATE;
+  }
+
+  protected InputPropagation axis(final InputAxis axis, final InputAxisDirection direction, final float menuValue, final float movementValue) {
     return InputPropagation.PROPAGATE;
   }
 

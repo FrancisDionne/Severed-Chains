@@ -16,6 +16,7 @@ import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.MessageBoxResult;
 import org.legendofdragoon.modloader.registries.RegistryEntry;
+import legend.lodmod.LodMod;
 
 import javax.annotation.Nullable;
 import java.util.List;

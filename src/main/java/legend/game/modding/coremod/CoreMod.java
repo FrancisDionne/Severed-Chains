@@ -20,6 +20,7 @@ import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionGameplayEnhanceConfig;
 import legend.game.modding.coremod.config.AdditionGroupConfigEntry;
+import legend.game.inventory.ItemGroupSortModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionOverlayConfigEntry;
 import legend.game.modding.coremod.config.AdditionRandomModeConfig;
@@ -133,14 +134,14 @@ public class CoreMod {
   public static final RegistryDelegate<CreateCrashSaveConfigEntry> CREATE_CRASH_SAVE_CONFIG = CONFIG_REGISTRAR.register("create_crash_save", CreateCrashSaveConfigEntry::new);
 
   /** Config isn't actually used, but adds a button to the options screen to open the keybinds screen */
-  public static final RegistryDelegate<ConfigEntry<Void>> CONTROLLER_KEYBINDS_CONFIG = register("controller_keybinds", ControllerKeybindsConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_SETTINGS_CONFIG = register("addition_settings", AdditionSettingsConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> BATTLE_UI_COLOUR_SETTINGS_CONFIG = register("battle_ui_colour_settings", BattleUIColourSettingsConfigEntry::new);
   public static final RegistryDelegate<ControllerStyleConfigEntry> CONTROLLER_STYLE_CONFIG = CONFIG_REGISTRAR.register("controller_style", ControllerStyleConfigEntry::new);
 
   // Per-campaign config
-  public static final RegistryDelegate<RunByDefaultConfig> RUN_BY_DEFAULT = CONFIG_REGISTRAR.register("run_by_default", RunByDefaultConfig::new);
+  public static final RegistryDelegate<ControllerKeybindsConfigEntry> CONTROLLER_KEYBINDS_CONFIG = CONFIG_REGISTRAR.register("controller_keybinds", ControllerKeybindsConfigEntry::new);
   public static final RegistryDelegate<EnabledModsConfigEntry> ENABLED_MODS_CONFIG = CONFIG_REGISTRAR.register("enabled_mods", EnabledModsConfigEntry::new);
+  public static final RegistryDelegate<RunByDefaultConfig> RUN_BY_DEFAULT = CONFIG_REGISTRAR.register("run_by_default", RunByDefaultConfig::new);
 
   public static final RegistryDelegate<BattleDifficultyConfigEntry> BATTLE_DIFFICULTY = register("battle_difficulty", BattleDifficultyConfigEntry::new);
   public static final RegistryDelegate<PermaDeathConfigEntry> PERMA_DEATH = register("perma_death", PermaDeathConfigEntry::new);

@@ -1,9 +1,9 @@
 package legend.game.inventory.screens;
 
 import legend.core.GameEngine;
-import legend.game.combat.BattleDifficulty;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
+import legend.core.platform.input.InputBindings;
 import legend.game.i18n.I18n;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
@@ -104,6 +104,9 @@ public class CampaignSelectionScreen extends MenuScreen {
       CONFIG.copyConfigFrom(data.saveGame.config);
 
       GameEngine.bootRegistries();
+
+      InputBindings.initBindings();
+      InputBindings.loadBindings(CONFIG);
 
       final GameLoadedEvent event = EVENTS.postEvent(new GameLoadedEvent(data.saveGame.state));
 

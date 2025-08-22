@@ -14,6 +14,7 @@ import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.MessageBoxResult;
 import legend.game.types.Renderable58;
+import legend.lodmod.LodMod;
 
 import java.util.List;
 import java.util.Set;

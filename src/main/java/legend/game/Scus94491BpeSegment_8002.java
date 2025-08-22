@@ -20,6 +20,7 @@ import legend.game.i18n.I18n;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
+import legend.game.inventory.ItemGroupSortMode;
 import legend.game.inventory.OverflowMode;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.FontOptions;
@@ -1307,6 +1308,39 @@ public final class Scus94491BpeSegment_8002 {
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
   }
 
+  public static <T extends RegistryEntry> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items, final int count, final List<String> retailSorting) {
+    display.sort(menuItemIconComparator(retailSorting));
+    setInventoryFromDisplay(display, items, count);
+  }
+
+  public static <T extends RegistryEntry> Comparator<MenuEntryStruct04<T>> menuItemIconComparator(final List<String> retailSorting) {
+    final boolean retail = true; //CONFIG.getConfig(ITEM_GROUP_SORT_MODE.get()) == ItemGroupSortMode.RETAIL;
+
+    Comparator<MenuEntryStruct04<T>> comparator = Comparator.comparingInt(item -> item.getIcon().resolve().icon);
+
+    if(retail) {
+      comparator = comparator.thenComparingInt(item -> {
+        if(!LodMod.MOD_ID.equals(item.item_00.getRegistryId().modId()) || !retailSorting.contains(item.item_00.getRegistryId().entryId())) {
+          return Integer.MAX_VALUE;
+        }
+
+        return retailSorting.indexOf(item.item_00.getRegistryId().entryId());
+      });
+
+      comparator = comparator.thenComparing(item -> {
+        if(LodMod.MOD_ID.equals(item.item_00.getRegistryId().modId()) && retailSorting.contains(item.item_00.getRegistryId().entryId())) {
+          return "";
+        }
+
+        return I18n.translate(item.getNameTranslationKey());
+      });
+    } else {
+      comparator = comparator.thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    }
+
+    return comparator;
+  }
+
   public static void sortEquipmentInventory(final int sortType) {
     final List<Equipment> list = switch(sortType) {
       case 1 -> sortEquipmentByPower(gameState_800babc8.equipment_1e8);
@@ -1331,7 +1365,7 @@ public final class Scus94491BpeSegment_8002 {
       items.add(MenuEntryStruct04.make(item));
     }
 
-    sortItems(items, gameState_800babc8.items_2e9, gameState_800babc8.items_2e9.size());
+    sortItems(items, gameState_800babc8.items_2e9, gameState_800babc8.items_2e9.size(), List.of(LodMod.ITEM_IDS));
   }
 
   @Method(0x80023b54L)

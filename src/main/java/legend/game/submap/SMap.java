@@ -97,6 +97,7 @@ import static legend.game.Scus94491BpeSegment.orderingTableBits_1f8003c0;
 import static legend.game.Scus94491BpeSegment.resizeDisplay;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment.tmdGp0Tpage_1f8003ec;
+import static legend.game.Scus94491BpeSegment.unloadSoundFile;
 import static legend.game.Scus94491BpeSegment.zOffset_1f8003e8;
 import static legend.game.Scus94491BpeSegment_8002.FUN_800218f0;
 import static legend.game.Scus94491BpeSegment_8002.FUN_8002246c;
@@ -127,6 +128,7 @@ import static legend.game.Scus94491BpeSegment_8003.RotTransPers4;
 import static legend.game.Scus94491BpeSegment_8003.perspectiveTransform;
 import static legend.game.Scus94491BpeSegment_8004.engineStateOnceLoaded_8004dd24;
 import static legend.game.Scus94491BpeSegment_8004.engineState_8004dd20;
+import static legend.game.Scus94491BpeSegment_8004.stopMusicSequence;
 import static legend.game.Scus94491BpeSegment_8005.collidedPrimitiveIndex_80052c38;
 import static legend.game.Scus94491BpeSegment_8005.renderBorder_80052b68;
 import static legend.game.Scus94491BpeSegment_8005.shouldRestoreCameraPosition_80052c40;
@@ -393,6 +395,27 @@ public class SMap extends EngineState {
   @Override
   public void loadGameFromMenu(final GameState52c gameState) {
     this.encounterAccumulator_800c6ae8 = 0;
+
+    // Copied over from LAB_8001e160
+    stopMusicSequence();
+    unloadSoundFile(8);
+
+    this.restoreMusicAfterMenu();
+  }
+
+  @Override
+  public boolean canSave() {
+    final SubmapSavable saveMode = this.submap.canSave();
+
+    if(saveMode == SubmapSavable.ALWAYS) {
+      return true;
+    }
+
+    if(saveMode == SubmapSavable.SAVE_ANYWHERE && CONFIG.getConfig(CoreMod.SAVE_ANYWHERE_CONFIG.get())) {
+      return true;
+    }
+
+    return false;
   }
 
   @Override
@@ -1389,6 +1412,10 @@ public class SMap extends EngineState {
   @ScriptParam(direction = ScriptParam.Direction.OUT, type = ScriptParam.Type.INT, name = "collidee", description = "The SubmapObject210 script index collided with, or -1 if not collided")
   @Method(0x800dee28L)
   private FlowControl scriptCheckPlayerCollision(final RunningScript<SubmapObject210> script) {
+    if(this.transitioning_800f7e4c) {
+      return FlowControl.CONTINUE;
+    }
+
     final Vector3f deltaMovement = new Vector3f();
     final Vector3f movement = new Vector3f();
 
