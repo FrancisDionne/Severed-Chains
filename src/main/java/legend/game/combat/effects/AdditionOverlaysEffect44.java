@@ -537,6 +537,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
   @Method(0x801073d4L)
   public void tick(final ScriptState<EffectManagerData6c<EffectManagerParams.VoidType>> state) {
     final EffectManagerData6c<EffectManagerParams.VoidType> manager = state.innerStruct_00;
+    final boolean allowMisinput = CONFIG.getConfig(CoreMod.ADDITION_ALLOW_MISINPUT_CONFIG.get());
 
     if(this.pauseTickerAndRenderer_31 == 0) {
       final AdditionOverlaysHit20[] hitArray = this.hitOverlays_40;
@@ -551,8 +552,10 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
         // Catch too late failure when no button pressed
         if(this.currentFrame_34 == hitArray[hitNum].frameSuccessUpperBound_12 + 1) {
           if(additionHitCompletionState_8011a014[hitNum] == 0) {
-            additionHitCompletionState_8011a014[hitNum] = -2;
-            this.propagateFailedAdditionHitFlag(hitArray, hitNum);
+            if(!allowMisinput || hitArray[hitNum].isCounter_1c) {
+              additionHitCompletionState_8011a014[hitNum] = -2;
+              this.propagateFailedAdditionHitFlag(hitArray, hitNum);
+            }
             this.currentInputStatus = AdditionButtonFeedback.NO_PRESS;
             if (SEffe.additionButtonFeedbackText != null) {
               SEffe.additionButtonFeedbackText.setFeedbackTextElement(hitNum, this.currentInputStatus);
@@ -561,12 +564,13 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
           }
         } else if(additionHitCompletionState_8011a014[hitNum] == 0) {
           hitFailed = 0;
+          break;
         }
         //LAB_8010748c
       }
 
       //LAB_801074a8
-      if(hitFailed != 0) {
+      if(hitFailed != 0 && (!allowMisinput || this.lastCompletedHit_39 < this.count_30)) {
         this.propagateFailedAdditionHitFlag(hitArray, hitNum);
       }
 
@@ -693,7 +697,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
                   }
 
                   //LAB_801076f0
-                  if(additionHitCompletionState_8011a014[hitNum] < 0) {
+                  if(additionHitCompletionState_8011a014[hitNum] < 0 && (!allowMisinput || hitOverlay.isCounter_1c)) {
                     this.propagateFailedAdditionHitFlag(hitArray, hitNum);
                   }
 
@@ -702,6 +706,13 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
                   this.numFramesToRenderCenterSquare_38 = 2;
                   this.lastCompletedHit_39 = hitNum;
                 }
+              }
+
+              if(allowMisinput && !hitOverlay.isCounter_1c && this.currentInputStatus.isBadInput()) {
+                hitOverlay.hitSuccessful_01 = true;
+                this.lastCompletedHit_39 = hitNum;
+                additionHitCompletionState_8011a014[hitNum] = 1;
+                this.flawlessAddition = false;
               }
             } else {  // Auto-complete
               if(this.currentFrame_34 >= hitOverlay.frameSuccessLowerBound_10 && this.currentFrame_34 <= hitOverlay.frameSuccessUpperBound_12) {

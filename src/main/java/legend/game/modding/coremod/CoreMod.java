@@ -15,12 +15,12 @@ import legend.core.platform.input.ScancodeInputActivation;
 import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
 import legend.game.inventory.IconSetConfigEntry;
+import legend.game.modding.coremod.config.AdditionAllowMisinputConfigEntry;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionDifficultyConfigEntry;
-import legend.game.modding.coremod.config.AdditionGameplayEnhanceConfig;
+import legend.game.modding.coremod.config.AdditionGameplayEnhanceConfigEntry;
 import legend.game.modding.coremod.config.AdditionGroupConfigEntry;
-import legend.game.inventory.ItemGroupSortModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionOverlayConfigEntry;
 import legend.game.modding.coremod.config.AdditionRandomModeConfig;
@@ -185,8 +185,9 @@ public class CoreMod {
   public static final RegistryDelegate<AdditionTimingOffsetConfigEntry> ADDITION_TIMING_OFFSET_CONFIG = register("addition_timing_offset", AdditionTimingOffsetConfigEntry::new);
   public static final RegistryDelegate<AdditionButtonModeConfigEntry> ADDITION_BUTTON_MODE_CONFIG = register("addition_button_mode", AdditionButtonModeConfigEntry::new);
   public static final RegistryDelegate<AdditionCounterDifficultyConfigEntry> ADDITION_COUNTER_DIFFICULTY_CONFIG = register("addition_counter_difficulty", AdditionCounterDifficultyConfigEntry::new);
-  public static final RegistryDelegate<AdditionGameplayEnhanceConfig> ADDITION_GAMEPLAY_ENHANCE_CONFIG = CONFIG_REGISTRAR.register("addition_gameplay_enhance", AdditionGameplayEnhanceConfig::new);
+  public static final RegistryDelegate<AdditionGameplayEnhanceConfigEntry> ADDITION_GAMEPLAY_ENHANCE_CONFIG = CONFIG_REGISTRAR.register("addition_gameplay_enhance", AdditionGameplayEnhanceConfigEntry::new);
   public static final RegistryDelegate<AdditionOverlaySizeConfigEntry> ADDITION_OVERLAY_SIZE_CONFIG = CONFIG_REGISTRAR.register("addition_overlay_size", AdditionOverlaySizeConfigEntry::new);
+  public static final RegistryDelegate<AdditionAllowMisinputConfigEntry> ADDITION_ALLOW_MISINPUT_CONFIG = CONFIG_REGISTRAR.register("addition_allow_misinput", AdditionAllowMisinputConfigEntry::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> DRAGOON_ADDITION_GROUP_CONFIG = register("dragoon_addition_group", DragoonAdditionGroupConfigEntry::new);
   public static final RegistryDelegate<DragoonAdditionModeConfigEntry> DRAGOON_ADDITION_MODE_CONFIG = register("dragoon_addition_mode", DragoonAdditionModeConfigEntry::new);

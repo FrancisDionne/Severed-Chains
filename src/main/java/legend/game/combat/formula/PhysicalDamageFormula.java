@@ -5,7 +5,9 @@ import legend.game.combat.Battle;
 import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.combat.effects.AdditionOverlaysEffect44;
 import legend.game.combat.types.AttackType;
+import legend.game.modding.coremod.CoreMod;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.game.Scus94491BpeSegment_8004.currentEngineState_8004dd04;
 import static legend.game.combat.Battle.adjustDamageForPower;
 
@@ -35,8 +37,14 @@ public final class PhysicalDamageFormula {
 
   public static int applyFlawlessAdditionModifier(final State<Integer> state) {
     int damage = state.value();
-    if(state.bents.get(Side.ATTACKER) instanceof final PlayerBattleEntity player && !player.isDragoon() && AdditionOverlaysEffect44.additionResults != null && AdditionOverlaysEffect44.additionResults.flawless) {
-      damage += Math.round(Math.max(1, damage * (0.05f + (AdditionOverlaysEffect44.additionResults.hits * 0.0215f)))); //5% + 2.15% per addition hit (potential max at 20% with best additions)
+    if(AdditionOverlaysEffect44.additionResults != null) {
+      if(state.bents.get(Side.ATTACKER) instanceof final PlayerBattleEntity player && !player.isDragoon() && AdditionOverlaysEffect44.additionResults.flawless) {
+        damage += Math.round(Math.max(1, damage * (0.05f + (AdditionOverlaysEffect44.additionResults.additionHits * 0.0215f)))); //5% + 2.15% per addition hit (potential max at 20% with best additions)
+      }
+      if(CONFIG.getConfig(CoreMod.ADDITION_ALLOW_MISINPUT_CONFIG.get()) && AdditionOverlaysEffect44.additionResults.hits < AdditionOverlaysEffect44.additionResults.additionHits) {
+        final float ratio = (float)(AdditionOverlaysEffect44.additionResults.hits + 1) / (AdditionOverlaysEffect44.additionResults.additionHits + 1);
+        damage = Math.round(damage * ratio);
+      }
     }
     return damage;
   }

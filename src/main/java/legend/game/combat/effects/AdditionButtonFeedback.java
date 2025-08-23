@@ -11,5 +11,13 @@ public enum AdditionButtonFeedback {
   GOOD_PLUS(),
   GOOD_MINUS(),
   PERFECT(),
-  FLAWLESS()
+  FLAWLESS();
+
+  public boolean isBadInput() {
+    return this == AdditionButtonFeedback.WRONG ||
+           this == AdditionButtonFeedback.LATE ||
+           this == AdditionButtonFeedback.EARLY ||
+           this == AdditionButtonFeedback.COUNTER ||
+           this == AdditionButtonFeedback.NO_PRESS;
+  }
 }
