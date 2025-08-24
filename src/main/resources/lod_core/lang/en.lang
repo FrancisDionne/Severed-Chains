@@ -270,7 +270,7 @@ lod_core.config.character_random_mode.help=A random party is formed with availab
 lod_core.config.addition_gameplay_enhance.label=Gameplay Enhancements
 lod_core.config.addition_gameplay_enhance.help=Completing additions flawlessly will reward you with more damage and faster mastery\n(Recommended to set Button Behavior to Feedback)
 lod_core.config.addition_allow_misinput.label=Allow Misinputs
-lod_core.config.addition_allow_misinput.help=Pressing at the wrong time during an addition will not cut it short.\nThe total damage of the addition will be a ratio of how many inputs were good instead.
+lod_core.config.addition_allow_misinput.help=Pressing at the wrong time during an addition will not cut it short.\nInstead, the total damage of the addition will be a ratio of how many inputs were good.
 
 lod_core.config.dragoon_addition_group.label=[--- Dragoon Additions ---]
 lod_core.config.dragoon_addition_mode.label=Input
