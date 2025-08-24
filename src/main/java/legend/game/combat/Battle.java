@@ -3934,49 +3934,51 @@ public class Battle extends EngineState {
         return FlowControl.CONTINUE;
       }
 
-      final int xp = AdditionOverlaysEffect44.additionResults.flawless ? 2 : 1;
+      if(!CONFIG.getConfig(CoreMod.ADDITION_ALLOW_MISINPUT_CONFIG.get()) || AdditionOverlaysEffect44.additionResults.hits >= AdditionOverlaysEffect44.additionResults.additionHits) {
+        final int xp = AdditionOverlaysEffect44.additionResults.flawless ? 2 : 1;
 
-      //LAB_800cd208
-      final int additionXp = Math.min(99, charData.additionXp_22[additionIndex] + xp);
+        //LAB_800cd208
+        final int additionXp = Math.min(99, charData.additionXp_22[additionIndex] + xp);
 
-      //LAB_800cd240
-      //LAB_800cd288
-      while(charData.additionLevels_1a[additionIndex] < 5 && additionXp >= charData.additionLevels_1a[additionIndex] * 20) {
-        charData.additionLevels_1a[additionIndex]++;
-      }
-
-      //LAB_800cd2ac
-      int nonMaxedAdditions = additionCounts_8004f5c0[charIndex];
-      int lastNonMaxAdditionIndex = -1;
-
-      // Find the first addition that isn't already maxed out
-      //LAB_800cd2ec
-      for(int additionIndex2 = 0; additionIndex2 < additionCounts_8004f5c0[charIndex]; additionIndex2++) {
-        if(charData.additionLevels_1a[additionIndex2] == 5) {
-          nonMaxedAdditions--;
-        } else {
-          //LAB_800cd308
-          lastNonMaxAdditionIndex = additionIndex2;
+        //LAB_800cd240
+        //LAB_800cd288
+        while(charData.additionLevels_1a[additionIndex] < 5 && additionXp >= charData.additionLevels_1a[additionIndex] * 20) {
+          charData.additionLevels_1a[additionIndex]++;
         }
 
-        //LAB_800cd30c
-      }
+        //LAB_800cd2ac
+        int nonMaxedAdditions = additionCounts_8004f5c0[charIndex];
+        int lastNonMaxAdditionIndex = -1;
 
-      // If there's only one addition that isn't maxed (the ultimate addition), unlock it
-      //LAB_800cd31c
-      if(nonMaxedAdditions < 2 && (charData.partyFlags_04 & 0x40) == 0) {
-        charData.partyFlags_04 |= 0x40;
+        // Find the first addition that isn't already maxed out
+        //LAB_800cd2ec
+        for(int additionIndex2 = 0; additionIndex2 < additionCounts_8004f5c0[charIndex]; additionIndex2++) {
+          if(charData.additionLevels_1a[additionIndex2] == 5) {
+            nonMaxedAdditions--;
+          } else {
+            //LAB_800cd308
+            lastNonMaxAdditionIndex = additionIndex2;
+          }
 
-        if(lastNonMaxAdditionIndex >= 0) {
-          charData.additionLevels_1a[lastNonMaxAdditionIndex] = 1;
+          //LAB_800cd30c
         }
 
-        //LAB_800cd36c
-        unlockedUltimateAddition_800bc910[bent.charSlot_276] = true;
-      }
+        // If there's only one addition that isn't maxed (the ultimate addition), unlock it
+        //LAB_800cd31c
+        if(nonMaxedAdditions < 2 && (charData.partyFlags_04 & 0x40) == 0) {
+          charData.partyFlags_04 |= 0x40;
 
-      //LAB_800cd390
-      charData.additionXp_22[additionIndex] = additionXp;
+          if(lastNonMaxAdditionIndex >= 0) {
+            charData.additionLevels_1a[lastNonMaxAdditionIndex] = 1;
+          }
+
+          //LAB_800cd36c
+          unlockedUltimateAddition_800bc910[bent.charSlot_276] = true;
+        }
+
+        //LAB_800cd390
+        charData.additionXp_22[additionIndex] = additionXp;
+      }
     }
 
     //LAB_800cd3ac
