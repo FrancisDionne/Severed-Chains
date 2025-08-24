@@ -107,6 +107,7 @@ import legend.game.inventory.screens.PostBattleScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionRandomModeConfig;
+import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.modding.coremod.config.CharacterRandomModeConfig;
 import legend.game.modding.coremod.config.GameplayBalanceConfigEntry;
 import legend.game.modding.coremod.config.PermaDeathConfigEntry;
@@ -8190,7 +8191,8 @@ public class Battle extends EngineState {
     final BattleEntity27c attacker = (BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00;
     final BattleEntity27c defender = (BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[1].get()].innerStruct_00;
 
-    final int damage = EVENTS.postEvent(new AttackEvent(attacker, defender, AttackType.PHYSICAL, CoreMod.PHYSICAL_DAMAGE_FORMULA.calculate(attacker, defender))).damage;
+    int damage = EVENTS.postEvent(new AttackEvent(attacker, defender, AttackType.PHYSICAL, CoreMod.PHYSICAL_DAMAGE_FORMULA.calculate(attacker, defender))).damage;
+    damage = BattleDifficultyConfigEntry.adjustCounterDamage(damage, this.currentTurnBent_800c66c8, defender);
 
     script.params_20[2].set(damage);
     script.params_20[3].set(this.determineAttackSpecialEffects(attacker, defender, AttackType.PHYSICAL));

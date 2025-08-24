@@ -2,11 +2,16 @@ package legend.game.modding.coremod.config;
 
 import legend.game.combat.BattleDifficulty;
 import legend.game.combat.Monsters;
+import legend.game.combat.bent.BattleEntity27c;
+import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.combat.types.MonsterStats1c;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigStorageLocation;
 import legend.game.saves.EnumConfigEntry;
+import legend.game.scripting.ScriptState;
+
+import javax.annotation.Nullable;
 
 import static legend.core.GameEngine.CONFIG;
 
@@ -52,5 +57,22 @@ public class BattleDifficultyConfigEntry extends EnumConfigEntry<BattleDifficult
 
   public static void reloadMonsters() {
     Monsters.loadMonsters();
+  }
+
+  public static int adjustCounterDamage(int damage, @Nullable final ScriptState<? extends BattleEntity27c> currentBent, final BattleEntity27c defender) {
+    if(currentBent != null && currentBent.innerStruct_00 instanceof final PlayerBattleEntity player && defender.charId_272 == player.charId_272) {
+      switch(CONFIG.getConfig(CoreMod.BATTLE_DIFFICULTY.get())) {
+        case BattleDifficulty.EASY:
+          damage = Math.round(damage * 0.80f);
+          break;
+        case BattleDifficulty.HARD:
+          damage = Math.round(damage * 2.5f);
+          break;
+        case BattleDifficulty.EXTREME:
+          damage = Math.round(damage * 5.0f);
+          break;
+      }
+    }
+    return damage;
   }
 }
