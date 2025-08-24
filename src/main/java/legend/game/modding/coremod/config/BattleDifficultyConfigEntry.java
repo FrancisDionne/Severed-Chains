@@ -20,6 +20,10 @@ public class BattleDifficultyConfigEntry extends EnumConfigEntry<BattleDifficult
     super(BattleDifficulty.class, BattleDifficulty.NORMAL, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 0, BattleDifficultyConfigEntry::reloadMonsters);
   }
 
+  public static void reloadMonsters() {
+    Monsters.loadMonsters();
+  }
+  
   public static void adjustMonsterStats(final MonsterStats1c monster) {
     switch(CONFIG.getConfig(CoreMod.BATTLE_DIFFICULTY.get())) {
       case BattleDifficulty.EASY:
@@ -53,10 +57,6 @@ public class BattleDifficultyConfigEntry extends EnumConfigEntry<BattleDifficult
         monster.speed_08 = Math.round(monster.speed_08 * 1.15f);
         break;
     }
-  }
-
-  public static void reloadMonsters() {
-    Monsters.loadMonsters();
   }
 
   public static int adjustCounterDamage(int damage, @Nullable final ScriptState<? extends BattleEntity27c> currentBent, final BattleEntity27c defender) {
