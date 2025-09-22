@@ -58,18 +58,18 @@ public class ItemListMenu extends ListMenu {
 
   @Override
   protected void drawListEntry(final int index, final int x, final int y, final int trim) {
+
     final Item item = this.combatItems_800c6988.get(index).item;
-    this.fontOptions.trim(trim).horizontalAlign(HorizontalAlign.LEFT);
+
+    this.fontOptions.trim(trim);
+    this.fontOptions.horizontalAlign(HorizontalAlign.LEFT);
+    renderText(I18n.translate(item), x, y, this.fontOptions);
 
     if(item.isRepeat()) {
       this.fontOptions.colour(TextColour.STATS_YELLOW);
     }
 
-    renderText(I18n.translate(item), x, y, this.fontOptions);
-
-    this.fontOptions.colour(TextColour.WHITE);
-
-    renderText("\u011d", x + 143, y, this.fontOptions);
+    renderText("×", x + 143, y, this.fontOptions);
 
     this.fontOptions.horizontalAlign(HorizontalAlign.RIGHT);
     renderText(String.valueOf(getInventoryEntryQuantity(item)), x + 168, y, this.fontOptions);

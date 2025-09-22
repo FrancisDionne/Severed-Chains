@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.game.Scus94491BpeSegment.startFadeEffect;
 import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
-import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HELP;
 
@@ -127,7 +127,7 @@ public class CampaingChallengesScreen extends VerticalLayoutScreen {
           if(configEntry.hasHelp()) {
             final Label help = label.addControl(new Label("?"));
             help.setScale(0.4f);
-            help.setPos((int)(textWidth(text) * label.getScale()) + 2, 1);
+            help.setPos((int)(DEFAULT_FONT.textWidth(text) * label.getScale()) + 2, 1);
             help.onHoverIn(() -> this.getStack().pushScreen(new TooltipScreen(I18n.translate(configEntry.getHelpTranslationKey()), this.mouseX, this.mouseY)));
             this.helpLabels.put(label, help);
             this.helpEntries.put(label, configEntry);

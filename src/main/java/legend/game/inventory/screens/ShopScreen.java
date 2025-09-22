@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static legend.core.GameEngine.CONFIG;
+import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.REGISTRIES;
 import static legend.game.SItem.FUN_80104b60;
@@ -75,7 +76,6 @@ import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.takeEquipment;
 import static legend.game.Scus94491BpeSegment_8002.takeItem;
-import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.Scus94491BpeSegment_8002.unloadRenderable;
 import static legend.game.Scus94491BpeSegment_8007.shopId_8007a3b4;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
@@ -425,7 +425,7 @@ public class ShopScreen extends MenuScreen {
           final Item item = (Item)items.get(firstItem + i);
           final int quantity = getInventoryEntryQuantity(item);
           final String quantityText = '(' + Integer.toString(quantity) + ')';
-          final int w = textWidth(quantityText);
+          final int w = DEFAULT_FONT.textWidth(quantityText);
           renderText(I18n.translate(item), 168, this.menuEntryY(i) + 2, UI_TEXT);
           renderText(quantityText, 168 + 120 + (19 - w), this.menuEntryY(i) + 2, UI_TEXT);
           renderItemIcon(item.getIcon(), 151, this.menuEntryY(i), 0x8);
@@ -442,7 +442,7 @@ public class ShopScreen extends MenuScreen {
           final Equipment equipment = (Equipment)items.get(firstItem + i);
           final int quantity = getInventoryEntryQuantity(equipment);
           final String quantityText = '(' + Integer.toString(quantity) + ')';
-          final int w = textWidth(quantityText);
+          final int w = DEFAULT_FONT.textWidth(quantityText);
           renderText(I18n.translate(equipment), 168, this.menuEntryY(i) + 2, equipment.canBeDiscarded() ? UI_TEXT : UI_TEXT_DISABLED);
           renderText(quantityText, 168 + 120 + (19 - w), this.menuEntryY(i) + 2, equipment.canBeDiscarded() ? UI_TEXT : UI_TEXT_DISABLED);
           renderItemIcon(equipment.icon_0e, 151, this.menuEntryY(i), 0x8);

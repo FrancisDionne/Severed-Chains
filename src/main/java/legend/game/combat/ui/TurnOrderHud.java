@@ -16,9 +16,9 @@ import org.joml.Matrix4f;
 import java.nio.file.Path;
 import java.util.List;
 
+import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
-import static legend.game.Scus94491BpeSegment_8002.textWidth;
 
 public final class TurnOrderHud {
   private static final Matrix4f m = new Matrix4f();
@@ -87,7 +87,7 @@ public final class TurnOrderHud {
       final boolean isPlayer = info.bent instanceof PlayerBattleEntity;
       final Texture portrait = textures[isPlayer ? info.bent.charId_272 : 9];
       final float y = bentIndex * 8f + 15;
-      final float textWidth = textWidth(name) * nameFont.getSize();
+      final float textWidth = DEFAULT_FONT.textWidth(name) * nameFont.getSize();
 
       longestName = Math.max(textWidth, longestName);
 

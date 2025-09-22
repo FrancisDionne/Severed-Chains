@@ -18,12 +18,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
+import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.game.SItem.FUN_80104b60;
 import static legend.game.SItem.renderCharacterPortrait;
 import static legend.game.SItem.renderItemIcon;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
-import static legend.game.Scus94491BpeSegment_8002.textWidth;
 import static legend.game.Scus94491BpeSegment_800b.textZ_800bdf00;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BOTTOM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
@@ -544,7 +544,7 @@ public class ListBox<T> extends Control {
         final String quantity = ListBox.this.entryToQuantity.apply(this.data);
         if (!quantity.equals("0")) {
           final String quantityText = '(' + quantity + ')';
-          final int w = textWidth(quantityText);
+          final int w = DEFAULT_FONT.textWidth(quantityText);
           renderText(quantityText, x + 140 + (19 - w), y + 3, this.fontOptions);
         }
       }
