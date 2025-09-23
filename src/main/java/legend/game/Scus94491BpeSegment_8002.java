@@ -22,7 +22,6 @@ import legend.game.i18n.I18n;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
-import legend.game.inventory.ItemGroupSortMode;
 import legend.game.inventory.OverflowMode;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.FontOptions;
@@ -3663,24 +3662,28 @@ public final class Scus94491BpeSegment_8002 {
               textTransforms.transfer.z = overrideZ;
             }
 
-            final QueuedModelStandard model = font.queueChar(InputCodepoints.getCodepoint(PLATFORM.getGamepadType(), c), textTransforms);
+            if(i == 0 || font.usesColour(c)) {
+              final QueuedModelStandard model = font.queueChar(InputCodepoints.getCodepoint(PLATFORM.getGamepadType(), c), textTransforms);
 
-            if(i == 0) {
-              model.colour(options.getRed(), options.getGreen(), options.getBlue());
-            } else {
-              model.colour(options.getShadowRed(), options.getShadowGreen(), options.getShadowBlue());
-            }
-
-            if(trim != 0) {
-              if(trim < 0) {
-                model.scissor(0, (int)y + 1, displayWidth_1f8003e0, (int)(height + trim));
-              } else {
-                model.scissor(0, (int)(y + 1 - trim), displayWidth_1f8003e0, (int)height);
+              if(font.usesColour(c)) {
+                if(i == 0) {
+                  model.colour(options.getRed(), options.getGreen(), options.getBlue());
+                } else if(font.usesColour(c)) {
+                  model.colour(options.getShadowRed(), options.getShadowGreen(), options.getShadowBlue());
+                }
               }
-            }
 
-            if(queueCallback != null) {
-              queueCallback.accept(model);
+              if(trim != 0) {
+                if(trim < 0) {
+                  model.scissor(0, (int)y + 1, displayWidth_1f8003e0, (int)(height + trim));
+                } else {
+                  model.scissor(0, (int)(y + 1 - trim), displayWidth_1f8003e0, (int)height);
+                }
+              }
+
+              if(queueCallback != null) {
+                queueCallback.accept(model);
+              }
             }
           }
         }
