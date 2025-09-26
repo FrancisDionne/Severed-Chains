@@ -20,6 +20,10 @@ public class BoolConfigEntry extends ConfigEntry<Boolean> {
   }
 
   public BoolConfigEntry(final boolean defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final double order, @Nullable final Runnable callback) {
+    this(defaultValue, storageLocation, category, true, order, callback);
+  }
+
+  public BoolConfigEntry(final boolean defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category, final boolean editable, final double order, @Nullable final Runnable callback) {
     super(
       defaultValue,
       storageLocation,
@@ -29,19 +33,21 @@ public class BoolConfigEntry extends ConfigEntry<Boolean> {
       order
     );
 
-    this.setEditControl((current, gameState) -> {
-      final Checkbox checkbox = new Checkbox();
-      checkbox.setHorizontalAlign(HorizontalAlign.RIGHT);
-      checkbox.setChecked(current, false);
-      checkbox.onToggled(val -> {
-        gameState.setConfig(this, val);
-        if(callback != null) {
-          callback.run();
-          checkbox.setChecked(gameState.getConfig(this), true);
-        }
+    if(editable) {
+      this.setEditControl((current, gameState) -> {
+        final Checkbox checkbox = new Checkbox();
+        checkbox.setHorizontalAlign(HorizontalAlign.RIGHT);
+        checkbox.setChecked(current);
+        checkbox.onToggled(val -> {
+          gameState.setConfig(this, val);
+          if(callback != null) {
+            callback.run();
+            checkbox.setChecked(gameState.getConfig(this), true);
+          }
+        });
+        return checkbox;
       });
-      return checkbox;
-    });
+    }
   }
 
   private static byte[] serialize(final boolean val) {

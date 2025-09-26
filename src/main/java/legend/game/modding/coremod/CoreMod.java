@@ -77,6 +77,7 @@ import legend.game.modding.coremod.config.RunByDefaultConfig;
 import legend.game.modding.coremod.config.SecondaryCharacterXpMultiplierConfigEntry;
 import legend.game.modding.coremod.config.SfxVolumeConfigEntry;
 import legend.game.modding.coremod.config.TextGroupConfigEntry;
+import legend.game.modding.coremod.config.ShowAdvancedOptionsConfigEntry;
 import legend.game.modding.coremod.config.TransformationModeConfigEntry;
 import legend.game.modding.coremod.config.TurboToggleConfig;
 import legend.game.modding.coremod.config.UnlockPartyConfig;
@@ -132,6 +133,7 @@ public class CoreMod {
   public static final RegistryDelegate<MusicPitchResolutionConfigEntry> MUSIC_PITCH_RESOLUTION_CONFIG = CONFIG_REGISTRAR.register("music_pitch_resolution", MusicPitchResolutionConfigEntry::new);
   public static final RegistryDelegate<MusicEffectsOverTimeGranularityConfigEntry> MUSIC_EFFECTS_OVER_TIME_GRANULARITY_CONFIG = CONFIG_REGISTRAR.register("music_effects_over_time_granularity", MusicEffectsOverTimeGranularityConfigEntry::new);
   public static final RegistryDelegate<CreateCrashSaveConfigEntry> CREATE_CRASH_SAVE_CONFIG = CONFIG_REGISTRAR.register("create_crash_save", CreateCrashSaveConfigEntry::new);
+  public static final RegistryDelegate<ShowAdvancedOptionsConfigEntry> SHOW_ADVANCED_OPTIONS_CONFIG = CONFIG_REGISTRAR.register("show_advanced_options", ShowAdvancedOptionsConfigEntry::new);
 
   /** Config isn't actually used, but adds a button to the options screen to open the keybinds screen */
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_SETTINGS_CONFIG = register("addition_settings", AdditionSettingsConfigEntry::new);
@@ -210,6 +212,7 @@ public class CoreMod {
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_DELETE = INPUT_ACTION_REGISTRAR.register("menu_delete", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_SORT = INPUT_ACTION_REGISTRAR.register("menu_sort", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_FILTER = INPUT_ACTION_REGISTRAR.register("menu_filter", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_ADVANCED = INPUT_ACTION_REGISTRAR.register("menu_advanced", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_HELP = INPUT_ACTION_REGISTRAR.register("menu_help", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_MODS = INPUT_ACTION_REGISTRAR.register("menu_mods", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_MENU_TEXTBOX_CONFIRM = INPUT_ACTION_REGISTRAR.register("menu_textbox_confirm", InputAction::fixed);
@@ -310,7 +313,10 @@ public class CoreMod {
       .add(INPUT_ACTION_MENU_FILTER.get(), new ButtonInputActivation(InputButton.X))
       .add(INPUT_ACTION_MENU_FILTER.get(), new ScancodeInputActivation(InputKey.Q))
       .add(INPUT_ACTION_MENU_HELP.get(), new ButtonInputActivation(InputButton.Y))
+      .add(INPUT_ACTION_MENU_HELP.get(), new ButtonInputActivation(InputButton.START))
       .add(INPUT_ACTION_MENU_HELP.get(), new KeyInputActivation(InputKey.H))
+      .add(INPUT_ACTION_MENU_ADVANCED.get(), new ButtonInputActivation(InputButton.SELECT))
+      .add(INPUT_ACTION_MENU_ADVANCED.get(), new KeyInputActivation(InputKey.V))
       .add(INPUT_ACTION_MENU_MODS.get(), new ButtonInputActivation(InputButton.Y))
       .add(INPUT_ACTION_MENU_MODS.get(), new KeyInputActivation(InputKey.M))
       .add(INPUT_ACTION_MENU_TEXTBOX_CONFIRM.get(), new ButtonInputActivation(InputButton.A))
