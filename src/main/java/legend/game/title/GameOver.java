@@ -11,6 +11,7 @@ import legend.game.EngineState;
 import legend.game.EngineStateEnum;
 import legend.game.Scus94491BpeSegment_8002;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.types.GsRVIEW2;
 import legend.game.types.McqHeader;
 import legend.game.unpacker.FileData;
 import legend.game.unpacker.Loader;
@@ -141,5 +142,10 @@ public class GameOver extends EngineState {
   public void updateDiscordRichPresence(final Activity activity) {
     activity.setDetails("Game Over");
     activity.setState(null);
+  }
+
+  @Override
+  public GsRVIEW2 getCamera() {
+    return null;
   }
 }
