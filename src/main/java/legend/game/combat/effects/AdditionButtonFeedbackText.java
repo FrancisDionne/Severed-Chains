@@ -28,25 +28,25 @@ public class AdditionButtonFeedbackText {
 
   public static Texture[] xboxAFrames = new Texture[] {
     Texture.png(Path.of("gfx", "ui", "additionButton_xbox_A_0.png")),
-    Texture.png(Path.of("gfx", "ui", "additionButton_xbox_A_0.png")),
+    Texture.png(Path.of("gfx", "ui", "additionButton_xbox_A_1.png")),
     Texture.png(Path.of("gfx", "ui", "additionButton_xbox_A_2.png"))
   };
 
   public static Texture[] xboxBFrames = new Texture[] {
     Texture.png(Path.of("gfx", "ui", "additionButton_xbox_B_0.png")),
-    Texture.png(Path.of("gfx", "ui", "additionButton_xbox_B_0.png")),
+    Texture.png(Path.of("gfx", "ui", "additionButton_xbox_B_1.png")),
     Texture.png(Path.of("gfx", "ui", "additionButton_xbox_B_2.png"))
   };
 
   public static Texture[] nintendoAFrames = new Texture[] {
     Texture.png(Path.of("gfx", "ui", "additionButton_nintendo_A_0.png")),
-    Texture.png(Path.of("gfx", "ui", "additionButton_nintendo_A_0.png")),
+    Texture.png(Path.of("gfx", "ui", "additionButton_nintendo_A_1.png")),
     Texture.png(Path.of("gfx", "ui", "additionButton_nintendo_A_2.png"))
   };
 
   public static Texture[] nintendoBFrames = new Texture[] {
     Texture.png(Path.of("gfx", "ui", "additionButton_nintendo_B_0.png")),
-    Texture.png(Path.of("gfx", "ui", "additionButton_nintendo_B_0.png")),
+    Texture.png(Path.of("gfx", "ui", "additionButton_nintendo_B_1.png")),
     Texture.png(Path.of("gfx", "ui", "additionButton_nintendo_B_2.png"))
   };
 
