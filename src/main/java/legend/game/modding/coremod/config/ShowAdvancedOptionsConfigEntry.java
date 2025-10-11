@@ -6,6 +6,6 @@ import legend.game.saves.ConfigStorageLocation;
 
 public class ShowAdvancedOptionsConfigEntry extends BoolConfigEntry {
   public ShowAdvancedOptionsConfigEntry() {
-    super(false, ConfigStorageLocation.GLOBAL, ConfigCategory.OTHER, false);
+    super(false, ConfigStorageLocation.GLOBAL, ConfigCategory.OTHER, false, 0, null);
   }
 }

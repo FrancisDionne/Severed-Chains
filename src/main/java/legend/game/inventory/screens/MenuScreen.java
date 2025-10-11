@@ -56,7 +56,7 @@ public abstract class MenuScreen extends ControlHost {
     checkbox.setSize(10, 10);
     checkbox.setPos(this.hotkeyX, 226);
     checkbox.onToggled(handler);
-    checkbox.setChecked(checked);
+    checkbox.setChecked(checked, false);
     this.hotkeyX += checkbox.getWidth() + 3;
 
     final Label checkboxLabel = this.addControl(new Label(I18n.translate("lod_core.ui.hotkey", label, InputCodepoints.getActionName(action.get()))));
@@ -67,7 +67,7 @@ public abstract class MenuScreen extends ControlHost {
 
     this.hotkeys.add(new Hotkey(label, action, () -> {
       playMenuSound(2);
-      checkbox.setChecked(!checkbox.isChecked());
+      checkbox.setChecked(!checkbox.isChecked(), false);
     }, checkbox, checkboxLabel));
   }
 
