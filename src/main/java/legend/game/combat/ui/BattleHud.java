@@ -49,13 +49,11 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static legend.core.GameEngine.CONFIG;
-import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.SItem.UI_WHITE_CENTERED;
-import static legend.game.SItem.UI_WHITE_SMALL;
 import static legend.game.SItem.menuStack;
 import static legend.game.Scus94491BpeSegment.centreScreenX_1f8003dc;
 import static legend.game.Scus94491BpeSegment.centreScreenY_1f8003de;
@@ -474,11 +472,6 @@ public class BattleHud {
       textZ_800bdf00 = 40;
 
       TurnOrderHud.render(this.battleMenu_800c6c34, this.sortedBents);
-
-//      for(int bentIndex = 0; bentIndex < this.sortedBents.size(); bentIndex++) {
-//        final String name = this.sortedBents.get(bentIndex);
-//        renderText(DEFAULT_FONT, name, 4, 4 + bentIndex * DEFAULT_FONT.textHeight(name) * UI_WHITE_SMALL.getSize(), UI_WHITE_SMALL);
-//      }
 
       textZ_800bdf00 = oldZ;
     }
