@@ -1,6 +1,8 @@
 package legend.game.inventory.screens;
 
 import legend.core.platform.input.InputMod;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Label;
@@ -46,9 +48,10 @@ public class LinksScreen extends VerticalLayoutScreen {
     help.getFontOptions().size(0.66f).horizontalAlign(HorizontalAlign.CENTRE);
     help.setY(200);
 
-    this.addHotkey(I18n.translate("lod_core.ui.links.view_link"), INPUT_ACTION_MENU_HELP, this::viewLink);
-    this.addHotkey(I18n.translate("lod_core.ui.links.open_link"), INPUT_ACTION_MENU_CONFIRM, this::openLink);
-    this.addHotkey(I18n.translate("lod_core.ui.links.back"), INPUT_ACTION_MENU_BACK, this::back);
+    FooterActionsHud.setMenuActions(FooterActions.HELP, null, null);
+    this.addHotkey(null, INPUT_ACTION_MENU_HELP, this::viewLink);
+    this.addHotkey(null, INPUT_ACTION_MENU_CONFIRM, this::openLink);
+    this.addHotkey(null, INPUT_ACTION_MENU_BACK, this::back);
   }
 
   private void addLink(final String text, final String url) {
