@@ -16,13 +16,13 @@ public class AdditionButtonFeedbackText {
 
   public static Texture[] playstationXFrames = new Texture[] {
     Texture.png(Path.of("gfx", "ui", "additionButton_playstation_X_0.png")),
-    Texture.png(Path.of("gfx", "ui", "additionButton_playstation_X_0.png")),
+    Texture.png(Path.of("gfx", "ui", "additionButton_playstation_X_1.png")),
     Texture.png(Path.of("gfx", "ui", "additionButton_playstation_X_2.png"))
   };
 
   public static Texture[] playstationOFrames = new Texture[] {
     Texture.png(Path.of("gfx", "ui", "additionButton_playstation_O_0.png")),
-    Texture.png(Path.of("gfx", "ui", "additionButton_playstation_O_0.png")),
+    Texture.png(Path.of("gfx", "ui", "additionButton_playstation_O_1.png")),
     Texture.png(Path.of("gfx", "ui", "additionButton_playstation_O_2.png"))
   };
 
