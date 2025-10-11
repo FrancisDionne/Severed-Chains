@@ -268,7 +268,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
   @Method(0x80106050L)
   private void renderAdditionButton(final int frames, final boolean isCounter) {
     final int offset = isCounter ? 1 : 0;
-    final ControllerStyle style = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
+    final ControllerStyle style = CONFIG.getConfig(CoreMod.CONTROLLER_STYLE_CONFIG.get());
     if(Math.abs(frames) >= 2) {  // Button up position
       // Arrow
       renderButtonPressHudElement1(0x24, 119.0f, 43.0f, Translucency.B_PLUS_F, 0x80);
