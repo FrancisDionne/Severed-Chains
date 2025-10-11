@@ -99,7 +99,7 @@ public class OptionsScreen extends VerticalLayoutScreen {
         if(this.validLocations.contains(configEntry.storageLocation) && (configEntry.hasEditControl() || configEntry.header) && (!this.hideNonBattleEntries() || configEntry.availableInBattle())) {
           this.configs.add(configEntry);
 
-          Control editControl;
+          Control editControl = null;
           boolean error = false;
 
           if(!configEntry.header) {
