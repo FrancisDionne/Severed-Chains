@@ -77,10 +77,6 @@ public class ConfigEntry<T> extends RegistryEntry {
     return false;
   }
 
-  public boolean isAdvanced() {
-    return false;
-  }
-
   /**
    * Whether this config entry will appear in the battle options menu
    */

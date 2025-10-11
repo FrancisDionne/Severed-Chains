@@ -38,10 +38,10 @@ public class LoadGameScreen extends MenuScreen {
   private final Runnable closed;
   private boolean closing;
 
-  public LoadGameScreen(final List<SaveCardData> saves, final Consumer<SaveCardData> saveSelected, final Runnable closed, final SaveCardData data) {
+  public LoadGameScreen(final List<SaveCardData> saves, final Consumer<SaveCardData> saveSelected, final Runnable closed, final Campaign campaign) {
     this.saveSelected = saveSelected;
     this.closed = closed;
-    this.campaign = data.campaign;
+    this.campaign = campaign;
 
     deallocateRenderables(0xff);
 

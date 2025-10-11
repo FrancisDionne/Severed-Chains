@@ -58,7 +58,7 @@ public class CampaignSelectionScreen extends MenuScreen {
   private final BigList<SaveCardData> campaignList;
 
   private Campaign selectedCampaign;
-  private Future<List<SavedGame>> saveFuture;
+  private Future<List<SaveCardData>> saveFuture;
 
   public CampaignSelectionScreen(final List<Campaign> campaigns) {
     deallocateRenderables(0xff);
@@ -125,7 +125,7 @@ public class CampaignSelectionScreen extends MenuScreen {
   private void showLoadGameScreen() {
     startFadeEffect(2, 5);
 
-    menuStack.pushScreen(new LoadGameScreen(this.saveFuture.resultNow(), save -> {
+    menuStack.pushScreen(new LoadGameScreen(this.saveFuture.resultNow(), data -> {
       menuStack.reset();
 
       CONFIG.clearConfig(ConfigStorageLocation.SAVE);

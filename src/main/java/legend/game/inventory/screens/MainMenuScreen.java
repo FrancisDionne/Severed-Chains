@@ -558,7 +558,7 @@ public class MainMenuScreen extends MenuScreen {
       menuStack.popScreen();
       this.fadeOutArrows();
       this.loadingStage = 0;
-    }, new SaveCardData(gameState_800babc8.campaign, null)));
+    }, gameState_800babc8.campaign));
   }
 
   private void showSaveScreen() {

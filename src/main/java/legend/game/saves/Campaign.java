@@ -1,6 +1,7 @@
 package legend.game.saves;
 
 import legend.core.IoHelper;
+import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.statistics.Statistics;
 import legend.game.unpacker.FileData;
@@ -107,17 +108,17 @@ public final class Campaign {
     }
   }
 
-  public List<SavedGame> loadAllSaves() {
-    final List<SavedGame> saves = new ArrayList<>();
+  public List<SaveCardData> loadAllSaves() {
+    final List<SaveCardData> saves = new ArrayList<>();
 
     for(final Path child : this.getSaves()) {
       final String filename = child.getFileName().toString();
       final String name = filename.substring(0, filename.lastIndexOf('.'));
 
       try {
-        saves.add(this.loadGame(name));
+        saves.add(new SaveCardData(this, this.loadGame(name)));
       } catch(final InvalidSaveException e) {
-        saves.add(SavedGame.invalid(name));
+        saves.add(new SaveCardData(this, SavedGame.invalid(name)));
       }
     }
 

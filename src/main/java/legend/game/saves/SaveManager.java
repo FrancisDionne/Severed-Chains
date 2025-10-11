@@ -6,6 +6,7 @@ import legend.core.IoHelper;
 import legend.core.memory.types.IntRef;
 import legend.game.EngineStateEnum;
 import legend.game.inventory.WhichMenu;
+import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.statistics.Statistics;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.GameState52c;
@@ -102,7 +103,7 @@ public final class SaveManager {
 
   private static final Pattern SAVE_NUMBER_PATTERN = Pattern.compile("^(.+?)\\s(\\d+)$");
 
-  public String generateSaveName(final List<SavedGame> existingSaves, final GameState52c state) {
+  public String generateSaveName(final List<SaveCardData> existingSaves, final GameState52c state) {
     final String location;
     if(engineState_8004dd20 == EngineStateEnum.WORLD_MAP_08) {
       location = worldMapNames_8011c1ec[continentIndex_800bf0b0];
@@ -115,11 +116,11 @@ public final class SaveManager {
     return this.generateSaveName(existingSaves, location);
   }
 
-  public String generateSaveName(final List<SavedGame> existingSaves, final String name) {
+  public String generateSaveName(final List<SaveCardData> existingSaves, final String name) {
     int highestSaveNumber = 0;
 
-    for(final SavedGame save : existingSaves) {
-      final Matcher matcher = SAVE_NUMBER_PATTERN.matcher(save.saveName);
+    for(final SaveCardData data : existingSaves) {
+      final Matcher matcher = SAVE_NUMBER_PATTERN.matcher(data.saveGame.saveName);
 
       if(matcher.matches() && matcher.group(1).equals(name)) {
         final int saveNumber = Integer.parseInt(matcher.group(2));

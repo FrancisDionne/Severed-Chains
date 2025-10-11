@@ -3,6 +3,7 @@ package legend.game;
 import discord.DiscordRichPresence;
 import legend.core.GameEngine;
 import legend.core.Version;
+import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.SaveFailedException;
 import legend.game.saves.SavedGame;
@@ -45,7 +46,7 @@ public final class Main {
       boolean generatedCrashSave = false;
 
       if(gameState_800babc8 != null && CONFIG.getConfig(CoreMod.CREATE_CRASH_SAVE_CONFIG.get())) {
-        final List<SavedGame> saves = gameState_800babc8.campaign.loadAllSaves();
+        final List<SaveCardData> saves = gameState_800babc8.campaign.loadAllSaves();
         final String name = SAVES.generateSaveName(saves, "Crash Recovery");
 
         gameState_800babc8.submapScene_a4 = collidedPrimitiveIndex_80052c38;

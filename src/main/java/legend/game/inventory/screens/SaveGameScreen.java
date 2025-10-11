@@ -39,7 +39,7 @@ public class SaveGameScreen extends MenuScreen {
   private static final String Overwrite_save_8011c9e8 = "Overwrite save?";
 
   private final BigList<SaveCardData> saveList;
-  private final List<SavedGame> saves;
+  private final List<SaveCardData> saves;
 
   private final Runnable unload;
 
@@ -70,8 +70,8 @@ public class SaveGameScreen extends MenuScreen {
       this.saveList.addEntry(new SaveCardData(gameState_800babc8.campaign, null));
     }
 
-    for(final SavedGame save : this.saves) {
-      this.saveList.addEntry(new SaveCardData(gameState_800babc8.campaign, save));
+    for(final SaveCardData data : this.saves) {
+      this.saveList.addEntry(new SaveCardData(gameState_800babc8.campaign, data.saveGame));
     }
 
     this.addHotkey(null, INPUT_ACTION_MENU_DELETE, this::menuDelete);
@@ -147,7 +147,7 @@ public class SaveGameScreen extends MenuScreen {
         if(result.messageBoxResult == MessageBoxResult.YES) {
           try {
             this.saveList.getSelected().saveGame.state.campaign.deleteSave(this.saveList.getSelected().saveGame.fileName);
-            this.saves.removeIf(save -> save.fileName.equals(this.saveList.getSelected().saveGame.fileName));
+            this.saves.removeIf(data -> data.saveGame.fileName.equals(this.saveList.getSelected().saveGame.fileName));
             this.saveList.removeEntry(this.saveList.getSelected());
           } catch(final IOException e) {
             LOGGER.error("Failed to delete save", e);
