@@ -14,7 +14,6 @@ import legend.game.types.ActiveStatsa0;
 import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.Renderable58;
-import legend.lodmod.LodMod;
 
 import java.util.List;
 import java.util.Set;
@@ -41,6 +40,7 @@ import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryItems;
 import static legend.game.Scus94491BpeSegment_8002.menuItemIconComparator;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
+import static legend.game.Scus94491BpeSegment_8002.sortItemInventory;
 import static legend.game.Scus94491BpeSegment_8002.takeItemId;
 import static legend.game.Scus94491BpeSegment_8002.unloadRenderable;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
@@ -58,6 +58,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_TOP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
@@ -98,6 +99,7 @@ public class UseItemScreen extends MenuScreen {
 
   public UseItemScreen(final Runnable unload) {
     this.unload = unload;
+    this.addHotkey(null, INPUT_ACTION_MENU_SORT, this::menuSort);
   }
 
   @Override
@@ -159,6 +161,12 @@ public class UseItemScreen extends MenuScreen {
       }
     }
     FooterActionsHud.renderMenuActions(FooterActions.SORT, null, null);
+  }
+
+  private void menuSort() {
+    playMenuSound(2);
+    this.menuItems.sort(menuItemIconComparator());
+    sortItemInventory();
   }
 
   private void scroll(final int scroll) {
@@ -251,7 +259,6 @@ public class UseItemScreen extends MenuScreen {
       }
     }
 
-    this.menuItems.sort(menuItemIconComparator(List.of(LodMod.ITEM_IDS)));
     return this.menuItems.size();
   }
 
