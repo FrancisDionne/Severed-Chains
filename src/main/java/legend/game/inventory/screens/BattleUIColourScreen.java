@@ -61,8 +61,8 @@ public class BattleUIColourScreen extends VerticalLayoutScreen {
     this.loadControls();
 
     FooterActionsHud.setMenuActions(FooterActions.DEFAULT, null, null);
-    this.addHotkey(I18n.translate("lod_core.ui.options.default"), INPUT_ACTION_MENU_DELETE, this::setDefaultColor);
-    this.addHotkey(I18n.translate("lod_core.ui.options.back"), INPUT_ACTION_MENU_BACK, this::back);
+    this.addHotkey(null, INPUT_ACTION_MENU_DELETE, this::setDefaultColor);
+    this.addHotkey(null, INPUT_ACTION_MENU_BACK, this::back);
   }
 
   private void back() {

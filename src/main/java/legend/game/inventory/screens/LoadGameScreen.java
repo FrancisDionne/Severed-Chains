@@ -63,8 +63,8 @@ public class LoadGameScreen extends MenuScreen {
       this.saveList.addEntry(new SaveCardData(this.campaign, save));
     }
 
-    this.addHotkey(I18n.translate("lod_core.ui.load_game.delete"), INPUT_ACTION_MENU_DELETE, this::menuDelete);
-    this.addHotkey(I18n.translate("lod_core.ui.load_game.back"), INPUT_ACTION_MENU_BACK, this::menuEscape);
+    this.addHotkey(null, INPUT_ACTION_MENU_DELETE, this::menuDelete);
+    this.addHotkey(null, INPUT_ACTION_MENU_BACK, this::menuEscape);
   }
 
   private void onSelection(final SaveCardData data) {

@@ -19,8 +19,8 @@ import org.apache.logging.log4j.Logger;
 import org.legendofdragoon.modloader.registries.RegistryId;
 
 import javax.annotation.Nullable;
-import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +60,8 @@ public class OptionsScreen extends VerticalLayoutScreen {
 
     this.loadControls();
 
-    this.addHotkey(I18n.translate("lod_core.ui.options.help"), INPUT_ACTION_MENU_HELP, this::help);
-    this.addHotkey(I18n.translate("lod_core.ui.options.back"), INPUT_ACTION_MENU_BACK, this::back);
+    this.addHotkey(null, INPUT_ACTION_MENU_HELP, this::help);
+    this.addHotkey(null, INPUT_ACTION_MENU_BACK, this::back);
   }
 
   protected void init() {
@@ -132,9 +132,9 @@ public class OptionsScreen extends VerticalLayoutScreen {
         }
       });
 
-    this.addToggleHotkey(I18n.translate("lod_core.ui.options.advanced"), INPUT_ACTION_MENU_ADVANCED, CONFIG.getConfig(SHOW_ADVANCED_OPTIONS_CONFIG.get()), this::advanced);
-//    this.addHotkey(I18n.translate("lod_core.ui.options.help"), INPUT_ACTION_MENU_HELP, this::help);
-//    this.addHotkey(I18n.translate("lod_core.ui.options.back"), INPUT_ACTION_MENU_BACK, this::back);
+    this.addToggleHotkey(null, INPUT_ACTION_MENU_ADVANCED, CONFIG.getConfig(SHOW_ADVANCED_OPTIONS_CONFIG.get()), this::advanced);
+    this.addHotkey(null, INPUT_ACTION_MENU_HELP, this::help);
+    this.addHotkey(null, INPUT_ACTION_MENU_BACK, this::back);
   }
 
   protected boolean hideNonBattleEntries() {

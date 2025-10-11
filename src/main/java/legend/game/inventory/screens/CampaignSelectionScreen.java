@@ -78,9 +78,9 @@ public class CampaignSelectionScreen extends MenuScreen {
       this.campaignList.addEntry(new SaveCardData(campaign, campaign.latestSave));
     }
 
-    this.addHotkey(I18n.translate("lod_core.ui.campaign_selection.mods"), INPUT_ACTION_MENU_MODS, this::menuMods);
-    this.addHotkey(I18n.translate("lod_core.ui.campaign_selection.delete"), INPUT_ACTION_MENU_DELETE, this::menuDelete);
-    this.addHotkey(I18n.translate("lod_core.ui.campaign_selection.back"), INPUT_ACTION_MENU_BACK, this::menuEscape);
+    this.addHotkey(null, INPUT_ACTION_MENU_MODS, this::menuMods);
+    this.addHotkey(null, INPUT_ACTION_MENU_DELETE, this::menuDelete);
+    this.addHotkey(null, INPUT_ACTION_MENU_BACK, this::menuEscape);
   }
 
   private void onSelection(final SaveCardData saveData) {

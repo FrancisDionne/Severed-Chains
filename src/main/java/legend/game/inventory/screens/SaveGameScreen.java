@@ -2,7 +2,6 @@ package legend.game.inventory.screens;
 
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
-import legend.game.i18n.I18n;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.BigList;
 import legend.game.inventory.screens.controls.Glyph;
@@ -75,8 +74,8 @@ public class SaveGameScreen extends MenuScreen {
       this.saveList.addEntry(new SaveCardData(gameState_800babc8.campaign, save));
     }
 
-    this.addHotkey(I18n.translate("lod_core.ui.save_game.delete"), INPUT_ACTION_MENU_DELETE, this::menuDelete);
-    this.addHotkey(I18n.translate("lod_core.ui.save_game.back"), INPUT_ACTION_MENU_BACK, this::menuEscape);
+    this.addHotkey(null, INPUT_ACTION_MENU_DELETE, this::menuDelete);
+    this.addHotkey(null, INPUT_ACTION_MENU_BACK, this::menuEscape);
   }
 
   @Override

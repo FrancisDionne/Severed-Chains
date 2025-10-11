@@ -153,7 +153,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
     saveSlots.getFontOptions().size(0.66f).horizontalAlign(HorizontalAlign.CENTRE);
     saveSlots.setY(200);
 
-    this.addHotkey(I18n.translate("lod_core.ui.options.delete"), INPUT_ACTION_MENU_DELETE, this::recommended);
+    this.addHotkey(null, INPUT_ACTION_MENU_DELETE, this::recommended);
   }
 
   @Override

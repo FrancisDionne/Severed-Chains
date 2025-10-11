@@ -39,11 +39,17 @@ public abstract class MenuScreen extends ControlHost {
   private final List<Hotkey> hotkeys = new ArrayList<>();
   private int hotkeyX = 8;
 
-  public void addHotkey(final String label, final RegistryDelegate<InputAction> action, final Runnable handler) {
+  public void addHotkey(@Nullable final String label, final RegistryDelegate<InputAction> action, final Runnable handler) {
     final Button button = this.addControl(new Button(I18n.translate("lod_core.ui.hotkey", label, InputCodepoints.getActionName(action.get()))));
-    button.setScale(0.66f);
-    button.setSize((int)(button.getFont().textWidth(button.getText()) * button.getFontOptions().getSize() + 10), 10);
-    button.setPos(this.hotkeyX, 227);
+
+    if(label == null) {
+      button.setScale(0f);
+    } else {
+      button.setScale(0.66f);
+      button.setSize((int)(button.getFont().textWidth(button.getText()) * button.getFontOptions().getSize() + 10), 10);
+      button.setPos(this.hotkeyX, 227);
+    }
+
     button.onPressed(handler::run);
     button.onHoverIn(() -> playMenuSound(1));
     this.hotkeyX += button.getWidth();
@@ -51,18 +57,30 @@ public abstract class MenuScreen extends ControlHost {
     this.hotkeys.add(new Hotkey(label, action, handler, button));
   }
 
-  public void addToggleHotkey(final String label, final RegistryDelegate<InputAction> action, final boolean checked, final BooleanConsumer handler) {
+  public void addToggleHotkey(@Nullable final String label, final RegistryDelegate<InputAction> action, final boolean checked, final BooleanConsumer handler) {
     final Checkbox checkbox = this.addControl(new Checkbox());
-    checkbox.setSize(10, 10);
-    checkbox.setPos(this.hotkeyX, 226);
+
+    if(label == null) {
+      checkbox.setSize(0, 0);
+    } else {
+      checkbox.setSize(10, 10);
+      checkbox.setPos(this.hotkeyX, 226);
+    }
+
     checkbox.onToggled(handler);
     checkbox.setChecked(checked, false);
     this.hotkeyX += checkbox.getWidth() + 3;
 
     final Label checkboxLabel = this.addControl(new Label(I18n.translate("lod_core.ui.hotkey", label, InputCodepoints.getActionName(action.get()))));
-    checkboxLabel.setScale(0.66f);
-    checkboxLabel.setSize((int)(checkboxLabel.getFont().textWidth(checkboxLabel.getText()) * checkboxLabel.getFontOptions().getSize() + 10), 10);
-    checkboxLabel.setPos(this.hotkeyX, 228);
+
+    if(label == null) {
+      checkboxLabel.setScale(0f);
+    } else {
+      checkboxLabel.setScale(0.66f);
+      checkboxLabel.setSize((int)(checkboxLabel.getFont().textWidth(checkboxLabel.getText()) * checkboxLabel.getFontOptions().getSize() + 10), 10);
+      checkboxLabel.setPos(this.hotkeyX, 228);
+    }
+
     this.hotkeyX += checkboxLabel.getWidth() - 5;
 
     this.hotkeys.add(new Hotkey(label, action, () -> {
@@ -75,6 +93,9 @@ public abstract class MenuScreen extends ControlHost {
     this.hotkeyX = 8;
     for(int hotkeyIndex = 0; hotkeyIndex < this.hotkeys.size(); hotkeyIndex++) {
       final Hotkey hotkey = this.hotkeys.get(hotkeyIndex);
+      if(hotkey.label == null) {
+        continue;
+      }
       for(int controlIndex = 0; controlIndex < hotkey.controls.length; controlIndex++) {
         final Control control = hotkey.controls[controlIndex];
         control.setX(this.hotkeyX);
@@ -381,7 +402,7 @@ public abstract class MenuScreen extends ControlHost {
     private final Runnable handler;
     private final Control[] controls;
 
-    private Hotkey(final String label, final RegistryDelegate<InputAction> action, final Runnable handler, final Control... controls) {
+    private Hotkey(@Nullable final String label, final RegistryDelegate<InputAction> action, final Runnable handler, final Control... controls) {
       this.label = label;
       this.action = action;
       this.handler = handler;

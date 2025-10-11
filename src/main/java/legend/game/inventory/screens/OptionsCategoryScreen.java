@@ -53,7 +53,7 @@ public class OptionsCategoryScreen extends VerticalLayoutScreen {
     }
 
     FooterActionsHud.setMenuActions(null, null, null);
-    this.addHotkey(I18n.translate("lod_core.ui.options_category.back"), INPUT_ACTION_MENU_BACK, this::back);
+    this.addHotkey(null, INPUT_ACTION_MENU_BACK, this::back);
   }
 
   protected void init() {
