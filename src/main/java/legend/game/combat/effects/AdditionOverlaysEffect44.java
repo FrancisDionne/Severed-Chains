@@ -288,14 +288,14 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
       if(style == ControllerStyle.AUTO) {
         renderText(InputCodepoints.getActionName(isCounter ? INPUT_ACTION_BTTL_COUNTER.get() : INPUT_ACTION_BTTL_ATTACK.get()), GPU.getOffsetX() + 124.5f, GPU.getOffsetY() + 56.0f, UI_WHITE_SHADOWED);
       } else if(style == ControllerStyle.PLAYSTATION) {
-        renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.playstationOFrames[2] : AdditionButtonFeedbackText.playstationXFrames[2], 0);
+        renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.playstationOFrames[frames > 0 ? 1 : 2] : AdditionButtonFeedbackText.playstationXFrames[frames > 0 ? 1 : 2], 0);
       } else if(style == ControllerStyle.XBOX) {
-        renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.xboxBFrames[2] : AdditionButtonFeedbackText.xboxAFrames[2], 0);
+        renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.xboxBFrames[frames > 0 ? 1 : 2] : AdditionButtonFeedbackText.xboxAFrames[frames > 0 ? 1 : 2], 0);
       } else if(style == ControllerStyle.NINTENDO) {
-        renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.nintendoBFrames[2] : AdditionButtonFeedbackText.nintendoAFrames[2], 0);
+        renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.nintendoBFrames[frames > 0 ? 1 : 2] : AdditionButtonFeedbackText.nintendoAFrames[frames > 0 ? 1 : 2], 0);
       }
       // Glow
-      renderButtonPressHudElement1(0x25, 113.5f, 50.0f, Translucency.B_PLUS_F, 0x80);
+      renderButtonPressHudElement1(0x25, style == ControllerStyle.AUTO ? 113.5f : 115f, 50.0f, Translucency.B_PLUS_F, 0x80);
     }
   }
 
