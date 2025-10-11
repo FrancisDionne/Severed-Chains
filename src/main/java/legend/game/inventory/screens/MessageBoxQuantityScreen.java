@@ -63,7 +63,7 @@ public class MessageBoxQuantityScreen extends MessageBoxScreen {
 
   private String getText() {
     final boolean b = this.arrowsTick < (ARROWS_MAX_TICKS / 2);
-    return this.messageText + '\n' + (b ? "< " : "<< ") + "\u011d" + this.currentQuantity + (b ? " >" : " >>");
+    return this.messageText + '\n' + (b ? "< " : "<< ") + '×' + this.currentQuantity + (b ? " >" : " >>");
   }
 
   @Override

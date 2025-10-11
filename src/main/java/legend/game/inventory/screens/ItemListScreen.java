@@ -34,8 +34,10 @@ import static legend.game.Scus94491BpeSegment_8002.sortEquipmentInventory;
 import static legend.game.Scus94491BpeSegment_8002.sortItemInventory;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 
 public class ItemListScreen extends MenuScreen {
   private final Runnable unload;
@@ -98,9 +100,9 @@ public class ItemListScreen extends MenuScreen {
     this.addControl(Glyph.glyph(83)).setPos( 16, 164); // Button prompt pane
     this.addControl(Glyph.glyph(91)).setPos(194, 173); // Description pane
 
-//    this.addHotkey(I18n.translate("lod_core.ui.item_list.sort"), INPUT_ACTION_MENU_SORT, this::menuSort);
-//    this.addHotkey(I18n.translate("lod_core.ui.item_list.discard"), INPUT_ACTION_MENU_DELETE, this::menuDiscard);
-//    this.addHotkey(I18n.translate("lod_core.ui.item_list.back"), INPUT_ACTION_MENU_BACK, this::menuEscape);
+    this.addHotkey(null, INPUT_ACTION_MENU_SORT, this::menuSort);
+    this.addHotkey(null, INPUT_ACTION_MENU_DELETE, this::menuDiscard);
+    this.addHotkey(null, INPUT_ACTION_MENU_BACK, this::menuEscape);
 
     this.description.setPos(14, 168);
 
