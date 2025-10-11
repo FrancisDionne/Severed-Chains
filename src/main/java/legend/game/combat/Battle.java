@@ -4882,10 +4882,14 @@ public class Battle extends EngineState {
     final ControllerStyle style = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
     final int type = script.params_20[0].get();
     final boolean isButtonType = type == 33 || type == 35; // 33 = Button Up, 35 = Button Down
-    if (!isButtonType || style == ControllerStyle.PLAYSTATION) {
+    if (!isButtonType || style == ControllerStyle.AUTO) {
       renderButtonPressHudElement1(type, script.params_20[1].get(), script.params_20[2].get(), Translucency.of(script.params_20[3].get()), script.params_20[4].get());
+    } else if (style == ControllerStyle.PLAYSTATION) {
+      renderButtonPressHudElement1(AdditionButtonFeedbackText.playstationXFrames[type == 35 ? 2 : 0], 2);
     } else if (style == ControllerStyle.XBOX) {
       renderButtonPressHudElement1(AdditionButtonFeedbackText.xboxAFrames[type == 35 ? 2 : 0], 2);
+    } else if (style == ControllerStyle.NINTENDO) {
+      renderButtonPressHudElement1(AdditionButtonFeedbackText.nintendoAFrames[type == 35 ? 2 : 0], 2);
     }
     return FlowControl.CONTINUE;
   }

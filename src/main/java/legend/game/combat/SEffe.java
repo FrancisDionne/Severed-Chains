@@ -1288,10 +1288,14 @@ public final class SEffe {
     //LAB_80107b10
     // Button
     final ControllerStyle style = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
-    if (style == ControllerStyle.PLAYSTATION) {
+    if (style == ControllerStyle.AUTO) {
       renderButtonPressHudElement1(buttonHudMetricsIndex, x0 + 12, y0 + 66, Translucency.B_PLUS_F, 128);
+    } else if (style == ControllerStyle.PLAYSTATION) {
+      renderButtonPressHudElement1(AdditionButtonFeedbackText.playstationXFrames[buttonHudMetricsIndex == 35 ? 2 : 0], 1);
     } else if (style == ControllerStyle.XBOX) {
       renderButtonPressHudElement1(AdditionButtonFeedbackText.xboxAFrames[buttonHudMetricsIndex == 35 ? 2 : 0], 1);
+    } else if (style == ControllerStyle.NINTENDO) {
+      renderButtonPressHudElement1(AdditionButtonFeedbackText.nintendoAFrames[buttonHudMetricsIndex == 35 ? 2 : 0], 1);
     }
 
     // Button press red glow
