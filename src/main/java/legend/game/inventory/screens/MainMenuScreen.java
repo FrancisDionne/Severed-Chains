@@ -522,7 +522,9 @@ public class MainMenuScreen extends MenuScreen {
   }
 
   private void showLoadScreen() {
-    menuStack.pushScreen(new LoadGameScreen(data -> {
+    startFadeEffect(2, 10);
+
+    menuStack.pushScreen(new LoadGameScreen(gameState_800babc8.campaign.loadAllSaves(), data -> {
       menuStack.reset();
 
       final GameLoadedEvent event = EVENTS.postEvent(new GameLoadedEvent(data.saveGame.state));
@@ -552,6 +554,7 @@ public class MainMenuScreen extends MenuScreen {
 
       Statistics.load(gameState_800babc8.campaign.path, data.saveGame.fileName);
     }, () -> {
+      startFadeEffect(2, 5);
       menuStack.popScreen();
       this.fadeOutArrows();
       this.loadingStage = 0;

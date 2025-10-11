@@ -1,5 +1,6 @@
 package legend.game.inventory.screens;
 
+import legend.core.Async;
 import legend.core.GameEngine;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
@@ -18,6 +19,7 @@ import legend.game.saves.Campaign;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
 import legend.game.statistics.Statistics;
+import legend.game.saves.SavedGame;
 import legend.game.types.MessageBoxResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,12 +27,13 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.MODS;
-import static legend.core.GameEngine.SAVES;
 import static legend.core.GameEngine.bootMods;
 import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.menuStack;
@@ -41,6 +44,7 @@ import static legend.game.Scus94491BpeSegment_8005.collidedPrimitiveIndex_80052c
 import static legend.game.Scus94491BpeSegment_8005.submapCutForSave_800cb450;
 import static legend.game.Scus94491BpeSegment_8005.submapCut_80052c30;
 import static legend.game.Scus94491BpeSegment_8005.submapScene_80052c34;
+import static legend.game.Scus94491BpeSegment_800b.fullScreenEffect_800bb140;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.loadingNewGameState_800bdc34;
 import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
@@ -53,9 +57,12 @@ public class CampaignSelectionScreen extends MenuScreen {
 
   private final BigList<SaveCardData> campaignList;
 
-  public CampaignSelectionScreen() {
+  private Campaign selectedCampaign;
+  private Future<List<SavedGame>> saveFuture;
+
+  public CampaignSelectionScreen(final List<Campaign> campaigns) {
     deallocateRenderables(0xff);
-    startFadeEffect(2, 10);
+    startFadeEffect(2, 5);
 
     this.addControl(new Background());
 
@@ -74,7 +81,7 @@ public class CampaignSelectionScreen extends MenuScreen {
     this.campaignList.onSelection(this::onSelection);
     this.setFocus(this.campaignList);
 
-    for(final Campaign campaign : SAVES.loadAllCampaigns()) {
+    for(final Campaign campaign : campaigns) {
       this.campaignList.addEntry(new SaveCardData(campaign, campaign.latestSave));
     }
 
@@ -97,7 +104,28 @@ public class CampaignSelectionScreen extends MenuScreen {
       missingMods = bootMods(MODS.getAllModIds());
     }
 
-    final Runnable loadGameScreen = () -> menuStack.pushScreen(new LoadGameScreen(data -> {
+    if(missingMods.isEmpty()) {
+      this.loadSaves(saveData.campaign);
+    } else {
+      menuStack.pushScreen(new MessageBoxScreen(I18n.translate("lod_core.ui.campaign_selection.missing_mods_confirm"), 2, result -> {
+        if(result.messageBoxResult == MessageBoxResult.YES) {
+          this.loadSaves(saveData.campaign);
+        }
+      }));
+    }
+  }
+
+  private void loadSaves(final Campaign campaign) {
+    startFadeEffect(1, 5);
+
+    this.selectedCampaign = campaign;
+    this.saveFuture = Async.run(campaign::loadAllSaves);
+  }
+
+  private void showLoadGameScreen() {
+    startFadeEffect(2, 5);
+
+    menuStack.pushScreen(new LoadGameScreen(this.saveFuture.resultNow(), save -> {
       menuStack.reset();
 
       CONFIG.clearConfig(ConfigStorageLocation.SAVE);
@@ -128,20 +156,10 @@ public class CampaignSelectionScreen extends MenuScreen {
       BattleDifficultyConfigEntry.reloadMonsters();
       Statistics.load(gameState_800babc8.campaign.path, data.saveGame.fileName);
     }, () -> {
+      startFadeEffect(2, 5);
       menuStack.popScreen();
-      startFadeEffect(2, 10);
       bootMods(MODS.getAllModIds());
-    }, saveData));
-
-    if(missingMods.isEmpty()) {
-      loadGameScreen.run();
-    } else {
-      menuStack.pushScreen(new MessageBoxScreen(I18n.translate("lod_core.ui.campaign_selection.missing_mods_confirm"), 2, result -> {
-        if(result.messageBoxResult == MessageBoxResult.YES) {
-          loadGameScreen.run();
-        }
-      }));
-    }
+    }, this.selectedCampaign));
   }
 
   @Override
@@ -152,6 +170,11 @@ public class CampaignSelectionScreen extends MenuScreen {
   @Override
   protected void render() {
     FooterActionsHud.renderMenuActions(FooterActions.DELETE, FooterActions.MODS, null);
+    if(this.saveFuture != null && this.saveFuture.isDone() && fullScreenEffect_800bb140.currentColour_28 == 0xff) {
+      this.showLoadGameScreen();
+      this.selectedCampaign = null;
+      this.saveFuture = null;
+    }
   }
 
   private void menuMods() {
