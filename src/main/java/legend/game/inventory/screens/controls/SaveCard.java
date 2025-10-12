@@ -69,7 +69,7 @@ public class SaveCard extends Control {
 
   public void setSaveData(final SaveCardData data) {
     this.saveData = data.saveGame;
-    this.config = CONFIG;
+    this.config = data.campaign.config;
 
     if(this.saveData != null && this.saveData.isValid()) {
       this.invalidSave.setVisibility(false);
