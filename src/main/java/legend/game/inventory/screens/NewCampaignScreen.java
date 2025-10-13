@@ -14,6 +14,7 @@ import legend.game.combat.DragoonAdditionMode;
 import legend.game.combat.MashMode;
 import legend.game.combat.PreferredBattleCameraAngle;
 import legend.game.combat.effects.TransformationMode;
+import legend.game.combat.ui.AdditionButtonStyle;
 import legend.game.combat.ui.AdditionOverlayMode;
 import legend.game.combat.ui.FooterActionColor;
 import legend.game.combat.ui.FooterActions;
@@ -222,6 +223,8 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
   }
 
   private void setRecommendedOptions(final int recommendId) {
+    CONFIG.setConfig(CoreMod.ADDITION_BUTTON_STYLE_CONFIG.get(), AdditionButtonStyle.ORIGINAL);
+
     if(recommendId != 3) { //if not Nostalgia preset
       //Common/Default Options
       CONFIG.setConfig(CoreMod.PREFERRED_BATTLE_CAMERA_ANGLE.get(), PreferredBattleCameraAngle.PLAYER);
