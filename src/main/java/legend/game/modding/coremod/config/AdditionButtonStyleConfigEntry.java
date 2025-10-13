@@ -7,6 +7,6 @@ import legend.game.saves.EnumConfigEntry;
 
 public class AdditionButtonStyleConfigEntry extends EnumConfigEntry<AdditionButtonStyle> {
   public AdditionButtonStyleConfigEntry() {
-    super(AdditionButtonStyle.class, AdditionButtonStyle.MODERN, ConfigStorageLocation.GLOBAL, ConfigCategory.GAMEPLAY, 9002);
+    super(AdditionButtonStyle.class, AdditionButtonStyle.MODERN, ConfigStorageLocation.GLOBAL, ConfigCategory.GRAPHICS);
   }
 }
