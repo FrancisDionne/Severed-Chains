@@ -2,9 +2,9 @@ package legend.game.combat;
 
 public enum AdditionCounterDifficulty {
   NONE(),
-  EASIER(),
+  //EASIER(),
   EASY(),
   NORMAL(),
   HARD(),
-  HARDER(),
+  //HARDER(),
 }

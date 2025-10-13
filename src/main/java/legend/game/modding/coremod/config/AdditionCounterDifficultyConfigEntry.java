@@ -17,10 +17,10 @@ public class AdditionCounterDifficultyConfigEntry extends EnumConfigEntry<Additi
     if(threshold > 0) {
       return switch(CONFIG.getConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get())) {
         case AdditionCounterDifficulty.NONE -> 0;
-        case AdditionCounterDifficulty.EASIER -> Math.round(threshold * 1.75f);
+        //case AdditionCounterDifficulty.EASIER -> Math.round(threshold * 1.75f);
         case AdditionCounterDifficulty.EASY -> Math.round(threshold * 1.5f);
         case AdditionCounterDifficulty.HARD -> Math.round(threshold * 0.375f);
-        case AdditionCounterDifficulty.HARDER -> Math.round(threshold * 0.125f);
+        //case AdditionCounterDifficulty.HARDER -> Math.round(threshold * 0.125f);
         default -> threshold;
       };
     }

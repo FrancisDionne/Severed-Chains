@@ -15,9 +15,11 @@ import legend.core.platform.input.KeyInputActivation;
 import legend.core.platform.input.ScancodeInputActivation;
 import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
+import legend.game.combat.ui.AdditionButtonStyle;
 import legend.game.inventory.IconSetConfigEntry;
 import legend.game.modding.coremod.config.AdditionAllowMisinputConfigEntry;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
+import legend.game.modding.coremod.config.AdditionButtonStyleConfigEntry;
 import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionGameplayEnhanceConfigEntry;
@@ -138,6 +140,7 @@ public class CoreMod {
   /** Config isn't actually used, but adds a button to the options screen to open the keybinds screen */
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_SETTINGS_CONFIG = register("addition_settings", AdditionSettingsConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> BATTLE_UI_COLOUR_SETTINGS_CONFIG = register("battle_ui_colour_settings", BattleUIColourSettingsConfigEntry::new);
+  public static final RegistryDelegate<AdditionButtonStyleConfigEntry> ADDITION_BUTTON_STYLE_CONFIG = register("addition_button_style", AdditionButtonStyleConfigEntry::new);
   public static final RegistryDelegate<ControllerStyleConfigEntry> CONTROLLER_STYLE_CONFIG = CONFIG_REGISTRAR.register("controller_style", ControllerStyleConfigEntry::new);
 
   // Per-campaign config

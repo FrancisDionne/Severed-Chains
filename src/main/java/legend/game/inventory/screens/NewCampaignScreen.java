@@ -292,7 +292,7 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
 
         CONFIG.setConfig(CoreMod.ADDITION_DIFFICULTY_CONFIG.get(), AdditionDifficulty.EASY);
         CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_SIZE_CONFIG.get(), 1.2f);
-        CONFIG.setConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get(), AdditionCounterDifficulty.EASIER);
+        CONFIG.setConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get(), AdditionCounterDifficulty.EASY);
         CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.EASY);
         break;
       case 0: //Normal

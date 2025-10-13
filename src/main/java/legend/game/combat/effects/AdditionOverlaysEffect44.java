@@ -13,6 +13,7 @@ import legend.game.combat.AdditionButtonMode;
 import legend.game.combat.SEffe;
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.types.AdditionHitProperties10;
+import legend.game.combat.ui.AdditionButtonStyle;
 import legend.game.combat.ui.AdditionOverlayMode;
 import legend.game.combat.ui.ControllerStyle;
 import legend.core.platform.input.InputCodepoints;
@@ -267,35 +268,35 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
   /** Runs callbacks to render correct button icon effects during addition */
   @Method(0x80106050L)
   private void renderAdditionButton(final int frames, final boolean isCounter) {
-    final int offset = isCounter ? 1 : 0;
-    final ControllerStyle style = CONFIG.getConfig(CoreMod.CONTROLLER_STYLE_CONFIG.get());
+    final ControllerStyle controllerStyle = CoreMod.CONTROLLER_STYLE_CONFIG.get().getStyle();
+    final AdditionButtonStyle buttonStyle = CONFIG.getConfig(CoreMod.ADDITION_BUTTON_STYLE_CONFIG.get());
     if(Math.abs(frames) >= 2) {  // Button up position
       // Arrow
       renderButtonPressHudElement1(0x24, 119.0f, 43.0f, Translucency.B_PLUS_F, 0x80);
-      if(style == ControllerStyle.AUTO) {
+      if(buttonStyle == AdditionButtonStyle.MODERN) {
         renderText(InputCodepoints.getActionName(isCounter ? INPUT_ACTION_BTTL_COUNTER.get() : INPUT_ACTION_BTTL_ATTACK.get()), GPU.getOffsetX() + 124.5f, GPU.getOffsetY() + 56.0f, UI_WHITE_SHADOWED);
-      } else if(style == ControllerStyle.PLAYSTATION) {
+      } else if(controllerStyle == ControllerStyle.PLAYSTATION) {
         renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.playstationOFrames[0] : AdditionButtonFeedbackText.playstationXFrames[0], 0);
-      } else if(style == ControllerStyle.XBOX) {
+      } else if(controllerStyle == ControllerStyle.XBOX) {
         renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.xboxBFrames[0] : AdditionButtonFeedbackText.xboxAFrames[0], 0);
-      } else if(style == ControllerStyle.NINTENDO) {
+      } else if(controllerStyle == ControllerStyle.NINTENDO) {
         renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.nintendoBFrames[0] : AdditionButtonFeedbackText.nintendoAFrames[0], 0);
       }
     } else {  // Button down position
       //LAB_80106114
       // Arrow
       renderButtonPressHudElement1(0x24, 119.0f, 51.0f, Translucency.B_PLUS_F, 0x80);
-      if(style == ControllerStyle.AUTO) {
+      if(buttonStyle == AdditionButtonStyle.MODERN) {
         renderText(InputCodepoints.getActionName(isCounter ? INPUT_ACTION_BTTL_COUNTER.get() : INPUT_ACTION_BTTL_ATTACK.get()), GPU.getOffsetX() + 124.5f, GPU.getOffsetY() + 56.0f, UI_WHITE_SHADOWED);
-      } else if(style == ControllerStyle.PLAYSTATION) {
+      } else if(controllerStyle == ControllerStyle.PLAYSTATION) {
         renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.playstationOFrames[frames > 0 ? 1 : 2] : AdditionButtonFeedbackText.playstationXFrames[frames > 0 ? 1 : 2], 0);
-      } else if(style == ControllerStyle.XBOX) {
+      } else if(controllerStyle == ControllerStyle.XBOX) {
         renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.xboxBFrames[frames > 0 ? 1 : 2] : AdditionButtonFeedbackText.xboxAFrames[frames > 0 ? 1 : 2], 0);
-      } else if(style == ControllerStyle.NINTENDO) {
+      } else if(controllerStyle == ControllerStyle.NINTENDO) {
         renderButtonPressHudElement1(isCounter ? AdditionButtonFeedbackText.nintendoBFrames[frames > 0 ? 1 : 2] : AdditionButtonFeedbackText.nintendoAFrames[frames > 0 ? 1 : 2], 0);
       }
       // Glow
-      renderButtonPressHudElement1(0x25, style == ControllerStyle.AUTO ? 113.5f : 115f, 50.0f, Translucency.B_PLUS_F, 0x80);
+      renderButtonPressHudElement1(0x25, buttonStyle == AdditionButtonStyle.MODERN ? 113.5f : 115f, 50.0f, Translucency.B_PLUS_F, 0x80);
     }
   }
 
