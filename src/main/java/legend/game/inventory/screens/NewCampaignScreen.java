@@ -224,6 +224,9 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
 
   private void setRecommendedOptions(final int recommendId) {
     CONFIG.setConfig(CoreMod.ADDITION_BUTTON_STYLE_CONFIG.get(), AdditionButtonStyle.ORIGINAL);
+    CONFIG.setConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get(), false);
+    CONFIG.setConfig(CoreMod.CHARACTER_RANDOM_MODE_CONFIG.get(), false);
+    CONFIG.setConfig(CoreMod.GAMEPLAY_BALANCE_CONFIG.get(), false);
 
     if(recommendId != 3) { //if not Nostalgia preset
       //Common/Default Options
@@ -318,8 +321,10 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
 
         CONFIG.setConfig(CoreMod.ADDITION_OVERLAY_CONFIG.get(), AdditionOverlayMode.OFF);
         CONFIG.setConfig(CoreMod.ADDITION_COUNTER_DIFFICULTY_CONFIG.get(), AdditionCounterDifficulty.HARD);
-        CONFIG.setConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get(), true);
         CONFIG.setConfig(CoreMod.DRAGOON_ADDITION_DIFFICULTY_CONFIG.get(), DragoonAdditionDifficulty.HARD);
+        CONFIG.setConfig(CoreMod.ADDITION_RANDOM_MODE_CONFIG.get(), true);
+        CONFIG.setConfig(CoreMod.CHARACTER_RANDOM_MODE_CONFIG.get(), true);
+        CONFIG.setConfig(CoreMod.GAMEPLAY_BALANCE_CONFIG.get(), true);
         break;
     }
 
