@@ -35,6 +35,10 @@ import legend.game.EngineState;
 import legend.game.combat.Battle;
 import legend.game.debugger.Debugger;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.scripting.FlowControl;
+import legend.game.scripting.RunningScript;
+import legend.game.scripting.ScriptDescription;
+import legend.game.scripting.ScriptParam;
 import legend.game.types.Translucency;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -197,7 +201,8 @@ public class RenderEngine {
       final Shader<ShaderOptionsTmd>.UniformVec2 tpageOverride = shader.new UniformVec2("tpageOverride");
       final Shader<ShaderOptionsTmd>.UniformFloat discardTranslucency = shader.new UniformFloat("discardTranslucency");
       final Shader<ShaderOptionsTmd>.UniformInt tmdTranslucency = shader.new UniformInt("tmdTranslucency");
-      return () -> new ShaderOptionsTmd(modelIndex, recolour, uvOffset, clutOverride, tpageOverride, discardTranslucency, tmdTranslucency);
+      final Shader<ShaderOptionsTmd>.UniformInt usePs1Depth = shader.new UniformInt("usePs1Depth");
+      return () -> new ShaderOptionsTmd(modelIndex, recolour, uvOffset, clutOverride, tpageOverride, discardTranslucency, tmdTranslucency, usePs1Depth);
     }
   );
 
@@ -220,9 +225,10 @@ public class RenderEngine {
       final Shader<ShaderOptionsBattleTmd>.UniformVec2 tpageOverride = shader.new UniformVec2("tpageOverride");
       final Shader<ShaderOptionsBattleTmd>.UniformFloat discardTranslucency = shader.new UniformFloat("discardTranslucency");
       final Shader<ShaderOptionsBattleTmd>.UniformInt tmdTranslucency = shader.new UniformInt("tmdTranslucency");
+      final Shader<ShaderOptionsBattleTmd>.UniformInt usePs1Depth = shader.new UniformInt("usePs1Depth");
       final Shader<ShaderOptionsBattleTmd>.UniformInt ctmdFlags = shader.new UniformInt("ctmdFlags");
       final Shader<ShaderOptionsBattleTmd>.UniformVec3 battleColour = shader.new UniformVec3("battleColour");
-      return () -> new ShaderOptionsBattleTmd(modelIndex, recolour, uvOffset, clutOverride, tpageOverride, discardTranslucency, tmdTranslucency, ctmdFlags, battleColour);
+      return () -> new ShaderOptionsBattleTmd(modelIndex, recolour, uvOffset, clutOverride, tpageOverride, discardTranslucency, tmdTranslucency, usePs1Depth, ctmdFlags, battleColour);
     }
   );
 
@@ -246,6 +252,7 @@ public class RenderEngine {
   public final Map<Translucency, Obj> plainQuads = new EnumMap<>(Translucency.class);
   public Obj opaqueQuad;
   // Simple quads
+  public Obj centredQuadOpaque;
   public Obj centredQuadBPlusF;
   public Obj centredQuadBMinusF;
   // Line box (reticles)
@@ -523,6 +530,13 @@ public class RenderEngine {
       .build();
     this.opaqueQuad.persistent = true;
 
+    this.centredQuadOpaque = new QuadBuilder("Centred Quad Opaque")
+      .monochrome(1.0f)
+      .pos(-0.5f, -0.5f, 0.0f)
+      .size(1.0f, 1.0f)
+      .build();
+    this.centredQuadOpaque.persistent = true;
+
     this.centredQuadBPlusF = new QuadBuilder("Centred Quad B+F")
       .translucency(Translucency.B_PLUS_F)
       .monochrome(1.0f)
@@ -747,6 +761,7 @@ public class RenderEngine {
 
   private void renderBatch(final RenderBatch batch) {
     if(batch.needsSorting) {
+      this.sortPerspectivePool(batch.modelPool);
       this.sortOrthoPool(batch.orthoPool);
       batch.needsSorting = false;
     }
@@ -1004,10 +1019,21 @@ public class RenderEngine {
     this.transformsUniform.set(this.transformsBuffer);
   }
 
-  private final Comparator<QueuedModel<?, ?>> translucencySorter = Comparator.comparingDouble((QueuedModel<?, ?> model) -> model.transforms.m32()).reversed();
+  private final Comparator<QueuedModel<?, ?>> perspectiveTranslucencySorter = Comparator.comparingDouble((QueuedModel<?, ?> model) -> model.modelView.m32() + model.screenspaceOffset.z).reversed();
+  private final Comparator<QueuedModel<?, ?>> orthoTranslucencySorter = Comparator.comparingDouble((QueuedModel<?, ?> model) -> model.transforms.m32() + model.screenspaceOffset.z).reversed();
+
+  private void sortPerspectivePool(final QueuePool<QueuedModel<?, ?>> pool) {
+    // Cache modelview for sorting
+    for(int i = 0; i < pool.size(); i++) {
+      final QueuedModel<?, ?> model = pool.get(i);
+      this.camera3d.getView().mul(model.transforms, model.modelView);
+    }
+
+    pool.sort(this.perspectiveTranslucencySorter);
+  }
 
   private void sortOrthoPool(final QueuePool<QueuedModel<?, ?>> pool) {
-    pool.sort(this.translucencySorter);
+    pool.sort(this.orthoTranslucencySorter);
   }
 
   public <T extends QueuedModel<?, ?>> T queueModel(final Obj obj, final Class<T> type) {
@@ -1304,5 +1330,12 @@ public class RenderEngine {
     } else if(action == INPUT_ACTION_MENU_END.get() && CONFIG.getConfig(CoreMod.TURBO_TOGGLE_CONFIG.get())) {
       Config.resumeGameSpeedMultiplier();
     }
+  }
+
+  @ScriptDescription("Returns a .12 aspect ratio multiplier for adjusting widths for widescreen")
+  @ScriptParam(direction = ScriptParam.Direction.OUT, type = ScriptParam.Type.INT, name = "multiplier", description = "The width multiplier (.12)")
+  public static FlowControl scriptGetRenderAspectMultiplier(final RunningScript<?> script) {
+    script.params_20[0].set((int)(RENDERER.getRenderAspectRatio() / RENDERER.getNativeAspectRatio() * 0x1000));
+    return FlowControl.CONTINUE;
   }
 }

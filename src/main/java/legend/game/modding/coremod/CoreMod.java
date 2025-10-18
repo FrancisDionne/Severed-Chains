@@ -15,7 +15,6 @@ import legend.core.platform.input.KeyInputActivation;
 import legend.core.platform.input.ScancodeInputActivation;
 import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
-import legend.game.combat.ui.AdditionButtonStyle;
 import legend.game.inventory.IconSetConfigEntry;
 import legend.game.modding.coremod.config.AdditionAllowMisinputConfigEntry;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
@@ -24,6 +23,8 @@ import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionDifficultyConfigEntry;
 import legend.game.modding.coremod.config.AdditionGameplayEnhanceConfigEntry;
 import legend.game.modding.coremod.config.AdditionGroupConfigEntry;
+import legend.game.inventory.Item;
+import legend.game.inventory.ItemRegistryEvent;
 import legend.game.modding.coremod.config.AdditionModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionOverlayConfigEntry;
 import legend.game.modding.coremod.config.AdditionRandomModeConfig;
@@ -83,6 +84,7 @@ import legend.game.modding.coremod.config.ShowAdvancedOptionsConfigEntry;
 import legend.game.modding.coremod.config.TransformationModeConfigEntry;
 import legend.game.modding.coremod.config.TurboToggleConfig;
 import legend.game.modding.coremod.config.UnlockPartyConfig;
+import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.modding.events.input.RegisterDefaultInputBindingsEvent;
 import legend.game.saves.BoolConfigEntry;
 import legend.game.saves.CampaignNameConfigEntry;
@@ -105,6 +107,10 @@ import java.util.function.Supplier;
 public class CoreMod {
   public static final String MOD_ID = "lod_core";
   public static ArrayList<String> configOrder = new ArrayList<String>();
+
+  private static final Registrar<Item, ItemRegistryEvent> ITEM_REGISTRAR = new Registrar<>(GameEngine.REGISTRIES.items, MOD_ID);
+
+  public static final RegistryDelegate<Item> NOTHING = ITEM_REGISTRAR.register("nothing", NothingItem::new);
 
   private static final Registrar<ConfigEntry<?>, ConfigRegistryEvent> CONFIG_REGISTRAR = new Registrar<>(GameEngine.REGISTRIES.config, MOD_ID);
 
@@ -281,6 +287,11 @@ public class CoreMod {
   }
 
   @EventListener
+  public static void registerItems(final ItemRegistryEvent event) {
+    ITEM_REGISTRAR.registryEvent(event);
+  }
+
+  @EventListener
   public static void registerDefaultInputBindings(final RegisterDefaultInputBindingsEvent event) {
     event
       .add(INPUT_ACTION_MENU_UP.get(), new ButtonInputActivation(InputButton.DPAD_UP))
@@ -357,5 +368,10 @@ public class CoreMod {
       .add(INPUT_ACTION_DEBUG_TOGGLE_WIREFRAME.get(), new KeyInputActivation(InputKey.F2))
       .add(INPUT_ACTION_DEBUG_RELOAD_SHADERS.get(), new KeyInputActivation(InputKey.F5))
     ;
+  }
+
+  @EventListener
+  public static void onLoadGameSetInventorySize(final GameLoadedEvent event) {
+    event.gameState.items_2e9.setMaxSize(GameEngine.CONFIG.getConfig(INVENTORY_SIZE_CONFIG.get()));
   }
 }

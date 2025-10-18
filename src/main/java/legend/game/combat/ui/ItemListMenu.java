@@ -5,6 +5,7 @@ import legend.core.memory.Method;
 import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.i18n.I18n;
 import legend.game.inventory.Item;
+import legend.game.inventory.ItemStack;
 import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.inventory.screens.TextColour;
@@ -34,7 +35,6 @@ import java.util.stream.Collectors;
 import static legend.core.GameEngine.EVENTS;
 import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
 import static legend.game.Scus94491BpeSegment_8002.renderText;
-import static legend.game.Scus94491BpeSegment_8002.takeItemId;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 
 public class ItemListMenu extends ListMenu {
@@ -59,7 +59,7 @@ public class ItemListMenu extends ListMenu {
   @Override
   protected void drawListEntry(final int index, final int x, final int y, final int trim) {
 
-    final Item item = this.combatItems_800c6988.get(index).item;
+    final Item item = this.combatItems_800c6988.get(index).item();
 
     this.fontOptions.trim(trim);
     this.fontOptions.horizontalAlign(HorizontalAlign.LEFT);
@@ -78,18 +78,20 @@ public class ItemListMenu extends ListMenu {
   @Override
   protected void onSelection(final int index) {
     //LAB_800f50b8
-    this.player_08.setActiveItem(this.combatItems_800c6988.get(index).item);
+    this.player_08.setActiveItem(this.combatItems_800c6988.get(index).getStack());
   }
 
   @Override
   protected void onUse(final int index) {
-    final Item item = this.player_08.item_d4;
-    takeItemId(item);
+    final ItemStack original = this.player_08.item_d4;
+    this.player_08.item_d4 = this.player_08.item_d4.take(1);
+    gameState_800babc8.items_2e9.removeIfEmpty(original);
 
-    final RepeatItemReturnEvent repeatItemReturnEvent = EVENTS.postEvent(new RepeatItemReturnEvent(item, item.isRepeat()));
+    final ItemStack stack = this.player_08.item_d4;
+    final RepeatItemReturnEvent repeatItemReturnEvent = EVENTS.postEvent(new RepeatItemReturnEvent(stack, stack.isRepeat()));
 
     if(repeatItemReturnEvent.returnItem) {
-      this.hud.battle.usedRepeatItems_800c6c3c.add(item);
+      this.hud.battle.usedRepeatItems_800c6c3c.add(stack);
     }
 
     if(this.player_08.item_d4.canTarget(Item.TargetType.ENEMIES)) {
@@ -117,7 +119,7 @@ public class ItemListMenu extends ListMenu {
 
     script.params_20[1].set(this.hud.battleMenu_800c6c34.target_48);
     script.params_20[2].set(-1); // Used to be item ID
-    script.params_20[3].set(this.player_08.item_d4.getRegistryId());
+    script.params_20[3].set(this.player_08.item_d4.getItem().getRegistryId());
 
     // If it's a target all item, -1 the target
     if(this.selectionState_a0 == 1 && this.player_08.item_d4.canTarget(Item.TargetType.ALL)) {
@@ -131,42 +133,46 @@ public class ItemListMenu extends ListMenu {
     this.combatItems_800c6988.clear();
 
     //LAB_800f8420
-    for(int itemSlot = 0; itemSlot < gameState_800babc8.items_2e9.size(); itemSlot++) {
-      final Item item = gameState_800babc8.items_2e9.get(itemSlot);
+    for(int itemSlot = 0; itemSlot < gameState_800babc8.items_2e9.getSize(); itemSlot++) {
+      final ItemStack stack = gameState_800babc8.items_2e9.get(itemSlot);
+
+      if(!stack.canBeUsed(Item.UsageLocation.BATTLE)) {
+        continue;
+      }
 
       boolean found = false;
 
       //LAB_800f843c
       for(final CombatItem02 combatItem : this.combatItems_800c6988) {
-        if(combatItem.item == item) {
+        if(combatItem.is(stack)) {
+          combatItem.addStack(stack);
           found = true;
-          combatItem.count++;
           break;
         }
       }
 
       if(!found) {
-        this.combatItems_800c6988.add(new CombatItem02(item));
+        this.combatItems_800c6988.add(new CombatItem02(stack));
       }
     }
 
     final Comparator<CombatItem02> comparator = Comparator
-      .comparing((CombatItem02 x) -> x.item instanceof RecoverHpItem)
-      .thenComparing(x -> x.item instanceof AngelsPrayerItem)
-      .thenComparing(x -> x.item instanceof RecoverMpItem)
-      .thenComparing(x -> x.item instanceof RecoverSpItem)
-      .thenComparing(x -> x.item instanceof RecoverStatusItem)
-      .thenComparing(x -> x.item instanceof final AttackItem attackItem && !attackItem.isTargetAll())
-      .thenComparing(x -> x.item instanceof final AttackItem attackItem && attackItem.isTargetAll())
-      .thenComparing(x -> x.item instanceof CauseStatusItem)
-      .thenComparing(x -> x.item instanceof final BattleItem battleItem && battleItem.isRepeat())
-      .thenComparing(x -> x.item instanceof BuffItem)
-      .thenComparing(x -> x.item instanceof SachetItem)
-      .thenComparing(x -> x.item instanceof SignetStoneItem)
-      .thenComparing(x -> x.item instanceof PandemoniumItem)
-      .thenComparing(x -> x.item instanceof TotalVanishingItem)
-      .thenComparing(x -> x.item instanceof CharmPotionItem).reversed()
-      .thenComparing(x -> I18n.translate(x.item.getNameTranslationKey()));
+      .comparing((CombatItem02 x) -> x.item() instanceof RecoverHpItem)
+      .thenComparing(x -> x.item() instanceof AngelsPrayerItem)
+      .thenComparing(x -> x.item() instanceof RecoverMpItem)
+      .thenComparing(x -> x.item() instanceof RecoverSpItem)
+      .thenComparing(x -> x.item() instanceof RecoverStatusItem)
+      .thenComparing(x -> x.item() instanceof final AttackItem attackItem && !attackItem.isTargetAll())
+      .thenComparing(x -> x.item() instanceof final AttackItem attackItem && attackItem.isTargetAll())
+      .thenComparing(x -> x.item() instanceof CauseStatusItem)
+      .thenComparing(x -> x.item() instanceof final BattleItem battleItem && battleItem.isRepeat(x.getStack()))
+      .thenComparing(x -> x.item() instanceof BuffItem)
+      .thenComparing(x -> x.item() instanceof SachetItem)
+      .thenComparing(x -> x.item() instanceof SignetStoneItem)
+      .thenComparing(x -> x.item() instanceof PandemoniumItem)
+      .thenComparing(x -> x.item() instanceof TotalVanishingItem)
+      .thenComparing(x -> x.item() instanceof CharmPotionItem).reversed()
+      .thenComparing(x -> I18n.translate(x.item().getNameTranslationKey(x.getStack())));
 
     this.combatItems_800c6988 = this.combatItems_800c6988.stream().sorted(comparator).collect(Collectors.toList());
   }
@@ -187,7 +193,12 @@ public class ItemListMenu extends ListMenu {
 
         this.fontOptions.trim(0);
         this.fontOptions.horizontalAlign(HorizontalAlign.CENTRE);
-        renderText(I18n.translate(this.combatItems_800c6988.get(this.listScroll_1e + this.listIndex_24).item.getBattleDescriptionTranslationKey()), 160, 157, this.fontOptions);
+
+        final ItemStack selected = this.combatItems_800c6988.get(this.listScroll_1e + this.listIndex_24).getStack();
+
+        if(!selected.isEmpty()) {
+          renderText(I18n.translate(selected.getBattleDescriptionTranslationKey()), 160, 157, this.fontOptions);
+        }
       }
     }
   }

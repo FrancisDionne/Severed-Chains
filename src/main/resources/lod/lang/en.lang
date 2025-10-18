@@ -1,6 +1,9 @@
 # Mod metadata
 lod.name=Legend of Dragoon
 
+# Config
+lod.config.item_stack_size.label=Item Stack Size
+
 # Elements
 lod.elements.dark.name=Dark
 lod.elements.fire.name=Fire

@@ -5,7 +5,7 @@ import legend.game.inventory.screens.HorizontalAlign;
 
 import javax.annotation.Nullable;
 
-/** Convenience class for simple enum-backed configs */
+/** Convenience class for simple bool-backed configs */
 public class BoolConfigEntry extends ConfigEntry<Boolean> {
   public BoolConfigEntry(final boolean defaultValue, final ConfigStorageLocation storageLocation, final ConfigCategory category) {
     this(defaultValue, storageLocation, category, 0, null);

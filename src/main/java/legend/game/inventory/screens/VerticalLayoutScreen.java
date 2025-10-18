@@ -232,14 +232,23 @@ public class VerticalLayoutScreen extends MenuScreen {
 
   private void menuNavigateUp() {
     final int optionCount = this.rows.size();
-    if(this.highlightedRow > this.scroll) {
+
+    // Skip over hidden entries
+    int destRow;
+    for(destRow = this.highlightedRow - 1; destRow >= this.scroll; destRow--) {
+      if(this.visible.getBoolean(destRow)) {
+        break;
+      }
+    }
+
+    if(destRow >= this.scroll) {
       playMenuSound(1);
-      this.highlightRow(this.highlightedRow - 1);
+      this.highlightRow(destRow);
     } else if(this.scroll > 0) {
       playMenuSound(1);
       this.scroll--;
       this.updateEntries();
-      this.highlightRow(Math.floorMod(this.highlightedRow - 1, optionCount));
+      this.highlightRow(Math.floorMod(destRow, optionCount));
     } else if(optionCount > 1 && this.allowWrapY) {
       playMenuSound(1);
       this.highlightRow(optionCount - 1);
@@ -250,12 +259,21 @@ public class VerticalLayoutScreen extends MenuScreen {
 
   private void menuNavigateDown() {
     final int optionCount = this.rows.size();
-    if(this.highlightedRow < this.scroll + this.visibleEntries() - 1) {
+
+    // Skip over hidden entries
+    int destRow;
+    for(destRow = this.highlightedRow + 1; destRow < this.scroll + this.visibleEntries(); destRow++) {
+      if(this.visible.getBoolean(destRow)) {
+        break;
+      }
+    }
+
+    if(destRow < this.scroll + this.visibleEntries()) {
       playMenuSound(1);
-      this.highlightRow(this.highlightedRow + 1);
-    } else if(this.highlightedRow != optionCount - 1) {
+      this.highlightRow(destRow);
+    } else if(destRow != optionCount) {
       playMenuSound(1);
-      this.highlightRow(this.highlightedRow + 1);
+      this.highlightRow(destRow);
       this.scroll++;
       this.updateEntries();
     } else if(optionCount > 1 && this.allowWrapY) {

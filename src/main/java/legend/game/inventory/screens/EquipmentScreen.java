@@ -44,6 +44,7 @@ import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.Scus94491BpeSegment_8002.sortEquipmentInventory;
 import static legend.game.Scus94491BpeSegment_8002.takeEquipment;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
+import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BOTTOM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
@@ -163,11 +164,12 @@ public class EquipmentScreen extends MenuScreen {
     for(int equipmentSlot = 0; equipmentSlot < equipments.size(); equipmentSlot++) {
       final Equipment equipment = equipments.get(equipmentSlot);
       if(canEquip(equipment, charIndex)) {
-        final MenuEntryStruct04<Equipment> menuEntry = MenuEntryStruct04.make(equipment);
-        menuEntry.itemSlot_01 = equipmentSlot;
-
-        if(this.filter == -1 || EquipmentSlot.fromLegacy(this.filter) == menuEntry.item_00.slot) {
-          this.menuItems.add(menuEntry);
+        if(equipment != gameState_800babc8.charData_32c[charIndex].equipment_14.get(equipment.slot)) {
+          final MenuEntryStruct04<Equipment> menuEntry = new MenuEntryStruct04<>(equipment);
+          menuEntry.itemSlot_01 = equipmentSlot;
+          if(this.filter == -1 || EquipmentSlot.fromLegacy(this.filter) == menuEntry.item_00.slot) {
+            this.menuItems.add(menuEntry);
+          }
         }
       }
     }

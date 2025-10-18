@@ -7,14 +7,17 @@ import legend.game.i18n.I18n;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
+import legend.game.inventory.ItemStack;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Glyph;
 import legend.game.inventory.screens.controls.ItemList;
 import legend.game.inventory.screens.controls.Label;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.events.inventory.Inventory;
 import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.MessageBoxResult;
+import legend.lodmod.LodMod;
 import org.legendofdragoon.modloader.registries.RegistryEntry;
 
 import javax.annotation.Nullable;
@@ -30,6 +33,7 @@ import static legend.game.Scus94491BpeSegment_8002.getFirstIndexOfInventoryEntry
 import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
 import static legend.game.Scus94491BpeSegment_8002.menuItemIconComparator;
 import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
+import static legend.game.Scus94491BpeSegment_8002.setInventoryFromDisplay;
 import static legend.game.Scus94491BpeSegment_8002.sortEquipmentInventory;
 import static legend.game.Scus94491BpeSegment_8002.sortItemInventory;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
@@ -42,8 +46,8 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 public class ItemListScreen extends MenuScreen {
   private final Runnable unload;
 
-  private final ItemList<Item> itemList = new ItemList<>(i -> gameState_800babc8.items_2e9.size());
-  private final ItemList<Equipment> equipmentList = new ItemList<>(i -> gameState_800babc8.equipment_1e8.size());
+  private final ItemList<ItemStack> itemList = new ItemList<>(stack -> stack.item_00.canStack() || stack.item_00.getSize() > 1 ? stack.item_00.getSize() : 0, null);
+  private final ItemList<Equipment> equipmentList = new ItemList<>(null, i -> gameState_800babc8.equipment_1e8.size());
   private final Label description = new Label("");
 
   public ItemListScreen(final Runnable unload) {
@@ -112,11 +116,11 @@ public class ItemListScreen extends MenuScreen {
 
     this.setFocus(this.itemList);
 
-    final MenuEntries<Item> items = new MenuEntries<>();
+    final MenuEntries<ItemStack> items = new MenuEntries<>();
     final MenuEntries<Equipment> equipment = new MenuEntries<>();
     loadItemsAndEquipmentForDisplay(equipment, items, 0);
 
-    for(final MenuEntryStruct04<Item> item : items) {
+    for(final MenuEntryStruct04<ItemStack> item : items) {
       this.itemList.add(item);
     }
 
@@ -141,36 +145,36 @@ public class ItemListScreen extends MenuScreen {
     FooterActionsHud.renderMenuActions(FooterActions.DISCARD, FooterActions.SORT, null);
   }
 
-  private <T> void showDiscardMenu(final ItemList<T> list, final List<T> inv, final boolean isItem) {
+  private <T extends InventoryEntry> void showDiscardMenu(final ItemList<T> list, final List<T> inv, final boolean isItem) {
     if(((list.getSelectedItem().flags_02 & 0x2000) != 0)) {
       playMenuSound(40);
     } else {
       playMenuSound(2);
 
       final InventoryEntry entry = (InventoryEntry)list.getSelectedItem().item_00;
-      final int quantity = getInventoryEntryQuantity(isItem ? (Item)entry : (Equipment)entry);
+      final int quantity = getInventoryEntryQuantity(isItem ? (ItemStack)entry : (Equipment)entry);
       final String itemText = I18n.translate(entry.getNameTranslationKey());
 
       menuStack.pushScreen(new MessageBoxQuantityScreen("Discard " + itemText + '?', 1, quantity, 2, result -> {
-        this.discard(result, list, inv);
+        this.discard(result.messageBoxResult, list, inv);
       }));
     }
   }
 
-  private <T> void discard(final MessageBoxResults result, final ItemList<T> list, final List<T> inv) {
-    if(result.messageBoxResult == MessageBoxResult.YES) {
-      final RegistryEntry entry = (RegistryEntry)list.getSelectedItem().item_00;
+  private <T extends InventoryEntry> void discard(final MessageBoxResult result, final ItemList<T> list, final List<T> inv) {
+    if(result == MessageBoxResult.YES) {
+      list.remove(list.getSelectedItem());
+      final List<MenuEntryStruct04<T>> items = list.getItems();
+      setInventoryFromDisplay(items, inv, items.size());
+      this.updateDescription(list.getSelectedItem());
+    }
+  }
 
-      for (int i = 0; i < result.intValue; i++) {
-        final int index = getFirstIndexOfInventoryEntry(entry);
-        inv.remove(index);
-      }
-
-      if(getInventoryEntryQuantity(entry) < 1) {
-        list.remove(list.getSelectedItem());
-      }
-
-      list.refreshList();
+  private void discard(final MessageBoxResult result, final ItemList<ItemStack> list, final Inventory inv) {
+    if(result == MessageBoxResult.YES) {
+      list.remove(list.getSelectedItem());
+      final List<MenuEntryStruct04<ItemStack>> items = list.getItems();
+      setInventoryFromDisplay(items, inv, items.size());
       this.updateDescription(list.getSelectedItem());
     }
   }
@@ -183,7 +187,7 @@ public class ItemListScreen extends MenuScreen {
   private void menuDiscard() {
     if(this.itemList.isHighlightShown()) {
       if(!this.itemList.isEmpty()) {
-        this.showDiscardMenu(this.itemList, gameState_800babc8.items_2e9, true);
+        this.showDiscardMenu(this.itemList, gameState_800babc8.items_2e9.stacks, true);
       }
     } else if(!this.equipmentList.isEmpty()) {
       this.showDiscardMenu(this.equipmentList, gameState_800babc8.equipment_1e8, false);
@@ -192,10 +196,12 @@ public class ItemListScreen extends MenuScreen {
 
   private void menuSort() {
     playMenuSound(2);
-    this.itemList.sort(menuItemIconComparator());
-    this.equipmentList.sort(menuItemIconComparator());
+    this.itemList.sort(menuItemIconComparator(List.of(LodMod.ITEM_IDS), stack -> stack.getItem().getRegistryId()));
+    this.equipmentList.sort(menuEquipmentSlotComparator());
     sortItemInventory();
     sortEquipmentInventory(0);
+    this.itemList.removeIf(MenuEntryStruct04::isEmpty);
+    this.equipmentList.removeIf(MenuEntryStruct04::isEmpty);
   }
 
   @Override

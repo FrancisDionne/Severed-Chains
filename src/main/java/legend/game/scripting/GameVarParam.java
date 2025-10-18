@@ -12,7 +12,7 @@ import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.combat.effects.TransformationMode;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.InventoryEntry;
-import legend.game.inventory.Item;
+import legend.game.inventory.ItemStack;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.submap.SMap;
 import legend.game.submap.SubmapObject210;
@@ -22,9 +22,11 @@ import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.REGISTRIES;
 import static legend.game.Scus94491BpeSegment_8004.currentEngineState_8004dd04;
 import static legend.game.Scus94491BpeSegment_8006.battleState_8006e398;
+import static legend.game.Scus94491BpeSegment_800b.battleStage_800bb0f4;
 import static legend.game.Scus94491BpeSegment_800b.equipmentOverflow;
 import static legend.game.Scus94491BpeSegment_800b.itemOverflow;
 import static legend.game.Scus94491BpeSegment_800b.scriptStatePtrArr_800bc1c0;
+import static legend.game.combat.SBtld.startLegacyEncounter;
 
 public class GameVarParam extends Param {
   private final int index;
@@ -100,7 +102,7 @@ public class GameVarParam extends Param {
 
       case 64 -> ((SMap)currentEngineState_8004dd04).sobjs_800c6880[0].index;
       case 65 -> ((SMap)currentEngineState_8004dd04).submapControllerState_800c6740.index;
-      case 66 -> ((SMap)currentEngineState_8004dd04).sobjCount_800c6730;
+      case 66 -> ((SMap)currentEngineState_8004dd04).submap.objects.size();
       case 67 -> Scus94491BpeSegment_800b._800bd7b0;
       case 68 -> Scus94491BpeSegment_800b.previousSubmapCut_800bda08;
       case 69 -> Scus94491BpeSegment_8005.submapCut_80052c30;
@@ -159,7 +161,7 @@ public class GameVarParam extends Param {
 //      case 135 -> Scus94491BpeSegment_8006._8006e398.specialEffect_00[7]._00.get();
 //      case 136 -> Scus94491BpeSegment_8006._8006e398.specialEffect_00[8]._00.get();
 //      case 137 -> Scus94491BpeSegment_8006._8006e398.specialEffect_00[9]._00.get();
-      case 138 -> Scus94491BpeSegment_800b.gameState_800babc8.items_2e9.size();
+      case 138 -> Scus94491BpeSegment_800b.gameState_800babc8.items_2e9.getSize();
       case 139 -> Scus94491BpeSegment_800b.gameState_800babc8.equipment_1e8.size();
 
       default -> throw new IllegalArgumentException("Unknown game data index " + this.index);
@@ -208,16 +210,16 @@ public class GameVarParam extends Param {
         // size and simply add the drop to the list if var[41] is set.
       }
       case 41 -> {
-        final InventoryEntry invEntry = val < 192 ? REGISTRIES.equipment.getEntry(LodMod.id(LodMod.EQUIPMENT_IDS[val])).get() : REGISTRIES.items.getEntry(LodMod.id(LodMod.ITEM_IDS[val - 192])).get();
+        final InventoryEntry invEntry = val < 192 ? REGISTRIES.equipment.getEntry(LodMod.id(LodMod.EQUIPMENT_IDS[val])).get() : new ItemStack(REGISTRIES.items.getEntry(LodMod.id(LodMod.ITEM_IDS[val - 192])).get());
 
         if(invEntry instanceof final Equipment equipment) {
           equipmentOverflow.add(equipment);
-        } else if(invEntry instanceof final Item item) {
+        } else if(invEntry instanceof final ItemStack item) {
           itemOverflow.add(item);
         }
       }
       case 42 -> ((Battle)currentEngineState_8004dd04).forcedTurnBent_800c66bc = (ScriptState<BattleEntity27c>)scriptStatePtrArr_800bc1c0[val];
-      case 43 -> Scus94491BpeSegment_800b.encounterId_800bb0f8 = val;
+      case 43 -> startLegacyEncounter(val, battleStage_800bb0f4);
       case 44 -> ((Battle)currentEngineState_8004dd04).cameraScriptMainTableJumpIndex_800c6748 = val;
 //      case 45 -> Scus94491BpeSegment_8006._8006e398._180.get(0);
 //      case 46 -> Bttl_800c.intRef_800c6718.set(val);
@@ -239,7 +241,7 @@ public class GameVarParam extends Param {
 
       case 64 -> ((SMap)currentEngineState_8004dd04).sobjs_800c6880[0] = (ScriptState<SubmapObject210>)scriptStatePtrArr_800bc1c0[val];
       case 65 -> ((SMap)currentEngineState_8004dd04).submapControllerState_800c6740 = (ScriptState<ScriptedObject>)scriptStatePtrArr_800bc1c0[val];
-      case 66 -> ((SMap)currentEngineState_8004dd04).sobjCount_800c6730 = val;
+//      case 66 -> ((SMap)currentEngineState_8004dd04).sobjCount_800c6730 = val;
       case 67 -> Scus94491BpeSegment_800b._800bd7b0 = val;
       case 68 -> Scus94491BpeSegment_800b.previousSubmapCut_800bda08 = val;
       case 69 -> Scus94491BpeSegment_8005.submapCut_80052c30 = val;

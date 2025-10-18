@@ -39,6 +39,7 @@ import legend.game.saves.serializers.V1Serializer;
 import legend.game.saves.serializers.V2Serializer;
 import legend.game.saves.serializers.V3Serializer;
 import legend.game.saves.serializers.V4Serializer;
+import legend.game.saves.serializers.V5Serializer;
 import legend.game.scripting.ScriptManager;
 import legend.game.sound.Sequencer;
 import legend.game.types.Translucency;
@@ -104,7 +105,7 @@ public final class GameEngine {
   public static final Sequencer SEQUENCER = new Sequencer();
 
   public static final ConfigCollection CONFIG = new ConfigCollection();
-  public static final SaveManager SAVES = new SaveManager(V4Serializer.MAGIC_V4, V4Serializer::toV4);
+  public static final SaveManager SAVES = new SaveManager(V5Serializer.MAGIC_V5, V5Serializer::toV5);
 
   public static final PlatformManager PLATFORM = new SdlPlatformManager();
   public static final RenderEngine RENDERER = new RenderEngine();
@@ -169,10 +170,11 @@ public final class GameEngine {
 
   private static String statusText = "";
 
-  private static boolean loading;
+  private static boolean engineLoading = true;
+  private static boolean unpackerLoading = true;
 
   public static boolean isLoading() {
-    return loading;
+    return engineLoading || unpackerLoading;
   }
 
   public static Updater.Release getUpdate() {
@@ -197,7 +199,6 @@ public final class GameEngine {
       try {
         LOGGER.info("Severed Chains %s commit %s built %s starting", Version.FULL_VERSION, Version.HASH, Version.TIMESTAMP);
 
-        loading = true;
         RENDERER.setRenderCallback(GameEngine::loadGfx);
 
         Files.createDirectories(Path.of("saves"));
@@ -206,6 +207,7 @@ public final class GameEngine {
         SAVES.registerDeserializer(V2Serializer::fromV2Matcher, V2Serializer::fromV2);
         SAVES.registerDeserializer(V3Serializer::fromV3Matcher, V3Serializer::fromV3);
         SAVES.registerDeserializer(V4Serializer::fromV4Matcher, V4Serializer::fromV4);
+        SAVES.registerDeserializer(V5Serializer::fromV5Matcher, V5Serializer::fromV5);
 
         synchronized(INIT_LOCK) {
           Unpacker.setStatusListener(status -> statusText = status);
@@ -240,7 +242,7 @@ public final class GameEngine {
             }
           }
 
-          loading = false;
+          unpackerLoading = false;
         }
       } catch(final Exception e) {
         throw new RuntimeException(e);
@@ -314,6 +316,9 @@ public final class GameEngine {
 
     // Initialize event bus and find all event handlers
     EVENT_ACCESS.initialize(MODS);
+
+    // Load mod registries
+    EVENTS.postEvent(new AddRegistryEvent(REGISTRIES));
 
     // Initialize config and input registries
     REGISTRY_ACCESS.initialize(REGISTRIES.config);
@@ -476,6 +481,8 @@ public final class GameEngine {
 
     onMouseRelease = RENDERER.events().onMouseRelease((window, x, y, button, mods) -> skip());
     onShutdown = RENDERER.events().onClose(Unpacker::stop);
+
+    engineLoading = false;
   }
 
   private static void skip() {
@@ -529,7 +536,7 @@ public final class GameEngine {
       if(loadingFade > 1.0f) {
         loadingFade = 1.0f;
       }
-    } else if(!loading) {
+    } else if(!unpackerLoading) {
       synchronized(UPDATER_LOCK) {
         if(UPDATE_CHECK_FINISHED) {
           transitionToGame();
@@ -558,7 +565,7 @@ public final class GameEngine {
       .useTextureAlpha()
     ;
 
-    if(loading) {
+    if(unpackerLoading) {
       // Offset sine wave delta to quickly shift between colours and then wait for a moment before repeating
       eyeColour += Math.max(0.0f, MathHelper.sin(deltaMs / 300.0f % MathHelper.TWO_PI) * 0.75f + 0.25f) / 500.0f;
 
