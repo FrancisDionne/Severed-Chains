@@ -197,7 +197,7 @@ public class ItemListScreen extends MenuScreen {
   private void menuSort() {
     playMenuSound(2);
     this.itemList.sort(menuItemIconComparator(List.of(LodMod.ITEM_IDS), stack -> stack.getItem().getRegistryId()));
-    this.equipmentList.sort(menuEquipmentSlotComparator());
+    this.equipmentList.sort(menuItemIconComparator());
     sortItemInventory();
     sortEquipmentInventory(0);
     this.itemList.removeIf(MenuEntryStruct04::isEmpty);

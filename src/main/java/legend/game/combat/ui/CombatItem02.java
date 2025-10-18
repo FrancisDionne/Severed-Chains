@@ -36,4 +36,8 @@ public class CombatItem02 {
   public int getSize() {
     return this.size;
   }
+
+  public Item item() {
+    return this.item;
+  }
 }

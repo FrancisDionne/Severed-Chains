@@ -369,20 +369,20 @@ public class CombatDebuggerController {
       hp.setMaxRaw(9999);
 
       if (bent instanceof final PlayerBattleEntity player) {
-        bent.attack_34 = 0;
-        bent.magicAttack_36 = 0;
+        bent.stats.getStat(LodMod.ATTACK_STAT.get()).setRaw(0);
+        bent.stats.getStat(LodMod.MAGIC_ATTACK_STAT.get()).setRaw(0);
         bent.attackHit_3c = 9999;
         bent.magicHit_3e = 9999;
-        bent.defence_38 = 9999;
-        bent.magicDefence_3a = 9999;
+        bent.stats.getStat(LodMod.DEFENSE_STAT.get()).setRaw(9999);
+        bent.stats.getStat(LodMod.MAGIC_DEFENSE_STAT.get()).setRaw(9999);
       } else {
         bent.stats.getStat(LodMod.SPEED_STAT.get()).setRaw(0);
-        bent.attack_34 = 0;
-        bent.magicAttack_36 = 0;
+        bent.stats.getStat(LodMod.ATTACK_STAT.get()).setRaw(0);
+        bent.stats.getStat(LodMod.MAGIC_ATTACK_STAT.get()).setRaw(0);
         bent.attackHit_3c = 0;
         bent.magicHit_3e = 0;
-        bent.defence_38 = 9999;
-        bent.magicDefence_3a = 9999;
+        bent.stats.getStat(LodMod.DEFENSE_STAT.get()).setRaw(9999);
+        bent.stats.getStat(LodMod.MAGIC_DEFENSE_STAT.get()).setRaw(9999);
       }
     }
   }

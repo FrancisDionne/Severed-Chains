@@ -12,6 +12,7 @@ import legend.game.i18n.I18n;
 import legend.game.inventory.Addition04;
 import legend.game.inventory.EquipItemResult;
 import legend.game.inventory.Equipment;
+import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
 import legend.game.inventory.ItemIcon;
 import legend.game.inventory.ItemStack;
@@ -1694,7 +1695,7 @@ public final class SItem {
       final MenuEntryStruct04<?> menuItem = menuItems.get(s3);
       final String text = I18n.translate(menuItem.getNameTranslationKey());
 
-      if(menuItem.item_00 instanceof final RegistryEntry entry) {
+      if(menuItem.item_00 instanceof final InventoryEntry entry) {
         final int quantity = displayQuantity ? getInventoryEntryQuantity(entry) : 0;
         if (quantity > 0) {
           final String quantityText = '(' + Integer.toString(quantity) + ')';

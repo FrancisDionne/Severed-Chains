@@ -8918,7 +8918,7 @@ public class Battle extends EngineState {
     final PreferredBattleCameraAngle config = CONFIG.getConfig(CoreMod.PREFERRED_BATTLE_CAMERA_ANGLE.get());
     if (config != PreferredBattleCameraAngle.NORMAL) {
       int filteredArrayIndex = 0;
-      final int[] filteredIndices = new int[this.currentStageData_800c6718.cameraPosIndices_18.length];
+      final int[] filteredIndices = new int[encounter.cameraPosIndices.length];
       final int[] cameraAngles = switch(config) {
         case PreferredBattleCameraAngle.PLAYER -> BattleCamera.playerCameraAngles;
         case PreferredBattleCameraAngle.SIDE -> BattleCamera.sideCameraAngles;
@@ -8926,8 +8926,8 @@ public class Battle extends EngineState {
         default -> throw new IllegalArgumentException("Couldn't match the config " + config + " to a camera angles preset array");
       };
 
-      for (int i = 0; i < this.currentStageData_800c6718.cameraPosIndices_18.length; i++) {
-        if (this.cameraArrayContainsIndex(this.currentStageData_800c6718.cameraPosIndices_18[i], cameraAngles)) {
+      for (int i = 0; i < encounter.cameraPosIndices.length; i++) {
+        if (this.cameraArrayContainsIndex(encounter.cameraPosIndices[i], cameraAngles)) {
           if(!battleStart && this.hud.currentCameraPositionIndicesIndex_800c66b0 == i) {
             return i;
           }

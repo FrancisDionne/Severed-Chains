@@ -569,8 +569,8 @@ public class ListBox<T> extends Control {
         }
       }
 
-      if(drawQuantity && ListBox.this.entryToQuantity != null) {
-        final String quantity = ListBox.this.entryToQuantity.apply(this.data);
+      if(drawQuantity && ListBox.this.entryToCount != null) {
+        final String quantity = String.valueOf(ListBox.this.entryToCount.applyAsInt(this.data));
         if (!quantity.equals("0")) {
           final String quantityText = '(' + quantity + ')';
           final int w = DEFAULT_FONT.textWidth(quantityText);

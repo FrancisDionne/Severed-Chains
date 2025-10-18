@@ -12,7 +12,7 @@ import java.util.List;
 import static legend.core.GameEngine.EVENTS;
 
 public class Inventory implements Iterable<ItemStack> {
-  private final List<ItemStack> stacks = new ArrayList<>();
+  public final List<ItemStack> stacks = new ArrayList<>();
   private int maxSize;
   private boolean enableEvents = true;
 

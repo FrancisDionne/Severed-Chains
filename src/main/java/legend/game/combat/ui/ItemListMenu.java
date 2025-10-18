@@ -59,20 +59,21 @@ public class ItemListMenu extends ListMenu {
   @Override
   protected void drawListEntry(final int index, final int x, final int y, final int trim) {
 
-    final Item item = this.combatItems_800c6988.get(index).item();
+    final ItemStack stack = this.combatItems_800c6988.get(index).getStack();
+    final Item item = stack.getItem();
 
     this.fontOptions.trim(trim);
     this.fontOptions.horizontalAlign(HorizontalAlign.LEFT);
     renderText(I18n.translate(item), x, y, this.fontOptions);
 
-    if(item.isRepeat()) {
+    if(item.isRepeat(stack)) {
       this.fontOptions.colour(TextColour.STATS_YELLOW);
     }
 
     renderText("×", x + 143, y, this.fontOptions);
 
     this.fontOptions.horizontalAlign(HorizontalAlign.RIGHT);
-    renderText(String.valueOf(getInventoryEntryQuantity(item)), x + 168, y, this.fontOptions);
+    renderText(String.valueOf(getInventoryEntryQuantity(stack)), x + 168, y, this.fontOptions);
   }
 
   @Override

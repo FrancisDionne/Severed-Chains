@@ -206,7 +206,7 @@ public class ShopScreen extends MenuScreen {
         if(entry.item instanceof Equipment) {
           this.renderEquipmentStatChange((Equipment)entry.item, characterIndices_800bdbb8[this.equipCharIndex]);
         } else {
-          this.renderNumberOfItems(((ItemStack)entry.item).getItem());
+          this.renderNumberOfItems((ItemStack)entry.item);
         }
 
         renderString(16, 122, I18n.translate(entry.item.getDescriptionTranslationKey()), false);
