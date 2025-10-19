@@ -4369,7 +4369,6 @@ public final class Scus94491BpeSegment_8002 {
   }
 
   public static List<ItemStack> getUniqueInventoryItems() {
-    //return gameState_800babc8.items_2e9.stacks.stream().distinct().toList();
     return gameState_800babc8.items_2e9.stacks.stream().filter(distinctByKey(ItemStack::getRegistryId)).toList();
   }
 
