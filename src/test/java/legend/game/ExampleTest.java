@@ -28,7 +28,7 @@ public class ExampleTest {
     Input.sendKeyPress(InputKey.RETURN);
 
     // Inject most recent save
-    final SavedGame save = SAVES.loadAllCampaigns().getFirst().loadAllSaves().getFirst();
+    final SavedGame save = SAVES.loadAllCampaigns().getFirst().loadAllSaves().getFirst().saveGame;
     Harness.injectGameState(save.state, save.config, true);
 
     // Init some configs
