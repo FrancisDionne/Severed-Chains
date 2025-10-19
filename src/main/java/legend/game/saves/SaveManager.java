@@ -9,6 +9,7 @@ import legend.core.platform.input.InputBindings;
 import legend.game.EngineStateEnum;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.SaveCardData;
+import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.statistics.Statistics;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.types.ActiveStatsa0;
@@ -387,6 +388,8 @@ public final class SaveManager {
   public void loadGameState(final SaveCardData data) {
     this.loadGameState(data.saveGame.state, data.saveGame.config, true);
     submapCutForSave_800cb450 = submapCut_80052c30;
+    BattleDifficultyConfigEntry.reloadMonsters();
+    Statistics.load(gameState_800babc8.campaign.path, data.saveGame.fileName);
   }
 
   public void loadGameState(final GameState52c state, final ConfigCollection config, final boolean fullBoot) {
