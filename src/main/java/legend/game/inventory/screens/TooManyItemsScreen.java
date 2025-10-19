@@ -1,10 +1,10 @@
 package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
-import legend.game.combat.ui.FooterActions;
-import legend.game.combat.ui.FooterActionsHud;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.InventoryEntry;
@@ -15,7 +15,6 @@ import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.MessageBoxResult;
 import legend.game.types.Renderable58;
-import legend.lodmod.LodMod;
 
 import java.util.List;
 import java.util.Set;
@@ -527,7 +526,7 @@ public class TooManyItemsScreen extends MenuScreen {
   }
 
   private void inventoryNavigateEnd() {
-    final int slotCount = gameState_800babc8.items_2e9.getSize();
+    final int slotCount = getUniqueInventoryItems().size();
 
     if(this.invScroll + this.invIndex != slotCount - 1) {
       playMenuSound(1);
