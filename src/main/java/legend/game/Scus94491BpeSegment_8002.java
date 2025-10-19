@@ -4343,8 +4343,7 @@ public final class Scus94491BpeSegment_8002 {
         }
       }
       return quantity;
-    }
-    else {
+    } else {
       return (int)gameState_800babc8.equipment_1e8.stream().filter((e) -> compareInventoryEntries((InventoryEntry)e, entry)).count();
     }
   }
