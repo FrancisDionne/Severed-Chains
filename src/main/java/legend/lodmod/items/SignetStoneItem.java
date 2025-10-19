@@ -7,9 +7,6 @@ import legend.game.inventory.ItemStack;
 import legend.game.scripting.ScriptState;
 import legend.lodmod.LodMod;
 
-import static legend.core.GameEngine.CONFIG;
-import static legend.lodmod.LodConfig.ITEM_STACK_SIZE;
-
 public class SignetStoneItem extends BattleItem {
   public SignetStoneItem() {
     super(ItemIcon.SACK, 200);
@@ -17,7 +14,7 @@ public class SignetStoneItem extends BattleItem {
 
   @Override
   public int getMaxStackSize(final ItemStack stack) {
-    return CONFIG.getConfig(ITEM_STACK_SIZE.get());
+    return 1;
   }
 
   @Override

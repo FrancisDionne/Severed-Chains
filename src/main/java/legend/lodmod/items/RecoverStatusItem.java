@@ -7,12 +7,10 @@ import legend.game.inventory.ItemStack;
 import legend.game.inventory.UseItemResponse;
 import legend.game.scripting.ScriptState;
 
-import static legend.core.GameEngine.CONFIG;
 import static legend.game.SItem.characterCount_8011d7c4;
 import static legend.game.Scus94491BpeSegment.simpleRand;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
-import static legend.lodmod.LodConfig.ITEM_STACK_SIZE;
 
 public class RecoverStatusItem extends BattleItem {
   private final int status;
@@ -24,7 +22,7 @@ public class RecoverStatusItem extends BattleItem {
 
   @Override
   public int getMaxStackSize(final ItemStack stack) {
-    return CONFIG.getConfig(ITEM_STACK_SIZE.get());
+    return 1;
   }
 
   @Override

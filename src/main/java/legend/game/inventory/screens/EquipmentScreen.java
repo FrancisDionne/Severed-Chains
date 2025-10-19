@@ -258,7 +258,7 @@ public class EquipmentScreen extends MenuScreen {
         if(itemIndex < this.menuItems.size()) {
           final Equipment equipment = this.menuItems.get(itemIndex).item_00;
           final EquipItemResult previousEquipment = equipItem(equipment, characterIndices_800bdbb8[this.charSlot]);
-          final int indexOfItemToEquip = getFirstIndexOfInventoryEntry(equipment);
+          final int indexOfItemToEquip = getFirstIndexOfInventoryEntry(equipment.getRegistryId(), false);
           takeEquipment(indexOfItemToEquip);
 
           if(previousEquipment.previousEquipment != null) {
@@ -411,7 +411,7 @@ public class EquipmentScreen extends MenuScreen {
     if(itemIndex < this.menuItems.size()) {
       final Equipment equipment = this.menuItems.get(itemIndex).item_00;
       final EquipItemResult previousEquipment = equipItem(equipment, characterIndices_800bdbb8[this.charSlot]);
-      final int indexOfItemToEquip = getFirstIndexOfInventoryEntry(equipment);
+      final int indexOfItemToEquip = getFirstIndexOfInventoryEntry(equipment.getRegistryId(), false);
       takeEquipment(indexOfItemToEquip);
 
       if(previousEquipment.previousEquipment != null) {

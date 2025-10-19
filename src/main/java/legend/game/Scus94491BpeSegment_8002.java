@@ -89,9 +89,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -4330,22 +4333,44 @@ public final class Scus94491BpeSegment_8002 {
   }
 
   public static <T extends InventoryEntry> int getInventoryEntryQuantity(final T entry) {
-    final List<?> list = entry instanceof Item ? gameState_800babc8.items_2e9.stacks : gameState_800babc8.equipment_1e8;
-    return (int)list.stream().filter((e) -> compareInventoryEntries((InventoryEntry)e, entry)).count();
+    if(entry instanceof ItemStack) {
+      final List<ItemStack> list = gameState_800babc8.items_2e9.stacks;
+      int quantity = 0;
+      for(int i = 0; i < list.size(); i++) {
+        final ItemStack stack = list.get(i);
+        if(stack.getItem().getRegistryId().equals(entry.getRegistryId())) {
+          quantity += stack.getSize();
+        }
+      }
+      return quantity;
+    }
+    else {
+      return (int)gameState_800babc8.equipment_1e8.stream().filter((e) -> compareInventoryEntries((InventoryEntry)e, entry)).count();
+    }
   }
 
-  public static <T extends InventoryEntry> int getFirstIndexOfInventoryEntry(final T entry) {
-    final List<?> list = entry instanceof Item ? gameState_800babc8.items_2e9.stacks : gameState_800babc8.equipment_1e8;
-    final int index = (int)list.stream().takeWhile((e) -> !compareInventoryEntries((InventoryEntry)e, entry)).count();
+  public static <T extends InventoryEntry> int getFirstIndexOfInventoryEntry(final RegistryId entry, final boolean isItem) {
+    final List<?> list = isItem ? gameState_800babc8.items_2e9.stacks : gameState_800babc8.equipment_1e8;
+    final int index = (int)list.stream().takeWhile((e) -> !compareInventoryEntries(((InventoryEntry)e).getRegistryId(), entry)).count();
     return index < list.size() ? index : -1;
   }
 
   public static <T extends InventoryEntry> boolean compareInventoryEntries(final T entry1, final T entry2) {
-    return Objects.equals(entry1.getRegistryId().toString(), entry2.getRegistryId().toString());
+    return Objects.equals(entry1.getRegistryId(), entry2.getRegistryId());
+  }
+
+  public static <T extends InventoryEntry> boolean compareInventoryEntries(final RegistryId entry1, final RegistryId entry2) {
+    return Objects.equals(entry1, entry2);
+  }
+
+  public static <T> Predicate<T> distinctByKey(final Function<? super T, ?> keyExtractor) {
+    final Set<Object> seen = ConcurrentHashMap.newKeySet();
+    return t -> seen.add(keyExtractor.apply(t));
   }
 
   public static List<ItemStack> getUniqueInventoryItems() {
-    return gameState_800babc8.items_2e9.stacks.stream().distinct().toList();
+    //return gameState_800babc8.items_2e9.stacks.stream().distinct().toList();
+    return gameState_800babc8.items_2e9.stacks.stream().filter(distinctByKey(ItemStack::getRegistryId)).toList();
   }
 
   public static List<Equipment> getUniqueInventoryEquipments() {

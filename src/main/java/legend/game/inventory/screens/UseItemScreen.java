@@ -15,7 +15,6 @@ import legend.game.types.ActiveStatsa0;
 import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.Renderable58;
-import legend.lodmod.LodMod;
 
 import java.util.List;
 import java.util.Set;
@@ -262,7 +261,7 @@ public class UseItemScreen extends MenuScreen {
       }
     }
 
-    this.menuItems.sort(menuItemIconComparator(List.of(LodMod.ITEM_IDS), stack -> stack.getItem().getRegistryId()));
+    //this.menuItems.sort(menuItemIconComparator(List.of(LodMod.ITEM_IDS), stack -> stack.getItem().getRegistryId()));
     return this.menuItems.size();
   }
 

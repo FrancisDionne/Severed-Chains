@@ -10,10 +10,8 @@ import legend.game.scripting.ScriptState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.EVENTS;
 import static legend.game.combat.Battle.seed_800fa754;
-import static legend.lodmod.LodConfig.ITEM_STACK_SIZE;
 
 public class RecoveryBallItem extends Item {
   private static final Logger LOGGER = LogManager.getFormatterLogger(RecoveryBallItem.class);
@@ -24,7 +22,7 @@ public class RecoveryBallItem extends Item {
 
   @Override
   public int getMaxStackSize(final ItemStack stack) {
-    return CONFIG.getConfig(ITEM_STACK_SIZE.get());
+    return 1;
   }
 
   @Override

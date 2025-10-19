@@ -728,7 +728,7 @@ public class ShopScreen extends MenuScreen {
                 boolean taken = false;
 
                 for (int j = 0; j < result.intValue; j++) {
-                  final int index = getFirstIndexOfInventoryEntry(isItem ? (ItemStack)entry : (Equipment)entry);
+                  final int index = getFirstIndexOfInventoryEntry(entry.getRegistryId(), isItem);
                   if(isItem) {
                     taken = Scus94491BpeSegment_8002.takeItemFromSlot(slot, 1) || taken;
                   } else {
@@ -1160,7 +1160,7 @@ public class ShopScreen extends MenuScreen {
     } else {
       playMenuSound(2);
 
-      final InventoryEntry entry = (InventoryEntry)list.get(slot);
+      final InventoryEntry entry = isItem ? new ItemStack((ItemStack)list.get(slot)) : (InventoryEntry)list.get(slot);
       final int quantity = getInventoryEntryQuantity(isItem ? (ItemStack)entry : (Equipment)entry);
       final String itemText = I18n.translate(entry.getNameTranslationKey());
 
@@ -1168,9 +1168,9 @@ public class ShopScreen extends MenuScreen {
         if(Objects.requireNonNull(result.messageBoxResult) == MessageBoxResult.YES) {
           boolean taken = false;
           for (int i = 0; i < result.intValue; i++) {
-            final int index = getFirstIndexOfInventoryEntry(isItem ? (ItemStack)entry : (Equipment)entry);
+            final int index = getFirstIndexOfInventoryEntry(entry.getRegistryId(), isItem);
             if(isItem) {
-              taken = Scus94491BpeSegment_8002.takeItemFromSlot(slot, 1) || taken;
+              taken = Scus94491BpeSegment_8002.takeItemFromSlot(index, 1) || taken;
             } else {
               taken = takeEquipment(index) || taken;
             }
@@ -1352,9 +1352,9 @@ public class ShopScreen extends MenuScreen {
   private void menuSell10NavigateEnd() {
     final int itemCount;
     if(this.sellType == 0) { // equipment
-      itemCount = gameState_800babc8.equipment_1e8.size();
+      itemCount = getUniqueInventoryEquipments().size();
     } else { // items
-      itemCount = gameState_800babc8.items_2e9.getSize();
+      itemCount = getUniqueInventoryItems().size();
     }
 
     if(this.invScroll_8011e0e4 + this.invIndex_8011e0e0 != itemCount - 1) {

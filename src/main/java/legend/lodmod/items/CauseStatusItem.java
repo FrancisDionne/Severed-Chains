@@ -5,9 +5,7 @@ import legend.game.inventory.ItemIcon;
 import legend.game.inventory.ItemStack;
 import legend.game.scripting.ScriptState;
 
-import static legend.core.GameEngine.CONFIG;
 import static legend.game.Scus94491BpeSegment.simpleRand;
-import static legend.lodmod.LodConfig.ITEM_STACK_SIZE;
 
 public class CauseStatusItem extends BattleItem {
   private final int useItemColour;
@@ -21,7 +19,7 @@ public class CauseStatusItem extends BattleItem {
 
   @Override
   public int getMaxStackSize(final ItemStack stack) {
-    return CONFIG.getConfig(ITEM_STACK_SIZE.get());
+    return 1;
   }
 
   @Override

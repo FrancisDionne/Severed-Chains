@@ -6,7 +6,6 @@ import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.InventoryEntry;
-import legend.game.inventory.Item;
 import legend.game.inventory.ItemStack;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Glyph;
@@ -46,7 +45,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
 public class ItemListScreen extends MenuScreen {
   private final Runnable unload;
 
-  private final ItemList<ItemStack> itemList = new ItemList<>(stack -> stack.item_00.canStack() || stack.item_00.getSize() > 1 ? stack.item_00.getSize() : 0, null);
+  private final ItemList<ItemStack> itemList = new ItemList<>(null, i -> gameState_800babc8.items_2e9.stacks.size());
   private final ItemList<Equipment> equipmentList = new ItemList<>(null, i -> gameState_800babc8.equipment_1e8.size());
   private final Label description = new Label("");
 
@@ -156,25 +155,25 @@ public class ItemListScreen extends MenuScreen {
       final String itemText = I18n.translate(entry.getNameTranslationKey());
 
       menuStack.pushScreen(new MessageBoxQuantityScreen("Discard " + itemText + '?', 1, quantity, 2, result -> {
-        this.discard(result.messageBoxResult, list, inv);
+        this.discard(result, list, inv);
       }));
     }
   }
 
-  private <T extends InventoryEntry> void discard(final MessageBoxResult result, final ItemList<T> list, final List<T> inv) {
-    if(result == MessageBoxResult.YES) {
-      list.remove(list.getSelectedItem());
-      final List<MenuEntryStruct04<T>> items = list.getItems();
-      setInventoryFromDisplay(items, inv, items.size());
-      this.updateDescription(list.getSelectedItem());
-    }
-  }
+  private <T extends InventoryEntry> void discard(final MessageBoxResults result, final ItemList<T> list, final List<T> inv) {
+    if(result.messageBoxResult == MessageBoxResult.YES) {
+      final InventoryEntry entry = (InventoryEntry)list.getSelectedItem().item_00;
 
-  private void discard(final MessageBoxResult result, final ItemList<ItemStack> list, final Inventory inv) {
-    if(result == MessageBoxResult.YES) {
-      list.remove(list.getSelectedItem());
-      final List<MenuEntryStruct04<ItemStack>> items = list.getItems();
-      setInventoryFromDisplay(items, inv, items.size());
+      for (int i = 0; i < result.intValue; i++) {
+        final int index = getFirstIndexOfInventoryEntry(entry.getRegistryId(), entry instanceof ItemStack);
+        inv.remove(index);
+      }
+
+      if(getInventoryEntryQuantity(entry) < 1) {
+        list.remove(list.getSelectedItem());
+      }
+
+      list.refreshList();
       this.updateDescription(list.getSelectedItem());
     }
   }

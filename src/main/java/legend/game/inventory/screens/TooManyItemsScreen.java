@@ -573,7 +573,7 @@ public class TooManyItemsScreen extends MenuScreen {
     } else {
       final List<?> list = isItem ? gameState_800babc8.items_2e9.stacks : gameState_800babc8.equipment_1e8;
       final InventoryEntry discardedItem = (isItem ? this.items : this.equipment).get(this.invIndex + this.invScroll).item_00;
-      final int index = getFirstIndexOfInventoryEntry(isItem ? (ItemStack)discardedItem : (Equipment)discardedItem);
+      final int index = getFirstIndexOfInventoryEntry(discardedItem.getRegistryId(), isItem);
       final MenuEntryStruct04<?> entry = new MenuEntryStruct04<>(isItem ? (ItemStack)list.get(index) : (Equipment)list.get(index));
 
       this.droppedItems.set(this.dropIndex, (MenuEntryStruct04<InventoryEntry>)entry);

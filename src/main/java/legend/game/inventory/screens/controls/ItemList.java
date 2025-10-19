@@ -35,7 +35,12 @@ public class ItemList<T extends InventoryEntry> extends Control {
   public ItemList(@Nullable final ToIntFunction<MenuEntryStruct04<T>> getItemCount, @Nullable final Int2IntFunction itemSlotCount) {
     this(
       entry -> I18n.translate(entry.getNameTranslationKey()),
-      getItemCount,
+      entry -> {
+        if(entry.item_00 instanceof final InventoryEntry e) {
+          return getInventoryEntryQuantity(e);
+        }
+        return 0;
+      },
       (entry, x, y, flags) -> entry.item_00.renderIcon(x, y, flags),
       menuItem -> (menuItem.flags_02 & 0x1000) != 0 ? menuItem.flags_02 & 0xf : -1,
       menuItem -> (menuItem.flags_02 & 0x1000) != 0,

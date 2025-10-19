@@ -548,14 +548,6 @@ public class ListBox<T> extends Control {
       renderText(this.string, x + 28, y + 3, this.fontOptions);
       textZ_800bdf00 = oldZ;
 
-      if(ListBox.this.entryToCount != null) {
-        final int count = ListBox.this.entryToCount.applyAsInt(this.data);
-
-        if(count > 0) {
-          this.renderNumber(x + this.getWidth() - 69, y + 5, count, 10);
-        }
-      }
-
       if(ListBox.this.entryToIcon != null) {
         ListBox.this.entryToIcon.accept(this.data, x + 13, y + 1, 0x8);
       }
@@ -570,9 +562,9 @@ public class ListBox<T> extends Control {
       }
 
       if(drawQuantity && ListBox.this.entryToCount != null) {
-        final String quantity = String.valueOf(ListBox.this.entryToCount.applyAsInt(this.data));
-        if (!quantity.equals("0")) {
-          final String quantityText = '(' + quantity + ')';
+        final int quantity = ListBox.this.entryToCount.applyAsInt(this.data);
+        if (quantity > 0) {
+          final String quantityText = "(" + quantity + ')';
           final int w = DEFAULT_FONT.textWidth(quantityText);
           renderText(quantityText, x + 140 + (19 - w), y + 3, this.fontOptions);
         }
