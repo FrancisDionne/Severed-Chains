@@ -119,7 +119,7 @@ public abstract class ListMenu {
   public abstract void getTargetingInfo(final RunningScript<?> script);
 
   protected boolean canUse() {
-    if(this.player_08.item_d4.getItem() instanceof AngelsPrayerItem && CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
+    if(this.player_08.item_d4 != null && this.player_08.item_d4.getItem() instanceof AngelsPrayerItem && CONFIG.getConfig(CoreMod.PERMA_DEATH.get())) {
       return false;
     }
     return true;
