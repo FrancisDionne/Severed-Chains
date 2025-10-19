@@ -508,7 +508,6 @@ public class MainMenuScreen extends MenuScreen {
       ConfigStorage.saveConfig(CONFIG, ConfigStorageLocation.GLOBAL, Path.of("config.dcnf"));
       ConfigStorage.saveConfig(CONFIG, ConfigStorageLocation.CAMPAIGN, gameState_800babc8.campaign.path.resolve("campaign_config.dcnf"));
       menuStack.popScreen();
-      menuStack.popScreen();
       this.loadingStage = 0;
 
       canSave_8011dc88 = currentEngineState_8004dd04.canSave();
