@@ -3,10 +3,10 @@ package legend.game.inventory.screens;
 import legend.core.MathHelper;
 import legend.core.memory.Method;
 import legend.core.opengl.Texture;
-import legend.game.combat.ui.FooterActions;
-import legend.game.combat.ui.FooterActionsHud;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
+import legend.game.combat.ui.FooterActions;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.EquipItemResult;
 import legend.game.inventory.Equipment;
@@ -50,13 +50,13 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BOTTOM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_END;
+import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_FILTER;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_HOME;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_PAGE_UP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_SORT;
-import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_FILTER;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_TOP;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 import static legend.game.modding.coremod.CoreMod.REDUCE_MOTION_FLASHING_CONFIG;
@@ -103,6 +103,7 @@ public class EquipmentScreen extends MenuScreen {
         this.slotScroll = 0;
         this.selectedSlot = 0;
         this.loadingStage++;
+        this.menuItemSort(true);
 
       case 2:
         deallocateRenderables(0);
@@ -425,20 +426,26 @@ public class EquipmentScreen extends MenuScreen {
 
       this.getEquippableItemsForCharacter(characterIndices_800bdbb8[this.charSlot]);
 
+      if(this.sort > -1) {
+        sortEquipmentInventory(this.sort);
+      }
+
       this.loadingStage = 2;
     } else {
       playMenuSound(40);
     }
   }
 
-  private void menuItemSort() {
+  private void menuItemSort(final boolean silent) {
     this.sort = this.sort + 1 <= 2 ? this.sort + 1 : 0;
     this.setSortFooter();
-    playMenuSound(2);
-    final MenuEntries<Equipment> equipment = new MenuEntries<>();
     sortEquipmentInventory(this.sort);
     this.getEquippableItemsForCharacter(characterIndices_800bdbb8[this.charSlot]);
-    this.loadingStage = 2;
+
+    if(!silent) {
+      playMenuSound(2);
+      this.loadingStage = 2;
+    }
   }
 
   private void setSortFooter() {
@@ -550,7 +557,7 @@ public class EquipmentScreen extends MenuScreen {
     }
 
     if(action == INPUT_ACTION_MENU_SORT.get()) {
-      this.menuItemSort();
+      this.menuItemSort(false);
       return InputPropagation.HANDLED;
     }
 
