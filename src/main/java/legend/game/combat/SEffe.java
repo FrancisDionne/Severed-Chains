@@ -10,16 +10,15 @@ import legend.core.gpu.Rect4i;
 import legend.core.gte.GsCOORDINATE2;
 import legend.core.gte.MV;
 import legend.core.gte.ModelPart10;
-import legend.core.gte.Tmd;
-import legend.core.gte.TmdObjTable1c;
-import legend.core.gte.TmdWithId;
+import legend.game.tmd.Tmd;
+import legend.game.tmd.TmdObjTable1c;
+import legend.game.tmd.TmdWithId;
 import legend.core.gte.Transforms;
 import legend.core.memory.Method;
 import legend.core.opengl.Obj;
 import legend.core.opengl.PolyBuilder;
 import legend.core.opengl.QuadBuilder;
-import legend.core.opengl.Texture;
-import legend.core.opengl.TmdObjLoader;
+import legend.game.tmd.TmdObjLoader;
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.deff.Anim;
 import legend.game.combat.deff.DeffManager7cc;
@@ -829,7 +828,7 @@ public final class SEffe {
     GsGetLw(shadow.modelParts_00[0].coord2_04, lw);
 
     RENDERER
-      .queueModel(shadow.modelParts_00[0].obj, lw, QueuedModelTmd.class)
+      .queueModel(shadow.modelParts_00[0].tmd_08.getObj(), lw, QueuedModelTmd.class)
       .lightDirection(lightDirectionMatrix_800c34e8)
       .lightColour(lightColourMatrix_800c3508)
       .backgroundColour(GTE.backgroundColour);
@@ -1766,7 +1765,6 @@ public final class SEffe {
     final TmdObjTable1c sourceModel = source.tmd_08;
     final TmdObjTable1c diffModel = diff.tmd_08;
     final VertexDifferenceAnimation18 animation = state.innerStruct_00;
-    animation.obj = source.obj;
     animation.tmd = sourceModel;
     animation.ticksRemaining_00 = ticks;
     animation.embiggener_04 = embiggener;
@@ -4439,8 +4437,6 @@ public final class SEffe {
       effect.tpage_10 = (int)((tmdWithId.id & 0xffff_0000L) >>> 11);
     }
 
-    effect.obj = TmdObjLoader.fromObjTable(state.name, effect.tmd_08);
-
     //LAB_801184ac
     manager.params_10.flags_00 = 0x1400_0000;
     script.params_20[0].set(state.index);
@@ -4506,8 +4502,6 @@ public final class SEffe {
     s0._00 = 0x300_0000;
     s0.tmdType_04 = null;
     s0.tmd_08 = objTable;
-
-    s0.obj = TmdObjLoader.fromObjTable(state.name, s0.tmd_08);
 
     //LAB_801186bc
     //LAB_801186c0
@@ -4634,7 +4628,6 @@ public final class SEffe {
       final TmdSpriteEffect10 subEffect = new TmdSpriteEffect10();
       effect.subEffect_1c = subEffect;
       getSpriteTmdFromSource(subEffect, effectFlag);
-      subEffect.obj = TmdObjLoader.fromObjTable(state.name, subEffect.tmd_08);
       manager.params_10.flags_00 = 0x1400_0000;
     } else if(effectType == 0) {
       //LAB_801195a8
