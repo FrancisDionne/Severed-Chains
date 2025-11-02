@@ -10,6 +10,7 @@ import legend.core.gpu.Rect4i;
 import legend.core.gte.GsCOORDINATE2;
 import legend.core.gte.MV;
 import legend.core.gte.ModelPart10;
+import legend.core.opengl.Texture;
 import legend.game.tmd.Tmd;
 import legend.game.tmd.TmdObjTable1c;
 import legend.game.tmd.TmdWithId;
