@@ -36,17 +36,28 @@ import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.REGISTRIES;
+import static legend.game.Audio.playMenuSound;
+import static legend.game.FullScreenEffects.fullScreenEffect_800bb140;
+import static legend.game.FullScreenEffects.startFadeEffect;
+import static legend.game.Menus.allocateRenderable;
+import static legend.game.Menus.deallocateRenderables;
+import static legend.game.Menus.uiFile_800bdc3c;
+import static legend.game.Menus.unloadRenderable;
+import static legend.game.Menus.whichMenu_800bdc38;
 import static legend.game.SItem.FUN_80104b60;
 import static legend.game.SItem.UI_TEXT;
 import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.UI_TEXT_DISABLED;
 import static legend.game.SItem.UI_TEXT_SELECTED_CENTERED;
+import static legend.game.SItem.addGold;
 import static legend.game.SItem.allocateOneFrameGlyph;
 import static legend.game.SItem.allocateUiElement;
 import static legend.game.SItem.cacheCharacterSlots;
 import static legend.game.SItem.canEquip;
 import static legend.game.SItem.characterCount_8011d7c4;
 import static legend.game.SItem.equipItem;
+import static legend.game.SItem.giveEquipment;
+import static legend.game.SItem.giveItem;
 import static legend.game.SItem.glyph_801142d4;
 import static legend.game.SItem.glyphs_80114510;
 import static legend.game.SItem.initGlyph;
@@ -78,12 +89,13 @@ import static legend.game.Scus94491BpeSegment_8002.renderText;
 import static legend.game.Scus94491BpeSegment_8002.takeEquipment;
 import static legend.game.Scus94491BpeSegment_8002.unloadRenderable;
 import static legend.game.Scus94491BpeSegment_8007.shopId_8007a3b4;
+import static legend.game.SItem.shopId_8007a3b4;
+import static legend.game.SItem.takeEquipment;
+import static legend.game.SItem.takeItemFromSlot;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
-import static legend.game.Scus94491BpeSegment_800b.fullScreenEffect_800bb140;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
-import static legend.game.Scus94491BpeSegment_800b.uiFile_800bdc3c;
-import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
+import static legend.game.Text.renderText;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BOTTOM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
@@ -730,7 +742,7 @@ public class ShopScreen extends MenuScreen {
                 for (int j = 0; j < result.intValue; j++) {
                   final int index = getFirstIndexOfInventoryEntry(entry.getRegistryId(), isItem);
                   if(isItem) {
-                    taken = Scus94491BpeSegment_8002.takeItemFromSlot(slot, 1) || taken;
+                    taken = takeItemFromSlot(slot, 1) || taken;
                   } else {
                     taken = takeEquipment(index) || taken;
                   }
@@ -1170,7 +1182,7 @@ public class ShopScreen extends MenuScreen {
           for (int i = 0; i < result.intValue; i++) {
             final int index = getFirstIndexOfInventoryEntry(entry.getRegistryId(), isItem);
             if(isItem) {
-              taken = Scus94491BpeSegment_8002.takeItemFromSlot(index, 1) || taken;
+              taken = takeItemFromSlot(index, 1) || taken;
             } else {
               taken = takeEquipment(index) || taken;
             }

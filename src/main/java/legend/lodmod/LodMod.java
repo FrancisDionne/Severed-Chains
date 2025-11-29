@@ -11,6 +11,7 @@ import legend.core.platform.input.InputButton;
 import legend.core.platform.input.InputKey;
 import legend.core.platform.input.KeyInputActivation;
 import legend.core.platform.input.ScancodeInputActivation;
+import legend.game.additions.AdditionRegistryEvent;
 import legend.game.characters.Element;
 import legend.game.characters.ElementRegistryEvent;
 import legend.game.characters.FractionalStat;
@@ -32,6 +33,7 @@ import legend.game.combat.deff.RegisterDeffsEvent;
 import legend.game.combat.encounters.EncounterRegistryEvent;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.EquipmentRegistryEvent;
+import legend.game.inventory.GoodsRegistryEvent;
 import legend.game.inventory.IconMapEvent;
 import legend.game.inventory.IconSet;
 import legend.game.inventory.ItemIcon;
@@ -67,8 +69,6 @@ import org.legendofdragoon.modloader.registries.RegistryId;
 import java.util.Map;
 
 import static legend.core.GameEngine.CONFIG;
-import static legend.game.Scus94491BpeSegment_8005.spellCombatDescriptions_80052018;
-import static legend.game.Scus94491BpeSegment_8005.spells_80052734;
 import static legend.game.combat.Battle.spellStats_800fa0b8;
 
 /** Will eventually contain standard LOD content. Will be able to be disabled for total overhaul mods. */
@@ -182,6 +182,37 @@ public class LodMod {
     "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", ""
+  };
+
+  public static final String[] GOODS_IDS = {
+    "red_dragoon_spirit", "blue_dragoon_spirit", "jade_dragoon_spirit", "gold_dragoon_spirit", "violet_dragoon_spirit",
+    "silver_dragoon_spirit", "dark_dragoon_spirit", "divine_dragoon_spirit", "war_bulletin", "fathers_stone",
+    "prison_key", "axe_from_shack", "good_spirits", "shiny_bag", "water_bottle",
+    "life_water", "magic_oil", "yellow_stone", "blue_stone", "red_stone",
+    "letter_from_lynn", "pass_for_valley", "kates_bouquet", "key_to_ship", "boat_license",
+    "dragon_blocker", "moon_gem", "moon_dagger", "moon_mirror", "omega_bomb",
+    "omega_master", "law_maker", "law_output", "gold_dragoon_spirit_2", "magic_shiny_bag",
+    "vanishing_stone", "lavitzs_picture",
+  };
+
+
+  public static final String[] SPELL_IDS = {
+    "flameshot", "explosion", "final_burst", "red_eyed_dragon", "divine_dg_cannon", "wing_blaster", "gaspless", "blossom_storm",
+    "jade_dragon", "divine_dg_ball", "star_children", "moon_light", "gates_of_heaven", "w_silver_dragon", "wing_blaster", "astral_drain",
+    "death_dimension", "gaspless", "demons_gate", "dark_dragon", "atomic_mind", "thunder_kid", "thunder_god", "violet_dragon",
+    "freezing_ring", "rainbow_breath", "rose_storm", "diamond_dust", "blue_sea_dragon", "grand_stream", "meteor_strike", "golden_dragon",
+    "spell32", "spell33", "spell34", "spell35", "spell36", "spell37", "spell38", "spell39",
+    "spell40", "spell41", "spell42", "spell43", "spell44", "spell45", "spell46", "spell47",
+    "spell48", "spell49", "spell50", "spell51", "spell52", "spell53", "spell54", "spell55",
+    "spell56", "spell57", "spell58", "spell59", "spell60", "spell61", "spell62", "spell63",
+    "spell64", "star_children", "moon_light", "gates_of_heaven", "spell68", "spell69", "spell70", "spell71",
+    "spell72", "spell73", "spell74", "spell75", "spell76", "spell77", "spell78", "spell79",
+    "spell80", "spell81", "spell82", "spell83", "spell84", "spell85", "spell86", "spell87",
+    "spell88", "spell89", "spell90", "spell91", "spell92", "spell93", "spell94", "spell95",
+    "spell96", "spell97", "spell98", "spell99", "spell100", "spell101", "spell102", "spell103",
+    "spell104", "spell105", "spell106", "spell107", "spell108", "spell109", "spell110", "spell111",
+    "spell112", "spell113", "spell114", "spell115", "spell116", "spell117", "spell118", "spell119",
+    "spell120", "spell121", "spell122", "spell123", "spell124", "spell125", "spell126", "spell127",
   };
 
   public static final String[] SHOP_IDS = {
@@ -321,6 +352,11 @@ public class LodMod {
   }
 
   @EventListener
+  public static void registerGoods(final GoodsRegistryEvent event) {
+    LodGoods.register(event);
+  }
+
+  @EventListener
   public static void registerShops(final ShopRegistryEvent event) {
     LodShops.register(event);
   }
@@ -334,9 +370,7 @@ public class LodMod {
   public static void registerSpells(final SpellRegistryEvent event) {
     for(int spellId = 0; spellId < spellStats_800fa0b8.length; spellId++) {
       if(spellStats_800fa0b8[spellId] == null) {
-        final String name = spellId < 84 ? spells_80052734[spellId] : "Spell " + spellId;
-        final String desc = spellId < 84 ? spellCombatDescriptions_80052018[spellId] : "";
-        spellStats_800fa0b8[spellId] = SpellStats0c.fromFile(name, desc, Loader.loadFile("spells/" + spellId + ".dspl"));
+        spellStats_800fa0b8[spellId] = SpellStats0c.fromFile(id(SPELL_IDS[spellId]), Loader.loadFile("spells/" + spellId + ".dspl"));
       }
     }
   }
@@ -382,6 +416,11 @@ public class LodMod {
   @EventListener
   public static void registerDeffs(final RegisterDeffsEvent event) {
     LodDeffs.register(event);
+  }
+
+  @EventListener
+  public static void registerAdditions(final AdditionRegistryEvent event) {
+    LodAdditions.register(event);
   }
 
   @EventListener

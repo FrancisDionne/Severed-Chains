@@ -19,6 +19,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
+import static legend.game.Menus.allocateManualRenderable;
+import static legend.game.Menus.uploadRenderable;
 import static legend.game.SItem.allocateUiElement;
 import static legend.game.SItem.renderFraction;
 import static legend.game.Scus94491BpeSegment_8002.allocateManualRenderable;
@@ -123,6 +125,10 @@ public class ItemList<T extends InventoryEntry> extends Control {
 
   public void removeIf(final Predicate<MenuEntryStruct04<T>> predicate) {
     this.items.removeIf(predicate);
+  }
+
+  public int getCount() {
+    return this.items.getCount();
   }
 
   public void clear() {

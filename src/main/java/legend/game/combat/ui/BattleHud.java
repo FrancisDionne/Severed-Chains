@@ -54,30 +54,29 @@ import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
+import static legend.core.GameEngine.SCRIPTS;
+import static legend.game.Audio.playMenuSound;
+import static legend.game.Audio.playSound;
+import static legend.game.Graphics.centreScreenX_1f8003dc;
+import static legend.game.Graphics.centreScreenY_1f8003de;
+import static legend.game.Graphics.vsyncMode_8007a3b8;
+import static legend.game.Menus.whichMenu_800bdc38;
 import static legend.game.SItem.UI_WHITE_CENTERED;
 import static legend.game.SItem.menuStack;
-import static legend.game.Scus94491BpeSegment.centreScreenX_1f8003dc;
-import static legend.game.Scus94491BpeSegment.centreScreenY_1f8003de;
-import static legend.game.Scus94491BpeSegment.playSound;
 import static legend.game.Scus94491BpeSegment.simpleRand;
-import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
-import static legend.game.Scus94491BpeSegment_8004.additionCounts_8004f5c0;
+import static legend.game.Scus94491BpeSegment_8004.CHARACTER_ADDITIONS;
 import static legend.game.Scus94491BpeSegment_8004.simpleRandSeed_8004dd44;
 import static legend.game.Scus94491BpeSegment_8006.battleState_8006e398;
-import static legend.game.Scus94491BpeSegment_8007.vsyncMode_8007a3b8;
 import static legend.game.Scus94491BpeSegment_800b.characterStatsLoaded_800be5d0;
 import static legend.game.Scus94491BpeSegment_800b.encounter;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
-import static legend.game.Scus94491BpeSegment_800b.scriptStatePtrArr_800bc1c0;
-import static legend.game.Scus94491BpeSegment_800b.textZ_800bdf00;
 import static legend.game.Scus94491BpeSegment_800b.tickCount_800bb0fc;
-import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
+import static legend.game.Text.renderText;
+import static legend.game.Text.textZ_800bdf00;
 import static legend.game.combat.Battle.melbuStageToMonsterNameIndices_800c6f30;
 import static legend.game.combat.bent.BattleEntity27c.FLAG_400;
 import static legend.game.combat.bent.BattleEntity27c.FLAG_CANT_TARGET;
 import static legend.game.combat.bent.BattleEntity27c.FLAG_CURRENT_TURN;
-import static legend.game.combat.bent.BattleEntity27c.FLAG_MONSTER;
 import static legend.game.combat.ui.BattleMenuStruct58.battleMenuIconMetrics_800fb674;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
@@ -85,6 +84,7 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
+import static legend.lodmod.LodGoods.DIVINE_DRAGOON_SPIRIT;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_ADDITIONS;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_ESCAPE;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_GUARD;
@@ -298,7 +298,7 @@ public class BattleHud {
         }
 
         //LAB_800eccac
-        if((targetBent.storage_44[7] & FLAG_CANT_TARGET) == 0) {
+        if(!targetBent.hasFlag(FLAG_CANT_TARGET)) {
           this.drawTargetArrow(colour, target);
         }
 
@@ -461,7 +461,7 @@ public class BattleHud {
       for(int bentIndex = 0; bentIndex < battleState_8006e398.getAliveBentCount(); bentIndex++) {
         final ScriptState<? extends BattleEntity27c> state = battleState_8006e398.aliveBents_e78[bentIndex];
 
-        if((state.storage_44[7] & (FLAG_400 | FLAG_CURRENT_TURN)) != 0) {
+        if(state.hasAnyFlag(FLAG_400 | FLAG_CURRENT_TURN)) {
           this.addTurnOrderBent(state.innerStruct_00, false, true);
         }
       }
@@ -616,7 +616,7 @@ public class BattleHud {
           final PlayerBattleEntity player = state.innerStruct_00;
           final int brightnessIndex0;
           final int brightnessIndex1;
-          if((this.battle.currentTurnBent_800c66c8.storage_44[7] & FLAG_MONSTER) != 0x1 && this.battle.currentTurnBent_800c66c8 == state) {
+          if(this.battle.currentTurnBent_800c66c8 == state) {
             brightnessIndex0 = 2;
             brightnessIndex1 = 2;
           } else {
@@ -1260,8 +1260,7 @@ public class BattleHud {
       if((num.flags_02 & 0x8000) != 0) {
         if(num.state_00 != 0) {
           if(num.bentIndex_04 != -1) {
-            final ScriptState<?> state = scriptStatePtrArr_800bc1c0[num.bentIndex_04];
-            final BattleEntity27c bent = (BattleEntity27c)state.innerStruct_00;
+            final BattleEntity27c bent = SCRIPTS.getObject(num.bentIndex_04, BattleEntity27c.class);
 
             final float x;
             final float y;
@@ -1459,8 +1458,7 @@ public class BattleHud {
 
   @Method(0x800f4268L)
   public void addFloatingNumberForBent(@Nullable final BattleEntity27c attacker, final int bentIndex, final int damage, final int colour) {
-    final ScriptState<?> state = scriptStatePtrArr_800bc1c0[bentIndex];
-    final BattleEntity27c bent = (BattleEntity27c)state.innerStruct_00;
+    final BattleEntity27c bent = SCRIPTS.getObject(bentIndex, BattleEntity27c.class);
 
     final float x;
     final float y;
@@ -1749,7 +1747,7 @@ public class BattleHud {
         }
 
         if(PLATFORM.isActionPressed(INPUT_ACTION_BTTL_ADDITIONS.get())) {
-          if(additionCounts_8004f5c0[this.battle.currentTurnBent_800c66c8.innerStruct_00.charId_272] != 0) {
+          if(CHARACTER_ADDITIONS[this.battle.currentTurnBent_800c66c8.innerStruct_00.charId_272].length != 0) {
             playSound(0, 2, (short)0, (short)0);
             this.initListMenu((PlayerBattleEntity)this.battle.currentTurnBent_800c66c8.innerStruct_00, 2);
           } else {
@@ -2031,7 +2029,7 @@ public class BattleHud {
           RENDERER.queueOrthoModel(this.battleMenu_800c6c34.menuObj, this.battleMenu_800c6c34.transforms, QueuedModelStandard.class)
             .vertices(this.battleMenu_800c6c34.actionIconObjOffset + iconId * 12 + iconState * 4, 4)
             .translucency(Translucency.of(battleMenuIconMetrics_800fb674[iconId].translucencyMode_06));
-        } else if(this.battleMenu_800c6c34.player_04.charId_272 != 0 || (gameState_800babc8.goods_19c[0] & 0xff) >>> 7 == 0) {
+        } else if(this.battleMenu_800c6c34.player_04.charId_272 != 0 || !gameState_800babc8.goods_19c.has(DIVINE_DRAGOON_SPIRIT)) {
           RENDERER.queueOrthoModel(this.battleMenu_800c6c34.menuObj, this.battleMenu_800c6c34.transforms, QueuedModelStandard.class)
             .vertices(this.battleMenu_800c6c34.actionDragoonIconObjOffset + this.battleMenu_800c6c34.player_04.charId_272 * 12 + iconState * 4, 4)
             .translucency(Translucency.of(battleMenuIconMetrics_800fb674[1].translucencyMode_06));
@@ -2163,7 +2161,7 @@ public class BattleHud {
     for(targetIndex = 0; targetIndex < count; targetIndex++) {
       target = this.battle.targetBents_800c71f0[targetType][this.battleMenu_800c6c34.targetedSlot_800c697c];
 
-      if(target != null && (target.storage_44[7] & FLAG_CANT_TARGET) == 0) {
+      if(target != null && !target.hasFlag(FLAG_CANT_TARGET)) {
         break;
       }
 
