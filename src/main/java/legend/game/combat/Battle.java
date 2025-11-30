@@ -3960,8 +3960,6 @@ public class Battle extends EngineState {
             nonMaxedAdditions--;
           }
 
-          int lastNonMaxAdditionIndex = -1;
-
           // If there's only one addition that isn't maxed (the ultimate addition), unlock it
           //LAB_800cd31c
           if(nonMaxedAdditions < 2 && (charData.partyFlags_04 & 0x40) == 0) {
