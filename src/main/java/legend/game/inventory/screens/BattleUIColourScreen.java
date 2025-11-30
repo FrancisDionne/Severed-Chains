@@ -9,6 +9,7 @@ import legend.game.i18n.I18n;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Label;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.BattleUIColourSettingsConfigEntry;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigCollection;
 import legend.game.saves.ConfigEntry;
@@ -175,12 +176,7 @@ public class BattleUIColourScreen extends VerticalLayoutScreen {
     final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
 
     if(this.listBox == null || this.currentBoxOffsetX != xOffset || dirty) {
-      final int rgb = ((CONFIG.getConfig(CoreMod.BATTLE_UI_COLOUR_BLUE_CONFIG.get()) & 0xff) << 16) |
-        ((CONFIG.getConfig(CoreMod.BATTLE_UI_COLOUR_GREEN_CONFIG.get()) & 0xff) << 8) |
-        ((CONFIG.getConfig(CoreMod.BATTLE_UI_COLOUR_RED_CONFIG.get()) & 0xff));
-
-      Config.setBattleRgb(rgb);
-
+      BattleUIColourSettingsConfigEntry.setRGB();
       this.currentBoxOffsetX = xOffset;
       this.listBox = new UiBox("Battle UI Colour Screen List", 368 * 0.09f, 100f, 368 * 0.82f, 80f, 0.7f);
       dirty = false;
