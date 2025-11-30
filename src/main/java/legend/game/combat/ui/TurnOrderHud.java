@@ -11,11 +11,15 @@ import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.inventory.screens.TextColour;
+import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.BattleUIColourSettingsConfigEntry;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.nio.file.Path;
 import java.util.List;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.core.GameEngine.RENDERER;
 import static legend.game.Text.renderText;
@@ -139,7 +143,7 @@ public final class TurnOrderHud {
       turnOrderBox = new UiBox("Turn Order Box", x - 2 - xOffset, 4f, currentBoxWidth, 67f);
     }
 
-    turnOrderBox.render(Config.changeBattleRgb() ? Config.getBattleRgb() : Config.defaultUiColour);
+    turnOrderBox.render(Config.changeBattleRgb() ? Config.getBattleRgb() : BattleUIColourSettingsConfigEntry.getRGB());
     renderText("Turn Order", x + 1 - xOffset, 6, titleFont, 120);
 
     m.translation(x + 36, 4.5f, 120);
