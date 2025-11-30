@@ -176,10 +176,10 @@ public final class AdditionConfigs {
     //print();
   }
 
-  private static AdditionHitProperties10[] createAdditionHitPropertiesArray() {
+  private static AdditionHitProperties10[] createAdditionHitPropertiesArray(final int hitCount) {
     //There needs to be 8 elements in the array, so fill with empty elements
-    final AdditionHitProperties10[] additionHitProperties = new AdditionHitProperties10[8];
-    for (int i = 0; i < 8; i++) {
+    final AdditionHitProperties10[] additionHitProperties = new AdditionHitProperties10[hitCount];
+    for (int i = 0; i < hitCount; i++) {
       additionHitProperties[i] = new AdditionHitProperties10(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
     return additionHitProperties;
@@ -217,7 +217,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Dart_DoubleSlash() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(2);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 100, 30, 0, 0, 0, 0, 8, 5, 12, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 19, 11, 2, 50, 5, 0, 4, 0, 8, 3, 3, 10, 32, 0, 0, new AdditionSound(5, 11), new AdditionSound(3, 9));
     adjustHitOverlayStartingOffset(additionHitProperties);
@@ -233,7 +233,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Dart_Volcano() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(4);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 50, 5, 1, 0, 0, 0, 8, 5, 12, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 33, 27, 3, 50, 5, 0, 0, 0, 25, 2, 1, 12, 32, 0, 0, new AdditionSound(5, 28), new AdditionSound(1, 26));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 30, fc ? 14 : 15, 3, 50, 5, 0, 0, 0, 0, 0, 0, 13, 32, 0, 0, new AdditionSound(9, 15), new AdditionSound(2, 13));
@@ -251,7 +251,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Dart_BurningRush() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(3);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 50, 10, 2, 0, 0, 0, 8, 5, 12, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 27, 12, 3, 50, 10, 0, 0, 0, 0, 27, 8, 10, 32, 0, 0, new AdditionSound(13, 12), new AdditionSound(1, 10));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 22, 8, 2, 50, 10, 0, 4, -8, 5, 17, 8, 8, 32, 0, 0, new AdditionSound(9, 8), new AdditionSound(3, 6));
@@ -268,7 +268,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Dart_CrushDance() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(5);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 30, 10, 3, 0, 0, 0, 8, 5, 12, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 28, 22, 3, 30, 10, 0, 0, 0, 0, 12, 6, 11, 32, 0, 0, new AdditionSound(7, 23), new AdditionSound(1, 21));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 26, 14, 3, 30, 10, 0, 0, 0, 0, 0, 0, 12, 32, 0, 0, new AdditionSound(9, 14), new AdditionSound(3, 12));
@@ -287,7 +287,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Dart_MadnessHero() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 20, 10, 4, 0, 0, 0, 8, 5, 12, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 15, 9, 3, 20, 10, 0, 0, 0, 0, 0, 0, 11, 32, 0, 0, new AdditionSound(5, 10), new AdditionSound(2, 8));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 8, 2, 3, 20, 10, 0, 0, 0, 0, 0, 0, 10, 32, 0, fc ? 1 : 0, new AdditionSound(7, 3), new AdditionSound(3, 1));
@@ -307,7 +307,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Dart_MoonStrike() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(7);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 30, 8, 5, 0, 0, 0, 8, 5, 12, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 25, 19, 3, 30, 2, 0, 0, 0, 16, 3, 7, 9, 32, 0, 0, new AdditionSound(7, 20), new AdditionSound(2, 18));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 14, 8, 3, 30, 2, 0, 0, 0, 0, 0, 0, 10, 32, 0, 0, new AdditionSound(8, 9), new AdditionSound(1, 7));
@@ -328,7 +328,7 @@ public final class AdditionConfigs {
   }
 
   public static MasterAddition createAdditionHits_Dart_BlazingDynamo() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(8);
     additionHitProperties[0] = createAdditionHitProperties(0xe0, 14, 9, 3, 40, 20, 6, 0, 0, 0, 8, 5, 12, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 23, 17, 3, 30, 20, 0, 0, 0, 0, 0, 0, 9, 32, 0, fc ? 1 : 0, new AdditionSound(8, 18), new AdditionSound(1, 16));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 10, 5, 2, 30, 10, 0, 0, 0, 3, 2, 1, 7, 32, 0, fc ? 2 : 0, new AdditionSound(5, 6), new AdditionSound(2, 4));
@@ -350,7 +350,7 @@ public final class AdditionConfigs {
   }
 
   public static AdditionHits80 createAdditionHits_Unknown1() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 5, 0, 0, 100, 0, 7, 0, 0, 0, 4, 1, 8, 32, 0, 11, new AdditionSound(5, 11), new AdditionSound(0, 9));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 15, 4, 0, 10, 0, 0, 0, 0, 0, 14, 0, 7, 32, 0, 0, new AdditionSound(8, 13), new AdditionSound(3, 11));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 16, 10, 0, 20, 0, 0, 0, 0, 6, 8, 1, 10, 32, 0, 0, new AdditionSound(5, 11), new AdditionSound(0, 9));
@@ -362,7 +362,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Lavitz_Harpoon() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(2);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 17, 11, 3, 75, 30, 8, 0, 0, 2, 5, 7, 16, 32, 0, fc ? 10 : 11, new AdditionSound(5, 11), new AdditionSound(0, 9));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 25, 13, 2, 25, 5, 0, 4, -8, 0, 8, 12, 14, 32, 0, 0, new AdditionSound(8, 13), new AdditionSound(3, 11));
     adjustHitOverlayStartingOffset(additionHitProperties);
@@ -378,7 +378,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Lavitz_SpinningCane() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(3);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 17, 11, 3, 50, 15, 9, 0, 2, 2, 5, 7, 16, 32, 0, fc ? 10 : 11, new AdditionSound(5, 11), new AdditionSound(0, 9));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 22, 16, 3, 25, 10, 0, 0, 0, 0, 17, 5, 16, 32, 0, 0, new AdditionSound(9, 16), new AdditionSound(1, 14));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 25, 20, 2, 25, 10, 0, 4, -4, 10, 8, 5, 17, 32, 0, 0, new AdditionSound(10, 20), new AdditionSound(3, 18), new AdditionSound(7, 4), new AdditionSound(7, 10), new AdditionSound(5, 11), new AdditionSound(0, 9));
@@ -395,7 +395,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Lavitz_RodTyphoon() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(5);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 17, 11, 3, 30, 6, 10, 0, 2, 2, 5, 7, 16, 32, 0, fc ? 10 : 11, new AdditionSound(5, 11), new AdditionSound(0, 9));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 19, 13, 3, 30, 6, 0, 0, -3, 11, 7, 3, 15, 32, 0, fc ? 1 : 0, new AdditionSound(8, 14), new AdditionSound(1, 12));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 13, 7, 3, 30, 6, 0, 0, -2, 0, 9, 11, 12, 32, 0, 0, new AdditionSound(8, 7), new AdditionSound(2, 5));
@@ -414,7 +414,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Lavitz_GustOfWindDance() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(7);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 17, 11, 3, 30, 5, 11, 0, 0, 2, 5, 7, 16, 32, 0, fc ? 10 : 11, new AdditionSound(5, 11), new AdditionSound(0, 9));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 29, 14, 3, 30, 5, 0, 0, 0, 0, 29, 6, 15, 32, 0, 0, new AdditionSound(8, 14), new AdditionSound(1, 12));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 22, 15, 3, 30, 5, 0, 0, 0, 4, 11, 23, 9, 32, 0, 0, new AdditionSound(12, 15), new AdditionSound(3, 13));
@@ -435,7 +435,7 @@ public final class AdditionConfigs {
   }
 
   public static MasterAddition createAdditionHits_Lavitz_FlowerStorm() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(8);
     additionHitProperties[0] = createAdditionHitProperties(0xe0, 17, 11, 3, 30, 8, 12, 0, 0, 2, 5, 7, 16, 32, 0, fc ? 10 : 11, new AdditionSound(5, 11), new AdditionSound(0, 9));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 19, 13, 3, 30, 8, 0, 0, 0, 0, 0, 0, 18, 32, 18, 0, new AdditionSound(10, 13), new AdditionSound(1, 11));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 27, 20, 2, 30, 8, 0, 0, 0, 14, 12, 12, 12, 32, 0, fc ? 1 : 0, new AdditionSound(13, 20), new AdditionSound(2, 19));
@@ -457,7 +457,7 @@ public final class AdditionConfigs {
   }
 
   public static AdditionHits80 createAdditionHits_Unknown2() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 2, 0, 0, 100, 0, 13, 0, 0, 0, 1, 7, 10, 32, 18, 11, new AdditionSound(5, 5), new AdditionSound(0, 3));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 14, 5, 0, 10, 0, 0, 0, 0, 0, 0, 0, 7, 32, 0, 0, new AdditionSound(4, 11), new AdditionSound(2, 9));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 32, 25, 0, 20, 0, 0, 0, 0, 4, 21, 2, 7, 32, 0, 0, new AdditionSound(5, 5), new AdditionSound(0, 3));
@@ -469,7 +469,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Rose_WhipSmack() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(2);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 11, 5, 3, 75, 30, 14, 0, 3, 2, 2, 9, 12, 32, 0, fc ? 10 : 11, new AdditionSound(5, 5), new AdditionSound(0, 3));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 16, 11, 2, 25, 5, 0, 4, 0, 0, 0, 0, 8, 32, 0, 0, new AdditionSound(4, 11), new AdditionSound(2, 9));
     adjustHitOverlayStartingOffset(additionHitProperties);
@@ -485,7 +485,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Rose_MoreAndMore() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(3);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 11, 5, 3, 50, 10, 15, 0, 3, 2, 2, 5, 12, 32, 0, fc ? 10 : 11, new AdditionSound(5, 5), new AdditionSound(0, 3));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 15, 9, 3, 50, 10, 0, 0, -4, 8, 2, 7, 8, 32, 0, 0, new AdditionSound(7, 9), new AdditionSound(1, 7));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 33, 8, 2, 50, 10, 0, 4, 0, 6, 2, 11, 6, 32, 0, 0, new AdditionSound(10, 8), new AdditionSound(3, 6));
@@ -502,7 +502,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Rose_HardBlade() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 11, 5, 3, 20, 10, 16, 0, 0, 2, 2, 9, 12, 32, 0, fc ? 10 : 11, new AdditionSound(5, 5), new AdditionSound(0, 3));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 17, 11, 3, 20, 5, 0, 0, 0, 10, 2, 8, 8, 32, 0, 0, new AdditionSound(4, 12), new AdditionSound(1, 10));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 22, 16, 2, 20, 5, 0, 0, 0, 0, 2, 0, 12, 32, 18, 0, new AdditionSound(8, 16), new AdditionSound(2, 14));
@@ -522,7 +522,7 @@ public final class AdditionConfigs {
   }
 
   public static MasterAddition createAdditionHits_Rose_DemonsDance() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(8);
     additionHitProperties[0] = createAdditionHitProperties(0xe0, 11, 5, 3, 30, 20, 17, 0, 0, 2, 2, 9, 12, 32, 0, fc ? 10 : 11, new AdditionSound(5, 5), new AdditionSound(0, 3));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 12, 6, 3, 30, 20, 0, 0, 0, 0, 0, 0, 10, 32, 0, 0, new AdditionSound(9, 7), new AdditionSound(1, 5));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 14, 9, 2, 30, 10, 0, 0, 0, 6, 3, 8, 10, 32, 0, fc ? 1 : 0, new AdditionSound(4, 9), new AdditionSound(3, 7));
@@ -544,7 +544,7 @@ public final class AdditionConfigs {
   }
 
   public static AdditionHits80 createAdditionHits_Unknown3() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 0, 0, 0, 100, 0, 18, 0, 0, 0, 0, 0, 12, 0, 0, 0, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, new AdditionSound(10, 3), new AdditionSound(1, 1));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, new AdditionSound(4, 9), new AdditionSound(0, 7));
@@ -556,7 +556,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Kongol_Pursuit() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(2);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 8, fc ? 1 : 2, 3, 75, 30, 19, 0, 10, 0, 0, 0, 16, 32, 0, 11, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 30, 21, 2, 25, 5, 0, 4, -10, 0, 0, 0, 2, 32, 0, 0, new AdditionSound(10, 21), new AdditionSound(3, 19));
     adjustHitOverlayStartingOffset(additionHitProperties);
@@ -572,7 +572,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Kongol_Inferno() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(4);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 8, fc ? 1 : 2, 3, 40, 5, 20, 0, 15, 0, 0, 0, 20, 32, 0, 11, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 56, fc ? 45 : 46, 3, 20, 5, 0, 0, 15, 0, 0, 0, 15, 32, 0, 0, new AdditionSound(9, 46), new AdditionSound(1, 44), new AdditionSound(7, 26), new AdditionSound(7, 39), new AdditionSound(10, 3), new AdditionSound(2, 1));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 9, fc ? 2 : 3, 3, 20, 5, 0, 0, -8, 0, 1, 12, 18, 32, 0, 0, new AdditionSound(10, 3), new AdditionSound(2, 1));
@@ -590,7 +590,7 @@ public final class AdditionConfigs {
   }
 
   public static MasterAddition createAdditionHits_Kongol_BoneCrush() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xe0, 8, fc ? 1 : 2, 3, 50, 20, 21, 0, 10, 0, 0, 0, 20, 32, 0, 11, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 19, fc ? 12 : 13, 3, 30, 20, 0, 0, 0, 11, 2, 7, 15, 32, 0, 0, new AdditionSound(4, 14), new AdditionSound(1, 12));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 10, 5, 2, 30, 20, 0, 0, -3, 3, 2, 3, 15, 32, 0, 0, new AdditionSound(11, 5), new AdditionSound(1, 3));
@@ -610,7 +610,7 @@ public final class AdditionConfigs {
   }
 
   public static AdditionHits80 createAdditionHits_Unknown4() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 0, 0, 0, 100, 0, 22, 0, 0, 0, 0, 0, 7, 0, 0, 0, new AdditionSound(0, 0), new AdditionSound(0, 0), new AdditionSound(0, 0), new AdditionSound(0, 0), new AdditionSound(0, 0), new AdditionSound(0, 0), new AdditionSound(0, 0), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, new AdditionSound(0, 0), new AdditionSound(0, 0), new AdditionSound(0, 0), new AdditionSound(0, 0));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0);
@@ -622,7 +622,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Meru_DoubleSmack() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(2);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 7, 1, 3, 75, 10, 23, 0, 0, 0, 0, 0, 9, 32, 18, fc ? 12 : 13, new AdditionSound(4, 1), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 21, 6, 2, 25, 10, 0, 4, -6, 0, 6, 5, 10, 32, 0, 0, new AdditionSound(5, 6), new AdditionSound(3, 4));
     adjustHitOverlayStartingOffset(additionHitProperties);
@@ -638,7 +638,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Meru_HammerSpin() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(4);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 7, 1, 3, 50, 20, 24, 0, 0, 0, 0, 0, 9, 32, 18, fc ? 12 : 13, new AdditionSound(4, 1), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 26, fc ? 7 : 8, 3, 50, 5, 0, 0, 0, 6, 12, 8, 10, 32, 0, 0, new AdditionSound(8, 8), new AdditionSound(1, 6));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 11, fc ? 2 : 3, 3, 25, 5, 0, 0, 0, 0, 3, 3, 9, 32, 0, 0, new AdditionSound(15, 3), new AdditionSound(0, 1));
@@ -656,7 +656,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Meru_CoolBoogie() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(5);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 7, 1, 3, 20, 12, 25, 0, 0, 0, 0, 0, 9, 32, 18, fc ? 12 : 13, new AdditionSound(4, 1), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 19, 8, 3, 20, 12, 0, 0, -7, 0, 9, 6, 9, 32, 0, 0, new AdditionSound(8, 8), new AdditionSound(1, 6));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 34, fc ? 16 : 17, 3, 20, 12, 0, 0, 3, 6, 11, 20, 10, 32, 0, 0, new AdditionSound(9, 17), new AdditionSound(2, 15), new AdditionSound(7, 30), new AdditionSound(7, 33), new AdditionSound(10, 2), new AdditionSound(0, 0));
@@ -675,7 +675,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Meru_CatsCradle() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(7);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 7, 1, 3, 30, 3, 26, 0, 0, 0, 0, 0, 9, 32, 18, fc ? 12 : 13, new AdditionSound(4, 1), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 12, 6, 3, 20, 3, 0, 0, 0, 5, 3, 1, 12, 32, 0, fc ? 1 : 0, new AdditionSound(10, 7), new AdditionSound(1, 5));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 16, fc ? 8 : 9, 3, 20, 3, 0, 0, 0, 0, 11, 6, 15, 32, 0, 0, new AdditionSound(5, 9), new AdditionSound(0, 7));
@@ -696,7 +696,7 @@ public final class AdditionConfigs {
   }
 
   public static MasterAddition createAdditionHits_Meru_PerkyStep() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(8);
     additionHitProperties[0] = createAdditionHitProperties(0xe0, 7, 1, 3, 30, 20, 27, 0, 0, 0, 0, 0, 9, 32, 18, fc ? 12 : 13, new AdditionSound(4, 1), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 24, 16, 3, 30, 20, 0, 0, 0, 6, 14, 10, 14, 32, 0, 0, new AdditionSound(5, 16), new AdditionSound(1, 14));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 21, 1, 2, 30, 10, 0, 0, 0, 0, 4, 7, 14, 32, 19, fc ? 1 : 0, new AdditionSound(9, 1), new AdditionSound(1, 0));
@@ -718,7 +718,7 @@ public final class AdditionConfigs {
   }
 
   public static AdditionHits80 createAdditionHits_Unknown5() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 0, 0, 0, 100, 0, 28, 0, 0, 0, 0, 0, 6, 0, 0, 0, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, new AdditionSound(10, 21), new AdditionSound(3, 19));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, new AdditionSound(5, 2), new AdditionSound(0, 0));
@@ -730,7 +730,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Haschel_DoublePunch() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(2);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 75, 30, 29, 0, 0, 0, 0, 0, 8, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 23, 3, 2, 25, 5, 0, 4, 0, 0, 0, 0, 8, 32, 0, 0, new AdditionSound(10, 3), new AdditionSound(1, 1));
     adjustHitOverlayStartingOffset(additionHitProperties);
@@ -746,7 +746,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Haschel_FlurryOfStyx() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(3);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 100, 10, 30, 0, 0, 0, 0, 0, 8, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 19, 3, 3, 25, 5, 0, 0, -8, 0, 0, 0, 10, 32, 0, 0, new AdditionSound(10, 3), new AdditionSound(0, 1));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 51, 42, 2, 25, 5, 0, 4, -8, 3, 3, 0, 13, 32, 0, 0, new AdditionSound(11, 42), new AdditionSound(3, 40));
@@ -763,7 +763,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Haschel_Summon4Gods() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(4);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 25, 20, 31, 0, 0, 0, 0, 0, 8, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 15, 9, 3, 25, 10, 0, 0, -3, 0, 0, 0, 5, 32, 19, fc ? 1 : 0, new AdditionSound(9, 10), new AdditionSound(1, 8));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 19, fc ? 9 : 11, 3, 25, 10, 0, 0, 0, 0, 9, 8, 5, 32, 0, 0, new AdditionSound(5, 11), new AdditionSound(2, 9));
@@ -781,7 +781,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Haschel_5RingShattering() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(5);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 30, 7, 32, 0, 0, 0, 0, 0, 8, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 15, 9, 3, 30, 7, 0, 0, 0, 6, 3, 5, 4, 32, 0, fc ? 1 : 0, new AdditionSound(4, 10), new AdditionSound(1, 8));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 12, 6, 2, 30, 7, 0, 0, -3, 4, 2, 3, 5, 32, 0, 0, new AdditionSound(8, 6), new AdditionSound(1, 4));
@@ -800,7 +800,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Haschel_HexHammer() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(7);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 15, 9, 3, 30, 3, 33, 0, 0, 0, 0, 0, 8, 32, 0, fc ? 10 : 11, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 13, 7, 3, 30, 2, 0, 0, 0, 4, 2, 5, 8, 32, 0, fc ? 1 : 0, new AdditionSound(5, 8), new AdditionSound(1, 6));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 13, 4, 2, 30, 2, 0, 0, 0, 3, 1, 3, 8, 0, 0, fc ? 1 : 0, new AdditionSound(9, 4), new AdditionSound(2, 2));
@@ -821,7 +821,7 @@ public final class AdditionConfigs {
   }
 
   public static MasterAddition createAdditionHits_Haschel_OmniSweep() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(8);
     additionHitProperties[0] = createAdditionHitProperties(0xe0, 15, 9, 3, 30, 8, 34, 0, 0, 0, 0, 0, 8, 32, 0, fc ? 10 : 11, new AdditionSound(4, 8), new AdditionSound(0, 6));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 18, fc ? 7 : 8, 2, 30, 6, 0, 0, 0, 5, 3, 4, 5, 0, 0, fc ? 1 : 0, new AdditionSound(9, 8), new AdditionSound(1, 6));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 12, fc ? 2 : 3, 3, 30, 6, 0, 0, 0, 0, 2, 1, 10, 0, 0, 0, new AdditionSound(8, 2), new AdditionSound(2, 0));
@@ -843,7 +843,7 @@ public final class AdditionConfigs {
   }
 
   public static AdditionHits80 createAdditionHits_Unknown6() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 0, 0, 0, 100, 0, 35, 0, 0, 0, 0, 0, 6, 0, 0, 0, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, new AdditionSound(8, 15), new AdditionSound(3, 13));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, new AdditionSound(9, 19), new AdditionSound(1, 17), new AdditionSound(7, 13), new AdditionSound(7, 15), new AdditionSound(10, 4), new AdditionSound(3, 2));
@@ -855,7 +855,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Albert_Harpoon() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(2);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 8, 2, 3, 75, 30, 36, 0, 5, 0, 1, 0, 19, 32, 0, fc ? 10 : 11, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 44, 15, 2, 25, 5, 0, 4, 0, 3, 10, 3, 10, 32, 0, 0, new AdditionSound(8, 15), new AdditionSound(3, 13));
     adjustHitOverlayStartingOffset(additionHitProperties);
@@ -871,7 +871,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Albert_SpinningCane() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(3);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 8, 2, 3, 50, 15, 37, 0, 5, 0, 1, 0, 19, 32, 0, fc ? 10 : 11, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 24, fc ? 17 : 19, 3, 25, 10, 0, 0, 4, 0, 4, 0, 8, 32, 0, 0, new AdditionSound(9, 19), new AdditionSound(1, 17), new AdditionSound(7, 13), new AdditionSound(7, 15), new AdditionSound(10, 4), new AdditionSound(3, 2));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 20, 4, 2, 25, 10, 0, 4, 0, 0, 0, 0, 6, 32, 0, 0, new AdditionSound(10, 4), new AdditionSound(3, 2));
@@ -888,7 +888,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Albert_RodTyphoon() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(5);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 8, 2, 3, 30, 6, 38, 0, 0, 0, 1, 3, 19, 32, 0, fc ? 10 : 11, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 31, fc ? 21 : 22, 3, 30, 6, 0, 0, 5, 0, 20, 0, 16, 32, 0, 0, new AdditionSound(8, 22), new AdditionSound(1, 20));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 11, fc ? 3 : 4, 3, 30, 6, 0, 0, 0, 0, 0, 0, 16, 32, 0, 0, new AdditionSound(8, 4), new AdditionSound(2, 2));
@@ -907,7 +907,7 @@ public final class AdditionConfigs {
   }
 
   public static LevelLockedAddition createAdditionHits_Albert_GustOfWindDance() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(7);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 8, 2, 3, 30, 5, 39, 0, 5, 0, 1, 0, 19, 32, 0, fc ? 10 : 11, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 33, fc ? 18 : 19, 3, 30, 5, 0, 0, -3, 17, 2, 4, 11, 32, 0, 0, new AdditionSound(8, 19), new AdditionSound(2, 17));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 32, fc ? 14 : 15, 3, 30, 5, 0, 0, 3, 10, 3, 15, 17, 32, 0, 0, new AdditionSound(12, 15), new AdditionSound(3, 13), new AdditionSound(7, 3));
@@ -928,7 +928,7 @@ public final class AdditionConfigs {
   }
 
   public static MasterAddition createAdditionHits_Albert_FlowerStorm() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(8);
     additionHitProperties[0] = createAdditionHitProperties(0xe0, 8, 2, 3, 30, 8, 40, 0, 0, 0, 1, 0, 19, 32, 0, fc ? 10 : 11, new AdditionSound(5, 2), new AdditionSound(0, 0));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 26, 12, 3, 30, 8, 0, 0, -12, 10, 6, 8, 10, 32, 0, 0, new AdditionSound(10, 12), new AdditionSound(3, 10));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 17, 3, 2, 30, 8, 0, 0, 12, 0, 3, 22, 13, 32, 0, fc ? 1 : 0, new AdditionSound(13, 3), new AdditionSound(2, 1), new AdditionSound(7, 0));
@@ -950,7 +950,7 @@ public final class AdditionConfigs {
   }
 
   public static AdditionHits80 createAdditionHits_Unknown7() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 0, 0, 0, 100, 0, 41, 0, 0, 0, 0, 0, 12, 0, 18, 0);
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0);
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0);
@@ -962,7 +962,7 @@ public final class AdditionConfigs {
   }
 
   public static AdditionHits80 createAdditionHits_Unknown8() {
-    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray();
+    final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(6);
     additionHitProperties[0] = createAdditionHitProperties(0xc0, 0, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new AdditionSound(4, 9), new AdditionSound(0, 7));
     additionHitProperties[1] = createAdditionHitProperties(0xc0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new AdditionSound(5, 11), new AdditionSound(3, 9));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new AdditionSound(4, 9), new AdditionSound(0, 7));
