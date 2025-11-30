@@ -51,7 +51,6 @@ public class AdditionNameTextEffect1c implements ScriptedObject {
   @Method(0x800d37dcL)
   private void renderAdditionNameChar(final int x, final int y, final String additionName, final int charOffset, final int brightness) {
     int charIndex = 0;
-    final String additionName = getAdditionName(additionId);
 
     //LAB_800d3838
     int chr;

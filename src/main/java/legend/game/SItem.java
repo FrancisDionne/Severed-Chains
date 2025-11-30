@@ -78,8 +78,13 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.DEFAULT_FONT;
@@ -108,30 +113,6 @@ import static legend.game.Menus.renderablePtr_800bdba8;
 import static legend.game.Menus.uiFile_800bdc3c;
 import static legend.game.Menus.unloadRenderable;
 import static legend.game.Scus94491BpeSegment.simpleRand;
-import static legend.game.Scus94491BpeSegment.stopAndResetSoundsAndSequences;
-import static legend.game.Scus94491BpeSegment.unloadSoundFile;
-import static legend.game.Scus94491BpeSegment_8002.allocateRenderable;
-import static legend.game.Scus94491BpeSegment_8002.clearCharacterStats;
-import static legend.game.Scus94491BpeSegment_8002.clearEquipmentStats;
-import static legend.game.Scus94491BpeSegment_8002.copyPlayingSounds;
-import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
-import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryEquipments;
-import static legend.game.Scus94491BpeSegment_8002.getUniqueInventoryItems;
-import static legend.game.Scus94491BpeSegment_8002.giveEquipment;
-import static legend.game.Scus94491BpeSegment_8002.giveItem;
-import static legend.game.Scus94491BpeSegment_8002.loadMenuTexture;
-import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
-import static legend.game.Scus94491BpeSegment_8002.sssqResetStuff;
-import static legend.game.Scus94491BpeSegment_8002.takeEquipmentId;
-import static legend.game.Scus94491BpeSegment_8002.takeItem;
-import static legend.game.Scus94491BpeSegment_8002.unloadRenderable;
-import static legend.game.Scus94491BpeSegment_8004.additionCounts_8004f5c0;
-import static legend.game.Scus94491BpeSegment_8004.additionOffsets_8004f5ac;
-import static legend.game.Scus94491BpeSegment_8004.currentEngineState_8004dd04;
-import static legend.game.Scus94491BpeSegment_8004.engineState_8004dd20;
-import static legend.game.Scus94491BpeSegment_8004.stopMusicSequence;
-import static legend.game.Scus94491BpeSegment_8005.additionData_80052884;
 import static legend.game.Scus94491BpeSegment_8004.CHARACTER_ADDITIONS;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
 import static legend.game.Scus94491BpeSegment_800b.characterStatsLoaded_800be5d0;
@@ -145,7 +126,6 @@ import static legend.game.Text.textZ_800bdf00;
 import static legend.game.combat.Battle.seed_800fa754;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
-import static legend.game.modding.coremod.CoreMod.ITEM_GROUP_SORT_MODE;
 import static legend.lodmod.LodGoods.BLUE_DRAGOON_SPIRIT;
 import static legend.lodmod.LodGoods.DARK_DRAGOON_SPIRIT;
 import static legend.lodmod.LodGoods.DIVINE_DRAGOON_SPIRIT;
@@ -174,6 +154,7 @@ public final class SItem {
   public static final FontOptions UI_WHITE_SMALL = new FontOptions().colour(TextColour.WHITE).size(0.67f);
 
   public static int shopId_8007a3b4;
+  public static final int EQUIPMENT_MAX_AMOUNT = 255;
 
   public static final RegistryDelegate<Good>[] characterDragoonIndices_800c6e68 = new RegistryDelegate[10];
   static {
@@ -714,8 +695,30 @@ public final class SItem {
     return true;
   }
 
+  public static boolean isItemInventoryFull()
+  {
+    return getInventoryItemCount() >= CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get());
+  }
+
+  public static boolean isEquipmentInventoryFull()
+  {
+    return getInventoryEquipmentCount() >= EQUIPMENT_MAX_AMOUNT;
+  }
+
+  public static int getRemainingInventoryItemSpace() {
+    return org.joml.Math.max(0, CONFIG.getConfig(CoreMod.INVENTORY_SIZE_CONFIG.get()) - getInventoryItemCount());
+  }
+
+  public static int getRemainingInventoryEquipmentSpace() {
+    return org.joml.Math.max(0, EQUIPMENT_MAX_AMOUNT - getInventoryEquipmentCount());
+  }
+
   @Method(0x80023484L)
   public static boolean giveItem(final Item item) {
+    if(isItemInventoryFull()) {
+      return false;
+    }
+
     return gameState_800babc8.items_2e9.give(item).isEmpty();
   }
 
@@ -729,6 +732,10 @@ public final class SItem {
 
   @Method(0x80023484L)
   public static boolean giveEquipment(final Equipment equipment) {
+    if(isEquipmentInventoryFull()) {
+      return false;
+    }
+
     final GiveEquipmentEvent event = EVENTS.postEvent(new GiveEquipmentEvent(equipment, Collections.unmodifiableList(gameState_800babc8.equipment_1e8), 255));
 
     if(event.isCanceled() || event.givenEquipment.isEmpty()) {
@@ -789,6 +796,8 @@ public final class SItem {
       gameState_800babc8.gold_94 = 99999999;
     }
 
+    Statistics.appendStat(Statistics.Stats.GOLD, amount);
+
     //LAB_8002366c
     return 0;
   }
@@ -845,19 +854,64 @@ public final class SItem {
   }
 
   @Method(0x80023a2cL)
-  public static <T extends InventoryEntry> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items, final int count, final List<String> retailSorting) {
-    display.sort(menuItemIconComparator(retailSorting, InventoryEntry::getRegistryId));
-    setInventoryFromDisplay(display, items, count);
-  }
-
-  @Method(0x80023a2cL)
   public static void sortItems(final List<MenuEntryStruct04<ItemStack>> display, final Inventory items, final int count, final List<String> retailSorting) {
     display.sort(menuItemIconComparator(retailSorting, stack -> stack.getItem().getRegistryId()));
     setInventoryFromDisplay(display, items, count);
   }
 
+  public static <T extends InventoryEntry> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items, final List<String> retailSorting) {
+    display.sort(menuItemIconComparator(retailSorting, InventoryEntry::getRegistryId));
+    sortItems(items);
+  }
+
+  @Method(0x80023a2cL)
+  public static <T extends InventoryEntry> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items) {
+    display.sort(menuItemIconComparator());
+    sortItems(items);
+  }
+
+  public static <T extends InventoryEntry> List<T> sortItems(final List<T> list) {
+    final Comparator<T> comparator = Comparator
+      .comparingInt((T item) -> item.getIcon().resolve().icon)
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    return list.stream().sorted(comparator).collect(Collectors.toList());
+  }
+
+  public static List<Equipment> sortEquipmentByAlpha(final List<Equipment> list) {
+    final Comparator<Equipment> comparator = Comparator
+      .comparing((Equipment item) -> item.slot.ordinal())
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    return list.stream().sorted(comparator).collect(Collectors.toList());
+  }
+
+  public static List<Equipment> sortEquipmentByPower(final List<Equipment> list) {
+    final Comparator<Equipment> comparator = Comparator
+      .comparing((Equipment item) -> item.slot.ordinal())
+      .thenComparing(x -> {
+        if(x.slot == EquipmentSlot.WEAPON) {
+          return x.attack1_0a + x.magicAttack_11 + x.attackHit_14 + x.magicHit_15 + x.speed_0f;
+        }
+        return x.defence_12 + x.magicDefence_13 + x.attackAvoid_16 + x.magicAvoid_17 + x.speed_0f;
+      }, Comparator.reverseOrder())
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    return list.stream().sorted(comparator).collect(Collectors.toList());
+  }
+
+  public static List<Equipment> sortEquipmentByIcon(final List<Equipment> list) {
+    final Comparator<Equipment> comparator = Comparator
+      .comparing((Equipment item) -> item.getIcon().resolve().icon)
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+    return list.stream().sorted(comparator).collect(Collectors.toList());
+  }
+
+  public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemIconComparator() {
+    return Comparator
+      .comparingInt((MenuEntryStruct04<T> item) -> item.item_00.getIcon().resolve().icon)
+      .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
+  }
+
   public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemIconComparator(final List<String> retailSorting, final Function<T, RegistryId> idExtractor) {
-    final boolean retail = CONFIG.getConfig(ITEM_GROUP_SORT_MODE.get()) == ItemGroupSortMode.RETAIL;
+    final boolean retail = true; //CONFIG.getConfig(ITEM_GROUP_SORT_MODE.get()) == ItemGroupSortMode.RETAIL;
 
     Comparator<MenuEntryStruct04<T>> comparator = Comparator.comparingInt(item -> item.item_00.getIcon().resolve().icon);
 
@@ -888,14 +942,24 @@ public final class SItem {
     return comparator;
   }
 
-  public static Comparator<MenuEntryStruct04<Equipment>> menuEquipmentSlotComparator() {
-    return Comparator
-      .comparingInt((MenuEntryStruct04<Equipment> equipment) -> equipment.item_00.slot.ordinal())
-      .thenComparing(equipment -> I18n.translate(equipment.getNameTranslationKey()));
+  public static void sortEquipmentInventory(final int sortType) {
+    final List<Equipment> list = switch(sortType) {
+      case 1 -> sortEquipmentByPower(gameState_800babc8.equipment_1e8);
+      case 2 -> sortEquipmentByIcon(gameState_800babc8.equipment_1e8);
+      default -> sortEquipmentByAlpha(gameState_800babc8.equipment_1e8);
+    };
+    gameState_800babc8.equipment_1e8.clear();
+    gameState_800babc8.equipment_1e8.addAll(list);
+  }
+
+  public static void sortItemInventory() {
+    final List<ItemStack> list = sortItems(gameState_800babc8.items_2e9.stacks);
+    gameState_800babc8.items_2e9.clear();
+    gameState_800babc8.items_2e9.stacks.addAll(list);
   }
 
   @Method(0x80023a88L)
-  public static void sortItems() {
+  public static void sortBattleItems() {
     final List<MenuEntryStruct04<ItemStack>> items = new ArrayList<>();
 
     for(final ItemStack stack : gameState_800babc8.items_2e9) {
@@ -2549,5 +2613,56 @@ public final class SItem {
         characterStats.equipmentEscapeBonus_56 += event.escapeBonus;
       }
     }
+  }
+
+  public static <T extends InventoryEntry> int getInventoryEntryQuantity(final T entry) {
+    if(entry instanceof ItemStack) {
+      final List<ItemStack> list = gameState_800babc8.items_2e9.stacks;
+      int quantity = 0;
+      for(int i = 0; i < list.size(); i++) {
+        final ItemStack stack = list.get(i);
+        if(stack.getItem().getRegistryId().equals(entry.getRegistryId())) {
+          quantity += stack.getSize();
+        }
+      }
+      return quantity;
+    } else {
+      return (int)gameState_800babc8.equipment_1e8.stream().filter((e) -> compareInventoryEntries((InventoryEntry)e, entry)).count();
+    }
+  }
+
+  public static <T extends InventoryEntry> int getFirstIndexOfInventoryEntry(final RegistryId entry, final boolean isItem) {
+    final List<?> list = isItem ? gameState_800babc8.items_2e9.stacks : gameState_800babc8.equipment_1e8;
+    final int index = (int)list.stream().takeWhile((e) -> !compareInventoryEntries(((InventoryEntry)e).getRegistryId(), entry)).count();
+    return index < list.size() ? index : -1;
+  }
+
+  public static <T extends InventoryEntry> boolean compareInventoryEntries(final T entry1, final T entry2) {
+    return Objects.equals(entry1.getRegistryId(), entry2.getRegistryId());
+  }
+
+  public static <T extends InventoryEntry> boolean compareInventoryEntries(final RegistryId entry1, final RegistryId entry2) {
+    return Objects.equals(entry1, entry2);
+  }
+
+  public static <T> Predicate<T> distinctByKey(final Function<? super T, ?> keyExtractor) {
+    final Set<Object> seen = ConcurrentHashMap.newKeySet();
+    return t -> seen.add(keyExtractor.apply(t));
+  }
+
+  public static List<ItemStack> getUniqueInventoryItems() {
+    return gameState_800babc8.items_2e9.stacks.stream().filter(distinctByKey(ItemStack::getRegistryId)).toList();
+  }
+
+  public static List<Equipment> getUniqueInventoryEquipments() {
+    return gameState_800babc8.equipment_1e8.stream().distinct().toList();
+  }
+
+  public static int getInventoryItemCount() {
+    return getUniqueInventoryItems().stream().mapToInt(SItem::getInventoryEntryQuantity).sum();
+  }
+
+  public static int getInventoryEquipmentCount() {
+    return getUniqueInventoryEquipments().stream().mapToInt(SItem::getInventoryEntryQuantity).sum();
   }
 }

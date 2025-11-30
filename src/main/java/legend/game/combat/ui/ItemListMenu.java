@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static legend.core.GameEngine.EVENTS;
-import static legend.game.Scus94491BpeSegment_8002.getInventoryEntryQuantity;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
+import static legend.game.SItem.getInventoryEntryQuantity;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Text.renderText;
 

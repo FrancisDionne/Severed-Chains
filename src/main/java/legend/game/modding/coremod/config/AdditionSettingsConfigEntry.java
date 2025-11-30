@@ -11,7 +11,7 @@ import legend.game.saves.ConfigStorageLocation;
 
 import java.util.Set;
 
-import static legend.game.Scus94491BpeSegment.startFadeEffect;
+import static legend.game.FullScreenEffects.startFadeEffect;
 
 public class AdditionSettingsConfigEntry extends ConfigEntry<Void> {
   public AdditionSettingsConfigEntry() {

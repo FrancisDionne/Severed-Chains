@@ -240,6 +240,7 @@ import static legend.game.SItem.giveEquipment;
 import static legend.game.SItem.giveItem;
 import static legend.game.SItem.loadCharacterStats;
 import static legend.game.SItem.menuStack;
+import static legend.game.SItem.sortBattleItems;
 import static legend.game.SItem.sortItems;
 import static legend.game.Scus94491BpeSegment.FUN_80013404;
 import static legend.game.Scus94491BpeSegment.battlePreloadedEntities_1f8003f4;
@@ -275,6 +276,7 @@ import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 import static legend.game.Scus94491BpeSegment_800b.tickCount_800bb0fc;
 import static legend.game.Scus94491BpeSegment_800b.totalXpFromCombat_800bc95c;
 import static legend.game.Scus94491BpeSegment_800b.unlockedUltimateAddition_800bc910;
+import static legend.game.Text.scriptDeallocateAllTextboxes;
 import static legend.game.combat.Monsters.enemyRewards_80112868;
 import static legend.game.combat.Monsters.getMonsterStats_8010ba98;
 import static legend.game.combat.Monsters.monsterNames_80112068;
@@ -3645,9 +3647,9 @@ public class Battle extends EngineState {
     this.hud.renderDamage(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[0].get(), script.params_20[1].get());
 
     if (script.params_20[1].get() == -1) {
-      Statistics.appendStat((BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00, Statistics.Stats.TOTAL_EVADE, 1);
+      Statistics.appendStat(SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class), Statistics.Stats.TOTAL_EVADE, 1);
     } else if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null) {
-      if(this.currentTurnBent_800c66c8.innerStruct_00 instanceof PlayerBattleEntity && scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00 instanceof final PlayerBattleEntity player) {
+      if(this.currentTurnBent_800c66c8.innerStruct_00 instanceof PlayerBattleEntity && SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class) instanceof final PlayerBattleEntity player) {
         Statistics.appendStat(player, Statistics.Stats.TOTAL_PHYSICAL_TAKEN, script.params_20[1].get());
       }
     }
@@ -3749,15 +3751,15 @@ public class Battle extends EngineState {
   @ScriptEnum(BattleEntityStat.class)
   @Method(0x800ccda0L)
   public FlowControl scriptSetBentRawStat(final RunningScript<?> script) {
-    final BattleEntity27c bent = SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class);
     final BattleEntityStat stat = BattleEntityStat.fromLegacy(Math.max(0, script.params_20[2].get()));
-    final int[] storage44 = scriptStatePtrArr_800bc1c0[script.params_20[0].get()].storage_44;
+    final BattleEntity27c bent = SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class);
+    final ScriptState<?> bentState = SCRIPTS.getState(script.params_20[0].get());
     int value = script.params_20[1].get();
 
     if(this.currentTurnBent_800c66c8.innerStruct_00 != null) {
       //Disables revive in combat if perma death on
-      if(PermaDeathConfigEntry.isBlockRevive(stat, bent, this.currentTurnBent_800c66c8, value, (storage44[7] & FLAG_DEAD) != 0)) {
-        storage44[7] |= FLAG_DEAD;
+      if(PermaDeathConfigEntry.isBlockRevive(stat, bent, this.currentTurnBent_800c66c8, value, (bentState.hasFlag(FLAG_DEAD)))) {
+        bentState.setFlag(FLAG_DEAD);
         return FlowControl.CONTINUE;
       }
 
@@ -3971,6 +3973,7 @@ public class Battle extends EngineState {
           additionStats.xp = additionXp;
         }
       }
+    }
 
     //LAB_800cd3ac
     return FlowControl.CONTINUE;
@@ -4734,7 +4737,7 @@ public class Battle extends EngineState {
       final Addition addition = REGISTRIES.additions.getEntry(gameState_800babc8.charData_32c[script.params_20[0].get()].selectedAddition_19).get();
       final ScriptState<AdditionNameTextEffect1c> state = SCRIPTS.allocateScriptState("AdditionNameTextEffect1c", additionStruct);
       state.loadScriptFile(doNothingScript_8004f650);
-      state.setTicker((s, effect) -> additionStruct.tickAdditionNameEffect(s, this._800faa9d));
+      state.setTicker((s, effect) -> additionStruct.tickAdditionNameEffect(s, this._800faa9d, 0));
       final String additionName = I18n.translate(addition);
 
       //LAB_800d3e5c
@@ -7852,7 +7855,7 @@ public class Battle extends EngineState {
       spGained_800bc950[charSlot] = 0;
     }
 
-    Scus94491BpeSegment_8002.sortBattleItems();
+    sortBattleItems();
   }
 
   @Method(0x800ee8c4L)
@@ -8673,7 +8676,7 @@ public class Battle extends EngineState {
   @Method(0x800f984cL)
   public FlowControl scriptRenderRecover(final RunningScript<?> script) {
     final BattleEntity27c currentTurnBent = this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null;
-    final BattleEntity27c bent = (BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00;
+    final BattleEntity27c bent = SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class);
     final int value = GameplayBalanceConfigEntry.adjustValue(currentTurnBent, bent.charId_272, this.lastSelectedAction, playerLastActions, script.params_20[1].get(), false);
     this.hud.addFloatingNumberForBent(currentTurnBent, script.params_20[0].get(), value, script.params_20[2].get());
     Statistics.appendRecoverStat(currentTurnBent, value, script.params_20[2].get());

@@ -18,7 +18,7 @@ import java.util.List;
 
 import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.core.GameEngine.RENDERER;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
+import static legend.game.Text.renderText;
 
 public final class TurnOrderHud {
   private static final Matrix4f m = new Matrix4f();

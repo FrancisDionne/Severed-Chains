@@ -4,7 +4,6 @@ import legend.core.MathHelper;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
 import legend.game.combat.ui.FooterActionsHud;
-import legend.game.types.MenuAdditionInfo;
 import legend.game.additions.Addition;
 import legend.game.additions.CharacterAdditionStats;
 import legend.game.i18n.I18n;

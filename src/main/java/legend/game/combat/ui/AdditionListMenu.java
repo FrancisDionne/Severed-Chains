@@ -22,6 +22,7 @@ import java.util.List;
 import static legend.game.SItem.loadAdditions;
 import static legend.game.SItem.loadCharacterStats;
 import static legend.game.Scus94491BpeSegment_8004.CHARACTER_ADDITIONS;
+import static legend.game.Scus94491BpeSegment_8004.additionOffsets_8004f5ac;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 import static legend.game.Text.renderText;
@@ -114,6 +115,19 @@ public class AdditionListMenu extends ListMenu {
   @Override
   public void getTargetingInfo(final RunningScript<?> script) {
 
+  }
+
+  public static HashMap<Integer, Addition> getAdditions(final int charId){
+    final HashMap<Integer, Addition> additions = new HashMap<>();
+    final CharacterData2c charData = gameState_800babc8.charData_32c[charId];
+    for(int additionSlot = 0; additionSlot < CHARACTER_ADDITIONS[charId].length; additionSlot++) {
+      final Addition addition = CHARACTER_ADDITIONS[charId][additionSlot].get();
+      final CharacterAdditionStats additionStats = charData.additionStats.get(addition.getRegistryId());
+      if(addition.isUnlocked(charData, additionStats)) {
+        additions.put(additionSlot, addition);
+      }
+    }
+    return additions;
   }
 
   public static void setAddition(final PlayerBattleEntity player, final int index, final BattleHud hud) {

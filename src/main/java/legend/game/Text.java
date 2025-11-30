@@ -1851,21 +1851,31 @@ public final class Text {
 
   @Method(0x80029300L)
   public static void renderText(final String text, final float originX, final float originY, final FontOptions options) {
-    renderText(text, originX, originY, options, null);
+    renderText(text, originX, originY, options, null, 0);
+  }
+
+  @Method(0x80029300L)
+  public static void renderText(final String text, final float originX, final float originY, final FontOptions options, final float overrideZ) {
+    renderText(text, originX, originY, options, null, overrideZ);
   }
 
   @Method(0x80029300L)
   public static void renderText(final String text, final float originX, final float originY, final FontOptions options, @Nullable final Consumer<QueuedModelStandard> queueCallback) {
-    renderText(GameEngine.DEFAULT_FONT, text, originX, originY, options, queueCallback);
+    renderText(text, originX, originY, options, queueCallback, 0);
+  }
+
+  @Method(0x80029300L)
+  public static void renderText(final String text, final float originX, final float originY, final FontOptions options, @Nullable final Consumer<QueuedModelStandard> queueCallback, final float overrideZ) {
+    renderText(GameEngine.DEFAULT_FONT, text, originX, originY, options, queueCallback, overrideZ);
   }
 
   @Method(0x80029300L)
   public static void renderText(final Font font, final String text, final float originX, final float originY, final FontOptions options) {
-    renderText(font, text, originX, originY, options, null);
+    renderText(font, text, originX, originY, options, null, 0);
   }
 
   @Method(0x80029300L)
-  public static void renderText(final Font font, final String text, final float originX, final float originY, final FontOptions options, @Nullable final Consumer<QueuedModelStandard> queueCallback) {
+  public static void renderText(final Font font, final String text, final float originX, final float originY, final FontOptions options, @Nullable final Consumer<QueuedModelStandard> queueCallback, final float overrideZ) {
     font.init();
 
     final float height = 12.0f * options.getSize();
@@ -1901,7 +1911,7 @@ public final class Text {
             final float offsetX = (i & 1) * options.getSize();
             final float offsetY = (i >>> 1) * options.getSize();
 
-            textTransforms.transfer.set(x + glyphNudge + offsetX, y + offsetY, textZ_800bdf00 * 4.0f + i * 0.1f);
+            textTransforms.transfer.set(x + glyphNudge + offsetX, y + offsetY, (overrideZ > 0 ? overrideZ : textZ_800bdf00 * 4.0f) + i * 0.1f);
 
             if(trim < 0) {
               textTransforms.transfer.y += trim;
