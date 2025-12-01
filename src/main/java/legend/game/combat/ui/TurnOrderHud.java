@@ -133,7 +133,7 @@ public final class TurnOrderHud {
         .queueOrthoModel(quad, m, QueuedModelStandard.class)
         .texture(portrait);
 
-      renderText(name, x + 9 - xOffset+ (isTarget ? 4f : 0f), y, bentIndex == 0 ? activeNameFont : nameFont, 120);
+      renderText(name, x + 9 - xOffset + (isTarget ? 4f : 0f), y, bentIndex == 0 ? activeNameFont : nameFont, 120);
     }
 
     final float boxWidth = Math.max(longestName + x + 15, 50);

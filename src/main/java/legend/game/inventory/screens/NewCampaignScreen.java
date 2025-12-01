@@ -19,6 +19,7 @@ import legend.game.combat.ui.AdditionOverlayMode;
 import legend.game.combat.ui.FooterActionColor;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
+import legend.game.combat.ui.TrackerHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.IconSet;
 import legend.game.inventory.WhichMenu;
@@ -33,6 +34,7 @@ import legend.game.modding.events.gamestate.NewGameEvent;
 import legend.game.saves.Campaign;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
+import legend.game.statistics.Bestiary;
 import legend.game.statistics.Statistics;
 import legend.game.submap.EncounterRateMode;
 import legend.game.types.GameState52c;
@@ -173,6 +175,10 @@ public class NewCampaignScreen extends VerticalLayoutScreen {
       CONFIG.setConfig(CoreMod.ENABLED_MODS_CONFIG.get(), this.enabledMods.toArray(String[]::new));
 
       Statistics.load(null, null);
+      Bestiary.loadEntries();
+      TrackerHud.removeTrackers(null);
+      BestiaryScreen.resetCache();
+      Bestiary.loadTrackers();
 
       loadingNewGameState_800bdc34 = true;
       playMenuSound(2);

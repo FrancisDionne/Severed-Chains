@@ -20,6 +20,7 @@ import legend.game.EngineState;
 import legend.game.EngineStateEnum;
 import legend.game.Menus;
 import legend.game.additions.CharacterAdditionStats;
+import legend.game.combat.ui.TrackerHud;
 import legend.game.fmv.Fmv;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.CharSwapScreen;
@@ -3975,6 +3976,8 @@ public class SMap extends EngineState {
         if(PLATFORM.isActionPressed(INPUT_ACTION_GENERAL_OPEN_INVENTORY.get()) && !gameState_800babc8.indicatorsDisabled_4e3) {
           this.mapTransition(-1, 0x3ff); // Open inv
         }
+
+        TrackerHud.render();
       }
 
       case LOAD_MENU_13 -> {

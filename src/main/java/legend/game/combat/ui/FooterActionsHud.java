@@ -100,6 +100,7 @@ public final class FooterActionsHud {
       case FooterActions.PRESETS -> "Presets";
       case FooterActions.DEFAULT -> "Default";
       case FooterActions.JUMP -> "Jump";
+      case FooterActions.TRACK -> "Track";
     };
   }
 
@@ -208,7 +209,7 @@ public final class FooterActionsHud {
       case FooterActions.BACK -> INPUT_ACTION_MENU_BACK.get();
       case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD, FooterActions.ARCHIVE, FooterActions.TURN_ORDER, FooterActions.PRESETS, FooterActions.DEFAULT, FooterActions.JUMP -> INPUT_ACTION_MENU_DELETE.get();
       case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS, FooterActions.LIST, FooterActions.DISPLAY_MODE -> INPUT_ACTION_MENU_SORT.get();
-      case FooterActions.SELECT -> INPUT_ACTION_MENU_CONFIRM.get();
+      case FooterActions.SELECT, FooterActions.TRACK -> INPUT_ACTION_MENU_CONFIRM.get();
     };
     return new FooterAction(action, input);
   }

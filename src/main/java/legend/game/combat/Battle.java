@@ -101,6 +101,7 @@ import legend.game.i18n.I18n;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.ItemStack;
 import legend.game.inventory.WhichMenu;
+import legend.game.inventory.screens.BestiaryScreen;
 import legend.game.inventory.screens.PostBattleScreen;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.coremod.config.AdditionCounterDifficultyConfigEntry;
@@ -127,6 +128,7 @@ import legend.game.scripting.ScriptedObject;
 import legend.game.sound.QueuedSound28;
 import legend.game.sound.SoundFile;
 import legend.game.sound.SpuStruct08;
+import legend.game.statistics.Bestiary;
 import legend.game.statistics.Statistics;
 import legend.game.tim.Tim;
 import legend.game.tmd.Renderer;
@@ -3852,6 +3854,7 @@ public class Battle extends EngineState {
           Statistics.appendStat(Statistics.Stats.GOLD, goldGainedFromCombat_800bc920);
           if(data.combatant_144.charIndex_1a2 > -1 && this.currentTurnBent_800c66c8 != null) {
             Statistics.incrementMonsterKill(data.combatant_144.charIndex_1a2, Statistics.getMonsterKill(data.combatant_144.charIndex_1a2) == -1 ? 2 : 1);
+            Bestiary.checkTrackers();
           }
 
           if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null && this.currentTurnBent_800c66c8.innerStruct_00.charId_272 != data.combatant_144.charIndex_1a2) {
