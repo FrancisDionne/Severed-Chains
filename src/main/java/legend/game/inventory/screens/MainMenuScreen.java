@@ -7,6 +7,7 @@ import legend.core.opengl.QuadBuilder;
 import legend.core.platform.input.InputAction;
 import legend.game.EngineStateEnum;
 import legend.game.combat.ui.FooterActionsHud;
+import legend.game.combat.ui.TrackerHud;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Button;
@@ -15,8 +16,11 @@ import legend.game.inventory.screens.controls.DragoonSpirits;
 import legend.game.inventory.screens.controls.Glyph;
 import legend.game.inventory.screens.controls.SaveCard;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
+import legend.game.modding.coremod.config.BattleUIColourSettingsConfigEntry;
 import legend.game.saves.ConfigStorage;
 import legend.game.saves.ConfigStorageLocation;
+import legend.game.statistics.Bestiary;
 import legend.game.statistics.Statistics;
 import legend.game.types.MessageBoxResult;
 import legend.game.types.Translucency;
@@ -524,6 +528,9 @@ public class MainMenuScreen extends MenuScreen {
       currentEngineState_8004dd04.loadGameFromMenu(gameState_800babc8);
 
       Statistics.load(gameState_800babc8.campaign.path, data.saveGame.fileName);
+      Bestiary.loadEntries();
+      TrackerHud.removeTrackers(null);
+      Bestiary.loadTrackers();
     }, () -> {
       startFadeEffect(2, 5);
       menuStack.popScreen();

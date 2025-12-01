@@ -26,7 +26,7 @@ public final class Statistics {
 
   private static final Logger LOGGER = LogManager.getFormatterLogger(DiscordRichPresence.class);
 
-  public static HashMap<Integer, Float> statistics;
+  public static HashMap<Integer, String> statistics;
 
   //x1 Dart
   //x2 Lavitz
@@ -75,6 +75,7 @@ public final class Statistics {
     GOLD(10000, "Gold Earned"),
     CHEST(10001, "Chests Opened"),
     DISTANCE(10003, "Distance Traveled", "%.2f"),
+    TRACKER_BESTIARY(10004, "TRACKER_BESTIARY", "s"),
 
     DART_UNLOCKED(1, true),
     LAVITZ_UNLOCKED(2, true),
@@ -442,7 +443,7 @@ public final class Statistics {
           if(!line.isEmpty()) {
             final int i = Integer.parseInt(line.substring(0, line.indexOf('=')));
             if(i > 0) {
-              statistics.put(i, Float.parseFloat(line.replace(i + "=", "")));
+              statistics.put(i, line.replace(i + "=", ""));
             }
           }
         }
@@ -474,7 +475,7 @@ public final class Statistics {
       for(final Stats stat : Stats.values()) {
         final int i = stat.asInt();
         if(i > 0) {
-          text.append(i).append('=').append(statistics.getOrDefault(i, 0f)).append('\n');
+          text.append(i).append('=').append(statistics.getOrDefault(i, stat.format != null && stat.format.equals("s") ? "null" : "0")).append('\n');
         }
       }
       for(int i = 0; i < monsterNames_80112068.length; i++) {
@@ -488,23 +489,29 @@ public final class Statistics {
     return "";
   }
 
+  public static void setStat(final Stats stat, final String value) {
+    final int i = stat.asInt();
+    statistics.put(i, value);
+  }
+
   public static void appendStat(final Stats stat, final float value) {
     final int i = stat.asInt();
     if(!statistics.containsKey(i)) {
-      statistics.put(i, 0f);
+      statistics.put(i, "0");
     }
-    float newValue = statistics.get(i) + value;
+    float newValue = Float.parseFloat(statistics.get(i)) + value;
     if(stat.format != null && stat.format.equals("b")) {
       newValue = value > 0 ? 1 : 0;
     }
-    statistics.put(i, newValue);
+    statistics.put(i, String.valueOf(newValue));
   }
 
   public static void appendStat(final int statIndex, final float value) {
     if(!statistics.containsKey(statIndex)) {
-      statistics.put(statIndex, 0f);
+      statistics.put(statIndex, "0");
     }
-    statistics.put(statIndex, statistics.get(statIndex) + value);
+    final float newValue = Float.parseFloat(statistics.get(statIndex)) + value;
+    statistics.put(statIndex, String.valueOf(newValue));
   }
 
   public static void appendStat(final BattleEntity27c bent, final Stats stat, final float value) {
@@ -565,9 +572,15 @@ public final class Statistics {
   public static int getMonsterKill(final int monsterId) {
     final int statId = monsterId + 100000;
     if(statistics.containsKey(statId)) {
-      return Math.round(statistics.get(statId));
+      return Math.round(Float.parseFloat(statistics.get(statId)));
     }
     return 0;
+  }
+
+  public static String getStatRaw(final Stats stat) {
+    final int i = stat.asInt();
+    final String statRaw = statistics.get(i);
+    return statRaw == null || statRaw.equals("null") ? "" : statRaw;
   }
 
   public static float getStat(final int statIndex) {
@@ -598,7 +611,7 @@ public final class Statistics {
       default:
         final int i = stat.asInt() + offset;
         if(statistics.containsKey(i)) {
-          value = statistics.get(i);
+          value = Float.parseFloat(statistics.get(i));
         }
         break;
     }

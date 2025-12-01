@@ -7,10 +7,13 @@ import legend.core.IoHelper;
 import legend.core.memory.types.IntRef;
 import legend.core.platform.input.InputBindings;
 import legend.game.EngineStateEnum;
+import legend.game.combat.ui.TrackerHud;
 import legend.game.inventory.WhichMenu;
+import legend.game.inventory.screens.BestiaryScreen;
 import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.modding.coremod.config.BattleUIColourSettingsConfigEntry;
+import legend.game.statistics.Bestiary;
 import legend.game.statistics.Statistics;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.types.ActiveStatsa0;
@@ -392,6 +395,10 @@ public final class SaveManager {
     BattleDifficultyConfigEntry.reloadMonsters();
     BattleUIColourSettingsConfigEntry.setRGB();
     Statistics.load(gameState_800babc8.campaign.path, data.saveGame.fileName);
+    Bestiary.loadEntries();
+    TrackerHud.removeTrackers(null);
+    BestiaryScreen.resetCache();
+    Bestiary.loadTrackers();
   }
 
   public void loadGameState(final GameState52c state, final ConfigCollection config, final boolean fullBoot) {
