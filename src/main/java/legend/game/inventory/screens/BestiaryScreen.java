@@ -12,6 +12,7 @@ import legend.game.characters.Element;
 import legend.game.combat.types.EnemyRewards08;
 import legend.game.combat.ui.FooterActions;
 import legend.game.combat.ui.FooterActionsHud;
+import legend.game.combat.ui.TrackerHud;
 import legend.game.combat.ui.UiBox;
 import legend.game.i18n.I18n;
 import legend.game.modding.coremod.CoreMod;
@@ -79,6 +80,7 @@ public class BestiaryScreen extends MenuScreen {
   private final String battleDifficulty = I18n.translate("lod_core.config." + CoreMod.BATTLE_DIFFICULTY.getId().entryId() + '.' + CONFIG.getConfig(CoreMod.BATTLE_DIFFICULTY.get()).name());
 
   private final FontOptions headerFont;
+  private final FontOptions headerTrackedFont;
   private final FontOptions headerNumberFont;
   private final FontOptions locationFont;
   private final FontOptions statsFont;
@@ -98,6 +100,8 @@ public class BestiaryScreen extends MenuScreen {
   private final FontOptions sortFont;
   private final FontOptions gemFont;
   private final FontOptions difficultyFont;
+  private final FontOptions trackedFont;
+  private final FontOptions trackedHighlightFont;
 
   private int subEntryArrowTick;
   private float currentBoxOffsetX;
@@ -120,6 +124,7 @@ public class BestiaryScreen extends MenuScreen {
       .build();
 
     this.headerFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.DARK_GREY).size(1.1f).horizontalAlign(HorizontalAlign.CENTRE);
+    this.headerTrackedFont = new FontOptions().colour(TextColour.RED).shadowColour(TextColour.DARK_GREY).size(1.1f).horizontalAlign(HorizontalAlign.CENTRE);
     this.headerNumberFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.DARK_GREY).size(0.9f).horizontalAlign(HorizontalAlign.LEFT);
     this.statsFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.65f).horizontalAlign(HorizontalAlign.LEFT);
     this.loreFont = new FontOptions().colour(TextColour.CRUNCHY_TEXT_BROWN).shadowColour(TextColour.CRUNCHY_TEXT_SHADOW_BROWN).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
@@ -139,6 +144,8 @@ public class BestiaryScreen extends MenuScreen {
     this.sortFont = new FontOptions().colour(TextColour.YELLOW).shadowColour(TextColour.DARKER_GREY).size(0.4f).horizontalAlign(HorizontalAlign.CENTRE);
     this.gemFont = new FontOptions().colour(TextColour.GOLD).shadowColour(TextColour.DARKER_GREY).size(0.5f).horizontalAlign(HorizontalAlign.CENTRE);
     this.difficultyFont = new FontOptions().colour(TextColour.LIGHTER_GREY).shadowColour(TextColour.DARKER_GREY).size(0.4f).horizontalAlign(HorizontalAlign.LEFT);
+    this.trackedFont = new FontOptions().colour(TextColour.RED).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
+    this.trackedHighlightFont = new FontOptions().colour(TextColour.RED).shadowColour(TextColour.DARKER_GREY).size(0.45f).horizontalAlign(HorizontalAlign.LEFT);
 
     this.textures = new Texture[] {
       Texture.png(Path.of("gfx", "ui", "archive_screen", "bestiary", "bestiary_graphics.png")), //0
@@ -229,6 +236,7 @@ public class BestiaryScreen extends MenuScreen {
         .translucency(Translucency.HALF_B_PLUS_HALF_F);
     }
 
+    renderText("Tracked: " + TrackerHud.getTrackers("bestiary").size() + "/10", 0.5f, 229f, this.difficultyFont, 127);
     renderText("Difficulty: " + this.battleDifficulty, 0.5f, 235f, this.difficultyFont, 127);
   }
 
@@ -266,18 +274,18 @@ public class BestiaryScreen extends MenuScreen {
 
     if(this.monster.rank > 0 || this.monster.rank == -1) {
       if(Bestiary.devMode) {
-        renderText(this.monster.name + " [" + this.monster.charId + ']', 184, 10.5f, this.headerFont, 126);
+        renderText(this.monster.name + " [" + this.monster.charId + ']', 184, 10.5f, this.isTracked(this.monster) ? this.headerTrackedFont : this.headerFont, 126);
       } else {
-        renderText(this.monster.name, 184, 10.5f, this.headerFont, 126);
+        renderText(this.monster.name, 184, 10.5f, this.isTracked(this.monster) ? this.headerTrackedFont : this.headerFont, 126);
       }
     } else {
-      renderText(QUESTION_MARK_5, 184, 10.5f, this.headerFont, 126);
+      renderText(this.QUESTION_MARK_5, 184, 10.5f, this.headerFont, 126);
     }
 
     if(this.monster.rank > 0 || this.monster.rank == -1) {
       renderText(this.monster.location, 31, 206.5f, this.locationFont, 127);
     } else {
-      renderText(QUESTION_MARK_5, 31, 206.5f, this.locationFont, 126);
+      renderText(this.QUESTION_MARK_5, 31, 206.5f, this.locationFont, 126);
     }
 
     renderText(this.nf.format(this.monster.entryNumber), 15f, 28.5f, this.headerNumberFont, 125);
@@ -338,7 +346,7 @@ public class BestiaryScreen extends MenuScreen {
       if(this.monster.rank >= 2) {
         renderText(String.valueOf(this.getStat(i)), x + 28f, y, this.statsFont, 127);
       } else {
-        renderText(QUESTION_MARK_3, x + 28f, y, this.statsFont, 127);
+        renderText(this.QUESTION_MARK_3, x + 28f, y, this.statsFont, 127);
       }
       y += 11.45f;
     }
@@ -402,7 +410,7 @@ public class BestiaryScreen extends MenuScreen {
   private void renderStatus(final String status, final float x, final float y, final float xOffset, final int defPercent, final boolean counter) {
     final String guardSign = counter ? "-" : "+";
 
-    renderText(this.monster.rank >= 2 ? status : QUESTION_MARK_5, x, y, this.statsFont, 127);
+    renderText(this.monster.rank >= 2 ? status : this.QUESTION_MARK_5, x, y, this.statsFont, 127);
 
     if(this.monster.rank >= 2) {
       this.m.translation(x + 50.5f + xOffset, y - 1f, 125f);
@@ -424,33 +432,33 @@ public class BestiaryScreen extends MenuScreen {
     renderText("Battle Rewards", x + 74, 150f, this.titleFont, 127);
 
     if(rewards.xp_00 > 0) {
-      renderText(this.monster.isComplete() ? "Exp." : QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
-      renderText(this.monster.isComplete() ? String.valueOf(rewards.xp_00) : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? "Exp." : this.QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? String.valueOf(rewards.xp_00) : this.QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
       y += 13.5f;
     }
 
     if(rewards.gold_02 > 0) {
-      renderText(this.monster.isComplete() ? "Gold" : QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
-      renderText(this.monster.isComplete() ? String.valueOf(rewards.gold_02) : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? "Gold" : this.QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? String.valueOf(rewards.gold_02) : this.QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
       y += 13.5f;
     }
 
     if(rewards.itemDrop_05 != null) {
-      renderText(this.monster.isComplete() ? I18n.translate(rewards.itemDrop_05.get().getNameTranslationKey()) + " (" + rewards.itemChance_04 + "%)" : QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
+      renderText(this.monster.isComplete() ? I18n.translate(rewards.itemDrop_05.get().getNameTranslationKey()) + " (" + rewards.itemChance_04 + "%)" : this.QUESTION_MARK_5, x + 28f, y, this.rewardTitleFont, 127);
 
       if(this.monster.isComplete()) {
         renderItemIcon(rewards.itemDrop_05.get().getIcon(), x + 10f, y - 5f, 32, 0.9f, 0.9f, 0x8);
       } else {
-        renderText(QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
+        renderText(this.QUESTION_MARK_3, x, y, this.rewardTitleFont, 127);
       }
     }
   }
 
   private void renderLore() {
     if(this.monster.rank >= 2) {
-      renderText(this.monster.lore.isEmpty() ? LORE_DEFAULT : this.monster.lore, 23f, 146f, this.loreFont, 127);
+      renderText(this.monster.lore.isEmpty() ? this.LORE_DEFAULT : this.monster.lore, 23f, 146f, this.loreFont, 127);
     } else {
-      renderText(QUESTION_MARK_5, 23f, 146f, this.statsFont, 127);
+      renderText(this.QUESTION_MARK_5, 23f, 146f, this.statsFont, 127);
     }
   }
 
@@ -493,8 +501,12 @@ public class BestiaryScreen extends MenuScreen {
         renderText(String.valueOf(c), x + charX, y, highlighted ? (entry.isComplete() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
         charX += 3.7f;
       }
+
+      final FontOptions textFont = this.isTracked(entry) ? this.trackedFont : this.listFont;
+      final FontOptions textHighlightFont = this.isTracked(entry) ? this.trackedHighlightFont : this.listHighlightFont;
+
       renderText(":", x + 16f, y, highlighted ? (entry.isComplete() ? this.listNumberPerfectHighlightFont : this.listNumberHighlightFont) : this.listNumberFont, 123);
-      renderText(entry.rank > 0 || entry.rank == -1 ? (entry.listName == null ? entry.name : entry.listName) : QUESTION_MARK_5, x + 19f, y, highlighted ? (entry.isComplete() ? this.listPerfectHighlightFont : this.listHighlightFont) : (entry.isComplete() ? this.listPerfectFont : this.listFont), 123);
+      renderText(entry.rank > 0 || entry.rank == -1 ? (entry.listName == null ? entry.name : entry.listName) : this.QUESTION_MARK_5, x + 19f, y, highlighted ? (entry.isComplete() ? this.listPerfectHighlightFont : textHighlightFont) : (entry.isComplete() ? this.listPerfectFont : textFont), 123);
 
       if(highlighted) {
         this.m.translation(xOffset - x + 14.5f , y - 1.5f, 124);
@@ -777,6 +789,10 @@ public class BestiaryScreen extends MenuScreen {
     Bestiary.toggleTracker(this.monster);
   }
 
+  private boolean isTracked(final BestiaryEntry entry) {
+    return TrackerHud.exists("bestiary:" + entry.charId);
+  }
+
   @Override
   protected void render() {
     switch(this.loadingStage) {
@@ -806,7 +822,13 @@ public class BestiaryScreen extends MenuScreen {
         this.unload.run();
       }
     }
-    FooterActionsHud.renderActions(0, FooterActions.TRACK, FooterActions.BACK, FooterActions.LIST, FooterActions.JUMP, null);
+
+    final boolean canTrackEntry = this.monster.rank > 0 && this.monster.rank < 3 || this.monster.rank == -1;
+    if(canTrackEntry) {
+      FooterActionsHud.renderActions(0, FooterActions.BACK, FooterActions.LIST, FooterActions.JUMP, this.isTracked(this.monster) ? FooterActions.UNTRACK : FooterActions.TRACK, null);
+    } else {
+      FooterActionsHud.renderActions(0, FooterActions.BACK, FooterActions.LIST, FooterActions.JUMP, null, null);
+    }
   }
 
   @Override
