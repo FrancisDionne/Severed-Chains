@@ -82,4 +82,11 @@ public class AdditionHitProperties10 {
       default -> throw new IllegalArgumentException("Invalid property index " + index);
     };
   }
+
+  @Override
+  public String toString() {
+    return this.flags_00 + "," + this.totalFrames_01 + "," + this.overlayHitFrameOffset_02 + "," + this.totalSuccessFrames_03 + "," + this.damageMultiplier_04 + "," + this.sp_05 + "," + this.audioFile_06 + "," +
+           this.isFinalHit_07 + "," + this.cameraMovementX_08 + "," + this.cameraMovementZ_09 + "," + this.cameraMovementTicks_0a + "," + this.hitDistanceFromTarget_0b + "," + this.framesToHitPosition_0c + "," +
+           this._0d + "," + this.additionFailAnimationIndex_0e + "," + this.overlayStartingFrameOffset_0f;
+  }
 }
