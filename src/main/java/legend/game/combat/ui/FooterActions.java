@@ -17,5 +17,6 @@ public enum FooterActions {
   PRESETS,
   DEFAULT,
   JUMP,
-  TRACK
+  TRACK,
+  UNTRACK,
 }
