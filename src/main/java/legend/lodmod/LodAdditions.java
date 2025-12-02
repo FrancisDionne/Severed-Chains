@@ -2,12 +2,7 @@ package legend.lodmod;
 
 import legend.core.GameEngine;
 import legend.game.additions.Addition;
-import legend.game.additions.AdditionHitProperties10;
 import legend.game.additions.AdditionRegistryEvent;
-import legend.game.additions.AdditionSound;
-import legend.game.additions.LevelLockedAddition;
-import legend.game.additions.MasterAddition;
-import legend.game.additions.SimpleAddition;
 import legend.game.combat.AdditionConfigs;
 import org.legendofdragoon.modloader.registries.Registrar;
 import org.legendofdragoon.modloader.registries.RegistryDelegate;
