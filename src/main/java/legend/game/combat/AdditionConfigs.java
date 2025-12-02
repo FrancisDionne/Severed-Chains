@@ -737,12 +737,12 @@ public final class AdditionConfigs {
     setFrameCorrections();
     final AdditionHitProperties10[] additionHitProperties = createAdditionHitPropertiesArray(8);
     additionHitProperties[0] = createAdditionHitProperties(0xe0, 15, 9, 3, 30, 8, 34, 0, 0, 0, 0, 0, 8, 32, 0, fc ? 10 : 11, new AdditionSound(4, 8), new AdditionSound(0, 6));
-    additionHitProperties[1] = createAdditionHitProperties(0xc0, 18, fc ? 7 : 8, 2, 30, 6, 0, 0, 0, 5, 3, 4, 5, 0, 0, fc ? 1 : 0, new AdditionSound(9, 8), new AdditionSound(1, 6));
+    additionHitProperties[1] = createAdditionHitProperties(0xc0, 18, 8, 2, 30, 6, 0, 0, 0, 5, 3, 4, 5, 0, 0, fc ? 1 : 0, new AdditionSound(9, 8), new AdditionSound(1, 6));
     additionHitProperties[2] = createAdditionHitProperties(0xc0, 12, fc ? 2 : 3, 3, 30, 6, 0, 0, 0, 0, 2, 1, 10, 0, 0, 0, new AdditionSound(8, 2), new AdditionSound(2, 0));
     additionHitProperties[3] = createAdditionHitProperties(0xc0, 11, 6, 2, 40, 6, 0, 0, 0, 5, 2, 3, 10, 32, 0, fc ? 1 : 0, new AdditionSound(5, 7), new AdditionSound(0, 5));
-    additionHitProperties[4] = createAdditionHitProperties(0xc0, 16, fc ? 3 : 6, 3, 40, 6, 0, 0, 0, 0, 0, 0, 8, 32, 0, 0, new AdditionSound(9, 5), new AdditionSound(2, 3));
-    additionHitProperties[5] = createAdditionHitProperties(0xc0, 8, fc ? 2 : 3, 2, 40, 6, 0, 0, -3, 0, 3, 4, 6, 32, 0, 0, new AdditionSound(8, 3), new AdditionSound(1, 1));
-    additionHitProperties[6] = createAdditionHitProperties(0xc0, 19, fc ? 9 : 11, 3, 40, 6, 0, 0, 0, 4, 6, 7, 12, 32, 0, 0, new AdditionSound(11, 10), new AdditionSound(2, 8));
+    additionHitProperties[4] = createAdditionHitProperties(0xc0, 16, fc ? 4 : 6, 3, 40, 6, 0, 0, 0, 0, 0, 0, 8, 32, 0, 0, new AdditionSound(9, 5), new AdditionSound(2, 3));
+    additionHitProperties[5] = createAdditionHitProperties(0xc0, 8, 3, 2, 40, 6, 0, 0, -3, 0, 3, 4, 6, 32, 0, 0, new AdditionSound(8, 3), new AdditionSound(1, 1));
+    additionHitProperties[6] = createAdditionHitProperties(0xc0, 19, fc ? 10 : 11, 3, 40, 6, 0, 0, 0, 4, 6, 7, 12, 32, 0, 0, new AdditionSound(11, 10), new AdditionSound(2, 8));
     additionHitProperties[7] = createAdditionHitProperties(0xc0, 37, 3, 2, 50, 6, 0, 4, -7, 0, 2, 15, 10, 32, 0, 0, new AdditionSound(10, 3), new AdditionSound(3, 1));
     adjustHitOverlayStartingOffset(additionHitProperties);
 
