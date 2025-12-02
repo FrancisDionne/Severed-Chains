@@ -3,7 +3,9 @@ package legend.game.combat.effects;
 import legend.core.MathHelper;
 import legend.core.memory.Method;
 import legend.core.memory.types.TriConsumer;
+import legend.game.additions.Addition;
 import legend.game.combat.AdditionConfigs;
+import legend.game.i18n.I18n;
 import legend.game.scripting.ScriptState;
 import legend.game.scripting.ScriptedObject;
 import legend.game.types.Translucency;
@@ -40,8 +42,8 @@ public class AdditionNameTextEffect1c implements ScriptedObject {
     ScriptedObject.renderScriptDebugText(state, viewspace.x + GPU.getOffsetX() - 9.0f, viewspace.y + GPU.getOffsetY() - 9.0f);
   }
 
-  public static String getAdditionName(final int additionId) {
-    String additionName = AdditionConfigs.additionNames_800fa8d4[additionId];
+  public static String getAdditionName(final Addition addition) {
+    String additionName = I18n.translate(addition);
     if(AdditionOverlaysEffect44.additionResults != null && AdditionOverlaysEffect44.additionResults.flawless) {
       additionName += '+';
     }

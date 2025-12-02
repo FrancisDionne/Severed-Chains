@@ -496,7 +496,7 @@ public final class SBtld {
           activeDragoonAdditionIndex = dragoonAdditionIndices_801134e8[9];
         }
 
-        AdditionConfigs.load();
+        AdditionConfigs.initialize();
 
         //LAB_80109310
         //LAB_80109320
