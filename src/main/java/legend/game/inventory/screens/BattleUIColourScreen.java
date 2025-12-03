@@ -9,6 +9,7 @@ import legend.game.i18n.I18n;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Label;
 import legend.game.modding.coremod.CoreMod;
+import legend.game.modding.coremod.config.BattleUIColourSettingsConfigEntry;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigCollection;
 import legend.game.saves.ConfigEntry;
@@ -26,11 +27,11 @@ import java.util.Set;
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.core.GameEngine.RENDERER;
+import static legend.game.Audio.playMenuSound;
+import static legend.game.FullScreenEffects.startFadeEffect;
+import static legend.game.Menus.deallocateRenderables;
 import static legend.game.SItem.menuStack;
-import static legend.game.Scus94491BpeSegment.startFadeEffect;
-import static legend.game.Scus94491BpeSegment_8002.deallocateRenderables;
-import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
+import static legend.game.Text.renderText;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
 
@@ -175,12 +176,7 @@ public class BattleUIColourScreen extends VerticalLayoutScreen {
     final float xOffset = RENDERER.getWidescreenOrthoOffsetX();
 
     if(this.listBox == null || this.currentBoxOffsetX != xOffset || dirty) {
-      final int rgb = ((CONFIG.getConfig(CoreMod.BATTLE_UI_COLOUR_BLUE_CONFIG.get()) & 0xff) << 16) |
-        ((CONFIG.getConfig(CoreMod.BATTLE_UI_COLOUR_GREEN_CONFIG.get()) & 0xff) << 8) |
-        ((CONFIG.getConfig(CoreMod.BATTLE_UI_COLOUR_RED_CONFIG.get()) & 0xff));
-
-      Config.setBattleRgb(rgb);
-
+      BattleUIColourSettingsConfigEntry.setRGB();
       this.currentBoxOffsetX = xOffset;
       this.listBox = new UiBox("Battle UI Colour Screen List", 368 * 0.09f, 100f, 368 * 0.82f, 80f, 0.7f);
       dirty = false;

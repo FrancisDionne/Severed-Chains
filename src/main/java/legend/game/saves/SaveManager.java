@@ -7,9 +7,13 @@ import legend.core.IoHelper;
 import legend.core.memory.types.IntRef;
 import legend.core.platform.input.InputBindings;
 import legend.game.EngineStateEnum;
+import legend.game.combat.ui.TrackerHud;
 import legend.game.inventory.WhichMenu;
+import legend.game.inventory.screens.BestiaryScreen;
 import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
+import legend.game.modding.coremod.config.BattleUIColourSettingsConfigEntry;
+import legend.game.statistics.Bestiary;
 import legend.game.statistics.Statistics;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.types.ActiveStatsa0;
@@ -45,12 +49,13 @@ import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.bootMods;
 import static legend.core.GameEngine.bootRegistries;
+import static legend.game.EngineStates.engineState_8004dd20;
+import static legend.game.Menus.whichMenu_800bdc38;
 import static legend.game.SItem.chapterNames_80114248;
 import static legend.game.SItem.loadCharacterStats;
 import static legend.game.SItem.menuStack;
 import static legend.game.SItem.submapNames_8011c108;
 import static legend.game.SItem.worldMapNames_8011c1ec;
-import static legend.game.Scus94491BpeSegment_8004.engineState_8004dd20;
 import static legend.game.Scus94491BpeSegment_8005.collidedPrimitiveIndex_80052c38;
 import static legend.game.Scus94491BpeSegment_8005.submapCutForSave_800cb450;
 import static legend.game.Scus94491BpeSegment_8005.submapCut_80052c30;
@@ -60,7 +65,6 @@ import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.loadingNewGameState_800bdc34;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 import static legend.game.Scus94491BpeSegment_800b.submapId_800bd808;
-import static legend.game.Scus94491BpeSegment_800b.whichMenu_800bdc38;
 
 public final class SaveManager {
   private static final Logger LOGGER = LogManager.getFormatterLogger(SaveManager.class);
@@ -389,7 +393,12 @@ public final class SaveManager {
     this.loadGameState(data.saveGame.state, data.saveGame.config, true);
     submapCutForSave_800cb450 = submapCut_80052c30;
     BattleDifficultyConfigEntry.reloadMonsters();
+    BattleUIColourSettingsConfigEntry.setRGB();
     Statistics.load(gameState_800babc8.campaign.path, data.saveGame.fileName);
+    Bestiary.loadEntries();
+    TrackerHud.removeTrackers(null);
+    BestiaryScreen.resetCache();
+    Bestiary.loadTrackers();
   }
 
   public void loadGameState(final GameState52c state, final ConfigCollection config, final boolean fullBoot) {

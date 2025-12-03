@@ -6,7 +6,7 @@ import legend.game.inventory.ItemIcon;
 import legend.game.inventory.ItemStack;
 import legend.game.inventory.UseItemResponse;
 
-import static legend.game.Scus94491BpeSegment_8002.addSp;
+import static legend.game.SItem.addSp;
 
 public class RecoverSpItem extends BattleItem {
   private final boolean targetAll;

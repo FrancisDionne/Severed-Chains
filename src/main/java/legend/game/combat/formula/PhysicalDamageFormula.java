@@ -8,7 +8,7 @@ import legend.game.combat.types.AttackType;
 import legend.game.modding.coremod.CoreMod;
 
 import static legend.core.GameEngine.CONFIG;
-import static legend.game.Scus94491BpeSegment_8004.currentEngineState_8004dd04;
+import static legend.game.EngineStates.currentEngineState_8004dd04;
 import static legend.game.combat.Battle.adjustDamageForPower;
 
 public final class PhysicalDamageFormula {

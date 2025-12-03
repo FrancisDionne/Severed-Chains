@@ -18,7 +18,7 @@ import java.util.Arrays;
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.core.GameEngine.RENDERER;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
+import static legend.game.Text.renderText;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DELETE;
@@ -100,6 +100,8 @@ public final class FooterActionsHud {
       case FooterActions.PRESETS -> "Presets";
       case FooterActions.DEFAULT -> "Default";
       case FooterActions.JUMP -> "Jump";
+      case FooterActions.TRACK -> "Track";
+      case FooterActions.UNTRACK -> "Untrack";
     };
   }
 
@@ -208,7 +210,7 @@ public final class FooterActionsHud {
       case FooterActions.BACK -> INPUT_ACTION_MENU_BACK.get();
       case FooterActions.DELETE, FooterActions.FILTER, FooterActions.DISCARD, FooterActions.ARCHIVE, FooterActions.TURN_ORDER, FooterActions.PRESETS, FooterActions.DEFAULT, FooterActions.JUMP -> INPUT_ACTION_MENU_DELETE.get();
       case FooterActions.SORT, FooterActions.ADDITIONS, FooterActions.HELP, FooterActions.MODS, FooterActions.LIST, FooterActions.DISPLAY_MODE -> INPUT_ACTION_MENU_SORT.get();
-      case FooterActions.SELECT -> INPUT_ACTION_MENU_CONFIRM.get();
+      case FooterActions.SELECT, FooterActions.TRACK, FooterActions.UNTRACK -> INPUT_ACTION_MENU_CONFIRM.get();
     };
     return new FooterAction(action, input);
   }

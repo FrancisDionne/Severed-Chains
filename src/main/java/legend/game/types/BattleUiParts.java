@@ -12,8 +12,8 @@ import org.joml.Matrix4f;
 import javax.annotation.Nullable;
 
 import static legend.core.GameEngine.RENDERER;
-import static legend.game.Scus94491BpeSegment.displayHeight_1f8003e4;
-import static legend.game.Scus94491BpeSegment.displayWidth_1f8003e0;
+import static legend.game.Graphics.displayHeight_1f8003e4;
+import static legend.game.Graphics.displayWidth_1f8003e0;
 import static legend.game.Scus94491BpeSegment.levelUpUs_8001032c;
 import static legend.game.combat.Battle.asciiTable_800fa788;
 import static legend.game.combat.Battle.buttonPressHudMetrics_800faaa0;

@@ -15,7 +15,6 @@ import legend.core.gte.MV;
 import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.core.opengl.Texture;
-import legend.game.tmd.TmdObjLoader;
 import legend.core.platform.PlatformManager;
 import legend.core.platform.SdlPlatformManager;
 import legend.core.platform.WindowEvents;
@@ -23,7 +22,7 @@ import legend.core.platform.input.InputBindings;
 import legend.core.spu.Spu;
 import legend.game.EngineStateEnum;
 import legend.game.Main;
-import legend.game.Scus94491BpeSegment_8002;
+import legend.game.Scus94491BpeSegment;
 import legend.game.fmv.Fmv;
 import legend.game.i18n.I18n;
 import legend.game.inventory.ItemIcon;
@@ -40,8 +39,11 @@ import legend.game.saves.serializers.V2Serializer;
 import legend.game.saves.serializers.V3Serializer;
 import legend.game.saves.serializers.V4Serializer;
 import legend.game.saves.serializers.V5Serializer;
+import legend.game.saves.serializers.V6Serializer;
+import legend.game.saves.serializers.V7Serializer;
 import legend.game.scripting.ScriptManager;
 import legend.game.sound.Sequencer;
+import legend.game.tmd.TmdObjLoader;
 import legend.game.types.Translucency;
 import legend.game.unpacker.FileData;
 import legend.game.unpacker.Unpacker;
@@ -61,6 +63,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
+import static legend.game.Audio.startSound;
 import static legend.game.SItem.UI_WHITE;
 import static legend.game.SItem.albertXpTable_801138c0;
 import static legend.game.SItem.dartXpTable_801135e4;
@@ -74,12 +77,11 @@ import static legend.game.SItem.renderMenuCentredText;
 import static legend.game.SItem.roseXpTable_801139b4;
 import static legend.game.SItem.shanaXpTable_80113aa8;
 import static legend.game.Scus94491BpeSegment.battleUiParts;
-import static legend.game.Scus94491BpeSegment.gameLoop;
-import static legend.game.Scus94491BpeSegment.startSound;
-import static legend.game.Scus94491BpeSegment_8002.initTextboxGeometry;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
+import static legend.game.Scus94491BpeSegment.bindRendererEvents;
 import static legend.game.Scus94491BpeSegment_800b.shadowModel_800bda10;
-import static legend.game.Scus94491BpeSegment_800b.textZ_800bdf00;
+import static legend.game.Text.initTextboxGeometry;
+import static legend.game.Text.renderText;
+import static legend.game.Text.textZ_800bdf00;
 import static org.lwjgl.opengl.GL11C.GL_BLEND;
 import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11C.GL_SRC_ALPHA;
@@ -105,7 +107,7 @@ public final class GameEngine {
   public static final Sequencer SEQUENCER = new Sequencer();
 
   public static final ConfigCollection CONFIG = new ConfigCollection();
-  public static final SaveManager SAVES = new SaveManager(V5Serializer.MAGIC_V5, V5Serializer::toV5);
+  public static final SaveManager SAVES = new SaveManager(V7Serializer.MAGIC_V7, V7Serializer::toV7);
 
   public static final PlatformManager PLATFORM = new SdlPlatformManager();
   public static final RenderEngine RENDERER = new RenderEngine();
@@ -208,6 +210,8 @@ public final class GameEngine {
         SAVES.registerDeserializer(V3Serializer::fromV3Matcher, V3Serializer::fromV3);
         SAVES.registerDeserializer(V4Serializer::fromV4Matcher, V4Serializer::fromV4);
         SAVES.registerDeserializer(V5Serializer::fromV5Matcher, V5Serializer::fromV5);
+        SAVES.registerDeserializer(V6Serializer::fromV6Matcher, V6Serializer::fromV6);
+        SAVES.registerDeserializer(V7Serializer::fromV7Matcher, V7Serializer::fromV7);
 
         synchronized(INIT_LOCK) {
           Unpacker.setStatusListener(status -> statusText = status);
@@ -324,6 +328,9 @@ public final class GameEngine {
     REGISTRY_ACCESS.initialize(REGISTRIES.config);
     REGISTRY_ACCESS.initialize(REGISTRIES.inputActions);
 
+    // We need to boot the goods registry for save cards on the title screen
+    REGISTRY_ACCESS.initialize(REGISTRIES.goods);
+
     MOD_ACCESS.loadingComplete();
 
     // Load default bindings for input actions
@@ -436,7 +443,7 @@ public final class GameEngine {
     openalThread.start();
 
     synchronized(INIT_LOCK) {
-      Scus94491BpeSegment_8002.start();
+      Scus94491BpeSegment.main();
 
       TmdObjLoader.fromModel("Shadow", shadowModel_800bda10);
       for(int i = 0; i < shadowModel_800bda10.modelParts_00.length; i++) {
@@ -447,7 +454,7 @@ public final class GameEngine {
       initTextboxGeometry();
       battleUiParts.init();
       startSound();
-      gameLoop();
+      bindRendererEvents();
       Fmv.playCurrentFmv(0, EngineStateEnum.TITLE_02);
     }
   }
