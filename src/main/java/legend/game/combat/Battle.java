@@ -3945,7 +3945,7 @@ public class Battle extends EngineState {
 
         //LAB_800cd208
         final CharacterAdditionStats additionStats = charData.additionStats.get(charData.selectedAddition_19);
-        final int additionXp = Math.min(99, additionStats.xp + 1);
+        final int additionXp = Math.min(99, additionStats.xp + xp);
 
         //LAB_800cd240
         //LAB_800cd288
