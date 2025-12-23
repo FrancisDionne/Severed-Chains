@@ -1,7 +1,6 @@
 package legend.game;
 
 import legend.core.MathHelper;
-import legend.core.QueuedModelStandard;
 import legend.core.audio.sequencer.assets.BackgroundMusic;
 import legend.core.font.Font;
 import legend.core.gpu.Bpp;
@@ -18,6 +17,7 @@ import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
 import legend.game.inventory.Good;
 import legend.game.inventory.GoodsInventory;
+import legend.game.inventory.Inventory;
 import legend.game.inventory.InventoryEntry;
 import legend.game.inventory.Item;
 import legend.game.inventory.ItemGroupSortMode;
@@ -38,7 +38,6 @@ import legend.game.modding.events.inventory.EquipmentStatsEvent;
 import legend.game.modding.events.inventory.GatherAttackItemsEvent;
 import legend.game.modding.events.inventory.GatherRecoveryItemsEvent;
 import legend.game.modding.events.inventory.GiveEquipmentEvent;
-import legend.game.modding.events.inventory.Inventory;
 import legend.game.modding.events.inventory.TakeEquipmentEvent;
 import legend.game.scripting.FlowControl;
 import legend.game.scripting.RunningScript;
@@ -81,7 +80,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -639,8 +637,30 @@ public final class SItem {
 
   @Method(0x80022cd0L)
   public static int addSp(final int charIndex, final int amount) {
-    assert false;
-    return 0;
+    final CharacterData2c charData = gameState_800babc8.charData_32c[charIndex];
+    final ActiveStatsa0 stats = stats_800be5f8[charIndex];
+
+    final int maxSp = stats.dlevel_0f * 100;
+    if(stats.sp_08 == maxSp) {
+      return -2;
+    }
+
+    final int spToAdd = amount == -1 ? maxSp - stats.sp_08 : Math.min(amount, maxSp - stats.sp_08);
+    final int responseType = amount == -1 || spToAdd < amount ? -1 : amount;
+
+    charData.sp_0c += spToAdd;
+    gameState_800babc8.charData_32c[charIndex].dlevelXp_0e += amount == -1 ? spToAdd : amount;
+
+    if(gameState_800babc8.charData_32c[charIndex].dlevelXp_0e > 32000) {
+      gameState_800babc8.charData_32c[charIndex].dlevelXp_0e = 32000;
+    }
+
+    if(gameState_800babc8.charData_32c[charIndex].dlevelXp_0e >= dragoonXpRequirements_800fbbf0[charIndex][gameState_800babc8.charData_32c[charIndex].dlevel_13 + 1] && gameState_800babc8.charData_32c[charIndex].dlevel_13 < 5) {
+      gameState_800babc8.charData_32c[charIndex].dlevel_13++;
+    }
+
+    loadCharacterStats();
+    return responseType;
   }
 
   public static boolean takeItem(final Item item) {
@@ -1380,7 +1400,7 @@ public final class SItem {
   }
 
   @Method(0x80103e90L)
-  public static float renderMenuCentredText(final Font font, final String text, final float x, final float y, final int maxWidth, final FontOptions options, @Nullable final Consumer<QueuedModelStandard> queueCallback) {
+  public static float renderMenuCentredText(final Font font, final String text, final float x, final float y, final int maxWidth, final FontOptions options, @Nullable final Text.QueueCallback queueCallback) {
     final String[] split;
     if(font.textWidth(text) * options.getSize() <= maxWidth) {
       split = new String[] {text};
@@ -2615,6 +2635,7 @@ public final class SItem {
         characterStats.equipmentMpRegen_5a += event.mpRegen;
         characterStats.equipmentSpRegen_5c += event.spRegen;
         characterStats.equipmentEscapeBonus_56 += event.escapeBonus;
+        characterStats.equipmentGuardHeal += event.guardHealBonus;
       }
     }
   }

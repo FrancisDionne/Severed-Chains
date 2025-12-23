@@ -4,6 +4,7 @@ import legend.core.Latch;
 import legend.core.memory.Method;
 import legend.game.characters.Element;
 import legend.game.characters.ElementSet;
+import legend.game.combat.Battle;
 import legend.game.inventory.Equipment;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.events.battle.ArcherSpEvent;
@@ -27,6 +28,7 @@ import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 import static legend.game.combat.Battle.spellStats_800fa0b8;
 import static legend.game.combat.ui.BattleHud.playerNames_800fb378;
 import static legend.lodmod.LodGoods.DIVINE_DRAGOON_SPIRIT;
+import static legend.lodmod.LodMod.GUARD_HEAL_STAT;
 
 public class PlayerBattleEntity extends BattleEntity27c {
   private final Latch<ScriptState<PlayerBattleEntity>> scriptState;
@@ -71,10 +73,12 @@ public class PlayerBattleEntity extends BattleEntity27c {
   public int hpMulti_13c;
   public int mpMulti_13e;
 
+  public DetransformationMode detransformationMode = DetransformationMode.NOW;
+
   private final ScriptFile script;
 
-  public PlayerBattleEntity(final String name, final int scriptIndex, final ScriptFile script) {
-    super(LodMod.PLAYER_TYPE.get(), name);
+  public PlayerBattleEntity(final Battle battle, final String name, final int scriptIndex, final ScriptFile script) {
+    super(LodMod.PLAYER_TYPE.get(), battle, name);
 
     this.scriptState = new Latch<>(() -> SCRIPTS.getState(scriptIndex, PlayerBattleEntity.class));
     this.script = script;
@@ -92,6 +96,10 @@ public class PlayerBattleEntity extends BattleEntity27c {
 
   public boolean isDragoon() {
     return this.scriptState.get().hasFlag(FLAG_DRAGOON);
+  }
+
+  public boolean canBecomeDragoon() {
+    return (this.status_0e & 0x2000) != 0;
   }
 
   @Override
@@ -396,7 +404,7 @@ public class PlayerBattleEntity extends BattleEntity27c {
       case 5 -> sp = 150;
       default -> sp = 0;
     }
-    sp = EVENTS.postEvent(new ArcherSpEvent(this, sp)).sp;
+    sp = EVENTS.postEvent(new ArcherSpEvent(this.battle, this, sp)).sp;
     return sp;
   }
 
@@ -471,6 +479,11 @@ public class PlayerBattleEntity extends BattleEntity27c {
       case ARCHER_SP -> this.getArcherSp();
       case ADDITION_HIT_COUNT -> this.getAdditionHitCount();
 
+      case GUARD_HEAL -> this.stats.getStat(GUARD_HEAL_STAT.get()).get();
+      case GUARD_HEAL_RAW -> this.stats.getStat(GUARD_HEAL_STAT.get()).getRaw();
+
+      case DETRANSFORMATION_MODE -> this.detransformationMode.ordinal();
+
       default -> super.getStat(statIndex);
     };
   }
@@ -525,6 +538,8 @@ public class PlayerBattleEntity extends BattleEntity27c {
       case REVIVE -> this.revive_13a = value;
       case HP_MULTI -> this.hpMulti_13c = value;
       case MP_MULTI -> this.mpMulti_13e = value;
+
+      case GUARD_HEAL_RAW -> this.stats.getStat(GUARD_HEAL_STAT.get()).setRaw(value);
 
       default -> super.setStat(statIndex, value);
     }

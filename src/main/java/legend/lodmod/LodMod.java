@@ -27,10 +27,16 @@ import legend.game.characters.UnaryStatMod;
 import legend.game.characters.UnaryStatModConfig;
 import legend.game.characters.UnaryStatModType;
 import legend.game.characters.VitalsStat;
+import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.bent.BattleEntityType;
 import legend.game.combat.bent.BattleEntityTypeRegistryEvent;
+import legend.game.combat.bent.MonsterBattleEntity;
+import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.combat.deff.RegisterDeffsEvent;
 import legend.game.combat.encounters.EncounterRegistryEvent;
+import legend.game.combat.ui.BattleAction;
+import legend.game.combat.ui.GatherBattleActionsEvent;
+import legend.game.combat.ui.RegisterBattleActionsEvent;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.EquipmentRegistryEvent;
 import legend.game.inventory.GoodsRegistryEvent;
@@ -57,6 +63,7 @@ import legend.game.modding.events.input.RegisterDefaultInputBindingsEvent;
 import legend.game.modding.events.inventory.GatherAttackItemsEvent;
 import legend.game.modding.events.inventory.GatherRecoveryItemsEvent;
 import legend.game.saves.ConfigRegistryEvent;
+import legend.game.scripting.ScriptState;
 import legend.game.types.EquipmentSlot;
 import legend.game.types.SpellStats0c;
 import legend.game.unpacker.Loader;
@@ -67,8 +74,12 @@ import org.legendofdragoon.modloader.registries.RegistryDelegate;
 import org.legendofdragoon.modloader.registries.RegistryId;
 
 import java.util.Map;
+import java.util.Set;
 
 import static legend.core.GameEngine.CONFIG;
+import static legend.core.GameEngine.REGISTRIES;
+import static legend.game.Scus94491BpeSegment_8006.battleState_8006e398;
+import static legend.game.Scus94491BpeSegment_800b.encounter;
 import static legend.game.combat.Battle.spellStats_800fa0b8;
 
 /** Will eventually contain standard LOD content. Will be able to be disabled for total overhaul mods. */
@@ -112,6 +123,7 @@ public class LodMod {
   public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_ESCAPE = INPUT_ACTION_REGISTRAR.register("bttl_escape", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_GUARD = INPUT_ACTION_REGISTRAR.register("bttl_guard", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_ITEMS = INPUT_ACTION_REGISTRAR.register("bttl_items", InputAction::editable);
+  public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_SPELLS = INPUT_ACTION_REGISTRAR.register("bttl_spells", InputAction::editable);
   public static final RegistryDelegate<InputAction> INPUT_ACTION_BTTL_OPTIONS = INPUT_ACTION_REGISTRAR.register("bttl_options", InputAction::editable);
 
   private static final Registrar<StatType<?>, StatTypeRegistryEvent> STAT_TYPE_REGISTRAR = new Registrar<>(GameEngine.REGISTRIES.statTypes, MOD_ID);
@@ -126,6 +138,7 @@ public class LodMod {
   public static final RegistryDelegate<StatType<UnaryStat>> MAGIC_DEFENSE_STAT = STAT_TYPE_REGISTRAR.register("magic_defense", () -> new StatType<>(UnaryStat::new));
   public static final RegistryDelegate<StatType<UnaryStat>> AVOID_STAT = STAT_TYPE_REGISTRAR.register("avoid", () -> new StatType<>(UnaryStat::new));
   public static final RegistryDelegate<StatType<UnaryStat>> MAGIC_AVOID_STAT = STAT_TYPE_REGISTRAR.register("magic_avoid", () -> new StatType<>(UnaryStat::new));
+  public static final RegistryDelegate<StatType<UnaryStat>> GUARD_HEAL_STAT = STAT_TYPE_REGISTRAR.register("guard_heal", () -> new StatType<>(UnaryStat::new));
 
   private static final Registrar<StatModType<?, ?, ?>, StatModTypeRegistryEvent> STAT_MOD_TYPE_REGISTRAR = new Registrar<>(GameEngine.REGISTRIES.statModTypes, MOD_ID);
   public static final RegistryDelegate<StatModType<UnaryStat, UnaryStatMod, UnaryStatModConfig>> UNARY_STAT_MOD_TYPE = STAT_MOD_TYPE_REGISTRAR.register("unary", UnaryStatModType::new);
@@ -231,43 +244,16 @@ public class LodMod {
     "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop", "empty_shop",
   };
 
-  public static int getEquipmentIcon(final int equipID, final int defaultValue) {
-    return switch(equipID) {
-      case 0, 1, 2, 3, 4, 5, 6, 7 -> 0; //Swords
-      case 8, 9, 10, 11, 12 -> 1; //Axes
-      case 13, 14, 15, 16, 17, 18, 19 -> 0; //Rapiers
-      case 20, 21, 22, 23, 24, 25, 26 -> 3; //Spears
-      case 27, 28, 29, 30, 31, 32, 33 -> 4; //Bows
-      case 34, 35, 36, 37, 38, 39 -> 2; //Hammers
-      case 40, 41, 42, 43, 44, 45 -> 6; //Knuckles
-      case 62, 63 -> 8; //Leather Armor
-      case 47, 51, 52, 56, 61, 67, 68, 69, 70, 74 -> 10; //Heavy Armor
-      case 46, 48, 49, 54, 64 -> 11; //Mail Armor
-      case 50, 66, 73 -> 9; //Magic Armor
-      case 53, 55 -> 13; //Fur Armor
-      case 57, 58, 59, 60, 71 -> 14; //Light Armor
-      case 65, 72 -> 12; //Dress
-      case 76, 81, 83 -> 16; //Bandana
-      case 77, 78, 79, 80, 89, 90 -> 18; //Helmet
-      case 82, 91 -> 17; //Hat
-      case 84, 85, 86, 88 -> 15; //Hair Accessory
-      case 95, 96, 100, 101 -> 19; //Shoes
-      case 93, 97, 98, 99 -> 21; //Boots
-      case 94 -> 20; //Knee
-      case 103, 106, 107, 111, 153 -> 22; //Bangle
-      case 104, 113, 114, 117, 121, 124, 125, 126, 131, 133, 142 -> 23; //Ring
-      case 108, 110, 122, 127, 128, 148 -> 24; //Necklace
-      case 105, 112, 115, 116, 130, 134, 135, 136, 137, 138, 139, 140, 149, 150, 154, 155 -> 25; //Medallion
-      case 152 -> 26; //Bracelet
-      case 143, 144, 146 -> 27; //Earring
-      case 109 -> 28; //Bell
-      case -2 -> 29; //Bag
-      case 118, 119, 120, 123, 151 -> 30; //Shawl
-      case -1 -> 31; //Shoulder?
-      case 156, 157 -> 32; //Horn
-      default -> defaultValue;
-    };
-  }
+  private static final RegistryDelegate<BattleAction>[] RETAIL_MENU_BLOCKS = new RegistryDelegate[] {
+    LodBattleActions.ATTACK,
+    LodBattleActions.GUARD,
+    LodBattleActions.ITEMS,
+    LodBattleActions.ESCAPE,
+    LodBattleActions.TRANSFORM,
+    LodBattleActions.D_ATTACK,
+    LodBattleActions.SPELLS,
+    LodBattleActions.SPECIAL,
+  };
 
   @EventListener
   public static void registerInputActions(final InputActionRegistryEvent event) {
@@ -333,6 +319,7 @@ public class LodMod {
       .add(INPUT_ACTION_BTTL_TURN_ORDER.get(), new ButtonInputActivation(InputButton.X))
       .add(INPUT_ACTION_BTTL_OPTIONS.get(), new ScancodeInputActivation(InputKey.ESCAPE))
       .add(INPUT_ACTION_BTTL_OPTIONS.get(), new ButtonInputActivation(InputButton.START))
+      .add(INPUT_ACTION_BTTL_GUARD.get(), new ScancodeInputActivation(InputKey.G))
     ;
   }
 
@@ -402,6 +389,7 @@ public class LodMod {
     if(event.type == PLAYER_TYPE.get()) {
       event.addStat(MP_STAT.get());
       event.addStat(SP_STAT.get());
+      event.addStat(GUARD_HEAL_STAT.get());
     }
 
     event.addStat(SPEED_STAT.get());
@@ -421,6 +409,149 @@ public class LodMod {
   @EventListener
   public static void registerAdditions(final AdditionRegistryEvent event) {
     LodAdditions.register(event);
+  }
+
+  @EventListener
+  public static void registerBattleActions(final RegisterBattleActionsEvent event) {
+    LodBattleActions.register(event);
+  }
+
+  @EventListener
+  public static void gatherBattleActions(final GatherBattleActionsEvent event) {
+    final PlayerBattleEntity player = event.player;
+    int sort = 100;
+
+    if(player.isDragoon()) {
+      event.actions.put(LodBattleActions.D_ATTACK.get(), sort);
+    } else {
+      event.actions.put(LodBattleActions.ATTACK.get(), sort);
+    }
+
+    sort += 100;
+
+    if(!player.isDragoon() || CONFIG.getConfig(LodConfig.EXTENDED_DRAGOON_ACTIONS.get())) {
+      event.actions.put(LodBattleActions.GUARD.get(), sort);
+      sort += 100;
+      event.actions.put(LodBattleActions.ITEMS.get(), sort);
+      sort += 100;
+      event.actions.put(LodBattleActions.ADDITIONS.get(), sort);
+      sort += 100;
+    }
+
+    if(player.isDragoon()) {
+      event.actions.put(LodBattleActions.SPELLS.get(), sort);
+      sort += 100;
+
+      if(CONFIG.getConfig(LodConfig.EXTENDED_DRAGOON_ACTIONS.get())) {
+        event.actions.put(LodBattleActions.TRANSFORM.get(), sort);
+        sort += 100;
+      }
+    }
+
+    if(!player.isDragoon() || CONFIG.getConfig(LodConfig.EXTENDED_DRAGOON_ACTIONS.get())) {
+      event.actions.put(LodBattleActions.ESCAPE.get(), sort);
+      sort += 100;
+    }
+
+    if(!player.isDragoon() && player.stats.getStat(SP_STAT.get()).getCurrent() >= 100 && player.canBecomeDragoon()) {
+      event.actions.put(LodBattleActions.TRANSFORM.get(), sort);
+      sort += 100;
+
+      if(canSpecialTransform()) {
+        event.actions.put(LodBattleActions.SPECIAL.get(), sort);
+      }
+    }
+
+    final int legacyFlags = battleState_8006e398.statusConditions_00[player.bentSlot_274].menuBlockFlag_18 | battleState_8006e398.globalMenuBlocks_510;
+    disableRetailBattleActions(legacyFlags, event.disabledActions);
+
+    if((player.status_0e & 0x20) != 0) {
+      event.disabledActions.add(LodBattleActions.ATTACK.get());
+    }
+
+    if(encounter.escapeChance == 0) {
+      event.disabledActions.add(LodBattleActions.ESCAPE.get());
+    }
+
+    // This seems to be for the tutorial fights - disables all actions except for one
+    if(battleState_8006e398._54c != 0) {
+      for(final RegistryId id : REGISTRIES.battleActions) {
+        event.disabledActions.add(REGISTRIES.battleActions.getEntry(id).get());
+      }
+
+      final ScriptState<MonsterBattleEntity> tutorialEnemy = battleState_8006e398.monsterBents_e50[0];
+
+      if(battleState_8006e398._548 == 0) {
+        event.disabledActions.remove(LodBattleActions.ATTACK.get());
+        tutorialEnemy.setFlag(BattleEntity27c.FLAG_TAKE_FORCED_TURN);
+        battleState_8006e398._54c++;
+      } else if(battleState_8006e398._548 == 1) {
+        event.disabledActions.remove(LodBattleActions.ITEMS.get());
+        tutorialEnemy.setFlag(BattleEntity27c.FLAG_TAKE_FORCED_TURN);
+        battleState_8006e398._54c++;
+      } else if(battleState_8006e398._54c == 3) {
+        event.disabledActions.remove(LodBattleActions.ATTACK.get());
+      } else {
+        if((battleState_8006e398._54c == 5 || battleState_8006e398._54c == 9) || battleState_8006e398._54c == 16) {
+          event.disabledActions.remove(LodBattleActions.TRANSFORM.get());
+        } else if(battleState_8006e398._54c == 12) {
+          event.disabledActions.remove(LodBattleActions.D_ATTACK.get());
+        } else {
+          event.disabledActions.remove(LodBattleActions.SPELLS.get());
+        }
+
+        tutorialEnemy.setFlag(BattleEntity27c.FLAG_TAKE_FORCED_TURN);
+        battleState_8006e398._54c++;
+      }
+    }
+  }
+
+  public static void disableRetailBattleActions(final int packedActions, final Set<BattleAction> disabled) {
+    for(int i = 0; i < RETAIL_MENU_BLOCKS.length; i++) {
+      if((packedActions & 0x1 << i) != 0) {
+        disabled.add(RETAIL_MENU_BLOCKS[i].get());
+      }
+    }
+  }
+
+  private static boolean canSpecialTransform() {
+    if(battleState_8006e398.getPlayerCount() < 3) {
+      return false;
+    }
+
+    for(int i = 0; i < battleState_8006e398.getPlayerCount(); i++) {
+      final ScriptState<PlayerBattleEntity> player = battleState_8006e398.playerBents_e40[i];
+
+      // not dead or petrified
+      if(player.hasFlag(BattleEntity27c.FLAG_DEAD) && (player.innerStruct_00.status_0e & 0x1) != 0) {
+        return false;
+      }
+    }
+
+    for(int i = 0; i < battleState_8006e398.getPlayerCount(); i++) {
+      final ScriptState<PlayerBattleEntity> player = battleState_8006e398.playerBents_e40[i];
+      final int sp = player.innerStruct_00.stats.getStat(SP_STAT.get()).getCurrent();
+      final int dlevel = player.innerStruct_00.dlevel_06;
+
+      if(dlevel == 0 || sp < dlevel * 100) {
+        return false;
+      }
+
+    }
+
+    for(int i = 0; i < battleState_8006e398.getPlayerCount(); i++) {
+      if(battleState_8006e398.playerBents_e40[i].innerStruct_00.isDragoon()) {
+        return false;
+      }
+    }
+
+    for(int i = 0; i < battleState_8006e398.getPlayerCount(); i++) {
+      if(!battleState_8006e398.playerBents_e40[i].innerStruct_00.canBecomeDragoon()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   @EventListener

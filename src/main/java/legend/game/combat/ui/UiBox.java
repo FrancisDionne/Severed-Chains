@@ -155,6 +155,7 @@ public class UiBox {
 
     RENDERER.queueOrthoModel(this.hudBackgroundObj, this.transforms, QueuedModelStandard.class)
       .colour(r, g, b);
+    RENDERER.queueOrthoModel(this.hudBackgroundButDarkerObj, this.transforms, QueuedModelStandard.class);
 
     for(int i = 0; i < 8; i++) {
       RENDERER.queueOrthoModel(this.hudBackgroundBorders, this.transforms, QueuedModelStandard.class)

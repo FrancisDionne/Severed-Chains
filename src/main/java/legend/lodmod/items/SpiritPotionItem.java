@@ -11,7 +11,7 @@ import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 
 public class SpiritPotionItem extends RecoverSpItem {
   public SpiritPotionItem() {
-    super(10, false, 0, 100);
+    super(ItemIcon.RED_POTION, 10, false, 100, 0);
   }
 
   @Override
