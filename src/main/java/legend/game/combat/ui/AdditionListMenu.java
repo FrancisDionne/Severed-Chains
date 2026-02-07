@@ -64,7 +64,7 @@ public class AdditionListMenu extends ListMenu {
 
     this.fontOptions.trim(trim);
     this.fontOptions.horizontalAlign(HorizontalAlign.LEFT);
-    renderText(I18n.translate(this.menuAdditions.get(index)), x, y, this.fontOptions);
+    renderText(this.menuAdditions.get(index).getName(), x, y, this.fontOptions);
     renderText("/", x + 146, y, this.fontOptions);
 
     this.fontOptions.horizontalAlign(HorizontalAlign.RIGHT);

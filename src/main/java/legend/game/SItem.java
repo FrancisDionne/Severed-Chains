@@ -9,6 +9,7 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.game.additions.Addition;
 import legend.game.additions.CharacterAdditionStats;
+import legend.game.additions.UnlockState;
 import legend.game.combat.types.EnemyDrop;
 import legend.game.i18n.I18n;
 import legend.game.inventory.EquipItemResult;
@@ -1491,7 +1492,7 @@ public final class SItem {
       final Addition addition = additionDelegate.get();
       final CharacterAdditionStats additionStats = charData.additionStats.get(addition.getRegistryId());
 
-      if(additionStats.unlocked) {
+      if(additionStats.unlockState.isUsable()) {
         additions.add(addition);
       }
 
@@ -1499,7 +1500,7 @@ public final class SItem {
     }
 
     for(final var entry : charData.additionStats.entrySet()) {
-      if(!seen.contains(entry.getKey()) && entry.getValue().unlocked) {
+      if(!seen.contains(entry.getKey()) && entry.getValue().unlockState.isUsable()) {
         additions.add(REGISTRIES.additions.getEntry(entry.getKey()).get());
       }
     }
@@ -1516,14 +1517,14 @@ public final class SItem {
     for(final RegistryDelegate<Addition> additionDelegate : CHARACTER_ADDITIONS[charId]) {
       final Addition addition = additionDelegate.get();
       final CharacterAdditionStats additionStats = charData.additionStats.computeIfAbsent(addition.getRegistryId(), k -> new CharacterAdditionStats());
-      final boolean wasUnlocked = additionStats.unlocked;
 
-      additionStats.unlocked = additionStats.unlocked || addition.isUnlocked(gameState_800babc8, charData, additionStats);
+      if(additionStats.unlockState.isUnlockable() && addition.isUnlocked(gameState_800babc8, charData, additionStats)) {
+        final AdditionUnlockEvent event = EVENTS.postEvent(new AdditionUnlockEvent(charData, additionStats, addition));
 
-      EVENTS.postEvent(new AdditionUnlockEvent(charData, additionStats, addition));
-
-      if(additionStats.unlocked && !wasUnlocked) {
-        newlyUnlocked = addition;
+        if(!event.isCanceled()) {
+          newlyUnlocked = addition;
+          additionStats.unlockState = UnlockState.UNLOCKED;
+        }
       }
     }
 

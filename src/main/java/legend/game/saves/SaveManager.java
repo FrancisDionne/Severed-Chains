@@ -7,16 +7,18 @@ import legend.core.IoHelper;
 import legend.core.memory.types.IntRef;
 import legend.core.platform.input.InputBindings;
 import legend.game.EngineStateEnum;
+import legend.game.additions.UnlockState;
 import legend.game.combat.ui.TrackerHud;
 import legend.game.inventory.WhichMenu;
 import legend.game.inventory.screens.BestiaryScreen;
 import legend.game.inventory.screens.controls.SaveCardData;
 import legend.game.modding.coremod.config.BattleDifficultyConfigEntry;
 import legend.game.modding.coremod.config.BattleUIColourSettingsConfigEntry;
+import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.statistics.Bestiary;
 import legend.game.statistics.Statistics;
-import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.types.ActiveStatsa0;
+import legend.game.types.CharacterData2c;
 import legend.game.types.GameState52c;
 import legend.game.unpacker.ExpandableFileData;
 import legend.game.unpacker.FileData;
@@ -47,6 +49,7 @@ import java.util.stream.Stream;
 
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.EVENTS;
+import static legend.core.GameEngine.REGISTRIES;
 import static legend.core.GameEngine.bootMods;
 import static legend.core.GameEngine.bootRegistries;
 import static legend.game.EngineStates.engineState_8004dd20;
@@ -412,6 +415,14 @@ public final class SaveManager {
 
       InputBindings.initBindings();
       InputBindings.loadBindings(CONFIG);
+    }
+
+    for(final CharacterData2c character : state.charData_32c) {
+      for(final var entry : character.additionStats.entrySet()) {
+        if(REGISTRIES.additions.getEntry(entry.getKey()).get().isUnlocked(state, character, entry.getValue())) {
+          entry.getValue().unlockState = UnlockState.UNLOCKED;
+        }
+      }
     }
 
     final GameLoadedEvent event = EVENTS.postEvent(new GameLoadedEvent(state));
