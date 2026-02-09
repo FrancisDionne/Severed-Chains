@@ -26,7 +26,7 @@ public final class LodBattleActions {
   public static final RegistryDelegate<BattleAction> TRANSFORM = REGISTRAR.register("transform", TransformAction::new);
   public static final RegistryDelegate<BattleAction> SPECIAL = REGISTRAR.register("special", SpecialBattleAction::new);
   public static final RegistryDelegate<BattleAction> D_ATTACK = REGISTRAR.register("d_attack", () -> new RetailBattleAction(9));
-  public static final RegistryDelegate<BattleAction> ADDITIONS = REGISTRAR.register("additions", ChangeAdditionBattleAction::new);
+  //public static final RegistryDelegate<BattleAction> ADDITIONS = REGISTRAR.register("additions", ChangeAdditionBattleAction::new);
 
   static void register(final RegisterBattleActionsEvent event) {
     REGISTRAR.registryEvent(event);

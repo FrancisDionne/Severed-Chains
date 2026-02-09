@@ -86,7 +86,6 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_DOWN;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
-import static legend.lodmod.LodBattleActions.ADDITIONS;
 import static legend.lodmod.LodBattleActions.ESCAPE;
 import static legend.lodmod.LodBattleActions.GUARD;
 import static legend.lodmod.LodBattleActions.ITEMS;
@@ -1795,9 +1794,9 @@ public class BattleHud {
           selectedAction = this.useAction(ITEMS.get());
         } else if(PLATFORM.isActionPressed(INPUT_ACTION_BTTL_SPELLS.get())) {
           selectedAction = this.useAction(SPELLS.get());
-        } else if(PLATFORM.isActionPressed(INPUT_ACTION_BTTL_ADDITIONS.get())) {
-          selectedAction = this.useAction(ADDITIONS.get());
-        }
+        } //else if(PLATFORM.isActionPressed(INPUT_ACTION_BTTL_ADDITIONS.get())) {
+          //selectedAction = this.useAction(ADDITIONS.get());
+        //}
 
         // Input for pressing X on menu bar
         //LAB_800f671c
