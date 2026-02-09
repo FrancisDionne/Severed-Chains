@@ -1871,7 +1871,7 @@ public class BattleHud {
     //LAB_800f6ae0
     this.renderActionMenu();
 
-    if(selectedAction == this.useAction(GUARD.get())) { //Guard
+    if(selectedAction == GUARD.get()) { //Guard
       Statistics.appendStat(this.battle.currentTurnBent_800c66c8.innerStruct_00, Statistics.Stats.TOTAL_GUARD, 1);
     }
 

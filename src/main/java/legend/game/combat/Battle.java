@@ -1939,7 +1939,7 @@ public class Battle extends EngineState {
         livingCharIds_800bc968[i] = battleState_8006e398.alivePlayerBents_eac[i].innerStruct_00.charId_272;
       }
 
-      if(this.lastSelectedAction == this.hud.useAction(ESCAPE.get()) && this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null) {
+      if(this.lastSelectedAction == ESCAPE.get() && this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null) {
         Statistics.appendStat(this.currentTurnBent_800c66c8.innerStruct_00, Statistics.Stats.TOTAL_ESCAPE, 1);
       }
 
@@ -3779,7 +3779,7 @@ public class Battle extends EngineState {
         return FlowControl.CONTINUE;
       }
 
-      value = GameplayBalanceConfigEntry.adjustValue(this.currentTurnBent_800c66c8.innerStruct_00, bent.charId_272, this.lastSelectedAction, playerLastActions, value, true, this.hud);
+      value = GameplayBalanceConfigEntry.adjustValue(this.currentTurnBent_800c66c8.innerStruct_00, bent.charId_272, this.lastSelectedAction, playerLastActions, value, true);
     }
 
     switch(stat) {
@@ -8694,7 +8694,7 @@ public class Battle extends EngineState {
   public FlowControl scriptRenderRecover(final RunningScript<?> script) {
     final BattleEntity27c currentTurnBent = this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null;
     final BattleEntity27c bent = SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class);
-    final int value = GameplayBalanceConfigEntry.adjustValue(currentTurnBent, bent.charId_272, this.lastSelectedAction, playerLastActions, script.params_20[1].get(), false, this.hud);
+    final int value = GameplayBalanceConfigEntry.adjustValue(currentTurnBent, bent.charId_272, this.lastSelectedAction, playerLastActions, script.params_20[1].get(), false);
     this.hud.addFloatingNumberForBent(currentTurnBent, script.params_20[0].get(), value, script.params_20[2].get());
     Statistics.appendRecoverStat(currentTurnBent, value, script.params_20[2].get());
     return FlowControl.CONTINUE;

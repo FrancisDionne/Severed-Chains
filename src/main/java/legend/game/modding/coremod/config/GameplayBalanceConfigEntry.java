@@ -22,9 +22,9 @@ public class GameplayBalanceConfigEntry extends BoolConfigEntry {
     super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 5);
   }
 
-  public static int adjustValue(@Nullable final BattleEntity27c currentTurnBent, final int bentCharId, final BattleAction lastSelectedAction, final HashMap<Integer, PlayerLastAction> playerLastActions, int value, final boolean isSetStat, final BattleHud hud) {
+  public static int adjustValue(@Nullable final BattleEntity27c currentTurnBent, final int bentCharId, final BattleAction lastSelectedAction, final HashMap<Integer, PlayerLastAction> playerLastActions, int value, final boolean isSetStat) {
     if(CONFIG.getConfig(CoreMod.GAMEPLAY_BALANCE_CONFIG.get())) {
-      if(currentTurnBent != null && playerLastActions.containsKey(bentCharId) && currentTurnBent.charId_272 == bentCharId && lastSelectedAction == hud.useAction(GUARD.get())) {
+      if(currentTurnBent != null && playerLastActions.containsKey(bentCharId) && currentTurnBent.charId_272 == bentCharId && lastSelectedAction == GUARD.get()) {
         value = adjustGuardHealValue(currentTurnBent, playerLastActions.get(bentCharId).Count, value, isSetStat);
       }
     }
