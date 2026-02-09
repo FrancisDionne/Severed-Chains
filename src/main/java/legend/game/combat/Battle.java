@@ -242,6 +242,7 @@ import static legend.game.SItem.giveEquipment;
 import static legend.game.SItem.giveItem;
 import static legend.game.SItem.loadCharacterStats;
 import static legend.game.SItem.menuStack;
+import static legend.game.SItem.sortBattleItems;
 import static legend.game.SItem.sortItems;
 import static legend.game.Scus94491BpeSegment.FUN_80013404;
 import static legend.game.Scus94491BpeSegment.battlePreloadedEntities_1f8003f4;
@@ -277,6 +278,7 @@ import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 import static legend.game.Scus94491BpeSegment_800b.tickCount_800bb0fc;
 import static legend.game.Scus94491BpeSegment_800b.totalXpFromCombat_800bc95c;
 import static legend.game.Scus94491BpeSegment_800b.unlockedUltimateAddition_800bc910;
+import static legend.game.Text.scriptDeallocateAllTextboxes;
 import static legend.game.combat.Monsters.enemyRewards_80112868;
 import static legend.game.combat.Monsters.getMonsterStats_8010ba98;
 import static legend.game.combat.Monsters.monsterNames_80112068;
@@ -307,6 +309,8 @@ import static legend.game.modding.coremod.CoreMod.ADDITION_BUTTON_MODE_CONFIG;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.REDUCE_MOTION_FLASHING_CONFIG;
+import static legend.lodmod.LodBattleActions.ESCAPE;
+import static legend.lodmod.LodBattleActions.GUARD;
 import static legend.lodmod.LodGoods.DIVINE_DRAGOON_SPIRIT;
 import static legend.lodmod.LodMod.ATTACK_STAT;
 import static legend.lodmod.LodMod.AVOID_STAT;
@@ -1801,7 +1805,7 @@ public class Battle extends EngineState {
 
   @Method(0x800c79f0L)
   public void FUN_800c79f0() {
-    this.lastSelectedAction = -1;
+    this.lastSelectedAction = null;
     this.currentTurnBent_800c66c8 = battleState_8006e398.allBents_e0c[0];
     this.hud.FUN_800f417c();
 
@@ -1844,7 +1848,7 @@ public class Battle extends EngineState {
         this.forcedTurnBent_800c66bc = battleState_8006e398.getForcedTurnBent();
 
         if(this.forcedTurnBent_800c66bc != null) { // A bent has a forced turn
-          this.lastSelectedAction = -1;
+          this.lastSelectedAction = null;
           this.forcedTurnBent_800c66bc.clearFlag(FLAG_TAKE_FORCED_TURN).setFlag(FLAG_RELOAD_BATTLE_ACTIONS).setFlag(FLAG_CURRENT_TURN);
           this.currentTurnBent_800c66c8 = this.forcedTurnBent_800c66bc;
 
@@ -1854,7 +1858,7 @@ public class Battle extends EngineState {
           //LAB_800c7ce8
           if(battleState_8006e398.hasAliveMonsters()) { // Monsters alive, calculate next bent turn
             //LAB_800c7d3c
-            this.lastSelectedAction = -1;
+            this.lastSelectedAction = null;
             this.currentTurnBent_800c66c8 = battleState_8006e398.getCurrentTurnBent();
             this.currentTurnBent_800c66c8.setFlag(FLAG_RELOAD_BATTLE_ACTIONS).setFlag(FLAG_CURRENT_TURN);
 
@@ -1935,7 +1939,7 @@ public class Battle extends EngineState {
         livingCharIds_800bc968[i] = battleState_8006e398.alivePlayerBents_eac[i].innerStruct_00.charId_272;
       }
 
-      if(this.lastSelectedAction == 6 && this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null) {
+      if(this.lastSelectedAction == this.hud.useAction(ESCAPE.get()) && this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null) {
         Statistics.appendStat(this.currentTurnBent_800c66c8.innerStruct_00, Statistics.Stats.TOTAL_ESCAPE, 1);
       }
 
@@ -3659,9 +3663,9 @@ public class Battle extends EngineState {
     this.hud.renderDamage(this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null, script.params_20[0].get(), script.params_20[1].get());
 
     if (script.params_20[1].get() == -1) {
-      Statistics.appendStat((BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00, Statistics.Stats.TOTAL_EVADE, 1);
+      Statistics.appendStat(SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class), Statistics.Stats.TOTAL_EVADE, 1);
     } else if(this.currentTurnBent_800c66c8 != null && this.currentTurnBent_800c66c8.innerStruct_00 != null) {
-      if(this.currentTurnBent_800c66c8.innerStruct_00 instanceof PlayerBattleEntity && scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00 instanceof final PlayerBattleEntity player) {
+      if(this.currentTurnBent_800c66c8.innerStruct_00 instanceof PlayerBattleEntity && SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class) instanceof final PlayerBattleEntity player) {
         Statistics.appendStat(player, Statistics.Stats.TOTAL_PHYSICAL_TAKEN, script.params_20[1].get());
       }
     }
@@ -3763,15 +3767,15 @@ public class Battle extends EngineState {
   @ScriptEnum(BattleEntityStat.class)
   @Method(0x800ccda0L)
   public FlowControl scriptSetBentRawStat(final RunningScript<?> script) {
-    final BattleEntity27c bent = SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class);
     final BattleEntityStat stat = BattleEntityStat.fromLegacy(Math.max(0, script.params_20[2].get()));
-    final int[] storage44 = scriptStatePtrArr_800bc1c0[script.params_20[0].get()].storage_44;
+    final BattleEntity27c bent = SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class);
+    final ScriptState<?> bentState = SCRIPTS.getState(script.params_20[0].get());
     int value = script.params_20[1].get();
 
     if(this.currentTurnBent_800c66c8.innerStruct_00 != null) {
       //Disables revive in combat if perma death on
-      if(PermaDeathConfigEntry.isBlockRevive(stat, bent, this.currentTurnBent_800c66c8, value, (storage44[7] & FLAG_DEAD) != 0)) {
-        storage44[7] |= FLAG_DEAD;
+      if(PermaDeathConfigEntry.isBlockRevive(stat, bent, this.currentTurnBent_800c66c8, value, (bentState.hasFlag(FLAG_DEAD)))) {
+        bentState.setFlag(FLAG_DEAD);
         return FlowControl.CONTINUE;
       }
 
@@ -7867,7 +7871,7 @@ public class Battle extends EngineState {
       spGained_800bc950[charSlot] = 0;
     }
 
-    Scus94491BpeSegment_8002.sortBattleItems();
+    sortBattleItems();
   }
 
   @Method(0x800ee8c4L)
@@ -8689,7 +8693,7 @@ public class Battle extends EngineState {
   @Method(0x800f984cL)
   public FlowControl scriptRenderRecover(final RunningScript<?> script) {
     final BattleEntity27c currentTurnBent = this.currentTurnBent_800c66c8 != null ? this.currentTurnBent_800c66c8.innerStruct_00 : null;
-    final BattleEntity27c bent = (BattleEntity27c)scriptStatePtrArr_800bc1c0[script.params_20[0].get()].innerStruct_00;
+    final BattleEntity27c bent = SCRIPTS.getObject(script.params_20[0].get(), BattleEntity27c.class);
     final int value = GameplayBalanceConfigEntry.adjustValue(currentTurnBent, bent.charId_272, this.lastSelectedAction, playerLastActions, script.params_20[1].get(), false, this.hud);
     this.hud.addFloatingNumberForBent(currentTurnBent, script.params_20[0].get(), value, script.params_20[2].get());
     Statistics.appendRecoverStat(currentTurnBent, value, script.params_20[2].get());

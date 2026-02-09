@@ -6,12 +6,10 @@ import legend.game.inventory.ItemIcon;
 import legend.game.inventory.ItemStack;
 import legend.game.inventory.UseItemResponse;
 
-import static legend.core.GameEngine.CONFIG;
 import static legend.game.SItem.addSp;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
-import static legend.lodmod.LodConfig.ITEM_STACK_SIZE;
 
 public class RecoverSpItem extends BattleItem {
   private final boolean targetAll;

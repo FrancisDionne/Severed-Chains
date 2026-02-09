@@ -13,6 +13,8 @@ import legend.game.combat.AdditionButtonMode;
 import legend.game.combat.SEffe;
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.ui.AdditionButtonStyle;
+import legend.game.additions.AdditionHitProperties10;
+import legend.game.additions.AdditionSound;
 import legend.game.combat.ui.AdditionOverlayMode;
 import legend.game.combat.ui.ControllerStyle;
 import legend.core.platform.input.InputCodepoints;
@@ -46,6 +48,7 @@ import static legend.game.modding.coremod.CoreMod.ADDITION_TIMING_WINDOW_CONFIG;
 import static legend.game.modding.coremod.CoreMod.REDUCE_MOTION_FLASHING_CONFIG;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_ATTACK;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_COUNTER;
+
 
 public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.VoidType> {
   private static final Logger LOGGER = LogManager.getFormatterLogger(AdditionOverlaysEffect44.class);

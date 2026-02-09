@@ -1,7 +1,10 @@
 package legend.game.modding.coremod.config;
 
+import legend.game.combat.PlayerLastAction;
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.combat.bent.BattleEntityStat;
+import legend.game.combat.ui.BattleAction;
+import legend.game.combat.ui.BattleHud;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.BoolConfigEntry;
 import legend.game.saves.ConfigCategory;
@@ -12,16 +15,17 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 
 import static legend.core.GameEngine.CONFIG;
+import static legend.lodmod.LodBattleActions.GUARD;
 
 public class GameplayBalanceConfigEntry extends BoolConfigEntry {
   public GameplayBalanceConfigEntry() {
     super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 5);
   }
 
-  public static int adjustValue(@Nullable final BattleEntity27c currentTurnBent, final int bentCharId, final int lastSelectedAction, final HashMap<Integer, int[]> playerLastActions, int value, final boolean isSetStat) {
+  public static int adjustValue(@Nullable final BattleEntity27c currentTurnBent, final int bentCharId, final BattleAction lastSelectedAction, final HashMap<Integer, PlayerLastAction> playerLastActions, int value, final boolean isSetStat, final BattleHud hud) {
     if(CONFIG.getConfig(CoreMod.GAMEPLAY_BALANCE_CONFIG.get())) {
-      if(currentTurnBent != null && playerLastActions.containsKey(bentCharId) && currentTurnBent.charId_272 == bentCharId && lastSelectedAction == 1) {
-        value = adjustGuardHealValue(currentTurnBent, playerLastActions.get(bentCharId)[1], value, isSetStat);
+      if(currentTurnBent != null && playerLastActions.containsKey(bentCharId) && currentTurnBent.charId_272 == bentCharId && lastSelectedAction == hud.useAction(GUARD.get())) {
+        value = adjustGuardHealValue(currentTurnBent, playerLastActions.get(bentCharId).Count, value, isSetStat);
       }
     }
     return value;

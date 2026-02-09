@@ -6,9 +6,9 @@ import legend.core.platform.input.InputMod;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import static legend.game.Audio.playMenuSound;
 import static legend.game.SItem.setMessageBoxFontOptions;
 import static legend.game.SItem.setMessageBoxText;
-import static legend.game.Scus94491BpeSegment_8002.playMenuSound;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_LEFT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
