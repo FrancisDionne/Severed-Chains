@@ -12,9 +12,7 @@ import legend.core.platform.input.InputAction;
 import legend.game.combat.AdditionButtonMode;
 import legend.game.combat.SEffe;
 import legend.game.combat.bent.BattleEntity27c;
-import legend.game.combat.types.AdditionHitProperties10;
 import legend.game.combat.ui.AdditionButtonStyle;
-import legend.game.combat.types.AdditionSound;
 import legend.game.combat.ui.AdditionOverlayMode;
 import legend.game.combat.ui.ControllerStyle;
 import legend.core.platform.input.InputCodepoints;
@@ -25,6 +23,8 @@ import legend.game.modding.coremod.CoreMod;
 import legend.game.scripting.ScriptState;
 import legend.game.statistics.Statistics;
 import legend.game.types.Translucency;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joml.Math;
 import org.joml.Vector3f;
 
@@ -34,19 +34,21 @@ import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
+import static legend.core.GameEngine.SCRIPTS;
+import static legend.game.Graphics.GsGetLw;
 import static legend.game.Scus94491BpeSegment.battlePreloadedEntities_1f8003f4;
-import static legend.game.Scus94491BpeSegment_8002.renderText;
-import static legend.game.Scus94491BpeSegment_8003.GsGetLw;
-import static legend.game.Scus94491BpeSegment_800b.scriptStatePtrArr_800bc1c0;
+import static legend.game.Text.renderText;
 import static legend.game.combat.SEffe.additionBorderColours_800fb7f0;
 import static legend.game.combat.SEffe.additionHitCompletionState_8011a014;
 import static legend.game.combat.SEffe.additionOverlayActive_80119f41;
 import static legend.game.combat.SEffe.renderButtonPressHudElement1;
+import static legend.game.modding.coremod.CoreMod.ADDITION_TIMING_WINDOW_CONFIG;
 import static legend.game.modding.coremod.CoreMod.REDUCE_MOTION_FLASHING_CONFIG;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_ATTACK;
 import static legend.lodmod.LodMod.INPUT_ACTION_BTTL_COUNTER;
 
 public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.VoidType> {
+  private static final Logger LOGGER = LogManager.getFormatterLogger(AdditionOverlaysEffect44.class);
   private static final FontOptions UI_WHITE_SHADOWED = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.BLACK).horizontalAlign(HorizontalAlign.CENTRE);
 
   public int attackerScriptIndex_00;
@@ -88,7 +90,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
 
   @Method(0x801062a8L)
   public AdditionOverlaysEffect44(final int attackerScriptIndex, final int targetScriptIndex, final int autoCompleteType) {
-    this.attackerBent = (BattleEntity27c)scriptStatePtrArr_800bc1c0[attackerScriptIndex].innerStruct_00;
+    this.attackerBent = SCRIPTS.getObject(attackerScriptIndex, BattleEntity27c.class);
 
     this.reticleBorderShadow = new QuadBuilder("Reticle background")
       .translucency(Translucency.B_MINUS_F)
@@ -101,16 +103,8 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
       .build();
 
     //LAB_8010633c
-    int hitNum;
-    for(hitNum = 0; hitNum < 8; hitNum++) {
-      // Number of hits calculated by counting to first hit with 0 total frames
-      if((this.getHitProperty(this.attackerBent.charSlot_276, hitNum, 1, autoCompleteType) & 0xff) == 0) {
-        break;
-      }
-    }
-
     //LAB_80106374
-    final int hitCount = hitNum - 1;
+    final int hitCount = this.getHitCount(this.attackerBent.charSlot_276, autoCompleteType) - 1;
     this.count_30 = hitCount;
     this.attackerScriptIndex_00 = attackerScriptIndex;
     this.targetScriptIndex_04 = targetScriptIndex;
@@ -132,7 +126,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
     }
 
     //LAB_801063f0
-    for(hitNum = 0; hitNum < this.count_30; hitNum++) {
+    for(int hitNum = 0; hitNum < this.count_30; hitNum++) {
       final AdditionOverlaysHit20 hitOverlay = hitArray[hitNum];
       cumulativeOverlayDisplayDelay += this.getHitProperty(this.attackerBent.charSlot_276, hitNum, 15, autoCompleteType) & 0xff;
       hitOverlay.unused_00 = 1;
@@ -250,7 +244,7 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
   private void getBentTranslation(final int scriptIndex, final Vector3f out, final long coordType) {
     final MV transformationMatrix = new MV();
 
-    final BattleEntity27c bent = (BattleEntity27c)scriptStatePtrArr_800bc1c0[scriptIndex].innerStruct_00;
+    final BattleEntity27c bent = SCRIPTS.getObject(scriptIndex, BattleEntity27c.class);
 
     final GsCOORDINATE2 coord2;
     if(coordType == 0) {
@@ -301,6 +295,14 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
     }
   }
 
+  private int getHitCount(final int charSlot, final int autoCompleteType) {
+    if(autoCompleteType == 1 || autoCompleteType == 3) {
+      return additionTutorialExampleHits_800fb7c0.length;
+    }
+
+    return battlePreloadedEntities_1f8003f4.getHitCount(charSlot);
+  }
+
   /**
    * Selects where to get hit property from based on auto-complete type. 1 and 3 use a mysterious global 2-hit array,
    * which may be unused testing code.
@@ -308,16 +310,26 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
   @Method(0x801061bcL)
   private int getHitProperty(final int charSlot, final int hitNum, final int hitPropertyIndex, final int autoCompleteType) {
     //LAB_80106264
-    final int hitPropertyValue;
+    int hitPropertyValue;
     if(autoCompleteType == 1 || autoCompleteType == 3) {
       //LAB_80106274
-      hitPropertyValue = staticTestAdditionHitProperties_800fb7c0[hitNum].get(hitPropertyIndex);
+      hitPropertyValue = additionTutorialExampleHits_800fb7c0[hitNum].get(hitPropertyIndex);
     } else {
       //LAB_8010628c
-      hitPropertyValue = battlePreloadedEntities_1f8003f4.getHitProperty(charSlot, hitNum, hitPropertyIndex) & 0xff;
+      hitPropertyValue = battlePreloadedEntities_1f8003f4.getHit(charSlot, hitNum).get(hitPropertyIndex) & 0xff;
     }
 
     //LAB_80106298
+    // Increase timing window for additions (hitPropertyIndex 3 is totalSuccessFrames)
+    if(hitPropertyIndex == 3 && hitPropertyValue > 0) {
+      final float multiplier = CONFIG.getConfig(ADDITION_TIMING_WINDOW_CONFIG.get());
+      if(multiplier != 1.0f) {
+        final int originalValue = hitPropertyValue;
+        hitPropertyValue = (int)(hitPropertyValue * multiplier);
+        LOGGER.info("Addition timing window: original=%d frames, modified=%d frames (multiplier=%.1f)", originalValue, hitPropertyValue, multiplier);
+      }
+    }
+
     return hitPropertyValue;
   }
 
@@ -628,9 +640,9 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
           if(hitNum < this.count_30) {
             final AdditionOverlaysHit20 hitOverlay = hitArray[hitNum];
 
-            if(state.storage_44[8] != 0) {
+            if(state.getStor(8) != 0) {
               hitOverlay.isCounter_1c = true;
-              state.storage_44[8] = 0;
+              state.setStor(8, 0);
               Statistics.appendStat(this.attackerBent, Statistics.Stats.TOTAL_ADDITION_COUNTER, 1);
             }
 
@@ -840,12 +852,9 @@ public class AdditionOverlaysEffect44 implements Effect<EffectManagerParams.Void
     this.reticleBorderShadow.delete();
   }
 
-  private static final byte[] additionButtonRenderCallbackIndices_800fb7bc = {35, 40, 33, 38};
-
   /** Some kind of mysterious global 2-hit addition array. Should probably be yeeted, but need to be sure. */
-  private static final AdditionHitProperties10[] staticTestAdditionHitProperties_800fb7c0 = {
+  private static final AdditionHitProperties10[] additionTutorialExampleHits_800fb7c0 = {
     new AdditionHitProperties10(0xc0, 13, 9, 2, 50, 20, 2, 0, 0, 0, 8, 5, 8, 32, 0, 11, new AdditionSound(4, 9)),
     new AdditionHitProperties10(0xc0, 33, 27, 1, 30, 10, 0, 0, 0, 25, 2, 1, 8, 32, 0, 0, new AdditionSound(0, 7)),
-    new AdditionHitProperties10(0x0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new AdditionSound(-1, 0)),
   };
 }

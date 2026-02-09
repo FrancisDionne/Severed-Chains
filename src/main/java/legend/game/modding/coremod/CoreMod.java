@@ -32,6 +32,7 @@ import legend.game.modding.coremod.config.AdditionSettingsConfigEntry;
 import legend.game.modding.coremod.config.AdditionTimingModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionTimingOffsetConfigEntry;
 import legend.game.modding.coremod.config.AdditionOverlaySizeConfigEntry;
+import legend.game.modding.coremod.config.AdditionTimingWindowConfigEntry;
 import legend.game.modding.coremod.config.AllowWidescreenConfigEntry;
 import legend.game.modding.coremod.config.AudioDeviceConfig;
 import legend.game.modding.coremod.config.AutoTextDelayConfigEntry;
@@ -166,9 +167,9 @@ public class CoreMod {
   public static final RegistryDelegate<ConfigEntry<Void>> TEXT_GROUP_CONFIG = register("text_group", TextGroupConfigEntry::new);
   public static final RegistryDelegate<ConfigEntry<Void>> MISC_GROUP_CONFIG = register("misc_group", MiscGroupConfigEntry::new);
   public static final RegistryDelegate<CampaignNameConfigEntry> CAMPAIGN_NAME = CONFIG_REGISTRAR.register("campaign_name", CampaignNameConfigEntry::new);
-  public static final RegistryDelegate<TransformationModeConfigEntry> TRANSFORMATION_MODE_CONFIG = register("transformation_mode", TransformationModeConfigEntry::new);
-  public static final RegistryDelegate<BoolConfigEntry> QUICK_TEXT_CONFIG = register("quick_text", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 7001));
-  public static final RegistryDelegate<BoolConfigEntry> AUTO_TEXT_CONFIG = register("auto_text", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 7001));
+  public static final RegistryDelegate<TransformationModeConfigEntry> TRANSFORMATION_MODE_CONFIG = CONFIG_REGISTRAR.register("transformation_mode", TransformationModeConfigEntry::new);
+  public static final RegistryDelegate<BoolConfigEntry> QUICK_TEXT_CONFIG = CONFIG_REGISTRAR.register("quick_text", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 7001));
+  public static final RegistryDelegate<BoolConfigEntry> AUTO_TEXT_CONFIG = CONFIG_REGISTRAR.register("auto_text", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 7001));
   public static final RegistryDelegate<BoolConfigEntry> SAVE_ANYWHERE_CONFIG = register("save_anywhere", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 9002));
   public static final RegistryDelegate<BoolConfigEntry> DISABLE_STATUS_EFFECTS_CONFIG = register("disable_status_effects", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001));
   public static final RegistryDelegate<BoolConfigEntry> ENEMY_HP_BARS_CONFIG = register("enemy_hp_bars", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY, 3001));
@@ -182,6 +183,11 @@ public class CoreMod {
   public static final RegistryDelegate<IndicatorModeConfigEntry> INDICATOR_MODE_CONFIG = CONFIG_REGISTRAR.register("indicator_mode", IndicatorModeConfigEntry::new);
   public static final RegistryDelegate<InventorySizeConfigEntry> INVENTORY_SIZE_CONFIG = CONFIG_REGISTRAR.register("inventory_size", InventorySizeConfigEntry::new);
   public static final RegistryDelegate<EncounterRateConfigEntry> ENCOUNTER_RATE_CONFIG = CONFIG_REGISTRAR.register("encounter_rate", EncounterRateConfigEntry::new);
+  public static final RegistryDelegate<AdditionModeConfigEntry> ADDITION_MODE_CONFIG = register("addition_mode", AdditionModeConfigEntry::new);
+  public static final RegistryDelegate<BoolConfigEntry> AUTO_DRAGOON_ADDITION_CONFIG = CONFIG_REGISTRAR.register("auto_dragoon_addition", () -> new BoolConfigEntry(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.GAMEPLAY));
+  public static final RegistryDelegate<AdditionOverlayConfigEntry> ADDITION_OVERLAY_CONFIG = register("addition_overlay_mode", AdditionOverlayConfigEntry::new);
+  public static final RegistryDelegate<AdditionOverlaySizeConfigEntry> ADDITION_OVERLAY_SIZE_CONFIG = register("addition_overlay_size", AdditionOverlaySizeConfigEntry::new);
+  public static final RegistryDelegate<AdditionTimingWindowConfigEntry> ADDITION_TIMING_WINDOW_CONFIG = CONFIG_REGISTRAR.register("addition_timing_window", AdditionTimingWindowConfigEntry::new);
   public static final RegistryDelegate<AutoTextDelayConfigEntry> AUTO_TEXT_DELAY_CONFIG = CONFIG_REGISTRAR.register("auto_text_delay", AutoTextDelayConfigEntry::new);
   public static final RegistryDelegate<UnlockPartyConfig> UNLOCK_PARTY_CONFIG = CONFIG_REGISTRAR.register("unlock_party", UnlockPartyConfig::new);
   public static final RegistryDelegate<BattleUIColourRedConfigEntry> BATTLE_UI_COLOUR_RED_CONFIG = CONFIG_REGISTRAR.register("battle_ui_colour_red", BattleUIColourRedConfigEntry::new);
@@ -189,15 +195,12 @@ public class CoreMod {
   public static final RegistryDelegate<BattleUIColourBlueConfigEntry> BATTLE_UI_COLOUR_BLUE_CONFIG = CONFIG_REGISTRAR.register("battle_ui_colour_blue", BattleUIColourBlueConfigEntry::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> ADDITION_GROUP_CONFIG = register("addition_group", AdditionGroupConfigEntry::new);
-  public static final RegistryDelegate<AdditionModeConfigEntry> ADDITION_MODE_CONFIG = register("addition_mode", AdditionModeConfigEntry::new);
-  public static final RegistryDelegate<AdditionOverlayConfigEntry> ADDITION_OVERLAY_CONFIG = register("addition_overlay_mode", AdditionOverlayConfigEntry::new);
   public static final RegistryDelegate<AdditionDifficultyConfigEntry> ADDITION_DIFFICULTY_CONFIG = register("addition_difficulty", AdditionDifficultyConfigEntry::new);
   public static final RegistryDelegate<AdditionTimingModeConfigEntry> ADDITION_TIMING_MODE_CONFIG = register("addition_timing_mode", AdditionTimingModeConfigEntry::new);
   public static final RegistryDelegate<AdditionTimingOffsetConfigEntry> ADDITION_TIMING_OFFSET_CONFIG = register("addition_timing_offset", AdditionTimingOffsetConfigEntry::new);
   public static final RegistryDelegate<AdditionButtonModeConfigEntry> ADDITION_BUTTON_MODE_CONFIG = register("addition_button_mode", AdditionButtonModeConfigEntry::new);
   public static final RegistryDelegate<AdditionCounterDifficultyConfigEntry> ADDITION_COUNTER_DIFFICULTY_CONFIG = register("addition_counter_difficulty", AdditionCounterDifficultyConfigEntry::new);
   public static final RegistryDelegate<AdditionGameplayEnhanceConfigEntry> ADDITION_GAMEPLAY_ENHANCE_CONFIG = CONFIG_REGISTRAR.register("addition_gameplay_enhance", AdditionGameplayEnhanceConfigEntry::new);
-  public static final RegistryDelegate<AdditionOverlaySizeConfigEntry> ADDITION_OVERLAY_SIZE_CONFIG = CONFIG_REGISTRAR.register("addition_overlay_size", AdditionOverlaySizeConfigEntry::new);
   public static final RegistryDelegate<AdditionAllowMisinputConfigEntry> ADDITION_ALLOW_MISINPUT_CONFIG = CONFIG_REGISTRAR.register("addition_allow_misinput", AdditionAllowMisinputConfigEntry::new);
 
   public static final RegistryDelegate<ConfigEntry<Void>> DRAGOON_ADDITION_GROUP_CONFIG = register("dragoon_addition_group", DragoonAdditionGroupConfigEntry::new);

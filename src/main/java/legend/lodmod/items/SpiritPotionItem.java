@@ -11,7 +11,7 @@ import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 
 public class SpiritPotionItem extends RecoverSpItem {
   public SpiritPotionItem() {
-    super(10, false, 0, 100);
+    super(ItemIcon.RED_POTION, 10, false, 100, 0);
   }
 
   @Override
@@ -38,8 +38,8 @@ public class SpiritPotionItem extends RecoverSpItem {
 
   @Override
   protected void useItemScriptLoaded(final ScriptState<BattleEntity27c> user, final int targetBentIndex) {
-    user.storage_44[8] = 0x6868ff; // Colour
-    user.storage_44[28] = targetBentIndex;
-    user.storage_44[30] = user.index;
+    user.setStor(8, 0x6868ff); // Colour
+    user.setStor(28, targetBentIndex);
+    user.setStor(30, user.index);
   }
 }

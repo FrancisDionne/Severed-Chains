@@ -6,6 +6,7 @@ import legend.core.gpu.Bpp;
 import legend.core.gte.MV;
 import legend.core.opengl.BasicCamera;
 import legend.core.opengl.Camera;
+import legend.core.opengl.CopyShaderOptions;
 import legend.core.opengl.FrameBuffer;
 import legend.core.opengl.LineBuilder;
 import legend.core.opengl.Mesh;
@@ -69,8 +70,8 @@ import static legend.core.GameEngine.GTE;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.RENDERER;
 import static legend.core.MathHelper.PI;
-import static legend.game.Scus94491BpeSegment_8004.currentEngineState_8004dd04;
-import static legend.game.Scus94491BpeSegment_800c.worldToScreenMatrix_800c3548;
+import static legend.game.EngineStates.currentEngineState_8004dd04;
+import static legend.game.Graphics.worldToScreenMatrix_800c3548;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_DEBUG_FRAME_ADVANCE;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_DEBUG_FRAME_ADVANCE_HOLD;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_DEBUG_OPEN_DEBUGGER;
@@ -103,6 +104,7 @@ import static org.lwjgl.opengl.GL11C.GL_RGBA;
 import static org.lwjgl.opengl.GL11C.GL_RGBA16;
 import static org.lwjgl.opengl.GL11C.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11C.GL_TRIANGLE_STRIP;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11C.GL_VENDOR;
 import static org.lwjgl.opengl.GL11C.GL_VERSION;
@@ -154,6 +156,14 @@ public class RenderEngine {
       final Shader<SimpleShaderOptions>.UniformVec2 shiftUv = shader.new UniformVec2("shiftUv");
       final Shader<SimpleShaderOptions>.UniformVec4 recolour = shader.new UniformVec4("recolour");
       return () -> new SimpleShaderOptions(shiftUv, recolour);
+    }
+  );
+
+  public static final ShaderType<CopyShaderOptions> COPY_SHADER = new ShaderType<>(
+    options -> loadShader("copy", "copy", options),
+    shader -> {
+      final Shader<CopyShaderOptions>.UniformMat4 projection = shader.new UniformMat4("projection");
+      return () -> new CopyShaderOptions(projection);
     }
   );
 
@@ -485,6 +495,7 @@ public class RenderEngine {
     this.window.events().onInputActionReleased(this::onInputActionReleased);
 
     ShaderManager.addShader(SIMPLE_SHADER);
+    ShaderManager.addShader(COPY_SHADER);
     final Shader<VoidShaderOptions> screenShader = ShaderManager.addShader(SCREEN_SHADER);
     this.standardShader = ShaderManager.addShader(STANDARD_SHADER);
     this.standardShaderOptions = this.standardShader.makeOptions();
@@ -614,7 +625,7 @@ public class RenderEngine {
 
           this.scissorStack.reset();
         } else {
-          this.renderCallback.run();
+          this.renderFrame();
         }
       }
 
@@ -627,7 +638,7 @@ public class RenderEngine {
 
         this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
         this.resetBatches();
-        this.renderCallback.run();
+        this.renderFrame();
 
         if(this.frameAdvanceSingle) {
           this.frameAdvanceSingle = false;
@@ -653,15 +664,7 @@ public class RenderEngine {
           this.mainBatch.orthoPool.ignoreQueues = true;
         }
 
-        // Reset CLUT animations
-        this.clutAnimationBufferIndex = 0;
-
-        // Run game callback
-        this.renderCallback.run();
-
-        // Upload CLUT animations
-        this.clutAnimationBuffer.put(this.clutAnimationBufferIndex, -1);
-        this.clutAnimationUniform.set(this.clutAnimationBuffer);
+        this.renderFrame();
       }
 
       if(legacyMode == 0) {
@@ -757,6 +760,18 @@ public class RenderEngine {
 
       this.handleMovement();
     });
+  }
+
+  private void renderFrame() {
+    // Reset CLUT animations
+    this.clutAnimationBufferIndex = 0;
+
+    // Run game callback
+    this.renderCallback.run();
+
+    // Upload CLUT animations
+    this.clutAnimationBuffer.put(this.clutAnimationBufferIndex, -1);
+    this.clutAnimationUniform.set(this.clutAnimationBuffer);
   }
 
   private void renderBatch(final RenderBatch batch) {
@@ -911,6 +926,44 @@ public class RenderEngine {
     this.clutAnimationBuffer.put(this.clutAnimationBufferIndex++, replacementY);
   }
 
+  /** Duplicates the passed in texture into a new texture. New texture must be deleted by the caller. Can only be called on the render thread. */
+  public Texture copyTexture(final Texture texture) {
+    final Texture copy = Texture.copyAttributesFrom(texture);
+    final FrameBuffer buffer = FrameBuffer.create(builder -> builder.attachment(copy, GL_COLOR_ATTACHMENT0));
+    final Shader<CopyShaderOptions> shader = ShaderManager.getShader(COPY_SHADER);
+    final CopyShaderOptions options = shader.makeOptions();
+
+    final int w = texture.width;
+    final int h = texture.height;
+
+    glDepthMask(false);
+    glDisable(GL_BLEND);
+    this.state.backfaceCulling(false);
+    this.state.disableDepthTest();
+
+    buffer.bind();
+    texture.use();
+
+    glViewport(0, 0, w, h);
+    options.projection.ortho2DLH(0.0f, w, 0.0f, h);
+    shader.use();
+    options.apply();
+
+    final Mesh mesh = new Mesh(GL_TRIANGLE_STRIP, new float[] {
+      0, 0, 0, 0,
+      0, h, 0, 1,
+      w, 0, 1, 0,
+      w, h, 1, 1,
+    }, 4);
+    mesh.attribute(0, 0L, 2, 4);
+    mesh.attribute(1, 2L, 2, 4);
+    mesh.draw();
+    mesh.delete();
+    buffer.delete();
+
+    return copy;
+  }
+
   private void handleMovement() {
     if(this.movingLeft) {
       this.camera3d.strafe(-MOVE_SPEED * 200);
@@ -1019,8 +1072,20 @@ public class RenderEngine {
     this.transformsUniform.set(this.transformsBuffer);
   }
 
-  private final Comparator<QueuedModel<?, ?>> perspectiveTranslucencySorter = Comparator.comparingDouble((QueuedModel<?, ?> model) -> model.modelView.m32() + model.screenspaceOffset.z).reversed();
-  private final Comparator<QueuedModel<?, ?>> orthoTranslucencySorter = Comparator.comparingDouble((QueuedModel<?, ?> model) -> model.transforms.m32() + model.screenspaceOffset.z).reversed();
+  private final Comparator<QueuedModel<?, ?>> perspectiveTranslucencySorter = Comparator.comparingDouble((QueuedModel<?, ?> model) -> model.modelView.m32() + model.screenspaceOffset.z).reversed().thenComparingInt(model -> model.sequence);
+  private final Comparator<QueuedModel<?, ?>> orthoTranslucencySorter = Comparator.comparingDouble((QueuedModel<?, ?> model) -> model.transforms.m32() + model.screenspaceOffset.z).reversed().thenComparingInt(model -> model.sequence);
+  private final Comparator<QueuedModel<?, ?>> orthoTranslucencySorter1 = (a, b) -> {
+    final float depthA = a.transforms.m32() + a.screenspaceOffset.z;
+    final float depthB = b.transforms.m32() + b.screenspaceOffset.z;
+
+    final int depthComparison = Float.compare(depthB, depthA);
+
+    if(depthComparison == 0) {
+      return Integer.compare(b.sequence, a.sequence);
+    }
+
+    return depthComparison;
+  };
 
   private void sortPerspectivePool(final QueuePool<QueuedModel<?, ?>> pool) {
     // Cache modelview for sorting
@@ -1033,7 +1098,7 @@ public class RenderEngine {
   }
 
   private void sortOrthoPool(final QueuePool<QueuedModel<?, ?>> pool) {
-    pool.sort(this.orthoTranslucencySorter);
+    pool.sort(this.orthoTranslucencySorter1);
   }
 
   public <T extends QueuedModel<?, ?>> T queueModel(final Obj obj, final Class<T> type) {

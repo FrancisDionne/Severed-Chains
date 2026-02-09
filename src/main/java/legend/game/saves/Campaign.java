@@ -118,6 +118,7 @@ public final class Campaign {
       try {
         saves.add(new SaveCardData(this, this.loadGame(name)));
       } catch(final InvalidSaveException e) {
+        LOGGER.warn("Failed to load save " + filename, e);
         saves.add(new SaveCardData(this, SavedGame.invalid(name)));
       }
     }
