@@ -26,7 +26,9 @@ import legend.game.types.TextboxChar08;
 import legend.game.types.TextboxState;
 import legend.game.types.TextboxText84;
 import legend.game.types.TextboxTextState;
+import legend.game.types.TextboxType;
 import legend.game.types.Translucency;
+import legend.lodmod.LodEngineStateTypes;
 import org.joml.Math;
 import org.legendofdragoon.modloader.registries.RegistryId;
 
@@ -39,9 +41,8 @@ import static legend.core.GameEngine.GPU;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.REGISTRIES;
 import static legend.core.GameEngine.RENDERER;
-import static legend.game.Audio.playSound;
+import static legend.game.sound.Audio.playMenuSound;
 import static legend.game.EngineStates.currentEngineState_8004dd04;
-import static legend.game.EngineStates.engineState_8004dd20;
 import static legend.game.Graphics.centreScreenX_1f8003dc;
 import static legend.game.Graphics.centreScreenY_1f8003de;
 import static legend.game.Graphics.displayWidth_1f8003e0;
@@ -209,11 +210,11 @@ public final class Text {
     textboxText.minSelectionLine_72 = script.params_20[1].get();
     textboxText.maxSelectionLine_70 = script.params_20[2].get();
 
-    if(textboxText.state_00 == TextboxTextState._13) {
+    if(textboxText.state_00 == TextboxTextState.PROCESS_NO_INPUT_ADVANCED_13) {
       textboxText.state_00 = TextboxTextState.TRANSITION_AFTER_TIMEOUT_23;
       textboxText.ticksUntilStateTransition_64 = 10 * currentEngineState_8004dd04.tickMultiplier();
       textboxText.stateAfterTransition_78 = TextboxTextState.SELECTION_22;
-      playSound(0, 4, (short)0, (short)0);
+      playMenuSound(4);
     }
 
     //LAB_800257bc
@@ -226,7 +227,7 @@ public final class Text {
       .translucency(Translucency.HALF_B_PLUS_HALF_F)
       .pos(-1.0f, -1.0f, 0.0f)
       .size(2.0f, 2.0f)
-      .rgb(0.0f, 41.0f / 255.0f, 159.0f / 255.0f)
+      .rgb(1.0f, 1.0f, 1.0f)
       .monochrome(0, 0.0f)
       .monochrome(3, 0.0f)
       .build();
@@ -277,69 +278,21 @@ public final class Text {
 
     //LAB_80025824
     final Textbox4c textbox = textboxes_800be358[textboxIndex];
-
-    textbox.state_00 = TextboxState._1;
-    textbox.renderBorder_06 = false;
-    textbox.flags_08 = 0;
-    textbox.z_0c = 14;
-    textbox.currentTicks_10 = 0;
-    textbox.width_1c = 0;
-    textbox.height_1e = 0;
-    textbox.animationWidth_20 = 0x1000;
-    textbox.animationHeight_22 = 0x1000;
-    textbox.animationTicks_24 = 0;
-    textbox.currentX_28 = 0;
-    textbox.currentY_2c = 0;
-    textbox.stepX_30 = 0;
-    textbox.stepY_34 = 0;
-    textbox._38 = 0;
-    textbox._3c = 0;
+    textbox.clear();
   }
 
   @Method(0x800258a8L)
-  public static void clearTextboxText(final int a0) {
-    final TextboxText84 textboxText = textboxText_800bdf38[a0];
-    textboxText.state_00 = TextboxTextState._1;
-    textboxText.flags_08 = 0;
-    textboxText.z_0c = 13;
-    textboxText.textColour_28 = TextColour.WHITE;
-    textboxText.scrollSpeed_2a = 2.0f / currentEngineState_8004dd04.tickMultiplier();
-    textboxText.scrollAmount_2c = 0.0f;
-    textboxText.charIndex_30 = 0;
-    textboxText.charX_34 = 0;
-    textboxText.charY_36 = 0;
-    textboxText.linesScrolled_3a = 0;
-    textboxText._3e = 1;
-    textboxText._40 = 0;
-    textboxText.pauseTimer_44 = 0;
+  public static void clearTextboxText(final int textboxIndex) {
+    final TextboxText84 text = textboxText_800bdf38[textboxIndex];
+    text.clear();
 
-    final Textbox4c struct4c = textboxes_800be358[a0];
-    textboxText.x_14 = struct4c.x_14;
-    textboxText.y_16 = struct4c.y_16;
-    textboxText.chars_1c = struct4c.chars_18 - 1;
-    textboxText.lines_1e = struct4c.lines_1a - 1;
-    textboxText._18 = textboxText.x_14 - textboxText.chars_1c * 9 / 2;
-    textboxText._1a = textboxText.y_16 - textboxText.lines_1e * 6;
-
-    //LAB_800259b4
-    for(int i = 0; i < 8; i++) {
-      textboxText.digits_46[i] = 0;
-    }
-
-    //LAB_800259e4
-    textboxText._5c = TextboxTextState.UNINITIALIZED_0;
-    textboxText.selectionLine_60 = 0;
-    textboxText.ticksUntilStateTransition_64 = 0;
-    textboxText.selectionLine_68 = 0;
-    textboxText.selectionIndex_6c = 0;
-    textboxText.maxSelectionLine_70 = 0;
-    textboxText.minSelectionLine_72 = 0;
-    textboxText.stateAfterTransition_78 = TextboxTextState.UNINITIALIZED_0;
-    textboxText.element_7c = 0;
-    textboxText.digitIndex_80 = 0;
-
-    textboxText.waitTicks = 0;
-    textboxText.inputActions.clear();
+    final Textbox4c textbox = textboxes_800be358[textboxIndex];
+    text.x_14 = textbox.x_14;
+    text.y_16 = textbox.y_16;
+    text.chars_1c = textbox.chars_18 - 1;
+    text.lines_1e = textbox.lines_1a - 1;
+    text._18 = text.x_14 - text.chars_1c * 9 / 2;
+    text._1a = text.y_16 - text.lines_1e * 6;
   }
 
   @Method(0x80025a04L)
@@ -479,10 +432,8 @@ public final class Text {
   }
 
   @Method(0x80025f4cL)
-  public static void renderTextboxBackground(final int textboxIndex) {
+  public static void renderTextboxBackground(final Textbox4c textbox) {
     //LAB_80025f7c
-    final Textbox4c textbox = textboxes_800be358[textboxIndex];
-
     if(textbox.backgroundType_04 != BackgroundType.NO_BACKGROUND) {
       if(textbox.state_00 != TextboxState._1) {
         if(textbox.x_14 != textbox.oldX || textbox.y_16 != textbox.oldY || textbox.width_1c != textbox.oldW || textbox.height_1e != textbox.oldH) {
@@ -497,10 +448,11 @@ public final class Text {
         }
 
         RENDERER.queueOrthoModel(textboxBackgroundObj, textbox.backgroundTransforms, QueuedModelStandard.class)
+          .colour(textbox.colour)
           .worldScissor().set(0, 0, RENDERER.getRenderWidth(), RENDERER.getRenderHeight());
 
         if(textbox.renderBorder_06) {
-          renderTextboxBorder(textboxIndex, textbox.x_14 - textbox.width_1c, textbox.y_16 - textbox.height_1e, textbox.x_14 + textbox.width_1c, textbox.y_16 + textbox.height_1e);
+          renderTextboxBorder(textbox, textbox.x_14 - textbox.width_1c, textbox.y_16 - textbox.height_1e, textbox.x_14 + textbox.width_1c, textbox.y_16 + textbox.height_1e);
         }
       }
     }
@@ -509,7 +461,7 @@ public final class Text {
   }
 
   @Method(0x800261c0L)
-  public static void renderTextboxBorder(final int textboxIndex, final float boxLeft, final float boxTop, final float boxRight, final float boxBottom) {
+  public static void renderTextboxBorder(final Textbox4c textbox, final float boxLeft, final float boxTop, final float boxRight, final float boxBottom) {
     final float[] xs = {
       boxLeft + 4,
       boxRight - 4,
@@ -523,8 +475,6 @@ public final class Text {
       boxBottom - 5,
       boxBottom - 5,
     };
-
-    final Textbox4c textbox = textboxes_800be358[textboxIndex];
 
     if(textbox.animationWidth_20 != textbox.oldScaleW || textbox.animationHeight_22 != textbox.oldScaleH) {
       textbox.updateBorder = true;
@@ -569,57 +519,58 @@ public final class Text {
     final TextboxText84 textboxText = textboxText_800bdf38[textboxIndex];
 
     switch(textboxText.state_00) {
-      case _1 -> {
+      case INIT_TEXTBOX_TYPE_1 -> {
         //LAB_8002663c
-        if((textbox.flags_08 & 0x1) == 0) {
-          switch(textboxText.type_04) {
-            case 0 -> textboxText.state_00 = TextboxTextState._12;
+        if((textbox.flags_08 & TextboxText84.INITIALIZED) == 0) {
+          var type = TextboxType.from(textboxText.type_04);
+          switch(type) {
+            case NORMAL_INTERACTIVE -> textboxText.state_00 = TextboxTextState.CHECK_UNINITIALIZED_PENDING_INPUT_12;
 
-            case 2 -> {
+            case SCROLL_IN_UP -> {
               textboxText.state_00 = TextboxTextState.SCROLL_TEXT_UP_10;
-              textboxText.flags_08 |= 0x1;
+              textboxText.flags_08 |= TextboxText84.INITIALIZED;
               textboxText.scrollSpeed_2a = 1.0f / currentEngineState_8004dd04.tickMultiplier();
               textboxText.charX_34 = 0;
               textboxText.charY_36 = textboxText.lines_1e;
             }
 
-            case 3 -> {
+            case DELAYED_AUTO_START -> {
               textboxText.state_00 = TextboxTextState.TRANSITION_AFTER_TIMEOUT_23;
-              textboxText.flags_08 |= 0x1;
+              textboxText.flags_08 |= TextboxText84.INITIALIZED;
               textboxText.scrollSpeed_2a = 1.0f / currentEngineState_8004dd04.tickMultiplier();
               textboxText.charX_34 = 0;
               textboxText.charY_36 = 0;
               textboxText.ticksUntilStateTransition_64 = 10 * currentEngineState_8004dd04.tickMultiplier();
-              textboxText.stateAfterTransition_78 = TextboxTextState._17;
-              playSound(0, 4, (short)0, (short)0);
+              textboxText.stateAfterTransition_78 = TextboxTextState.IGNORE_SCROLL_LINE_BREAK_17;
+              playMenuSound(4);
             }
 
-            case 4 -> {
+            case SMAP_NAMED -> {
               //LAB_80026780
               do {
-                processTextboxLine(textboxIndex);
+                processTextboxCharacter(textboxIndex);
               } while((textboxText.flags_08 & TextboxText84.PROCESSED_NEW_LINE) == 0);
 
               textboxText.flags_08 ^= TextboxText84.PROCESSED_NEW_LINE;
             }
 
-            default ->
+            case SIMPLE ->
               //LAB_800267a0
               textboxText.state_00 = TextboxTextState.PROCESS_TEXT_4;
           }
         }
       }
 
-      case _2 -> textboxText.state_00 = TextboxTextState.PROCESS_TEXT_4;
+      case SET_STATE_PROCESS_TEXT_2 -> textboxText.state_00 = TextboxTextState.PROCESS_TEXT_4;
 
       //LAB_80026538
       case PROCESS_TEXT_4 ->
         //LAB_800267c4
-        processTextboxLine(textboxIndex);
+        processTextboxCharacter(textboxIndex);
 
       case SCROLL_TEXT_5 -> {
         //LAB_800267d4
-        if((textboxText.flags_08 & 0x1) != 0) {
+        if((textboxText.flags_08 & TextboxText84.INITIALIZED) != 0) { // process named textbox vertical scroll spacing
           //LAB_800267f4
           if(textboxText.linesScrolled_3a < textboxText.lines_1e - ((textboxText.flags_08 & TextboxText84.HAS_NAME) == 0 ? 1 : 2)) {
             //LAB_80026828
@@ -627,15 +578,15 @@ public final class Text {
             textboxText.linesScrolled_3a++;
             scrollTextboxDown(textboxIndex);
           } else {
-            textboxText.flags_08 ^= 0x1;
+            textboxText.flags_08 ^= TextboxText84.INITIALIZED;
             textboxText.linesScrolled_3a = 0;
             setTextboxArrowPosition(textboxIndex, true);
           }
           //LAB_8002684c
-        } else if((textboxText.flags_08 & TextboxText84.NO_INPUT) != 0) {
+        } else if((textboxText.flags_08 & TextboxText84.NO_INPUT) != 0) { // no input advanced scroll
           textboxText.state_00 = TextboxTextState.SCROLL_TEXT_DOWN_9;
-          textboxText.flags_08 |= 0x1;
-        } else {
+          textboxText.flags_08 |= TextboxText84.INITIALIZED;
+        } else { // input advanced scroll
           if(CONFIG.getConfig(CoreMod.AUTO_TEXT_CONFIG.get()) && autoTextDelayStart == 0) {
             autoTextDelayStart = System.nanoTime();
           }
@@ -647,7 +598,7 @@ public final class Text {
             if(textboxText.type_04 == 1 || textboxText.type_04 == 4) {
               //LAB_800268b4
               textboxText.state_00 = TextboxTextState.SCROLL_TEXT_DOWN_9;
-              textboxText.flags_08 |= 0x1;
+              textboxText.flags_08 |= TextboxText84.INITIALIZED;
             }
 
             if(textboxText.type_04 == 2) {
@@ -658,7 +609,7 @@ public final class Text {
         }
       }
 
-      case _6 -> {
+      case WAIT_FOR_INPUT_ADVANCED_DIRTY_BOX_6 -> {
         if(CONFIG.getConfig(CoreMod.AUTO_TEXT_CONFIG.get()) && autoTextDelayStart == 0) {
           autoTextDelayStart = System.nanoTime();
         }
@@ -669,26 +620,27 @@ public final class Text {
         }
       }
 
-      case _7 -> {
+      case PROCESS_INPUT_ADVANCED_7 -> {
+        //Ignore any block time configurations if set, as textbox is input advanced
         //LAB_800268fc
-        textboxText._40++;
-        if(textboxText._40 >= textboxText._3e) {
-          textboxText._40 = 0;
+        textboxText.blockTimeLeft_40++;
+        if(textboxText.blockTimeLeft_40 >= textboxText.blockTimer_3e) {
+          textboxText.blockTimeLeft_40 = 0;
           textboxText.state_00 = TextboxTextState.PROCESS_TEXT_4;
         }
 
         //LAB_80026928
         if((textboxText.flags_08 & TextboxText84.NO_INPUT) == 0) {
           if(PLATFORM.isActionHeld(INPUT_ACTION_MENU_CONFIRM.get()) || CONFIG.getConfig(CoreMod.QUICK_TEXT_CONFIG.get())) {
-            boolean found = false;
+            boolean endOfTextBlock = false;
 
             //LAB_80026954
             for(int lineIndex = 0; lineIndex < 4; lineIndex++) {
-              processTextboxLine(textboxIndex);
+              processTextboxCharacter(textboxIndex);
 
-              if(textboxText.state_00 == TextboxTextState.SCROLL_TEXT_5 || textboxText.state_00 == TextboxTextState._6 || textboxText.state_00 == TextboxTextState._15 || textboxText.state_00 == TextboxTextState._11 || textboxText.state_00 == TextboxTextState._13) {
+              if(textboxText.state_00 == TextboxTextState.SCROLL_TEXT_5 || textboxText.state_00 == TextboxTextState.WAIT_FOR_INPUT_ADVANCED_DIRTY_BOX_6 || textboxText.state_00 == TextboxTextState.CLOSE_TEXTBOX_15 || textboxText.state_00 == TextboxTextState.WAIT_FOR_INPUT_ADVANCED_CLEAN_BOX_11 || textboxText.state_00 == TextboxTextState.PROCESS_NO_INPUT_ADVANCED_13) {
                 //LAB_8002698c
-                found = true;
+                endOfTextBlock = true;
                 break;
               }
 
@@ -696,8 +648,8 @@ public final class Text {
             }
 
             //LAB_800269a0
-            if(!found) {
-              textboxText._40 = 0;
+            if(!endOfTextBlock) {
+              textboxText.blockTimeLeft_40 = 0;
               textboxText.state_00 = TextboxTextState.PROCESS_TEXT_4;
             }
           }
@@ -725,17 +677,17 @@ public final class Text {
         //LAB_80026a00
         scrollTextboxUp(textboxIndex);
 
-        if((textboxText.flags_08 & 0x4) != 0) {
-          textboxText.flags_08 ^= 0x4;
+        if((textboxText.flags_08 & TextboxText84.SCROLL_ACTION_COMPLETE) != 0) {
+          textboxText.flags_08 ^= TextboxText84.SCROLL_ACTION_COMPLETE;
 
-          if((textboxText.flags_08 & 0x2) == 0) {
+          if((textboxText.flags_08 & TextboxText84.TEXT_PARSE_COMPLETE) == 0) {
             //LAB_80026a5c
             do {
-              processTextboxLine(textboxIndex);
+              processTextboxCharacter(textboxIndex);
 
-              if(textboxText.state_00 == TextboxTextState._15) {
+              if(textboxText.state_00 == TextboxTextState.CLOSE_TEXTBOX_15) {
                 textboxText.linesScrolled_3a = 0;
-                textboxText.flags_08 |= 0x2;
+                textboxText.flags_08 |= TextboxText84.TEXT_PARSE_COMPLETE;
                 break;
               }
             } while(textboxText.state_00 != TextboxTextState.SCROLL_TEXT_5);
@@ -753,7 +705,7 @@ public final class Text {
         }
       }
 
-      case _11 -> {
+      case WAIT_FOR_INPUT_ADVANCED_CLEAN_BOX_11 -> {
         if(CONFIG.getConfig(CoreMod.AUTO_TEXT_CONFIG.get()) && autoTextDelayStart == 0) {
           autoTextDelayStart = System.nanoTime();
         }
@@ -764,18 +716,18 @@ public final class Text {
           clearTextboxChars(textboxIndex);
 
           textboxText.state_00 = TextboxTextState.PROCESS_TEXT_4;
-          textboxText.flags_08 ^= 0x1;
+          textboxText.flags_08 ^= TextboxText84.INITIALIZED;
           textboxText.charX_34 = 0;
           textboxText.charY_36 = 0;
           textboxText.linesScrolled_3a = 0;
 
-          if((textboxText.flags_08 & 0x8) != 0) {
-            textboxText.state_00 = TextboxTextState._13;
+          if((textboxText.flags_08 & TextboxText84.PERMIT_SCROLL_INPUT_ADVANCE) != 0) {
+            textboxText.state_00 = TextboxTextState.PROCESS_NO_INPUT_ADVANCED_13;
           }
         }
       }
 
-      case _12 -> {
+      case CHECK_UNINITIALIZED_PENDING_INPUT_12 -> {
         //LAB_80026af0
         if(textbox.state_00 == TextboxState.UNINITIALIZED_0) {
           textboxText.delete();
@@ -784,21 +736,21 @@ public final class Text {
         }
       }
 
-      case _13 -> {
+      case PROCESS_NO_INPUT_ADVANCED_13 -> {
         //LAB_80026b34
-        textboxText.flags_08 |= 0x8;
+        textboxText.flags_08 |= TextboxText84.PERMIT_SCROLL_INPUT_ADVANCE;
         setTextboxArrowPosition(textboxIndex, true);
 
         //LAB_80026b4c
         do {
-          processTextboxLine(textboxIndex);
+          processTextboxCharacter(textboxIndex);
 
           if(textboxText.state_00 == TextboxTextState.SCROLL_TEXT_5) {
             //LAB_80026b28
-            textboxText.state_00 = TextboxTextState._11;
+            textboxText.state_00 = TextboxTextState.WAIT_FOR_INPUT_ADVANCED_CLEAN_BOX_11;
             break;
           }
-        } while(textboxText.state_00 != TextboxTextState._15);
+        } while(textboxText.state_00 != TextboxTextState.CLOSE_TEXTBOX_15);
 
         //LAB_80026b6c
         if((textboxText.flags_08 & TextboxText84.NO_INPUT) != 0) {
@@ -806,10 +758,10 @@ public final class Text {
         }
 
         //LAB_80026ba0
-        if(textboxText._3e != 0) {
+        if(textboxText.blockTimer_3e != 0) {
           setTextboxArrowPosition(textboxIndex, false);
           textboxText._5c = textboxText.state_00;
-          textboxText.state_00 = TextboxTextState._14;
+          textboxText.state_00 = TextboxTextState.TICK_TIMER_SMAP_NO_INPUT_ADVANCED_14;
         }
 
         //LAB_80026bc8
@@ -819,27 +771,27 @@ public final class Text {
           textboxText.ticksUntilStateTransition_64 = 10 * currentEngineState_8004dd04.tickMultiplier();
           textboxText.stateAfterTransition_78 = TextboxTextState.SELECTION_22;
           textboxText.selectionLine_68 = textboxText.minSelectionLine_72;
-          playSound(0, 4, (short)0, (short)0);
+          playMenuSound(4);
         }
       }
 
-      case _14 -> {
+      case TICK_TIMER_SMAP_NO_INPUT_ADVANCED_14 -> {
         //LAB_80026c18
-        if((textboxText.flags_08 & 0x40) == 0) {
-          textboxText._40--;
+        if((textboxText.flags_08 & TextboxText84.SKIP_SMAP_COUNTDOWN_OR_FINISH_BATTLE_TEXTBOX) == 0) {
+          textboxText.blockTimeLeft_40--;
 
-          if(textboxText._40 <= 0) {
-            textboxText._40 = textboxText._3e;
+          if(textboxText.blockTimeLeft_40 <= 0) {
+            textboxText.blockTimeLeft_40 = textboxText.blockTimer_3e;
 
-            if(textboxText._5c == TextboxTextState._11) {
+            if(textboxText._5c == TextboxTextState.WAIT_FOR_INPUT_ADVANCED_CLEAN_BOX_11) {
               //LAB_80026c70
               clearTextboxChars(textboxIndex);
               textboxText.charX_34 = 0;
               textboxText.charY_36 = 0;
               textboxText.linesScrolled_3a = 0;
-              textboxText.state_00 = TextboxTextState._13;
-              textboxText.flags_08 ^= 0x1;
-            } else if(textboxText._5c == TextboxTextState._15) {
+              textboxText.state_00 = TextboxTextState.PROCESS_NO_INPUT_ADVANCED_13;
+              textboxText.flags_08 ^= TextboxText84.INITIALIZED;
+            } else if(textboxText._5c == TextboxTextState.CLOSE_TEXTBOX_15) {
               //LAB_80026c98
               //LAB_80026c9c
               textboxText.delete();
@@ -849,10 +801,10 @@ public final class Text {
         }
       }
 
-      case _15 -> {
+      case CLOSE_TEXTBOX_15 -> {
         //LAB_80026cb0
         if((textboxText.flags_08 & TextboxText84.NO_INPUT) != 0) {
-          textboxText.state_00 = TextboxTextState._16;
+          textboxText.state_00 = TextboxTextState.CLOSE_BATTLE_NO_INPUT_16;
         } else {
           if(CONFIG.getConfig(CoreMod.AUTO_TEXT_CONFIG.get()) && autoTextDelayStart == 0) {
             autoTextDelayStart = System.nanoTime();
@@ -868,42 +820,42 @@ public final class Text {
       }
 
       //LAB_800265d8
-      case _16 -> {
+      case CLOSE_BATTLE_NO_INPUT_16 -> {
         //LAB_80026cdc
         //LAB_80026ce8
-        if((textboxText.flags_08 & 0x40) != 0) {
+        if((textboxText.flags_08 & TextboxText84.SKIP_SMAP_COUNTDOWN_OR_FINISH_BATTLE_TEXTBOX) != 0) {
           textboxText.delete();
           textboxText.state_00 = TextboxTextState.UNINITIALIZED_0;
           setTextboxArrowPosition(textboxIndex, false);
         }
       }
 
-      case _17 -> {
+      case IGNORE_SCROLL_LINE_BREAK_17 -> {
         //LAB_80026d20
         textboxText.lines_1e++;
 
         //LAB_80026d30
         do {
-          processTextboxLine(textboxIndex);
+          processTextboxCharacter(textboxIndex);
 
-          if(textboxText.state_00 == TextboxTextState._15) {
+          if(textboxText.state_00 == TextboxTextState.CLOSE_TEXTBOX_15) {
             textboxText.linesScrolled_3a = 0;
-            textboxText.flags_08 |= 0x102;
+            textboxText.flags_08 |= TextboxText84.TEXT_PARSE_COMPLETE | TextboxText84.IGNORE_SCROLL_LINE_BREAK;
             break;
           }
         } while(textboxText.state_00 != TextboxTextState.SCROLL_TEXT_5);
 
         //LAB_80026d64
-        textboxText.state_00 = TextboxTextState._18;
+        textboxText.state_00 = TextboxTextState.PROCESS_STATE_TRANSITION_18;
         textboxText.selectionIndex_6c = -1;
         textboxText.lines_1e--;
       }
 
       //LAB_8002659c
-      case _18 -> {
+      case PROCESS_STATE_TRANSITION_18 -> {
         //LAB_80026d94
         if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_CONFIRM.get())) {
-          playSound(0, 2, (short)0, (short)0);
+          playMenuSound(2);
           textboxText.delete();
           textboxText.state_00 = TextboxTextState.UNINITIALIZED_0;
           textboxText.selectionIndex_6c = textboxText.selectionLine_68;
@@ -912,19 +864,19 @@ public final class Text {
           if(!PLATFORM.isActionHeld(INPUT_ACTION_MENU_DOWN.get())) {
             //LAB_80026ee8
             if(PLATFORM.isActionHeld(INPUT_ACTION_MENU_UP.get())) {
-              if((textboxText.flags_08 & 0x100) == 0 || textboxText.selectionLine_68 != 0) {
+              if((textboxText.flags_08 & TextboxText84.IGNORE_SCROLL_LINE_BREAK) == 0 || textboxText.selectionLine_68 != 0) {
                 //LAB_80026f38
-                playSound(0, 1, (short)0, (short)0);
+                playMenuSound(1);
 
                 int extraLines = 3;
                 if(textboxText.selectionLine_60 > 0) {
-                  textboxText.state_00 = TextboxTextState._19;
+                  textboxText.state_00 = TextboxTextState.TICK_STATE_TRANSITION_TIMER_19;
                   textboxText.selectionLine_60--;
                   textboxText.ticksUntilStateTransition_64 = 4 * currentEngineState_8004dd04.tickMultiplier();
                   textboxText.selectionLine_68--;
                 } else {
                   //LAB_80026f88
-                  if((textboxText.flags_08 & 0x2) != 0) {
+                  if((textboxText.flags_08 & TextboxText84.TEXT_PARSE_COMPLETE) != 0) {
                     // TODO not sure about this block of code
                     if(textboxText.linesScrolled_3a == 1) {
                       extraLines = 1;
@@ -936,7 +888,7 @@ public final class Text {
 
                       //LAB_80026fc0
                       textboxText.linesScrolled_3a = 0;
-                      textboxText.flags_08 ^= 0x2;
+                      textboxText.flags_08 ^= TextboxText84.TEXT_PARSE_COMPLETE;
                     }
 
                     //LAB_80026fe8
@@ -973,49 +925,49 @@ public final class Text {
                     //LAB_800270b0
                     textboxText.charX_34 = 0;
                     textboxText.charY_36 = 0;
-                    textboxText.flags_08 |= 0x80;
+                    textboxText.flags_08 |= TextboxText84.CHECK_SCROLL_ACTION;
 
                     //LAB_800270dc
                     do {
-                      processTextboxLine(textboxIndex);
+                      processTextboxCharacter(textboxIndex);
                     } while(textboxText.charY_36 == 0 && textboxText.state_00 != TextboxTextState.SCROLL_TEXT_5);
 
                     //LAB_80027104
-                    textboxText.state_00 = TextboxTextState._21;
-                    textboxText.flags_08 ^= 0x80;
+                    textboxText.state_00 = TextboxTextState.HANDLE_SCROLL_DOWN_21;
+                    textboxText.flags_08 ^= TextboxText84.CHECK_SCROLL_ACTION;
                   }
                 }
               }
             }
           }
 
-          textboxText.state_00 = TextboxTextState._19;
+          textboxText.state_00 = TextboxTextState.TICK_STATE_TRANSITION_TIMER_19;
           textboxText.selectionLine_60++;
           textboxText.ticksUntilStateTransition_64 = 4 * currentEngineState_8004dd04.tickMultiplier();
           textboxText.selectionLine_68++;
 
-          if((textboxText.flags_08 & 0x100) == 0 || textboxText.charY_36 + 1 != textboxText.selectionLine_68) {
+          if((textboxText.flags_08 & TextboxText84.IGNORE_SCROLL_LINE_BREAK) == 0 || textboxText.charY_36 + 1 != textboxText.selectionLine_68) {
             //LAB_80026e68
             //LAB_80026e6c
             if(textboxText.selectionLine_60 < textboxText.lines_1e) {
               //LAB_80026ed0
-              playSound(0, 1, (short)0, (short)0);
+              playMenuSound(1);
 
               //LAB_80026ee8
               if(PLATFORM.isActionHeld(INPUT_ACTION_MENU_UP.get())) {
-                if((textboxText.flags_08 & 0x100) == 0 || textboxText.selectionLine_68 != 0) {
+                if((textboxText.flags_08 & TextboxText84.IGNORE_SCROLL_LINE_BREAK) == 0 || textboxText.selectionLine_68 != 0) {
                   //LAB_80026f38
-                  playSound(0, 1, (short)0, (short)0);
+                  playMenuSound(1);
 
                   int extraLines = 3;
                   if(textboxText.selectionLine_60 > 0) {
-                    textboxText.state_00 = TextboxTextState._19;
+                    textboxText.state_00 = TextboxTextState.TICK_STATE_TRANSITION_TIMER_19;
                     textboxText.selectionLine_60--;
                     textboxText.ticksUntilStateTransition_64 = 4 * currentEngineState_8004dd04.tickMultiplier();
                     textboxText.selectionLine_68--;
                   } else {
                     //LAB_80026f88
-                    if((textboxText.flags_08 & 0x2) != 0) {
+                    if((textboxText.flags_08 & TextboxText84.TEXT_PARSE_COMPLETE) != 0) {
                       // TODO not sure about this block of code
                       if(textboxText.linesScrolled_3a == 1) {
                         extraLines = 1;
@@ -1027,7 +979,7 @@ public final class Text {
 
                         //LAB_80026fc0
                         textboxText.linesScrolled_3a = 0;
-                        textboxText.flags_08 ^= 0x2;
+                        textboxText.flags_08 ^= TextboxText84.TEXT_PARSE_COMPLETE;
                       }
 
                       //LAB_80026fe8
@@ -1064,44 +1016,44 @@ public final class Text {
                       //LAB_800270b0
                       textboxText.charX_34 = 0;
                       textboxText.charY_36 = 0;
-                      textboxText.flags_08 |= 0x80;
+                      textboxText.flags_08 |= TextboxText84.CHECK_SCROLL_ACTION;
 
                       //LAB_800270dc
                       do {
-                        processTextboxLine(textboxIndex);
+                        processTextboxCharacter(textboxIndex);
                       } while(textboxText.charY_36 == 0 && textboxText.state_00 != TextboxTextState.SCROLL_TEXT_5);
 
                       //LAB_80027104
-                      textboxText.state_00 = TextboxTextState._21;
-                      textboxText.flags_08 ^= 0x80;
+                      textboxText.state_00 = TextboxTextState.HANDLE_SCROLL_DOWN_21;
+                      textboxText.flags_08 ^= TextboxText84.CHECK_SCROLL_ACTION;
                     }
                   }
                 }
               }
             } else {
               textboxText.selectionLine_60 = textboxText_800bdf38[textboxIndex].lines_1e - 1;
-              textboxText.state_00 = TextboxTextState._20;
+              textboxText.state_00 = TextboxTextState.HANDLE_SCROLL_UP_20;
               textboxText.scrollAmount_2c = 0.0f;
 
               if(textboxText.linesScrolled_3a == 1) {
-                textboxText.state_00 = TextboxTextState._18;
+                textboxText.state_00 = TextboxTextState.PROCESS_STATE_TRANSITION_18;
                 textboxText.selectionLine_68--;
               }
             }
           } else {
-            textboxText.state_00 = TextboxTextState._3;
+            textboxText.state_00 = TextboxTextState.SPECIAL_SELECTION_BOUNDARY_CONDITION_SCRIPT_ONLY_3;
             textboxText.selectionLine_60--;
             textboxText.selectionLine_68--;
           }
         }
       }
 
-      case _19 -> {
+      case TICK_STATE_TRANSITION_TIMER_19 -> {
         //LAB_8002711c
         textboxText.ticksUntilStateTransition_64--;
 
         if(textboxText.ticksUntilStateTransition_64 == 0) {
-          textboxText.state_00 = TextboxTextState._18;
+          textboxText.state_00 = TextboxTextState.PROCESS_STATE_TRANSITION_18;
 
           if((textboxText.flags_08 & TextboxText84.SELECTION) != 0) {
             textboxText.state_00 = TextboxTextState.SELECTION_22;
@@ -1109,30 +1061,30 @@ public final class Text {
         }
       }
 
-      case _20 -> {
+      case HANDLE_SCROLL_UP_20 -> {
         //LAB_8002715c
         textboxText.scrollAmount_2c += 4.0f / currentEngineState_8004dd04.tickMultiplier();
 
         if(textboxText.scrollAmount_2c >= 12.0f) {
           advanceTextbox(textboxIndex);
-          textboxText.flags_08 |= 0x4;
+          textboxText.flags_08 |= TextboxText84.SCROLL_ACTION_COMPLETE;
           textboxText.scrollAmount_2c -= 12.0f;
           textboxText.charY_36 = textboxText.lines_1e;
         }
 
         //LAB_800271a8
-        if((textboxText.flags_08 & 0x4) != 0) {
-          textboxText.flags_08 ^= 0x4;
+        if((textboxText.flags_08 & TextboxText84.SCROLL_ACTION_COMPLETE) != 0) {
+          textboxText.flags_08 ^= TextboxText84.SCROLL_ACTION_COMPLETE;
 
-          if((textboxText.flags_08 & 0x2) == 0) {
+          if((textboxText.flags_08 & TextboxText84.TEXT_PARSE_COMPLETE) == 0) {
             //LAB_8002720c
             //LAB_80027220
             do {
-              processTextboxLine(textboxIndex);
+              processTextboxCharacter(textboxIndex);
 
-              if(textboxText.state_00 == TextboxTextState._15) {
+              if(textboxText.state_00 == TextboxTextState.CLOSE_TEXTBOX_15) {
                 textboxText.linesScrolled_3a = 0;
-                textboxText.flags_08 |= 0x2;
+                textboxText.flags_08 |= TextboxText84.TEXT_PARSE_COMPLETE;
                 break;
               }
             } while(textboxText.state_00 != TextboxTextState.SCROLL_TEXT_5);
@@ -1147,23 +1099,23 @@ public final class Text {
 
           //LAB_80027250
           //LAB_80027254
-          textboxText.state_00 = TextboxTextState._18;
+          textboxText.state_00 = TextboxTextState.PROCESS_STATE_TRANSITION_18;
         }
       }
 
       //LAB_800265f4
-      case _21 -> {
+      case HANDLE_SCROLL_DOWN_21 -> {
         //LAB_8002727c
         textboxText.scrollAmount_2c -= 4.0f / currentEngineState_8004dd04.tickMultiplier();
         if(textboxText.scrollAmount_2c <= 0.0f) {
           textboxText.charY_36 = 0;
           textboxText.scrollAmount_2c = 0.0f;
-          textboxText.state_00 = TextboxTextState._18;
-          textboxText.flags_08 |= 0x4;
+          textboxText.state_00 = TextboxTextState.PROCESS_STATE_TRANSITION_18;
+          textboxText.flags_08 |= TextboxText84.SCROLL_ACTION_COMPLETE;
         }
 
         //LAB_800272b0
-        if((textboxText.flags_08 & 0x4) != 0) {
+        if((textboxText.flags_08 & TextboxText84.SCROLL_ACTION_COMPLETE) != 0) {
           final LodString str = textboxText.str_24;
 
           //LAB_800272dc
@@ -1185,7 +1137,7 @@ public final class Text {
           } while(lineIndex != textboxText.lines_1e);
 
           //LAB_80027320
-          textboxText.state_00 = TextboxTextState._18;
+          textboxText.state_00 = TextboxTextState.PROCESS_STATE_TRANSITION_18;
           textboxText.charIndex_30 += 2;
           textboxText.charX_34 = 0;
           textboxText.charY_36 = textboxText.lines_1e;
@@ -1195,7 +1147,7 @@ public final class Text {
       case SELECTION_22 -> {
         //LAB_80027354
         if(PLATFORM.isActionPressed(INPUT_ACTION_MENU_CONFIRM.get())) {
-          playSound(0, 2, (short)0, (short)0);
+          playMenuSound(2);
           textboxText.delete();
           textboxText.state_00 = TextboxTextState.UNINITIALIZED_0;
           textboxText.selectionIndex_6c = textboxText.selectionLine_68 - textboxText.minSelectionLine_72;
@@ -1209,8 +1161,8 @@ public final class Text {
               textboxText.selectionLine_68 = textboxText.minSelectionLine_72;
             } else {
               //LAB_80027404
-              playSound(0, 1, (short)0, (short)0);
-              textboxText.state_00 = TextboxTextState._19;
+              playMenuSound(1);
+              textboxText.state_00 = TextboxTextState.TICK_STATE_TRANSITION_TIMER_19;
             }
           }
 
@@ -1224,8 +1176,8 @@ public final class Text {
             } else {
               //LAB_80027480
               //LAB_80027490
-              playSound(0, 1, (short)0, (short)0);
-              textboxText.state_00 = TextboxTextState._19;
+              playMenuSound(1);
+              textboxText.state_00 = TextboxTextState.TICK_STATE_TRANSITION_TIMER_19;
             }
           }
         }
@@ -1248,7 +1200,7 @@ public final class Text {
   }
 
   @Method(0x800274f0L)
-  public static void processTextboxLine(final int textboxIndex) {
+  public static void processTextboxCharacter(final int textboxIndex) {
     final TextboxText84 textboxText = textboxText_800bdf38[textboxIndex];
 
     // This code would be really tricky to make work at 60 FPS, but there isn't any harm in just slowing it down
@@ -1287,7 +1239,7 @@ public final class Text {
 
         if(control == TextboxText84.END) {
           //LAB_800276f4
-          textboxText.state_00 = TextboxTextState._15;
+          textboxText.state_00 = TextboxTextState.CLOSE_TEXTBOX_15;
 
           //LAB_80027704
           setTextboxArrowPosition(textboxIndex, true);
@@ -1318,7 +1270,7 @@ public final class Text {
 
           if(control == TextboxText84.END) {
             //LAB_800276f4
-            textboxText.state_00 = TextboxTextState._15;
+            textboxText.state_00 = TextboxTextState.CLOSE_TEXTBOX_15;
 
             //LAB_80027704
             setTextboxArrowPosition(textboxIndex, true);
@@ -1329,7 +1281,7 @@ public final class Text {
             }
 
             //LAB_80027724
-            textboxText.state_00 = TextboxTextState._7;
+            textboxText.state_00 = TextboxTextState.PROCESS_INPUT_ADVANCED_7;
           }
 
           //LAB_80027740
@@ -1339,7 +1291,7 @@ public final class Text {
       }
 
       //LAB_8002779c
-      textboxText.state_00 = TextboxTextState._7;
+      textboxText.state_00 = TextboxTextState.PROCESS_INPUT_ADVANCED_7;
       return;
     }
 
@@ -1352,7 +1304,7 @@ public final class Text {
 
       switch(chr >>> 8) {
         case TextboxText84.END -> {
-          textboxText.state_00 = TextboxTextState._15;
+          textboxText.state_00 = TextboxTextState.CLOSE_TEXTBOX_15;
           setTextboxArrowPosition(textboxIndex, true);
           parseMore = false;
         }
@@ -1366,7 +1318,7 @@ public final class Text {
             //LAB_80027880
             textboxText.state_00 = TextboxTextState.SCROLL_TEXT_5;
 
-            if((textboxText.flags_08 & 0x1) == 0) {
+            if((textboxText.flags_08 & TextboxText84.INITIALIZED) == 0) {
               setTextboxArrowPosition(textboxIndex, true);
             }
 
@@ -1376,7 +1328,7 @@ public final class Text {
 
         case TextboxText84.BUTTON -> {
           //LAB_80027d28
-          textboxText.state_00 = TextboxTextState._6;
+          textboxText.state_00 = TextboxTextState.WAIT_FOR_INPUT_ADVANCED_DIRTY_BOX_6;
 
           //LAB_80027d2c
           parseMore = false;
@@ -1384,7 +1336,7 @@ public final class Text {
 
         case TextboxText84.MUTLIBOX -> {
           setTextboxArrowPosition(textboxIndex, true);
-          textboxText.state_00 = TextboxTextState._11;
+          textboxText.state_00 = TextboxTextState.WAIT_FOR_INPUT_ADVANCED_CLEAN_BOX_11;
 
           if(str.charAt(textboxText.charIndex_30 + 1) >>> 8 == TextboxText84.LINE) {
             textboxText.charIndex_30++;
@@ -1394,8 +1346,8 @@ public final class Text {
         }
 
         case TextboxText84.SPEED -> {
-          textboxText._3e = chr & 0xff;
-          textboxText._40 = 0;
+          textboxText.blockTimer_3e = chr & 0xff;
+          textboxText.blockTimeLeft_40 = 0;
         }
 
         case TextboxText84.PAUSE -> {
@@ -1462,11 +1414,11 @@ public final class Text {
           textboxText.charY_36 = org.joml.Math.min(chr & 0xff, textboxText.lines_1e - 1);
 
         case TextboxText84.SAUTO -> {
-          textboxText.state_00 = TextboxTextState._13;
+          textboxText.state_00 = TextboxTextState.PROCESS_NO_INPUT_ADVANCED_13;
 
           final int v0 = 60 / vsyncMode_8007a3b8 * (chr & 0xff);
-          textboxText._3e = v0;
-          textboxText._40 = v0;
+          textboxText.blockTimer_3e = v0;
+          textboxText.blockTimeLeft_40 = v0;
 
           if(str.charAt(textboxText.charIndex_30 + 1) >>> 8 == TextboxText84.LINE) {
             textboxText.charIndex_30++;
@@ -1511,13 +1463,13 @@ public final class Text {
 
           if(textboxText.charX_34 < textboxText.chars_1c) {
             //LAB_80027d28
-            textboxText.state_00 = TextboxTextState._7;
+            textboxText.state_00 = TextboxTextState.PROCESS_INPUT_ADVANCED_7;
           } else if(textboxText.charY_36 >= textboxText.lines_1e - 1) {
             final int control = str.charAt(textboxText.charIndex_30 + 1) >>> 8;
 
             if(control == TextboxText84.END) {
               //LAB_80027c7c
-              textboxText.state_00 = TextboxTextState._15;
+              textboxText.state_00 = TextboxTextState.CLOSE_TEXTBOX_15;
               setTextboxArrowPosition(textboxIndex, true);
             } else {
               if(control == TextboxText84.LINE) {
@@ -1531,7 +1483,7 @@ public final class Text {
               textboxText.charX_34 = 0;
               textboxText.charY_36++;
 
-              if((textboxText.flags_08 & 0x1) == 0) {
+              if((textboxText.flags_08 & TextboxText84.INITIALIZED) == 0) {
                 setTextboxArrowPosition(textboxIndex, true);
               }
             }
@@ -1546,7 +1498,7 @@ public final class Text {
             }
 
             //LAB_80027d28
-            textboxText.state_00 = TextboxTextState._7;
+            textboxText.state_00 = TextboxTextState.PROCESS_INPUT_ADVANCED_7;
           }
 
           //LAB_80027d2c
@@ -1564,7 +1516,7 @@ public final class Text {
   @Method(0x80027d74L)
   public static void calculateAppropriateTextboxBounds(final int textboxIndex, final float x, final float y) {
     final int maxX;
-    if(engineState_8004dd20 == EngineStateEnum.SUBMAP_05) {
+    if(currentEngineState_8004dd04.is(LodEngineStateTypes.SUBMAP.get())) {
       maxX = 350;
     } else {
       maxX = 310;
@@ -1657,9 +1609,7 @@ public final class Text {
   }
 
   @Method(0x800282acL)
-  public static void renderTextboxText(final int textboxIndex) {
-    final TextboxText84 textboxText = textboxText_800bdf38[textboxIndex];
-
+  public static void renderTextboxText(final TextboxText84 textboxText) {
     final int firstCharInLineIndex;
     final int lastCharInLineIndex;
     if((textboxText.flags_08 & TextboxText84.HAS_NAME) != 0) {
@@ -1694,7 +1644,7 @@ public final class Text {
         if(chr.char_06 != 0) {
           int scrollY = 0;
           int scrollH = 0;
-          if((textboxText.flags_08 & 0x1) != 0) {
+          if((textboxText.flags_08 & TextboxText84.INITIALIZED) != 0) {
             if(i >= firstCharInLineIndex && i < lastCharInLineIndex) {
               final int scroll = org.joml.Math.round(textboxText.scrollAmount_2c);
               scrollY = -scroll;
@@ -1774,7 +1724,7 @@ public final class Text {
 
       if(textboxText.scrollAmount_2c >= 12.0f) {
         advanceTextbox(textboxIndex);
-        textboxText.flags_08 |= 0x4;
+        textboxText.flags_08 |= TextboxText84.SCROLL_ACTION_COMPLETE;
         textboxText.scrollAmount_2c -= 12.0f;
         textboxText.charY_36 = textboxText.lines_1e;
       }
@@ -1786,7 +1736,7 @@ public final class Text {
   @Method(0x80028f20L)
   public static boolean textboxFits(final int textboxIndex, final float x, final float y) {
     final int maxX;
-    if(engineState_8004dd20 == EngineStateEnum.SUBMAP_05) {
+    if(currentEngineState_8004dd04.is(LodEngineStateTypes.SUBMAP.get())) {
       maxX = 350;
     } else {
       maxX = 310;
@@ -1798,9 +1748,9 @@ public final class Text {
     //LAB_80028fd4
     return
       x - textboxes_800be358[textboxIndex].chars_18 * 4.5f >= 10 &&
-        x + textboxes_800be358[textboxIndex].chars_18 * 4.5f <= maxX &&
-        y - textboxes_800be358[textboxIndex].lines_1a * 6.0f >= 18 &&
-        y + textboxes_800be358[textboxIndex].lines_1a * 6.0f <= 222;
+      x + textboxes_800be358[textboxIndex].chars_18 * 4.5f <= maxX &&
+      y - textboxes_800be358[textboxIndex].lines_1a * 6.0f >= 18 &&
+      y + textboxes_800be358[textboxIndex].lines_1a * 6.0f <= 222;
 
     //LAB_80028ff0
   }
@@ -1822,7 +1772,7 @@ public final class Text {
     final TextboxText84 textboxText = textboxText_800bdf38[0];
     textboxText.type_04 = textboxTextType_80052ba8[1];
     textboxText.str_24 = new LodString("Garbage text"); // _80052c20
-    textboxText.flags_08 |= 0x40;
+    textboxText.flags_08 |= TextboxText84.SKIP_SMAP_COUNTDOWN_OR_FINISH_BATTLE_TEXTBOX;
 
     textboxText.chars_58 = new TextboxChar08[textboxText.chars_1c * (textboxText.lines_1e + 1)];
     Arrays.setAll(textboxText.chars_58, i -> new TextboxChar08());
@@ -1835,8 +1785,7 @@ public final class Text {
 
   /** The purple bar used in inn dialogs, etc. */
   @Method(0x80029140L)
-  public static void renderTextboxSelection(final int textboxIndex, final int selectionLine) {
-    final Textbox4c textbox = textboxes_800be358[textboxIndex];
+  public static void renderTextboxSelection(final Textbox4c textbox, final int selectionLine) {
     final int width = (textbox.chars_18 - 1) * 9;
     final float x = textbox.x_14;
     final float y = textbox.y_16 + selectionLine * 12 - (textbox.lines_1a - 1) * 6;
@@ -1971,11 +1920,8 @@ public final class Text {
   }
 
   @Method(0x800299d4L)
-  public static void renderTextboxArrow(final int textboxIndex) {
-    final TextboxArrow0c arrow = textboxArrows_800bdea0[textboxIndex];
-
+  public static void renderTextboxArrow(final TextboxText84 textboxText, final TextboxArrow0c arrow) {
     if((arrow.flags_00 & TextboxArrow0c.ARROW_VISIBLE) != 0) {
-      final TextboxText84 textboxText = textboxText_800bdf38[textboxIndex];
       if((textboxText.flags_08 & TextboxText84.SHOW_ARROW) != 0) {
         textboxArrowTransforms.scaling(1.0f, 0.875f, 1.0f);
         textboxArrowTransforms.transfer.set(arrow.x_04, arrow.y_06,  textboxText.z_0c * 4.0f);
@@ -2111,13 +2057,13 @@ public final class Text {
   @Method(0x80029eccL)
   public static FlowControl FUN_80029ecc(final RunningScript<?> script) {
     final TextboxText84 textboxText = textboxText_800bdf38[script.params_20[0].get()];
-    if(textboxText.state_00 == TextboxTextState._16 && (textboxText.flags_08 & TextboxText84.NO_INPUT) != 0) {
+    if(textboxText.state_00 == TextboxTextState.CLOSE_BATTLE_NO_INPUT_16 && (textboxText.flags_08 & TextboxText84.NO_INPUT) != 0) {
       textboxText.flags_08 ^= TextboxText84.NO_INPUT;
     }
 
     //LAB_80029f18
     //LAB_80029f1c
-    textboxText.flags_08 |= 0x40;
+    textboxText.flags_08 |= TextboxText84.SKIP_SMAP_COUNTDOWN_OR_FINISH_BATTLE_TEXTBOX;
     return FlowControl.CONTINUE;
   }
 
@@ -2158,33 +2104,32 @@ public final class Text {
   public static void renderTextboxes() {
     for(int i = 0; i < 8; i++) {
       //LAB_8002a10c
-      final Textbox4c textbox4c = textboxes_800be358[i];
-      if(textbox4c.state_00 != TextboxState.UNINITIALIZED_0 && (textbox4c.flags_08 & Textbox4c.RENDER_BACKGROUND) != 0) {
-        renderTextboxBackground(i);
+      final Textbox4c textbox = textboxes_800be358[i];
+      if(textbox.state_00 != TextboxState.UNINITIALIZED_0 && (textbox.flags_08 & Textbox4c.RENDER_BACKGROUND) != 0) {
+        renderTextboxBackground(textbox);
       }
 
       if(!currentEngineState_8004dd04.renderTextOnTopOfAllBoxes()) {
-        renderTextboxOverlays(i);
+        renderTextboxOverlays(textboxes_800be358[i], textboxText_800bdf38[i], textboxArrows_800bdea0[i]);
       }
     }
 
     if(currentEngineState_8004dd04.renderTextOnTopOfAllBoxes()) {
       for(int i = 0; i < 8; i++) {
-        renderTextboxOverlays(i);
+        renderTextboxOverlays(textboxes_800be358[i], textboxText_800bdf38[i], textboxArrows_800bdea0[i]);
       }
     }
   }
 
-  private static void renderTextboxOverlays(final int textboxIndex) {
-    final TextboxText84 text = textboxText_800bdf38[textboxIndex];
+  private static void renderTextboxOverlays(final Textbox4c textbox, final TextboxText84 text, final TextboxArrow0c arrow) {
     if(text.state_00 != TextboxTextState.UNINITIALIZED_0) {
       switch(text.state_00) {
-        case _18 -> renderTextboxSelection(textboxIndex, text.selectionLine_60);
-        case _19, SELECTION_22 -> renderTextboxSelection(textboxIndex, text.selectionLine_68);
+        case PROCESS_STATE_TRANSITION_18 -> renderTextboxSelection(textbox, text.selectionLine_60);
+        case TICK_STATE_TRANSITION_TIMER_19, SELECTION_22 -> renderTextboxSelection(textbox, text.selectionLine_68);
       }
 
-      renderTextboxText(textboxIndex);
-      renderTextboxArrow(textboxIndex);
+      renderTextboxText(text);
+      renderTextboxArrow(text, arrow);
     }
   }
 
@@ -2225,18 +2170,15 @@ public final class Text {
   }
 
   @Method(0x8002a32cL)
-  public static void initTextbox(final int textboxIndex, final boolean animateInOut, final float x, final float y, final int chars, final int lines) {
-    clearTextbox(textboxIndex);
+  public static void initTextbox(final Textbox4c textbox, final boolean animateInOut, final float x, final float y, final int chars, final int lines) {
+    textbox.backgroundType_04 = animateInOut ? BackgroundType.ANIMATE_IN_OUT : BackgroundType.NORMAL;
+    textbox.renderBorder_06 = true;
+    textbox.flags_08 |= Textbox4c.NO_ANIMATE_OUT;
 
-    final Textbox4c struct = textboxes_800be358[textboxIndex];
-    struct.backgroundType_04 = animateInOut ? BackgroundType.ANIMATE_IN_OUT : BackgroundType.NORMAL;
-    struct.renderBorder_06 = true;
-    struct.flags_08 |= Textbox4c.NO_ANIMATE_OUT;
-
-    struct.x_14 = x;
-    struct.y_16 = y;
-    struct.chars_18 = chars + 1;
-    struct.lines_1a = lines + 1;
+    textbox.x_14 = x;
+    textbox.y_16 = y;
+    textbox.chars_18 = chars + 1;
+    textbox.lines_1a = lines + 1;
   }
 
   @Method(0x8002a3ecL)

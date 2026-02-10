@@ -1,5 +1,6 @@
 package legend.game.inventory;
 
+import com.google.gson.JsonObject;
 import legend.game.characters.Element;
 import legend.game.combat.bent.BattleEntity27c;
 import legend.game.modding.coremod.CoreMod;
@@ -10,14 +11,19 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.legendofdragoon.modloader.registries.RegistryId;
 
+import javax.annotation.Nullable;
+
 import static legend.core.GameEngine.RENDERER;
 
-public class ItemStack implements InventoryEntry {
+public class ItemStack implements InventoryEntry<ItemStack> {
   public static final ItemStack EMPTY = new Empty();
 
   private final Item item;
   private int size;
   private int durability;
+
+  @Nullable
+  private JsonObject extraData;
 
   public ItemStack(final Item item, final int size, final int durability) {
     this.item = item;
@@ -36,6 +42,7 @@ public class ItemStack implements InventoryEntry {
 
   public ItemStack(final ItemStack other) {
     this(other.item, other.size, other.durability);
+    this.extraData = other.extraData != null ? other.extraData.deepCopy() : null;
   }
 
   @Override
@@ -180,6 +187,11 @@ public class ItemStack implements InventoryEntry {
     return this.size < 1 || this.durability < 1;
   }
 
+  @Override
+  public ItemStack copy() {
+    return new ItemStack(this);
+  }
+
   public boolean isSameItem(final Item item) {
     return item.isSame(this);
   }
@@ -259,8 +271,13 @@ public class ItemStack implements InventoryEntry {
   }
 
   @Override
-  public int getPrice() {
-    return this.getItem().getPrice(this);
+  public int getBuyPrice() {
+    return this.getItem().getBuyPrice(this);
+  }
+
+  @Override
+  public int getSellPrice() {
+    return this.getItem().getSellPrice(this);
   }
 
   /** Item can't be stolen by enemies */
@@ -322,6 +339,15 @@ public class ItemStack implements InventoryEntry {
 
   public int getAttackDamageMultiplier(final BattleEntity27c user, final BattleEntity27c target) {
     return this.getItem().getAttackDamageMultiplier(this, user, target);
+  }
+
+  @Nullable
+  public JsonObject getExtraData() {
+    return this.extraData;
+  }
+
+  public void setExtraData(@Nullable final JsonObject extraData) {
+    this.extraData = extraData;
   }
 
   @Override

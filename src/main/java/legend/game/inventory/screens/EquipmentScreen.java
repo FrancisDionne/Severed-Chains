@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Set;
 
 import static legend.core.GameEngine.CONFIG;
-import static legend.game.Audio.playMenuSound;
+import static legend.game.sound.Audio.playMenuSound;
 import static legend.game.FullScreenEffects.startFadeEffect;
 import static legend.game.Menus.deallocateRenderables;
-import static legend.game.SItem.FUN_801034cc;
-import static legend.game.SItem.FUN_80104b60;
+import static legend.game.SItem.addLeftRightArrows;
+import static legend.game.SItem.initHighlight;
 import static legend.game.SItem.addHp;
 import static legend.game.SItem.addMp;
 import static legend.game.SItem.allocateUiElement;
@@ -111,7 +111,7 @@ public class EquipmentScreen extends MenuScreen {
 
         if(this.itemHighlight == null) {
           this.itemHighlight = allocateUiElement(0x79, 0x79, this.FUN_800fc824(1), 0);
-          FUN_80104b60(this.itemHighlight);
+          initHighlight(this.itemHighlight);
         }
 
         this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
@@ -123,7 +123,7 @@ public class EquipmentScreen extends MenuScreen {
         break;
 
       case 3:
-        FUN_801034cc(this.charSlot, characterCount_8011d7c4);
+        addLeftRightArrows(this.charSlot, characterCount_8011d7c4);
         this.renderEquipmentScreen(this.charSlot, this.selectedSlot, this.slotScroll, 0);
 
         if(this.scrollAccumulator >= 1.0d) {

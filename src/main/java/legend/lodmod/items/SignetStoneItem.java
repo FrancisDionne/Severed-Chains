@@ -44,7 +44,7 @@ public class SignetStoneItem extends BattleItem {
 
   @Override
   protected int getUseItemScriptEntrypoint() {
-    return 1;
+    return 33;
   }
 
   @Override

@@ -13,8 +13,10 @@ import legend.core.platform.input.InputKey;
 import legend.core.platform.input.InputMod;
 import legend.core.platform.input.KeyInputActivation;
 import legend.core.platform.input.ScancodeInputActivation;
+import legend.game.RegisterEngineStateTypesEvent;
 import legend.game.combat.formula.Formula;
 import legend.game.combat.formula.PhysicalDamageFormula;
+import legend.game.combat.postbattleactions.RegisterPostBattleActionsEvent;
 import legend.game.inventory.IconSetConfigEntry;
 import legend.game.modding.coremod.config.AdditionAllowMisinputConfigEntry;
 import legend.game.modding.coremod.config.AdditionButtonModeConfigEntry;
@@ -25,6 +27,7 @@ import legend.game.modding.coremod.config.AdditionGameplayEnhanceConfigEntry;
 import legend.game.modding.coremod.config.AdditionGroupConfigEntry;
 import legend.game.inventory.Item;
 import legend.game.inventory.ItemRegistryEvent;
+import legend.game.inventory.screens.GatherShopExtensionsEvent;
 import legend.game.modding.coremod.config.AdditionModeConfigEntry;
 import legend.game.modding.coremod.config.AdditionOverlayConfigEntry;
 import legend.game.modding.coremod.config.AdditionRandomModeConfig;
@@ -56,6 +59,7 @@ import legend.game.modding.coremod.config.EnabledModsConfigEntry;
 import legend.game.modding.coremod.config.EncounterRateConfigEntry;
 import legend.game.modding.coremod.config.FmvVolumeConfigEntry;
 import legend.game.modding.coremod.config.FooterActionColorConfigEntry;
+import legend.game.modding.coremod.config.FrameSkipConfigEntry;
 import legend.game.modding.coremod.config.FullscreenConfigEntry;
 import legend.game.modding.coremod.config.GameplayBalanceConfigEntry;
 import legend.game.modding.coremod.config.IgnoreSteamInputModeConfigEntry;
@@ -85,6 +89,9 @@ import legend.game.modding.coremod.config.ShowAdvancedOptionsConfigEntry;
 import legend.game.modding.coremod.config.TransformationModeConfigEntry;
 import legend.game.modding.coremod.config.TurboToggleConfig;
 import legend.game.modding.coremod.config.UnlockPartyConfig;
+import legend.game.modding.coremod.shops.EquipmentShopExtension;
+import legend.game.modding.coremod.shops.GoodShopExtension;
+import legend.game.modding.coremod.shops.ItemShopExtension;
 import legend.game.modding.events.gamestate.GameLoadedEvent;
 import legend.game.modding.events.input.RegisterDefaultInputBindingsEvent;
 import legend.game.saves.BoolConfigEntry;
@@ -132,6 +139,7 @@ public class CoreMod {
   public static final RegistryDelegate<MonitorConfigEntry> MONITOR_CONFIG = CONFIG_REGISTRAR.register("monitor", MonitorConfigEntry::new);
   public static final RegistryDelegate<ReduceMotionFlashingConfigEntry> REDUCE_MOTION_FLASHING_CONFIG = CONFIG_REGISTRAR.register("reduce_motion_flashing", ReduceMotionFlashingConfigEntry::new);
   public static final RegistryDelegate<RetailFontConfigEntry> RETAIL_FONT_CONFIG = CONFIG_REGISTRAR.register("retail_font", RetailFontConfigEntry::new);
+  public static final RegistryDelegate<FrameSkipConfigEntry> FRAME_SKIP_CONFIG = CONFIG_REGISTRAR.register("frame_skip", FrameSkipConfigEntry::new);
 
   public static final RegistryDelegate<AudioDeviceConfig> AUDIO_DEVICE_CONFIG = CONFIG_REGISTRAR.register("audio_device", AudioDeviceConfig::new);
   public static final RegistryDelegate<MasterVolumeConfigEntry> MASTER_VOLUME_CONFIG = CONFIG_REGISTRAR.register("master_volume", MasterVolumeConfigEntry::new);
@@ -280,6 +288,11 @@ public class CoreMod {
   }
 
   @EventListener
+  public static void registerEngineStates(final RegisterEngineStateTypesEvent event) {
+    CoreEngineStateTypes.register(event);
+  }
+
+  @EventListener
   public static void registerConfig(final ConfigRegistryEvent event) {
     CONFIG_REGISTRAR.registryEvent(event);
   }
@@ -371,6 +384,18 @@ public class CoreMod {
       .add(INPUT_ACTION_DEBUG_TOGGLE_WIREFRAME.get(), new KeyInputActivation(InputKey.F2))
       .add(INPUT_ACTION_DEBUG_RELOAD_SHADERS.get(), new KeyInputActivation(InputKey.F5))
     ;
+  }
+
+  @EventListener
+  public static void registerPostBattleActions(final RegisterPostBattleActionsEvent event) {
+    CorePostBattleActions.register(event);
+  }
+
+  @EventListener
+  public static void gatherShopExtensions(final GatherShopExtensionsEvent event) {
+    event.addExtension(new ItemShopExtension(), 1000);
+    event.addExtension(new EquipmentShopExtension(), 1000);
+    event.addExtension(new GoodShopExtension(), 1000);
   }
 
   @EventListener

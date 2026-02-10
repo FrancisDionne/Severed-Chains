@@ -25,14 +25,14 @@ import java.util.concurrent.ThreadLocalRandom;
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.REGISTRIES;
-import static legend.game.Audio.playMenuSound;
+import static legend.game.sound.Audio.playMenuSound;
 import static legend.game.DrgnFiles.loadDrgnFile;
 import static legend.game.FullScreenEffects.startFadeEffect;
 import static legend.game.Menus.allocateRenderable;
 import static legend.game.Menus.deallocateRenderables;
 import static legend.game.Menus.uiFile_800bdc3c;
 import static legend.game.Menus.unloadRenderable;
-import static legend.game.SItem.FUN_80104b60;
+import static legend.game.SItem.initHighlight;
 import static legend.game.SItem.UI_TEXT;
 import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.UI_TEXT_DISABLED_CENTERED;
@@ -80,7 +80,7 @@ public class DabasScreen extends MenuScreen {
 
   private final Runnable unload;
 
-  private final MenuEntries<InventoryEntry> menuItems = new MenuEntries<>();
+  private final MenuEntries<InventoryEntry<?>> menuItems = new MenuEntries<>();
   private MenuEntryStruct04<Equipment> specialItem;
 
   public DabasScreen(final Runnable unload) {
@@ -100,7 +100,7 @@ public class DabasScreen extends MenuScreen {
         deallocateRenderables(0xff);
         renderGlyphs(dabasMenuGlyphs_80114228, 0, 0);
         this.renderable1 = allocateUiElement(0x9f, 0x9f, 60, this.getDabasMenuY(0));
-        FUN_80104b60(this.renderable1);
+        initHighlight(this.renderable1);
         this.renderDabasMenu(0);
 
         this.newDigEnabled = false;
@@ -247,7 +247,7 @@ public class DabasScreen extends MenuScreen {
     int itemCount = 0;
     dabasData.gold_34 = 0;
 
-    for(final MenuEntryStruct04<? extends InventoryEntry> item : this.menuItems) {
+    for(final MenuEntryStruct04<? extends InventoryEntry<?>> item : this.menuItems) {
       if(item != null) {
         if(item.item_00 instanceof Equipment) {
           equipmentCount++;
@@ -268,7 +268,7 @@ public class DabasScreen extends MenuScreen {
 
     this.hasItems = false;
 
-    for(final MenuEntryStruct04<? extends InventoryEntry> entry : this.menuItems) {
+    for(final MenuEntryStruct04<? extends InventoryEntry<?>> entry : this.menuItems) {
       if(entry.item_00 instanceof final ItemStack item) {
         giveItem(item);
       } else if(entry.item_00 instanceof final Equipment equipment) {

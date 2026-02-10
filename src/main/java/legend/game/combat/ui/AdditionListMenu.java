@@ -1,7 +1,5 @@
 package legend.game.combat.ui;
 
-import legend.core.Config;
-import legend.game.combat.AdditionConfigs;
 import legend.game.additions.Addition;
 import legend.game.additions.CharacterAdditionStats;
 import legend.game.combat.bent.PlayerBattleEntity;
@@ -12,12 +10,14 @@ import legend.game.inventory.screens.TextColour;
 import legend.game.scripting.RunningScript;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.CharacterData2c;
+import legend.game.ui.UiBox;
 import org.legendofdragoon.modloader.registries.RegistryDelegate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.game.SItem.loadAdditions;
 import static legend.game.SItem.loadCharacterStats;
 import static legend.game.Scus94491BpeSegment_8004.CHARACTER_ADDITIONS;
@@ -25,6 +25,7 @@ import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 import static legend.game.Text.renderText;
 import static legend.game.combat.SBtld.loadAdditions;
+import static legend.lodmod.LodConfig.UI_COLOUR;
 
 public class AdditionListMenu extends ListMenu {
   private final FontOptions fontOptions = new FontOptions().colour(TextColour.WHITE);
@@ -151,19 +152,19 @@ public class AdditionListMenu extends ListMenu {
         final Addition addition = this.menuAdditions.get(listIndex);
         final CharacterData2c charData = gameState_800babc8.charData_32c[this.player_08.charId_272];
         final CharacterAdditionStats additionStats = charData.additionStats.get(addition.getRegistryId());
-        final int damage = addition.getDamage(charData, additionStats);
-        final int sp = addition.getSp(charData, additionStats);
+        final int damage = addition.getDamage(gameState_800babc8, charData, additionStats);
+        final int sp = addition.getSp(gameState_800babc8, charData, additionStats);
 
         //Selected item description
         if(this.description == null) {
           this.description = new UiBox("Battle UI Addition Description", 44, 156, 232, 14);
         }
 
-        this.description.render(Config.changeBattleRgb() ? Config.getBattleRgb() : Config.defaultUiColour);
+        this.description.render(CONFIG.getConfig(UI_COLOUR.get()));
 
         this.fontOptions.trim(0);
         this.fontOptions.horizontalAlign(HorizontalAlign.CENTRE);
-        renderText("Hits: " + addition.getHitCount(charData, additionStats) + ", damage: " + damage + ", SP: " + sp, 160, 157, this.fontOptions);
+        renderText("Hits: " + addition.getHitCount(gameState_800babc8, charData, additionStats) + ", damage: " + damage + ", SP: " + sp, 160, 157, this.fontOptions);
       }
     }
   }

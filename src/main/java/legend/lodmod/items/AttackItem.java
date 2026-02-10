@@ -50,7 +50,7 @@ public class AttackItem extends BattleItem {
 
   @Override
   protected int getUseItemScriptEntrypoint() {
-    return 1;
+    return 33;
   }
 
   @Override

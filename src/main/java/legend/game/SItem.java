@@ -1,5 +1,6 @@
 package legend.game;
 
+import it.unimi.dsi.fastutil.ints.IntList;
 import legend.core.MathHelper;
 import legend.core.audio.sequencer.assets.BackgroundMusic;
 import legend.core.font.Font;
@@ -9,6 +10,7 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.game.additions.Addition;
 import legend.game.additions.CharacterAdditionStats;
+import legend.game.additions.UnlockState;
 import legend.game.combat.types.EnemyDrop;
 import legend.game.i18n.I18n;
 import legend.game.inventory.EquipItemResult;
@@ -26,6 +28,7 @@ import legend.game.inventory.screens.FontOptions;
 import legend.game.inventory.screens.HorizontalAlign;
 import legend.game.inventory.screens.MenuStack;
 import legend.game.inventory.screens.TextColour;
+import legend.game.inventory.screens.controls.Highlight;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.modding.coremod.config.PermaDeathConfigEntry;
 import legend.game.modding.events.characters.AdditionHitMultiplierEvent;
@@ -45,6 +48,7 @@ import legend.game.statistics.Statistics;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.CharacterData2c;
 import legend.game.types.EquipmentSlot;
+import legend.game.types.GameState52c;
 import legend.game.types.LevelStuff08;
 import legend.game.types.MagicStuff08;
 import legend.game.types.MenuEntries;
@@ -86,25 +90,14 @@ import static legend.core.GameEngine.DEFAULT_FONT;
 import static legend.core.GameEngine.EVENTS;
 import static legend.core.GameEngine.PLATFORM;
 import static legend.core.GameEngine.REGISTRIES;
-import static legend.game.Audio.copyPlayingSounds;
-import static legend.game.Audio.loadedAudioFiles_800bcf78;
-import static legend.game.Audio.musicPackageLoadedCallback;
-import static legend.game.Audio.playMenuSound;
-import static legend.game.Audio.playMusicPackage;
-import static legend.game.Audio.playingSoundsBackup_800bca78;
-import static legend.game.Audio.queuedSounds_800bd110;
-import static legend.game.Audio.sssqResetStuff;
-import static legend.game.Audio.stopAndResetSoundsAndSequences;
-import static legend.game.Audio.stopMusicSequence;
-import static legend.game.Audio.unloadSoundFile;
 import static legend.game.DrgnFiles.loadDrgnDir;
 import static legend.game.DrgnFiles.loadDrgnFileSync;
 import static legend.game.EngineStates.currentEngineState_8004dd04;
-import static legend.game.EngineStates.engineState_8004dd20;
+import static legend.game.Menus.allocateManualRenderable;
 import static legend.game.Menus.allocateRenderable;
 import static legend.game.Menus.loadMenuTexture;
-import static legend.game.Menus.renderablePtr_800bdba4;
-import static legend.game.Menus.renderablePtr_800bdba8;
+import static legend.game.Menus.leftArrowRenderable_800bdba4;
+import static legend.game.Menus.rightArrowRenderable_800bdba8;
 import static legend.game.Menus.uiFile_800bdc3c;
 import static legend.game.Menus.unloadRenderable;
 import static legend.game.Scus94491BpeSegment.simpleRand;
@@ -121,6 +114,15 @@ import static legend.game.Text.textZ_800bdf00;
 import static legend.game.combat.Battle.seed_800fa754;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
+import static legend.game.sound.Audio.copyPlayingSounds;
+import static legend.game.sound.Audio.playMenuSound;
+import static legend.game.sound.Audio.playMusicPackage;
+import static legend.game.sound.Audio.playingSoundsBackup_800bca78;
+import static legend.game.sound.Audio.queuedSounds_800bd110;
+import static legend.game.sound.Audio.stopAndResetSoundsAndSequences;
+import static legend.game.sound.Audio.stopMusicSequence;
+import static legend.game.sound.Audio.unloadSoundFile;
+import static legend.game.types.CharacterData2c.IN_PARTY;
 import static legend.lodmod.LodGoods.BLUE_DRAGOON_SPIRIT;
 import static legend.lodmod.LodGoods.DARK_DRAGOON_SPIRIT;
 import static legend.lodmod.LodGoods.DIVINE_DRAGOON_SPIRIT;
@@ -147,8 +149,10 @@ public final class SItem {
   public static final FontOptions UI_WHITE = new FontOptions().colour(TextColour.WHITE);
   public static final FontOptions UI_WHITE_CENTERED = new FontOptions().colour(TextColour.WHITE).horizontalAlign(HorizontalAlign.CENTRE);
   public static final FontOptions UI_WHITE_SMALL = new FontOptions().colour(TextColour.WHITE).size(0.67f);
+  public static final FontOptions UI_WHITE_SHADOWED = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.BLACK).horizontalAlign(HorizontalAlign.CENTRE);
+  public static final FontOptions UI_WHITE_SHADOWED_RIGHT = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.BLACK).horizontalAlign(HorizontalAlign.RIGHT);
 
-  public static int shopId_8007a3b4;
+  public static RegistryId shopId_8007a3b4;
   public static final int EQUIPMENT_MAX_AMOUNT = 255;
 
   public static final RegistryDelegate<Good>[] characterDragoonIndices_800c6e68 = new RegistryDelegate[10];
@@ -291,16 +295,6 @@ public final class SItem {
     "Albert", "Meru", "Kongol", "Miranda",
   };
 
-  public static final MenuGlyph06[] glyphs_80114510 = {
-    new MenuGlyph06(69, 0, 0),
-    new MenuGlyph06(70, 192, 0),
-    new MenuGlyph06(96, 40, 56),
-    new MenuGlyph06(97, 146, 16),
-    new MenuGlyph06(91, 16, 123),
-    new MenuGlyph06(91, 194, 123),
-    new MenuGlyph06(98, 16, 172),
-    new MenuGlyph06(99, 192, 172),
-  };
   public static final MenuGlyph06[] glyphs_80114548 = {
     new MenuGlyph06(69, 0, 0),
     new MenuGlyph06(70, 192, 0),
@@ -336,8 +330,6 @@ public final class SItem {
   };
 
   public static int characterCount_8011d7c4;
-
-  public static boolean canSave_8011dc88;
 
   @ScriptDescription("Gets the maximum number of items a player can carry")
   @ScriptParam(direction = ScriptParam.Direction.OUT, type = ScriptParam.Type.INT, name = "size")
@@ -493,42 +485,37 @@ public final class SItem {
   }
 
   @Method(0x80022928L)
-  public static int getUnlockedDragoonSpells(final int[] spellIndicesOut, final int charIndex) {
+  public static void getUnlockedDragoonSpells(final IntList spellIndices, final int charIndex) {
     //LAB_80022940
-    for(int spellIndex = 0; spellIndex < 8; spellIndex++) {
-      spellIndicesOut[spellIndex] = -1;
-    }
+    spellIndices.clear();
 
     if(charIndex == -1) {
       //LAB_80022a08
-      return 0;
+      return;
     }
 
     // Hardcoded Divine Dragoon spells
     if(charIndex == 0 && gameState_800babc8.goods_19c.has(DIVINE_DRAGOON_SPIRIT)) {
-      spellIndicesOut[0] = 9;
-      spellIndicesOut[1] = 4;
-      return 2;
+      spellIndices.add(9);
+      spellIndices.add(4);
+      return;
     }
 
     //LAB_80022994
     //LAB_80022998
     //LAB_800229d0
-    int spellCount = 0;
     for(int dlevel = 0; dlevel < stats_800be5f8[charIndex].dlevel_0f + 1; dlevel++) {
       final MagicStuff08 spellStuff = magicStuff_80111d20[charIndex][dlevel];
       final int spellIndex = spellStuff.spellIndex_02;
 
       if(spellIndex != -1) {
-        spellIndicesOut[spellCount] = spellIndex;
-        spellCount++;
+        spellIndices.add(spellIndex);
       }
 
       //LAB_800229e8
     }
 
     //LAB_80022a00
-    return spellCount;
   }
 
   @Method(0x80022a10L)
@@ -819,7 +806,7 @@ public final class SItem {
   }
 
   @Method(0x800239e0L)
-  public static <T extends InventoryEntry> void setInventoryFromDisplay(final List<MenuEntryStruct04<T>> display, final List<T> out, final int count) {
+  public static <T extends InventoryEntry<?>> void setInventoryFromDisplay(final List<MenuEntryStruct04<T>> display, final List<T> out, final int count) {
     out.clear();
 
     //LAB_800239ec
@@ -848,18 +835,18 @@ public final class SItem {
     setInventoryFromDisplay(display, items, count);
   }
 
-  public static <T extends InventoryEntry> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items, final List<String> retailSorting) {
+  public static <T extends InventoryEntry<?>> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items, final List<String> retailSorting) {
     display.sort(menuItemIconComparator(retailSorting, InventoryEntry::getRegistryId));
     sortItems(items);
   }
 
   @Method(0x80023a2cL)
-  public static <T extends InventoryEntry> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items) {
+  public static <T extends InventoryEntry<?>> void sortItems(final List<MenuEntryStruct04<T>> display, final List<T> items) {
     display.sort(menuItemIconComparator());
     sortItems(items);
   }
 
-  public static <T extends InventoryEntry> List<T> sortItems(final List<T> list) {
+  public static <T extends InventoryEntry<?>> List<T> sortItems(final List<T> list) {
     final Comparator<T> comparator = Comparator
       .comparingInt((T item) -> item.getIcon().resolve().icon)
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
@@ -893,13 +880,13 @@ public final class SItem {
     return list.stream().sorted(comparator).collect(Collectors.toList());
   }
 
-  public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemIconComparator() {
+  public static <T extends InventoryEntry<?>> Comparator<MenuEntryStruct04<T>> menuItemIconComparator() {
     return Comparator
       .comparingInt((MenuEntryStruct04<T> item) -> item.item_00.getIcon().resolve().icon)
       .thenComparing(item -> I18n.translate(item.getNameTranslationKey()));
   }
 
-  public static <T extends InventoryEntry> Comparator<MenuEntryStruct04<T>> menuItemIconComparator(final List<String> retailSorting, final Function<T, RegistryId> idExtractor) {
+  public static <T extends InventoryEntry<?>> Comparator<MenuEntryStruct04<T>> menuItemIconComparator(final List<String> retailSorting, final Function<T, RegistryId> idExtractor) {
     final boolean retail = true; //CONFIG.getConfig(ITEM_GROUP_SORT_MODE.get()) == ItemGroupSortMode.RETAIL;
 
     Comparator<MenuEntryStruct04<T>> comparator = Comparator.comparingInt(item -> item.item_00.getIcon().resolve().icon);
@@ -960,9 +947,14 @@ public final class SItem {
 
   @Method(0x8002a6fcL)
   public static void clearCharacterStats() {
+    clearCharacterStats(stats_800be5f8);
+  }
+
+  @Method(0x8002a6fcL)
+  public static void clearCharacterStats(final ActiveStatsa0[] activeStats) {
     //LAB_8002a730
     for(int charIndex = 0; charIndex < 9; charIndex++) {
-      final ActiveStatsa0 stats = stats_800be5f8[charIndex];
+      final ActiveStatsa0 stats = activeStats[charIndex];
 
       stats.xp_00 = 0;
       stats.hp_04 = 0;
@@ -1008,7 +1000,7 @@ public final class SItem {
       stats.dragoonDefence_74 = 0;
       stats.dragoonMagicDefence_75 = 0;
 
-      clearEquipmentStats(charIndex);
+      clearEquipmentStats(activeStats, charIndex);
 
 //      stats.addition_00_9c = 0;
       stats.additionSpMultiplier_9e = 0;
@@ -1019,8 +1011,8 @@ public final class SItem {
   }
 
   @Method(0x8002a86cL)
-  public static void clearEquipmentStats(final int charIndex) {
-    final ActiveStatsa0 stats = stats_800be5f8[charIndex];
+  public static void clearEquipmentStats(final ActiveStatsa0[] activeStats, final int charIndex) {
+    final ActiveStatsa0 stats = activeStats[charIndex];
 
     stats.specialEffectFlag_76 = 0;
 //    stats.equipmentType_77 = 0;
@@ -1125,14 +1117,7 @@ public final class SItem {
   public static void stopMenuMusic() {
     //LAB_8001e044
     //LAB_8001e0f8
-    if(loadingNewGameState_800bdc34) {
-      if(engineState_8004dd20 == EngineStateEnum.WORLD_MAP_08 && gameState_800babc8.isOnWorldMap_4e4) {
-        sssqResetStuff();
-        unloadSoundFile(8);
-        loadedAudioFiles_800bcf78.updateAndGet(val -> val | 0x80);
-        loadDrgnDir(0, 5850, files -> musicPackageLoadedCallback(files, 5850, true));
-      }
-    } else {
+    if(!loadingNewGameState_800bdc34) {
       //LAB_8001e160
       stopMusicSequence();
       unloadSoundFile(8);
@@ -1147,7 +1132,7 @@ public final class SItem {
   }
 
   @Method(0x801033ccL)
-  public static void FUN_801033cc(final Renderable58 a0) {
+  public static void initArrowRenderable(final Renderable58 a0) {
     a0.deallocationGroup_28 = 0x1;
     a0.heightScale_38 = 0;
     a0.widthScale = 0;
@@ -1160,7 +1145,7 @@ public final class SItem {
 
     final Renderable58 newRenderable = allocateUiElement(108, 111, renderable.x_40, renderable.y_44);
     newRenderable.flags_00 |= Renderable58.FLAG_DELETE_AFTER_ANIMATION;
-    FUN_801033cc(newRenderable);
+    initArrowRenderable(newRenderable);
   }
 
   @Method(0x80103444L)
@@ -1182,44 +1167,39 @@ public final class SItem {
   }
 
   @Method(0x801034ccL)
-  public static void FUN_801034cc(final int charSlot, final int charCount) {
-    FUN_801034cc(charSlot, charCount, 0, false);
-  }
-
-  @Method(0x801034ccL)
-  public static void FUN_801034cc(final int charSlot, final int charCount, final int yOffset, final boolean hide) {
-    setRandomRepeatGlyph(renderablePtr_800bdba4, 0x2d, 0x34, 0xaa, 0xb1);
-    setRandomRepeatGlyph(renderablePtr_800bdba8, 0x25, 0x2c, 0xa2, 0xa9);
+  public static void addLeftRightArrows(final int charSlot, final int charCount, final int yOffset, final boolean hide) {
+    setRandomRepeatGlyph(leftArrowRenderable_800bdba4, 0x2d, 0x34, 0xaa, 0xb1);
+    setRandomRepeatGlyph(rightArrowRenderable_800bdba8, 0x25, 0x2c, 0xa2, 0xa9);
 
     if(charSlot != 0 && !hide) {
-      if(renderablePtr_800bdba4 == null) {
+      if(leftArrowRenderable_800bdba4 == null) {
         final Renderable58 renderable = allocateUiElement(0x6f, 0x6c, 18, 16 + yOffset);
         renderable.repeatStartGlyph_18 = 0x2d;
         renderable.repeatEndGlyph_1c = 0x34;
-        renderablePtr_800bdba4 = renderable;
-        FUN_801033cc(renderable);
+        leftArrowRenderable_800bdba4 = renderable;
+        initArrowRenderable(renderable);
       }
     } else {
       //LAB_80103578
-      if(renderablePtr_800bdba4 != null) {
-        fadeOutArrow(renderablePtr_800bdba4);
-        renderablePtr_800bdba4 = null;
+      if(leftArrowRenderable_800bdba4 != null) {
+        fadeOutArrow(leftArrowRenderable_800bdba4);
+        leftArrowRenderable_800bdba4 = null;
       }
     }
 
     //LAB_80103598
     if(charSlot < charCount - 1 && !hide) {
-      if(renderablePtr_800bdba8 == null) {
+      if(rightArrowRenderable_800bdba8 == null) {
         final Renderable58 renderable = allocateUiElement(0x6f, 0x6c, 350, 16 + yOffset);
         renderable.repeatStartGlyph_18 = 0x25;
         renderable.repeatEndGlyph_1c = 0x2c;
-        renderablePtr_800bdba8 = renderable;
-        FUN_801033cc(renderable);
+        rightArrowRenderable_800bdba8 = renderable;
+        initArrowRenderable(renderable);
       }
       //LAB_801035e8
-    } else if(renderablePtr_800bdba8 != null) {
-      fadeOutArrow(renderablePtr_800bdba8);
-      renderablePtr_800bdba8 = null;
+    } else if(rightArrowRenderable_800bdba8 != null) {
+      fadeOutArrow(rightArrowRenderable_800bdba8);
+      rightArrowRenderable_800bdba8 = null;
     }
     //LAB_80103604
   }
@@ -1294,6 +1274,11 @@ public final class SItem {
     return renderable;
   }
 
+  public static Renderable58 allocateManualUiElement(final int startGlyph, final int endGlyph, final int x, final int y) {
+    final Renderable58 renderable = allocateManualRenderable(uiFile_800bdc3c.uiElements_0000(), null);
+    return allocateUiElement(renderable, startGlyph, endGlyph, x, y);
+  }
+
   @Method(0x80103910L)
   public static Renderable58 renderCharacterPortrait(final int charId, final int x, final int y, final int flags) {
     final Renderable58 renderable = allocateRenderable(uiFile_800bdc3c.itemIcons_c6a4(), null);
@@ -1342,11 +1327,11 @@ public final class SItem {
       secondaryCharIds_800bdbf8[slot] = -1;
       characterIndices_800bdbb8[slot] = -1;
 
-      if((gameState_800babc8.charData_32c[slot].partyFlags_04 & 0x1) != 0) {
+      if((gameState_800babc8.charData_32c[slot].partyFlags_04 & IN_PARTY) != 0) {
         characterIndices_800bdbb8[characterCount_8011d7c4] = slot;
         characterCount_8011d7c4++;
 
-        if(gameState_800babc8.charIds_88[0] != slot && gameState_800babc8.charIds_88[1] != slot && gameState_800babc8.charIds_88[2] != slot) {
+        if(!gameState_800babc8.charIds_88.contains(slot)) {
           secondaryCharIds_800bdbf8[usedCharacterSlots] = slot;
           usedCharacterSlots++;
         }
@@ -1459,12 +1444,15 @@ public final class SItem {
       }
 
       if(a0 == 0) {
-        for(int i = 0; i < characterCount_8011d7c4; i++) {
+        for(int i = 0; i < gameState_800babc8.charIds_88.size(); i++) {
           for(final EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
-            if(gameState_800babc8.charData_32c[characterIndices_800bdbb8[i]].equipment_14.get(equipmentSlot) != null) {
-              final Equipment equipment = gameState_800babc8.charData_32c[characterIndices_800bdbb8[i]].equipment_14.get(equipmentSlot);
+            final int charId = gameState_800babc8.charIds_88.getInt(i);
+            final CharacterData2c character = gameState_800babc8.charData_32c[charId];
+
+            if(character.equipment_14.get(equipmentSlot) != null) {
+              final Equipment equipment = character.equipment_14.get(equipmentSlot);
               final MenuEntryStruct04<Equipment> menuEntry = new MenuEntryStruct04<>(equipment);
-              menuEntry.flags_02 = 0x3000 | characterIndices_800bdbb8[i];
+              menuEntry.flags_02 = 0x3000 | charId;
               equipments.add(menuEntry);
 
               equipmentIndex++;
@@ -1490,7 +1478,7 @@ public final class SItem {
       final Addition addition = additionDelegate.get();
       final CharacterAdditionStats additionStats = charData.additionStats.get(addition.getRegistryId());
 
-      if(additionStats.unlocked) {
+      if(additionStats.unlockState.isUsable()) {
         additions.add(addition);
       }
     }
@@ -1507,14 +1495,14 @@ public final class SItem {
     for(final RegistryDelegate<Addition> additionDelegate : CHARACTER_ADDITIONS[charId]) {
       final Addition addition = additionDelegate.get();
       final CharacterAdditionStats additionStats = charData.additionStats.computeIfAbsent(addition.getRegistryId(), k -> new CharacterAdditionStats());
-      final boolean wasUnlocked = additionStats.unlocked;
 
-      additionStats.unlocked = additionStats.unlocked || addition.isUnlocked(charData, additionStats);
+      if(additionStats.unlockState.isUnlockable() && addition.isUnlocked(gameState_800babc8, charData, additionStats)) {
+        final AdditionUnlockEvent event = EVENTS.postEvent(new AdditionUnlockEvent(charData, additionStats, addition));
 
-      EVENTS.postEvent(new AdditionUnlockEvent(charData, additionStats, addition));
-
-      if(additionStats.unlocked && !wasUnlocked) {
-        newlyUnlocked = addition;
+        if(!event.isCanceled()) {
+          newlyUnlocked = addition;
+          additionStats.unlockState = UnlockState.UNLOCKED;
+        }
       }
     }
 
@@ -1532,11 +1520,11 @@ public final class SItem {
   }
 
   @Method(0x80104b60L)
-  public static void FUN_80104b60(final Renderable58 a0) {
-    a0.deallocationGroup_28 = 0x1;
-    a0.widthScale = 0;
-    a0.heightScale_38 = 0;
-    a0.z_3c = 35;
+  public static void initHighlight(final Renderable58 glyph) {
+    glyph.deallocationGroup_28 = 0x1;
+    glyph.widthScale = 0;
+    glyph.heightScale_38 = 0;
+    glyph.z_3c = 35;
   }
 
   @Method(0x80104b7cL)
@@ -2081,6 +2069,7 @@ public final class SItem {
   public static void renderCharacterStats(final int charIndex, @Nullable final Equipment equipment, final boolean allocate) {
     if(charIndex != -1) {
       final ActiveStatsa0 statsTmp;
+      final ActiveStatsa0 stats = stats_800be5f8[charIndex];
 
       if(equipment != null) {
         final Map<EquipmentSlot, Equipment> oldEquipment = new EnumMap<>(gameState_800babc8.charData_32c[charIndex].equipment_14);
@@ -2090,7 +2079,7 @@ public final class SItem {
         loadCharacterStats();
 
         //LAB_80108694
-        statsTmp = new ActiveStatsa0(stats_800be5f8[charIndex]);
+        statsTmp = new ActiveStatsa0(stats);
 
         //LAB_801086e8
         gameState_800babc8.charData_32c[charIndex].equipment_14.clear();
@@ -2100,11 +2089,10 @@ public final class SItem {
       } else {
         //LAB_80108720
         //LAB_80108740
-        statsTmp = new ActiveStatsa0(stats_800be5f8[charIndex]);
+        statsTmp = new ActiveStatsa0(stats);
       }
 
       //LAB_80108770
-      final ActiveStatsa0 stats = stats_800be5f8[charIndex];
       renderThreeDigitNumberComparison( 58, 116, stats.bodyAttack_6a, statsTmp.bodyAttack_6a);
       renderThreeDigitNumberComparison( 90, 116, stats.equipmentAttack_88, statsTmp.equipmentAttack_88);
       renderThreeDigitNumberComparison(122, 116, stats.bodyAttack_6a + stats.equipmentAttack_88, statsTmp.bodyAttack_6a + statsTmp.equipmentAttack_88);
@@ -2346,12 +2334,13 @@ public final class SItem {
         if(messageBox.type_15 == 2 || messageBox.type_15 == 1) {
           //LAB_8010ef10
           if(messageBox.highlightRenderable_04 == null) {
-            renderable = allocateUiElement(125, 125, messageBox.x_1c + 45, messageBox.menuIndex_18 * 12 + y + 5);
-            messageBox.highlightRenderable_04 = renderable;
-            renderable.heightScale_38 = 0;
-            renderable.widthScale = 0;
-            messageBox.highlightRenderable_04.z_3c = 31;
+            messageBox.highlightRenderable_04 = new Highlight();
+            messageBox.highlightRenderable_04.setSize(Math.max(DEFAULT_FONT.textWidth(messageBox.yes), DEFAULT_FONT.textWidth(messageBox.no)) + 12, DEFAULT_FONT.textHeight(messageBox.yes));
+            messageBox.highlightRenderable_04.setPos(messageBox.x_1c + 60 - messageBox.highlightRenderable_04.getWidth() / 2, messageBox.menuIndex_18 * messageBox.highlightRenderable_04.getHeight() + y + 5);
+            messageBox.highlightRenderable_04.setZ(31);
           }
+
+          messageBox.highlightRenderable_04.render(messageBox.highlightRenderable_04.getX(), messageBox.highlightRenderable_04.getY() + 2);
 
           //LAB_8010ef64
           textZ_800bdf00 = 30;
@@ -2368,7 +2357,8 @@ public final class SItem {
         messageBox.state_0c = 5;
 
         if(messageBox.highlightRenderable_04 != null) {
-          unloadRenderable(messageBox.highlightRenderable_04);
+          messageBox.highlightRenderable_04.delete();
+          messageBox.highlightRenderable_04 = null;
         }
 
         //LAB_8010f084
@@ -2433,12 +2423,18 @@ public final class SItem {
   @Method(0x80110030L)
   public static void loadCharacterStats() {
     clearCharacterStats();
+    loadCharacterStats(gameState_800babc8, stats_800be5f8);
+  }
+
+  @Method(0x80110030L)
+  public static void loadCharacterStats(final GameState52c gameState, final ActiveStatsa0[] activeStats) {
+    clearCharacterStats(activeStats);
 
     //LAB_80110174
     for(int charId = 0; charId < 9; charId++) {
-      final ActiveStatsa0 stats = stats_800be5f8[charId];
+      final ActiveStatsa0 stats = activeStats[charId];
 
-      final CharacterData2c charData = gameState_800babc8.charData_32c[charId];
+      final CharacterData2c charData = gameState.charData_32c[charId];
 
       final CharacterStatsEvent statsEvent = EVENTS.postEvent(new CharacterStatsEvent(charId));
 
@@ -2488,14 +2484,14 @@ public final class SItem {
       }
 
       //LAB_8011042c
-      applyEquipmentStats(charId);
+      applyEquipmentStats(activeStats, charId);
 
       final int v0 = dragoonGoodsBits_800fbd08[charId];
-      if(hasDragoon(gameState_800babc8.goods_19c, charId)) {
+      if(hasDragoon(gameState.goods_19c, charId)) {
         stats.flags_0c |= 0x2000;
 
-        if((gameState_800babc8.characterInitialized_4e6 & 0x1 << v0) == 0) {
-          gameState_800babc8.characterInitialized_4e6 |= 0x1 << v0;
+        if((gameState.characterInitialized_4e6 & 0x1 << v0) == 0) {
+          gameState.characterInitialized_4e6 |= 0x1 << v0;
 
           stats.mp_06 = statsEvent.maxMp;
           stats.maxMp_6e = statsEvent.maxMp;
@@ -2508,15 +2504,15 @@ public final class SItem {
       }
 
       //LAB_801104f8
-      if(charId == 0 && gameState_800babc8.goods_19c.has(DIVINE_DRAGOON_SPIRIT)) {
+      if(charId == 0 && gameState.goods_19c.has(DIVINE_DRAGOON_SPIRIT)) {
         stats.flags_0c |= 0x6000;
 
-        stats.dlevel_0f = gameState_800babc8.charData_32c[0].dlevel_13;
+        stats.dlevel_0f = gameState.charData_32c[0].dlevel_13;
 
         final int a1 = dragoonGoodsBits_800fbd08[0];
 
-        if((gameState_800babc8.characterInitialized_4e6 & 0x1 << a1) == 0) {
-          gameState_800babc8.characterInitialized_4e6 |= 0x1 << a1;
+        if((gameState.characterInitialized_4e6 & 0x1 << a1) == 0) {
+          gameState.characterInitialized_4e6 |= 0x1 << a1;
           stats.mp_06 = statsEvent.maxMp;
           stats.maxMp_6e = statsEvent.maxMp;
         } else {
@@ -2552,10 +2548,10 @@ public final class SItem {
   }
 
   @Method(0x8011085cL)
-  public static void applyEquipmentStats(final int charId) {
-    clearEquipmentStats(charId);
+  public static void applyEquipmentStats(final ActiveStatsa0[] activeStats, final int charId) {
+    clearEquipmentStats(activeStats, charId);
 
-    final ActiveStatsa0 characterStats = stats_800be5f8[charId];
+    final ActiveStatsa0 characterStats = activeStats[charId];
 
     //LAB_801108b0
     for(final EquipmentSlot equipmentSlot : EquipmentSlot.values()) {

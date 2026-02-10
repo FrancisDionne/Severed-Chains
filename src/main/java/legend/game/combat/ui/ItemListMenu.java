@@ -1,6 +1,5 @@
 package legend.game.combat.ui;
 
-import legend.core.Config;
 import legend.core.memory.Method;
 import legend.game.combat.bent.PlayerBattleEntity;
 import legend.game.i18n.I18n;
@@ -26,16 +25,19 @@ import legend.lodmod.items.RecoverStatusItem;
 import legend.lodmod.items.SachetItem;
 import legend.lodmod.items.SignetStoneItem;
 import legend.lodmod.items.TotalVanishingItem;
+import legend.game.ui.UiBox;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.EVENTS;
 import static legend.game.SItem.getInventoryEntryQuantity;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Text.renderText;
+import static legend.lodmod.LodConfig.UI_COLOUR;
 
 public class ItemListMenu extends ListMenu {
   private final FontOptions fontOptions = new FontOptions().colour(TextColour.WHITE);
@@ -66,7 +68,7 @@ public class ItemListMenu extends ListMenu {
       this.fontOptions.colour(TextColour.STATS_YELLOW);
     }
 
-    renderText(I18n.translate(item), x, y, this.fontOptions);
+    renderText(I18n.translate(stack.getNameTranslationKey()), x, y, this.fontOptions);
 
     this.fontOptions.colour(TextColour.WHITE);
 
@@ -106,6 +108,10 @@ public class ItemListMenu extends ListMenu {
 
   @Override
   protected int handleTargeting() {
+    if(this.player_08.item_d4.canTarget(Item.TargetType.INSTANT)) {
+      return 2;
+    }
+
     //TODO
     return this.hud.handleTargeting(this.player_08.item_d4.canTarget(Item.TargetType.ALLIES) ? 0 : 1, this.player_08.item_d4.canTarget(Item.TargetType.ALL));
   }
@@ -190,7 +196,7 @@ public class ItemListMenu extends ListMenu {
           this.description = new UiBox("Battle UI Item Description", 44, 156, 232, 14);
         }
 
-        this.description.render(Config.changeBattleRgb() ? Config.getBattleRgb() : Config.defaultUiColour);
+        this.description.render(CONFIG.getConfig(UI_COLOUR.get()));
 
         this.fontOptions.trim(0);
         this.fontOptions.horizontalAlign(HorizontalAlign.CENTRE);

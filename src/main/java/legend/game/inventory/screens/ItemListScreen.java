@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 import static legend.core.GameEngine.CONFIG;
-import static legend.game.Audio.playMenuSound;
+import static legend.game.sound.Audio.playMenuSound;
 import static legend.game.FullScreenEffects.startFadeEffect;
 import static legend.game.Menus.deallocateRenderables;
 import static legend.game.SItem.EQUIPMENT_MAX_AMOUNT;
@@ -143,7 +143,7 @@ public class ItemListScreen extends MenuScreen {
     FooterActionsHud.renderMenuActions(FooterActions.DISCARD, FooterActions.SORT, null);
   }
 
-  private <T extends InventoryEntry> void showDiscardMenu(final ItemList<T> list, final List<T> inv, final boolean isItem) {
+  private <T extends InventoryEntry<?>> void showDiscardMenu(final ItemList<T> list, final List<T> inv, final boolean isItem) {
     if(((list.getSelectedItem().flags_02 & 0x2000) != 0)) {
       playMenuSound(40);
     } else {
@@ -159,7 +159,7 @@ public class ItemListScreen extends MenuScreen {
     }
   }
 
-  private <T extends InventoryEntry> void discard(final MessageBoxResults result, final ItemList<T> list, final List<T> inv) {
+  private <T extends InventoryEntry<?>> void discard(final MessageBoxResults result, final ItemList<T> list, final List<T> inv) {
     if(result.messageBoxResult == MessageBoxResult.YES) {
       final InventoryEntry entry = (InventoryEntry)list.getSelectedItem().item_00;
 

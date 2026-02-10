@@ -1,6 +1,7 @@
 package legend.lodmod.items;
 
 import legend.game.combat.bent.BattleEntity27c;
+import legend.game.i18n.I18n;
 import legend.game.inventory.ItemIcon;
 import legend.game.inventory.ItemStack;
 import legend.game.inventory.UseItemResponse;
@@ -52,22 +53,17 @@ public class CharmPotionItem extends BattleItem {
 
     if(currentEngineState_8004dd04 instanceof final WMap wmap) {
       //LAB_80022e40
-      response._00 = 8;
       wmap.encounterAccumulator_800c6ae8 = 0;
     } else if(currentEngineState_8004dd04 instanceof final SMap smap && smap.submap.hasEncounters()) {
-      response._00 = 8;
       smap.encounterAccumulator_800c6ae8 = 0;
-    } else {
-      //LAB_80022e50
-      response._00 = 9;
     }
 
-    response.value_04 = 0;
+    response.success(I18n.translate(this.getTranslationKey("use")));
   }
 
   @Override
   protected int getUseItemScriptEntrypoint() {
-    return 2;
+    return 34;
   }
 
   @Override

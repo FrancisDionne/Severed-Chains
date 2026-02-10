@@ -36,7 +36,11 @@ public abstract class Item extends RegistryEntry {
     return this.getTranslationKey("battle_description");
   }
 
-  public int getPrice(final ItemStack stack) {
+  public int getBuyPrice(final ItemStack stack) {
+    return this.price * 2;
+  }
+
+  public int getSellPrice(final ItemStack stack) {
     return this.price;
   }
 
@@ -142,5 +146,7 @@ public abstract class Item extends RegistryEntry {
     ALLIES,
     ENEMIES,
     ALL,
+    // Instant use, does not allow selecting target
+    INSTANT,
   }
 }

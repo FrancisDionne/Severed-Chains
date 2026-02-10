@@ -37,7 +37,7 @@ public class SmokeBallItem extends BattleItem {
 
   @Override
   protected int getUseItemScriptEntrypoint() {
-    return 9;
+    return 41;
   }
 
   @Override

@@ -147,6 +147,7 @@ public class RenderEngine {
   final FloatBuffer scissorBuffer = BufferUtils.createFloatBuffer(4);
   private final FloatBuffer clutAnimationBuffer = BufferUtils.createFloatBuffer(2 * 2 * 1024); // 2 sets of 2 vectors
   private int clutAnimationBufferIndex;
+  private boolean frameSkip = true;
 
   public static final ShaderType<SimpleShaderOptions> SIMPLE_SHADER = new ShaderType<>(
     options -> loadShader("simple", "simple", options),
@@ -723,11 +724,16 @@ public class RenderEngine {
           this.scissorStack.reset();
         }
 
-        if(this.frameSkipIndex == Config.getGameSpeedMultiplier() - 1) {
-          this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
-        }
+        if(this.frameSkip) {
+          if(this.frameSkipIndex == Config.getGameSpeedMultiplier() - 1) {
+            this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
+          }
 
-        this.frameSkipIndex = (this.frameSkipIndex + 1) % Config.getGameSpeedMultiplier();
+          this.frameSkipIndex = (this.frameSkipIndex + 1) % Config.getGameSpeedMultiplier();
+        } else {
+          this.renderBufferIndex = (this.renderBufferIndex + 1) % RENDER_BUFFER_COUNT;
+          this.frameSkipIndex = 0;
+        }
 
         final long frameTime = System.nanoTime() - this.lastFrame;
         this.lastFrame = System.nanoTime();
@@ -843,8 +849,8 @@ public class RenderEngine {
           entry.render(null, layer);
         }
 
-        // First pass of translucency rendering - renders opaque pixels with translucency bit not set for translucent primitives (only applies to emulated VRAM)
-        if(!entry.texturesUsed && entry.hasTranslucency(layer)) {
+        // First pass of translucency rendering - renders opaque pixels with translucency bit not set for translucent primitives (note: does not apply to 24bpp textures)
+        if(entry.hasTranslucency(layer)) {
           for(int translucencyIndex = 0; translucencyIndex < Translucency.FOR_RENDERING.length; translucencyIndex++) {
             final Translucency translucency = Translucency.FOR_RENDERING[translucencyIndex];
 
@@ -887,7 +893,7 @@ public class RenderEngine {
       final QueuedModel<?, ?> entry = pool.get(i);
 
       if(entry.hasTranslucency()) {
-        entry.useShader(modelIndex, entry.texturesUsed ? 0 : 2); // Don't discard if we aren't using the emulated VRAM texture
+        entry.useShader(modelIndex, 2);
         this.state.enableDepthTest(entry.translucentDepthComparator);
 
         this.state.scissor(entry, this.scissorBuffer, this.scissorUniform);
@@ -1073,8 +1079,8 @@ public class RenderEngine {
   }
 
   private final Comparator<QueuedModel<?, ?>> perspectiveTranslucencySorter = Comparator.comparingDouble((QueuedModel<?, ?> model) -> model.modelView.m32() + model.screenspaceOffset.z).reversed().thenComparingInt(model -> model.sequence);
-  private final Comparator<QueuedModel<?, ?>> orthoTranslucencySorter = Comparator.comparingDouble((QueuedModel<?, ?> model) -> model.transforms.m32() + model.screenspaceOffset.z).reversed().thenComparingInt(model -> model.sequence);
-  private final Comparator<QueuedModel<?, ?>> orthoTranslucencySorter1 = (a, b) -> {
+
+  private final Comparator<QueuedModel<?, ?>> orthoTranslucencySorter = (a, b) -> {
     final float depthA = a.transforms.m32() + a.screenspaceOffset.z;
     final float depthB = b.transforms.m32() + b.screenspaceOffset.z;
 
@@ -1098,7 +1104,7 @@ public class RenderEngine {
   }
 
   private void sortOrthoPool(final QueuePool<QueuedModel<?, ?>> pool) {
-    pool.sort(this.orthoTranslucencySorter1);
+    pool.sort(this.orthoTranslucencySorter);
   }
 
   public <T extends QueuedModel<?, ?>> T queueModel(final Obj obj, final Class<T> type) {
@@ -1402,5 +1408,9 @@ public class RenderEngine {
   public static FlowControl scriptGetRenderAspectMultiplier(final RunningScript<?> script) {
     script.params_20[0].set((int)(RENDERER.getRenderAspectRatio() / RENDERER.getNativeAspectRatio() * 0x1000));
     return FlowControl.CONTINUE;
+  }
+
+  public void setFrameSkipOption(final boolean frameSkip) {
+    this.frameSkip = frameSkip;
   }
 }
