@@ -6,6 +6,7 @@ import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.inventory.screens.controls.Background;
 import legend.game.inventory.screens.controls.Button;
+import legend.game.inventory.screens.controls.Label;
 import legend.game.modding.coremod.CoreMod;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigCollection;
