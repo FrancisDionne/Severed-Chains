@@ -3,10 +3,9 @@ package legend.game.inventory.screens;
 import legend.core.MathHelper;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
-import legend.game.combat.ui.FooterActionsHud;
 import legend.game.additions.Addition;
 import legend.game.additions.CharacterAdditionStats;
-import legend.game.i18n.I18n;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.types.CharacterData2c;
 import legend.game.types.Renderable58;
 import org.legendofdragoon.modloader.registries.RegistryId;
@@ -146,15 +145,15 @@ public class AdditionsScreen extends MenuScreen {
         final Addition addition = this.additions.get(i);
         final int y = this.getAdditionSlotY(i);
 
-        renderText(I18n.translate(addition), 33, y - 2, !addition.getRegistryId().equals(selectedAddition) ? UI_TEXT : UI_TEXT_SELECTED);
+        renderText(addition.getName(), 33, y - 2, !addition.getRegistryId().equals(selectedAddition) ? UI_TEXT : UI_TEXT_SELECTED);
 
         if(allocate) {
           final CharacterAdditionStats additionStats = charData.additionStats.get(addition.getRegistryId());
           final int level = additionStats.level + 1;
           renderThreeDigitNumber(197, y, level);
-          renderThreeDigitNumber(230, y, addition.getHitCount(charData, additionStats));
-          renderThreeDigitNumber(263, y, addition.getSp(charData, additionStats));
-          renderThreeDigitNumber(297, y, addition.getDamage(charData, additionStats));
+          renderThreeDigitNumber(230, y, addition.getHitCount(gameState_800babc8, charData, additionStats));
+          renderThreeDigitNumber(263, y, addition.getSp(gameState_800babc8, charData, additionStats));
+          renderThreeDigitNumber(297, y, addition.getDamage(gameState_800babc8, charData, additionStats));
           renderThreeDigitNumber(322, y, additionStats.xp);
 
           if(level < 5) {

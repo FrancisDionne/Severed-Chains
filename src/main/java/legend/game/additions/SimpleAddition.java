@@ -1,6 +1,7 @@
 package legend.game.additions;
 
 import legend.game.types.CharacterData2c;
+import legend.game.types.GameState52c;
 
 public abstract class SimpleAddition extends Addition {
   public final int baseDamage;
@@ -14,38 +15,38 @@ public abstract class SimpleAddition extends Addition {
   }
 
   @Override
-  public int getDamage(final CharacterData2c charData, final CharacterAdditionStats additionStats) {
-    return (int)(this.baseDamage * this.getDamageMultiplier(charData, additionStats));
+  public int getDamage(final GameState52c gameState, final CharacterData2c charData, final CharacterAdditionStats additionStats) {
+    return (int)(this.baseDamage * this.getDamageMultiplier(gameState, charData, additionStats));
   }
 
   @Override
-  public int getSp(final CharacterData2c charData, final CharacterAdditionStats additionStats) {
+  public int getSp(final GameState52c gameState, final CharacterData2c charData, final CharacterAdditionStats additionStats) {
     int sp = 0;
 
     for(int hit = 0; hit < this.hits.length; hit++) {
       sp += this.hits[hit].sp_05;
     }
 
-    return (int)(sp * this.getSpMultiplier(charData, additionStats));
+    return (int)(sp * this.getSpMultiplier(gameState, charData, additionStats));
   }
 
   @Override
-  public float getDamageMultiplier(final CharacterData2c charData, final CharacterAdditionStats additionStats) {
+  public float getDamageMultiplier(final GameState52c gameState, final CharacterData2c charData, final CharacterAdditionStats additionStats) {
     return this.levelMultipliers[additionStats.level].damage;
   }
 
   @Override
-  public float getSpMultiplier(final CharacterData2c charData, final CharacterAdditionStats additionStats) {
+  public float getSpMultiplier(final GameState52c gameState, final CharacterData2c charData, final CharacterAdditionStats additionStats) {
     return this.levelMultipliers[additionStats.level].sp;
   }
 
   @Override
-  public int getHitCount(final CharacterData2c charData, final CharacterAdditionStats additionStats) {
+  public int getHitCount(final GameState52c gameState, final CharacterData2c charData, final CharacterAdditionStats additionStats) {
     return this.hits.length;
   }
 
   @Override
-  public AdditionHitProperties10 getHit(final CharacterData2c charData, final CharacterAdditionStats additionStats, final int index) {
+  public AdditionHitProperties10 getHit(final GameState52c gameState, final CharacterData2c charData, final CharacterAdditionStats additionStats, final int index) {
     return this.hits[index];
   }
 
@@ -56,6 +57,15 @@ public abstract class SimpleAddition extends Addition {
     public LevelMultipliers(final float damage, final float sp) {
       this.damage = damage;
       this.sp = sp;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if(!(obj instanceof final LevelMultipliers other)) {
+        return false;
+      }
+
+      return this.damage == other.damage && this.sp == other.sp;
     }
   }
 }

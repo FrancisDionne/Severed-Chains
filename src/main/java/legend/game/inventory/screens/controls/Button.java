@@ -93,7 +93,7 @@ public class Button extends Control {
   }
 
   @Override
-  protected void hoverIn() {
+  public void hoverIn() {
     super.hoverIn();
     if(!this.forceHighlightStyle) {
       this.hover.show();
@@ -101,7 +101,7 @@ public class Button extends Control {
   }
 
   @Override
-  protected void hoverOut() {
+  public void hoverOut() {
     if(!this.forceHighlightStyle) {
       this.hover.hide();
     }

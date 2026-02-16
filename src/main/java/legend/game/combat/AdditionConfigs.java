@@ -18,6 +18,7 @@ import java.util.HashMap;
 
 import static legend.core.GameEngine.CONFIG;
 import static legend.core.GameEngine.REGISTRIES;
+import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 
 public final class AdditionConfigs {
   public static HashMap<String, SimpleAddition> additionHits;
@@ -32,8 +33,8 @@ public final class AdditionConfigs {
     for(final RegistryId a : GameEngine.REGISTRIES.additions) {
       final Addition addition = GameEngine.REGISTRIES.additions.getEntry(a).get();
       System.out.println(a.entryId());
-      for(int i = 0; i < addition.getHitCount(null, null); i++) {
-        final AdditionHitProperties10 hit = addition.getHit(null, null, i);
+      for(int i = 0; i < addition.getHitCount(null, null, null); i++) {
+        final AdditionHitProperties10 hit = addition.getHit(null, null, null, i);
         System.out.println(hit.toString());
         for(final AdditionSound sound : hit.sounds) {
           System.out.println(sound.soundIndex + "," + sound.initialDelay);
@@ -135,9 +136,9 @@ public final class AdditionConfigs {
 
   public static AdditionHitProperties10 getHit(final CharacterData2c charData, final CharacterAdditionStats additionStats, final int hitNum) {
     if(fc) {
-      return additionHits.get(charData.selectedAddition_19.entryId()).getHit(charData, additionStats, hitNum);
+      return additionHits.get(charData.selectedAddition_19.entryId()).getHit(gameState_800babc8, charData, additionStats, hitNum);
     }
-    return REGISTRIES.additions.getEntry(charData.selectedAddition_19).get().getHit(charData, additionStats, hitNum);
+    return REGISTRIES.additions.getEntry(charData.selectedAddition_19).get().getHit(gameState_800babc8, charData, additionStats, hitNum);
   }
 
   private static AdditionHitProperties10[] createAdditionHitPropertiesArray(final int hitCount) {

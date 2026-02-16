@@ -43,7 +43,7 @@ public class AdditionNameTextEffect1c implements ScriptedObject {
   }
 
   public static String getAdditionName(final Addition addition) {
-    String additionName = I18n.translate(addition);
+    String additionName = addition.getName();
     if(AdditionOverlaysEffect44.additionResults != null && AdditionOverlaysEffect44.additionResults.flawless) {
       additionName += '+';
     }
