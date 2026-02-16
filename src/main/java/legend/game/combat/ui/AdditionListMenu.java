@@ -1,7 +1,6 @@
 package legend.game.combat.ui;
 
 import legend.core.Config;
-import legend.game.combat.AdditionConfigs;
 import legend.game.additions.Addition;
 import legend.game.additions.CharacterAdditionStats;
 import legend.game.combat.bent.PlayerBattleEntity;
@@ -12,15 +11,12 @@ import legend.game.inventory.screens.TextColour;
 import legend.game.scripting.RunningScript;
 import legend.game.types.ActiveStatsa0;
 import legend.game.types.CharacterData2c;
-import org.legendofdragoon.modloader.registries.RegistryDelegate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static legend.game.SItem.loadAdditions;
 import static legend.game.SItem.loadCharacterStats;
-import static legend.game.Scus94491BpeSegment_8004.CHARACTER_ADDITIONS;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 import static legend.game.Scus94491BpeSegment_800b.stats_800be5f8;
 import static legend.game.Text.renderText;
@@ -34,17 +30,15 @@ public class AdditionListMenu extends ListMenu {
   private final List<Addition> menuAdditions = new ArrayList<>();
 
   public AdditionListMenu(final BattleHud hud, final PlayerBattleEntity activePlayer, final ListPosition lastPosition, final Runnable onClose) {
-    super(hud, activePlayer, 186, modifyLastPosition(activePlayer, lastPosition), onClose);
+    super(hud, activePlayer, 186, lastPosition, onClose);
     loadAdditions(activePlayer.charId_272, this.menuAdditions);
-  }
 
-  private static ListPosition modifyLastPosition(final PlayerBattleEntity player, final ListPosition lastPosition) {
-    final CharacterData2c charData = gameState_800babc8.charData_32c[player.charId_272];
+    final CharacterData2c charData = gameState_800babc8.charData_32c[activePlayer.charId_272];
 
     int index = 0;
-    for(int i = 0; i < CHARACTER_ADDITIONS[player.charId_272].length; i++) {
-      final RegistryDelegate<Addition> additionDelegate = CHARACTER_ADDITIONS[player.charId_272][i];
-      if(additionDelegate.getId().equals(charData.selectedAddition_19)) {
+    for(int i = 0; i < this.menuAdditions.size(); i++) {
+      final Addition additionDelegate = this.menuAdditions.get(i);
+      if(additionDelegate.getRegistryId().equals(charData.selectedAddition_19)) {
         index = i;
       }
     }
@@ -56,8 +50,6 @@ public class AdditionListMenu extends ListMenu {
       lastPosition.lastListIndex_26 = index;
       lastPosition.lastListScroll_28 = 0;
     }
-
-    return lastPosition;
   }
 
   @Override
@@ -68,7 +60,7 @@ public class AdditionListMenu extends ListMenu {
   @Override
   protected void drawListEntry(final int index, final int x, final int y, final int trim) {
     final CharacterData2c charData = gameState_800babc8.charData_32c[this.player_08.charId_272];
-    final CharacterAdditionStats additionStats = charData.additionStats.get(CHARACTER_ADDITIONS[this.player_08.charId_272][index].getId());
+    final CharacterAdditionStats additionStats = charData.additionStats.get(this.menuAdditions.get(index).getRegistryId());
 
     this.fontOptions.trim(trim);
     this.fontOptions.horizontalAlign(HorizontalAlign.LEFT);
@@ -95,7 +87,7 @@ public class AdditionListMenu extends ListMenu {
 
   @Override
   protected void onUse(final int index) {
-    setAddition(this.player_08, index, this.hud);
+    setAddition(this.player_08, this.menuAdditions.get(index), this.hud);
     this.flags_02 &= ~0x8;
     this.menuState_00 = 8;
   }
@@ -115,24 +107,11 @@ public class AdditionListMenu extends ListMenu {
 
   }
 
-  public static HashMap<Integer, Addition> getAdditions(final int charId){
-    final HashMap<Integer, Addition> additions = new HashMap<>();
-    final CharacterData2c charData = gameState_800babc8.charData_32c[charId];
-    for(int additionSlot = 0; additionSlot < CHARACTER_ADDITIONS[charId].length; additionSlot++) {
-      final Addition addition = CHARACTER_ADDITIONS[charId][additionSlot].get();
-      final CharacterAdditionStats additionStats = charData.additionStats.get(addition.getRegistryId());
-      if(addition.isUnlocked(gameState_800babc8, charData, additionStats)) {
-        additions.put(additionSlot, addition);
-      }
-    }
-    return additions;
-  }
-
-  public static void setAddition(final PlayerBattleEntity player, final int index, final BattleHud hud) {
+  public static void setAddition(final PlayerBattleEntity player, final Addition addition, final BattleHud hud) {
     final ActiveStatsa0 stats = stats_800be5f8[player.charId_272];
     final CharacterData2c charData = gameState_800babc8.charData_32c[player.charId_272];
     player.combatant_144.mrg_04 = null;
-    charData.selectedAddition_19 = CHARACTER_ADDITIONS[player.charId_272][index].getId();
+    charData.selectedAddition_19 = addition.getRegistryId();
     loadCharacterStats();
     player.additionSpMultiplier_11a = stats.additionSpMultiplier_9e;
     player.additionDamageMultiplier_11c = stats.additionDamageMultiplier_9f;

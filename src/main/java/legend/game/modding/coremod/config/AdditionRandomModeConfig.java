@@ -3,7 +3,6 @@ package legend.game.modding.coremod.config;
 import legend.core.Random;
 import legend.game.additions.Addition;
 import legend.game.additions.CharacterAdditionStats;
-import legend.game.combat.ui.AdditionListMenu;
 import legend.game.saves.BoolConfigEntry;
 import legend.game.saves.ConfigCategory;
 import legend.game.saves.ConfigStorageLocation;
@@ -11,10 +10,9 @@ import legend.game.types.CharacterData2c;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
-import static legend.game.Scus94491BpeSegment_8004.CHARACTER_ADDITIONS;
+import static legend.game.SItem.loadAdditions;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
 
 public class AdditionRandomModeConfig extends BoolConfigEntry {
@@ -22,8 +20,10 @@ public class AdditionRandomModeConfig extends BoolConfigEntry {
     super(false, ConfigStorageLocation.CAMPAIGN, ConfigCategory.CHALLENGES, 3);
   }
 
-  public static int getRandomAddition(final int charId) {
-    final HashMap<Integer, Addition> additions = AdditionListMenu.getAdditions(charId);
+  public static Addition getRandomAddition(final int charId) {
+    final List<Addition> additions = new ArrayList<>();
+    loadAdditions(charId, additions);
+
     int additionIndex = -1;
 
     if(additions.size() > 1) {
@@ -32,8 +32,8 @@ public class AdditionRandomModeConfig extends BoolConfigEntry {
       final boolean balancedOdds = new Random().nextInt(100) < 70;
       int highestXp = 0;
 
-      for(int additionSlot = 0; additionSlot < CHARACTER_ADDITIONS[charId].length; additionSlot++) {
-        final Addition addition = CHARACTER_ADDITIONS[charId][additionSlot].get();
+      for(int additionSlot = 0; additionSlot < additions.size(); additionSlot++) {
+        final Addition addition = additions.get(additionSlot);
         final CharacterAdditionStats additionStats = charData.additionStats.get(addition.getRegistryId());
         bag.add(new RandomAdditionBagEntry(additionSlot, additionStats.xp));
         highestXp = Math.max(highestXp, additionStats.xp);
@@ -73,7 +73,7 @@ public class AdditionRandomModeConfig extends BoolConfigEntry {
         currentWeight += entry.weight;
       }
     }
-    return additionIndex;
+    return additionIndex != -1 ? additions.get(additionIndex) : null;
   }
 
   private static class RandomAdditionBagEntry {
