@@ -56,7 +56,7 @@ public class BattlePreloadedEntities_18cb0 {
     //LAB_800c74fc
     final CharacterData2c charData = gameState_800babc8.charData_32c[gameState_800babc8.charIds_88[charSlot]];
     final CharacterAdditionStats additionStats = charData.additionStats.get(charData.selectedAddition_19);
-    return REGISTRIES.additions.getEntry(charData.selectedAddition_19).get().getHitCount(charData, additionStats);
+    return REGISTRIES.additions.getEntry(charData.selectedAddition_19).get().getHitCount(gameState_800babc8, charData, additionStats);
   }
 
   @Method(0x800c7488L)

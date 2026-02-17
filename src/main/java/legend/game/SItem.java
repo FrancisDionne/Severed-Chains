@@ -9,16 +9,16 @@ import legend.core.opengl.Obj;
 import legend.core.opengl.QuadBuilder;
 import legend.game.additions.Addition;
 import legend.game.additions.CharacterAdditionStats;
+import legend.game.additions.UnlockState;
 import legend.game.combat.types.EnemyDrop;
 import legend.game.i18n.I18n;
 import legend.game.inventory.EquipItemResult;
 import legend.game.inventory.Equipment;
-import legend.game.inventory.InventoryEntry;
-import legend.game.inventory.Item;
 import legend.game.inventory.Good;
 import legend.game.inventory.GoodsInventory;
 import legend.game.inventory.Inventory;
-import legend.game.inventory.ItemGroupSortMode;
+import legend.game.inventory.InventoryEntry;
+import legend.game.inventory.Item;
 import legend.game.inventory.ItemIcon;
 import legend.game.inventory.ItemStack;
 import legend.game.inventory.OverflowMode;
@@ -71,6 +71,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1485,13 +1486,22 @@ public final class SItem {
     checkForNewlyUnlockedAddition(charId);
 
     final CharacterData2c charData = gameState_800babc8.charData_32c[charId];
+    final Set<RegistryId> seen = new HashSet<>();
 
     for(final RegistryDelegate<Addition> additionDelegate : CHARACTER_ADDITIONS[charId]) {
       final Addition addition = additionDelegate.get();
       final CharacterAdditionStats additionStats = charData.additionStats.get(addition.getRegistryId());
 
-      if(additionStats.unlocked) {
+      if(additionStats.unlockState.isUsable()) {
         additions.add(addition);
+      }
+
+      seen.add(additionDelegate.getId());
+    }
+
+    for(final var entry : charData.additionStats.entrySet()) {
+      if(!seen.contains(entry.getKey()) && entry.getValue().unlockState.isUsable()) {
+        additions.add(REGISTRIES.additions.getEntry(entry.getKey()).get());
       }
     }
   }
@@ -1507,14 +1517,14 @@ public final class SItem {
     for(final RegistryDelegate<Addition> additionDelegate : CHARACTER_ADDITIONS[charId]) {
       final Addition addition = additionDelegate.get();
       final CharacterAdditionStats additionStats = charData.additionStats.computeIfAbsent(addition.getRegistryId(), k -> new CharacterAdditionStats());
-      final boolean wasUnlocked = additionStats.unlocked;
 
-      additionStats.unlocked = additionStats.unlocked || addition.isUnlocked(charData, additionStats);
+      if(additionStats.unlockState.isUnlockable() && addition.isUnlocked(gameState_800babc8, charData, additionStats)) {
+        final AdditionUnlockEvent event = EVENTS.postEvent(new AdditionUnlockEvent(charData, additionStats, addition));
 
-      EVENTS.postEvent(new AdditionUnlockEvent(charData, additionStats, addition));
-
-      if(additionStats.unlocked && !wasUnlocked) {
-        newlyUnlocked = addition;
+        if(!event.isCanceled()) {
+          newlyUnlocked = addition;
+          additionStats.unlockState = UnlockState.UNLOCKED;
+        }
       }
     }
 

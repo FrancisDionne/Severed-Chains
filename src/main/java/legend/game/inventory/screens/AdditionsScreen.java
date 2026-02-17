@@ -3,9 +3,9 @@ package legend.game.inventory.screens;
 import legend.core.MathHelper;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
-import legend.game.combat.ui.FooterActionsHud;
 import legend.game.additions.Addition;
 import legend.game.additions.CharacterAdditionStats;
+import legend.game.combat.ui.FooterActionsHud;
 import legend.game.i18n.I18n;
 import legend.game.types.CharacterData2c;
 import legend.game.types.Renderable58;
@@ -23,6 +23,7 @@ import static legend.game.Menus.unloadRenderable;
 import static legend.game.SItem.FUN_801034cc;
 import static legend.game.SItem.FUN_80104b60;
 import static legend.game.SItem.UI_TEXT;
+import static legend.game.SItem.UI_TEXT_CENTERED;
 import static legend.game.SItem.UI_TEXT_SELECTED;
 import static legend.game.SItem.additionGlyphs_801141e4;
 import static legend.game.SItem.allocateUiElement;
@@ -46,8 +47,6 @@ import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_RIGHT;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_UP;
 
 public class AdditionsScreen extends MenuScreen {
-  private static final String Addition_cannot_be_used_8011c340 = "Additions cannot be used";
-
   private int loadingStage;
   private double scrollAccumulator;
   private final Runnable unload;
@@ -127,7 +126,7 @@ public class AdditionsScreen extends MenuScreen {
     final int charIndex = characterIndices_800bdbb8[charSlot];
 
     if(additions.isEmpty()) {
-      renderText(Addition_cannot_be_used_8011c340, 106, 150, UI_TEXT);
+      renderText(I18n.translate("lod_core.ui.additions.no_additions"), this.getWidth() / 2.0f, 150, UI_TEXT_CENTERED);
     } else {
       if(allocate) {
         renderGlyphs(additionGlyphs_801141e4, 0, 0);
@@ -146,15 +145,15 @@ public class AdditionsScreen extends MenuScreen {
         final Addition addition = this.additions.get(i);
         final int y = this.getAdditionSlotY(i);
 
-        renderText(I18n.translate(addition), 33, y - 2, !addition.getRegistryId().equals(selectedAddition) ? UI_TEXT : UI_TEXT_SELECTED);
+        renderText(addition.getName(), 33, y - 2, !addition.getRegistryId().equals(selectedAddition) ? UI_TEXT : UI_TEXT_SELECTED);
 
         if(allocate) {
           final CharacterAdditionStats additionStats = charData.additionStats.get(addition.getRegistryId());
           final int level = additionStats.level + 1;
           renderThreeDigitNumber(197, y, level);
-          renderThreeDigitNumber(230, y, addition.getHitCount(charData, additionStats));
-          renderThreeDigitNumber(263, y, addition.getSp(charData, additionStats));
-          renderThreeDigitNumber(297, y, addition.getDamage(charData, additionStats));
+          renderThreeDigitNumber(230, y, addition.getHitCount(gameState_800babc8, charData, additionStats));
+          renderThreeDigitNumber(263, y, addition.getSp(gameState_800babc8, charData, additionStats));
+          renderThreeDigitNumber(297, y, addition.getDamage(gameState_800babc8, charData, additionStats));
           renderThreeDigitNumber(322, y, additionStats.xp);
 
           if(level < 5) {
@@ -176,7 +175,12 @@ public class AdditionsScreen extends MenuScreen {
   private void scroll(final int scroll) {
     playMenuSound(1);
     this.charSlot = scroll;
-    unloadRenderable(this.additionHighlight);
+
+    if(this.additionHighlight != null) {
+      unloadRenderable(this.additionHighlight);
+      this.additionHighlight = null;
+    }
+
     this.loadingStage = 1;
   }
 
