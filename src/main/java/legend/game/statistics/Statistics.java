@@ -520,8 +520,9 @@ public final class Statistics {
     }
   }
 
-  public static void appendStat(final int charId, final Stats stat, final float value) {
+  public static void appendStat(int charId, final Stats stat, final float value) {
     if(value != 0) {
+      charId = charId == 9 ? 0 : charId; //Convert Divine Dragoon to Dart
       final int statIndex = Math.abs(stat.asInt()) + charId + 1;
       appendStat(Stats.asStat(statIndex), value);
     }
