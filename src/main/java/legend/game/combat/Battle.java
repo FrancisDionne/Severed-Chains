@@ -98,6 +98,7 @@ import legend.game.combat.ui.BattleAction;
 import legend.game.combat.ui.BattleActionTickFlowControl;
 import legend.game.combat.ui.BattleHud;
 import legend.game.combat.ui.BattleMenuStruct58;
+import legend.game.debugger.CombatDebuggerController;
 import legend.game.inventory.Equipment;
 import legend.game.inventory.EquipmentAttackType;
 import legend.game.inventory.ItemStack;
@@ -2164,6 +2165,10 @@ public class Battle extends EngineState<Battle> {
     }
 
     this.initPlayerBattleEntityStats();
+
+    if (CombatDebuggerController.autoPunchingBagMode) {
+      CombatDebuggerController.punchingBagMode();
+    }
 
     this.loadingStage++;
   }
