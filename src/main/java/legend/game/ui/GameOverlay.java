@@ -40,16 +40,27 @@ public final class GameOverlay {
     }
   }
 
+  public static void addNotification(final int seconds, final TextComponent text, final boolean isEphemeral) {
+    synchronized(notifications) {
+      notifications.addLast(new Notification(System.nanoTime() + seconds * 1_000_000_000L, text, isEphemeral));
+    }
+  }
+
   public static void drawNotifications() {
     synchronized(notifications) {
       final float x = 4.0f - RENDERER.getWidescreenOrthoOffsetX();
       float y = 4.0f;
 
+      for(int i = notifications.size() - 1; i > -1; i--) {
+        final Notification notif = notifications.get(i);
+        if(notif.isFinished() || (notif.isEphemeral && i + 1 < notifications.size())) {
+          notifications.remove(i);
+        }
+      }
+
       for(int i = 0; i < notifications.size(); i++) {
         y += notifications.get(i).draw(x, y);
       }
-
-      notifications.removeIf(Notification::isFinished);
     }
   }
 }

@@ -10,10 +10,16 @@ import static legend.game.Text.renderText;
 public class Notification {
   public final long expiration;
   public final TextComponent text;
+  public final boolean isEphemeral;
 
   public Notification(final long expiration, final TextComponent text) {
+    this(expiration, text, false);
+  }
+
+  public Notification(final long expiration, final TextComponent text, final boolean isEphemeral) {
     this.expiration = expiration;
     this.text = text;
+    this.isEphemeral = isEphemeral;
   }
 
   public float draw(final float x, final float y) {

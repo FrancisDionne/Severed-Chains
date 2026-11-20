@@ -219,6 +219,18 @@ lod_core.ui.item_list.discard=Discard
 lod_core.ui.item_list.back=Back
 lod_core.ui.item_list.discard_confirm=Discard %s?
 
+lod_core.ui.equip_screen.sort_text=Sort:
+lod_core.ui.equip_screen.sort_alpha=Alpha
+lod_core.ui.equip_screen.sort_power=Power
+lod_core.ui.equip_screen.sort_icon=Icon
+lod_core.ui.equip_screen.filter_text=Filter:
+lod_core.ui.equip_screen.filter_all=All
+lod_core.ui.equip_screen.filter_weapon=Weapon
+lod_core.ui.equip_screen.filter_helmet=Helmet
+lod_core.ui.equip_screen.filter_armour=Armor
+lod_core.ui.equip_screen.filter_boots=Boots
+lod_core.ui.equip_screen.filter_accessory=Accessory
+
 lod_core.ui.goods.goods=Goods
 
 lod_core.ui.additions.training=Practice

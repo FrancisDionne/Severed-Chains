@@ -2,6 +2,7 @@ package legend.game.inventory.screens;
 
 import legend.core.MathHelper;
 import legend.core.lang.I18nText;
+import legend.core.lang.RawText;
 import legend.core.memory.Method;
 import legend.core.platform.input.InputAction;
 import legend.core.platform.input.InputMod;
@@ -14,6 +15,7 @@ import legend.game.types.EquipmentSlot;
 import legend.game.types.MenuEntries;
 import legend.game.types.MenuEntryStruct04;
 import legend.game.types.Renderable58;
+import legend.game.ui.GameOverlay;
 
 import java.util.Set;
 
@@ -441,6 +443,7 @@ public class EquipmentScreen extends MenuScreen {
     if(!silent) {
       playMenuSound(2);
       this.loadingStage = 2;
+      this.setFooterHint(0);
     }
   }
 
@@ -460,6 +463,7 @@ public class EquipmentScreen extends MenuScreen {
     this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
     this.equipmentCount = this.getEquippableItemsForCharacter(characterIndices_800bdbb8.getInt(this.charSlot));
     this.slotScroll = Math.clamp(this.slotScroll, 0, Math.max(0, this.equipmentCount - 4));
+    this.setFooterHint(1);
   }
 
   private void menuUnequip() {
@@ -573,5 +577,27 @@ public class EquipmentScreen extends MenuScreen {
     }
 
     return InputPropagation.PROPAGATE;
+  }
+
+  private void setFooterHint(final int type) {
+    String text = "";
+    if(type == 0) {
+      text = I18n.translate("lod_core.ui.equip_screen.sort_text") + ' ';
+      if(this.sort == 0) {
+        text += I18n.translate("lod_core.ui.equip_screen.sort_alpha");
+      } else if(this.sort == 1) {
+        text += I18n.translate("lod_core.ui.equip_screen.sort_power");
+      } else if(this.sort == 2) {
+        text += I18n.translate("lod_core.ui.equip_screen.sort_icon");
+      }
+    } else if(type == 1) {
+      text = I18n.translate("lod_core.ui.equip_screen.filter_text") + ' ';
+      if(this.filter == null) {
+        text += I18n.translate("lod_core.ui.equip_screen.filter_all");
+      } else {
+        text += I18n.translate("lod_core.ui.equip_screen.filter_" + this.filter.name().toLowerCase());
+      }
+    }
+    GameOverlay.addNotification(2, new RawText(text), true);
   }
 }
