@@ -37,6 +37,8 @@ import static legend.game.SItem.sortEquipmentInventory;
 import static legend.game.SItem.takeEquipment;
 import static legend.game.Scus94491BpeSegment_800b.characterIndices_800bdbb8;
 import static legend.game.Scus94491BpeSegment_800b.gameState_800babc8;
+import static legend.game.Text.renderText;
+import static legend.game.Text.textZ_800bdf00;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BACK;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_BOTTOM;
 import static legend.game.modding.coremod.CoreMod.INPUT_ACTION_MENU_CONFIRM;
@@ -75,12 +77,17 @@ public class EquipmentScreen extends MenuScreen {
   private boolean allowWrapX = true;
   private boolean allowWrapY = true;
 
+  private int footerHintFrames;
+  private int footerHintType;
+  private final FontOptions footerHintFont = new FontOptions().colour(TextColour.WHITE).shadowColour(TextColour.BLACK).size(1.2f).horizontalAlign(HorizontalAlign.RIGHT);
+
   private final MenuEntries<Equipment> menuItems = new MenuEntries<>();
 
   public EquipmentScreen(final Runnable unload) {
     this.unload = unload;
     this.filter = null;
     this.sort = -1;
+    this.footerHintFrames = 0;
 
     this.characterCard = this.addControl(new CharacterCard());
     this.characterCard.setPos(8, 20);
@@ -142,6 +149,7 @@ public class EquipmentScreen extends MenuScreen {
           }
         }
 
+        this.renderFooterHint();
         break;
 
       // Fade out
@@ -441,6 +449,7 @@ public class EquipmentScreen extends MenuScreen {
     if(!silent) {
       playMenuSound(2);
       this.loadingStage = 2;
+      this.setFooterHint(0);
     }
   }
 
@@ -460,6 +469,7 @@ public class EquipmentScreen extends MenuScreen {
     this.itemHighlight.y_44 = this.menuHighlightPositionY(this.selectedSlot);
     this.equipmentCount = this.getEquippableItemsForCharacter(characterIndices_800bdbb8.getInt(this.charSlot));
     this.slotScroll = Math.clamp(this.slotScroll, 0, Math.max(0, this.equipmentCount - 4));
+    this.setFooterHint(1);
   }
 
   private void menuUnequip() {
@@ -573,5 +583,39 @@ public class EquipmentScreen extends MenuScreen {
     }
 
     return InputPropagation.PROPAGATE;
+  }
+
+  private void setFooterHint(final int type) {
+    this.footerHintFrames = 125;
+    this.footerHintType = type;
+  }
+
+  private void renderFooterHint() {
+    if(this.footerHintFrames > 0) {
+      String text = "";
+      if(this.footerHintType == 0) {
+        text = I18n.translate("lod_core.ui.equip_screen.sort_text") + ' ';
+        if(this.sort == 0) {
+          text += I18n.translate("lod_core.ui.equip_screen.sort_alpha");
+        } else if(this.sort == 1) {
+          text += I18n.translate("lod_core.ui.equip_screen.sort_power");
+        } else if(this.sort == 2) {
+          text += I18n.translate("lod_core.ui.equip_screen.sort_icon");
+        }
+      } else if(this.footerHintType == 1) {
+        text = I18n.translate("lod_core.ui.equip_screen.filter_text") + ' ';
+        if(this.filter == null) {
+          text += I18n.translate("lod_core.ui.equip_screen.filter_all");
+        } else {
+          text += I18n.translate("lod_core.ui.equip_screen.filter_" + this.filter.name().toLowerCase());
+        }
+      }
+
+      final int oldZ = textZ_800bdf00;
+      textZ_800bdf00 = 20;
+      renderText(text, 360, 224, this.footerHintFont);
+      textZ_800bdf00 = oldZ;
+      this.footerHintFrames--;
+    }
   }
 }
